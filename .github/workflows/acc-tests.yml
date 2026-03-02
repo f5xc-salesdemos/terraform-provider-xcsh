@@ -489,13 +489,13 @@ jobs:
           cache: true
 
       - name: Download mock test reports
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: mock-test-reports
           path: mock-reports/
 
       - name: Download real API test reports
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: real-api-test-reports
           path: real-reports/
@@ -581,7 +581,7 @@ jobs:
 
     steps:
       - name: Download all reports
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: all-reports/
         continue-on-error: true
