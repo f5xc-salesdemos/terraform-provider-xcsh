@@ -1,0 +1,15 @@
+{
+  "customSets": [
+    {
+      "label": "Guides",
+      "description": "Terraform provider setup and usage guides",
+      "paths": ["guides/**"]
+    },
+    {
+      "label": "Resources",
+      "description": "Terraform resource and data source reference",
+      "paths": ["resources/**", "data-sources/**"]
+    }
+  ],
+  "promote": ["index*", "guides/**"]
+}
