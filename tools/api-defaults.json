@@ -196,9 +196,7 @@
           "namespace": "tf-discover-1764663924"
         },
         "spec": {
-          "as_numbers": [
-            65000
-          ]
+          "as_numbers": [65000]
         }
       },
       "response_got": {
@@ -217,9 +215,7 @@
         "replace_form": null,
         "resource_version": "5197681708",
         "spec": {
-          "as_numbers": [
-            65000
-          ]
+          "as_numbers": [65000]
         },
         "status": [],
         "system_metadata": {
@@ -290,9 +286,7 @@
           "data": [
             {
               "ip_prefix": {
-                "prefix": [
-                  "10.0.0.0/8"
-                ]
+                "prefix": ["10.0.0.0/8"]
               }
             }
           ],
@@ -377,9 +371,7 @@
         },
         "spec": {
           "geoip": {
-            "country": [
-              "US"
-            ]
+            "country": ["US"]
           }
         }
       }
@@ -501,9 +493,7 @@
           "default_route_pools": [],
           "disable_rate_limit": {},
           "disable_waf": {},
-          "domains": [
-            "test.example.com"
-          ],
+          "domains": ["test.example.com"],
           "http": {
             "dns_volterra_managed": true,
             "port": 80
@@ -546,9 +536,7 @@
           "namespace": "tf-discover-1764663924"
         },
         "spec": {
-          "prefix": [
-            "10.0.0.0/8"
-          ]
+          "prefix": ["10.0.0.0/8"]
         }
       },
       "response_got": {
@@ -575,9 +563,7 @@
           ],
           "ipv6_prefix": [],
           "ipv6_prefixes": [],
-          "prefix": [
-            "10.0.0.0/8"
-          ]
+          "prefix": ["10.0.0.0/8"]
         },
         "status": [],
         "system_metadata": {
@@ -953,9 +939,7 @@
         },
         "spec": {
           "advertise_on_public_default_vip": {},
-          "domains": [
-            "test.example.com"
-          ],
+          "domains": ["test.example.com"],
           "listen_port": 8080,
           "origin_pools_weights": [],
           "tcp": {},
@@ -1034,9 +1018,7 @@
         },
         "spec": {
           "site_selector": {
-            "expressions": [
-              "site.name in (ves-io-mia-1)"
-            ]
+            "expressions": ["site.name in (ves-io-mia-1)"]
           },
           "site_type": "REGIONAL_EDGE"
         }
@@ -1058,9 +1040,7 @@
         "resource_version": "5197682268",
         "spec": {
           "site_selector": {
-            "expressions": [
-              "site.name in (ves-io-mia-1)"
-            ]
+            "expressions": ["site.name in (ves-io-mia-1)"]
           },
           "site_type": "REGIONAL_EDGE"
         },
