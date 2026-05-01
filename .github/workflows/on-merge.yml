@@ -490,9 +490,11 @@ jobs:
             --head "$BRANCH_NAME")
 
           PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
-          echo "pr_created=true" >> "$GITHUB_OUTPUT"
-          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
-          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          {
+            echo "pr_created=true"
+            echo "pr_number=$PR_NUMBER"
+            echo "pr_url=$PR_URL"
+          } >> "$GITHUB_OUTPUT"
           echo "Created PR #$PR_NUMBER: $PR_URL"
 
           # Enable auto-merge if available
@@ -547,25 +549,27 @@ jobs:
     steps:
       - name: Print summary
         run: |
-          echo "## On-Merge Workflow Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Step | Result |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|------|--------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Should Process | ${{ needs.detect-changes.outputs.should-process }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Is Bot Commit | ${{ needs.detect-changes.outputs.is-bot-commit }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Needs Regeneration | ${{ needs.detect-changes.outputs.needs-regeneration }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Specs Changed | ${{ needs.detect-changes.outputs.specs-changed }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Code Changed | ${{ needs.detect-changes.outputs.code-changed }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Tools Changed | ${{ needs.detect-changes.outputs.tools-changed }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Functions Changed | ${{ needs.detect-changes.outputs.functions-changed }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Docs Changed | ${{ needs.detect-changes.outputs.docs-changed }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Build/Test | ${{ needs.build-test.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Provider Regenerated | ${{ needs.regenerate-provider.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Docs Regenerated | ${{ needs.regenerate-docs.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Regeneration PR Created | ${{ needs.create-regeneration-pr.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Tagged/Released | ${{ needs.tag-release.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Notify MCP Repo | ${{ needs.notify-mcp-repo.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## On-Merge Workflow Summary"
+            echo ""
+            echo "| Step | Result |"
+            echo "|------|--------|"
+            echo "| Should Process | ${{ needs.detect-changes.outputs.should-process }} |"
+            echo "| Is Bot Commit | ${{ needs.detect-changes.outputs.is-bot-commit }} |"
+            echo "| Needs Regeneration | ${{ needs.detect-changes.outputs.needs-regeneration }} |"
+            echo "| Specs Changed | ${{ needs.detect-changes.outputs.specs-changed }} |"
+            echo "| Code Changed | ${{ needs.detect-changes.outputs.code-changed }} |"
+            echo "| Tools Changed | ${{ needs.detect-changes.outputs.tools-changed }} |"
+            echo "| Functions Changed | ${{ needs.detect-changes.outputs.functions-changed }} |"
+            echo "| Docs Changed | ${{ needs.detect-changes.outputs.docs-changed }} |"
+            echo "| Build/Test | ${{ needs.build-test.result }} |"
+            echo "| Provider Regenerated | ${{ needs.regenerate-provider.result }} |"
+            echo "| Docs Regenerated | ${{ needs.regenerate-docs.result }} |"
+            echo "| Regeneration PR Created | ${{ needs.create-regeneration-pr.result }} |"
+            echo "| Tagged/Released | ${{ needs.tag-release.result }} |"
+            echo "| Notify MCP Repo | ${{ needs.notify-mcp-repo.result }} |"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
           echo "### Delayed Tagging Logic" >> "$GITHUB_STEP_SUMMARY"
           echo "- Bot commits -> Tag immediately (regeneration complete)" >> "$GITHUB_STEP_SUMMARY"
           echo "- Human commits without regeneration -> Tag immediately" >> "$GITHUB_STEP_SUMMARY"
