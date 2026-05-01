@@ -213,8 +213,11 @@ resource "f5xc_namespace" "test" {
 resource "f5xc_aws_vpc_site" "test" {
   depends_on = [f5xc_namespace.test]
 
-  name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  name          = %[2]q
+  namespace     = f5xc_namespace.test.name
+  aws_region    = "us-east-1"
+  instance_type = "t3.xlarge"
+  ssh_key       = "mock-ssh-key"
 }
 `, nsName, name))
 }
@@ -230,8 +233,11 @@ resource "f5xc_namespace" "test" {
 resource "f5xc_aws_vpc_site" "test" {
   depends_on = [f5xc_namespace.test]
 
-  name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  name          = %[2]q
+  namespace     = f5xc_namespace.test.name
+  aws_region    = "us-east-1"
+  instance_type = "t3.xlarge"
+  ssh_key       = "mock-ssh-key"
 
   description = "AWS VPC Site created with mock test"
 
@@ -253,9 +259,12 @@ resource "f5xc_namespace" "test" {
 resource "f5xc_aws_vpc_site" "test" {
   depends_on = [f5xc_namespace.test]
 
-  name        = %[2]q
-  namespace   = f5xc_namespace.test.name
-  description = %[3]q
+  name          = %[2]q
+  namespace     = f5xc_namespace.test.name
+  aws_region    = "us-east-1"
+  instance_type = "t3.xlarge"
+  ssh_key       = "mock-ssh-key"
+  description   = %[3]q
 }
 `, nsName, name, description))
 }
@@ -271,8 +280,11 @@ resource "f5xc_namespace" "test" {
 resource "f5xc_aws_vpc_site" "test" {
   depends_on = [f5xc_namespace.test]
 
-  name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  name          = %[2]q
+  namespace     = f5xc_namespace.test.name
+  aws_region    = "us-east-1"
+  instance_type = "t3.xlarge"
+  ssh_key       = "mock-ssh-key"
 
   labels = {
     environment = "test"

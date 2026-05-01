@@ -14,7 +14,7 @@ DOCS_DIR=docs
 SPEC_DIR?=docs/specifications/api
 
 # API spec source
-ENRICHED_REPO?=robinmordasiewicz/f5xc-api-enriched
+ENRICHED_REPO?=f5xc-salesdemos/api-specs-enriched
 
 # Go commands
 GO=go
@@ -69,13 +69,6 @@ help:
 	@echo "  For SAFE multi-user cleanup, use CleanupTracked() in your test code:"
 	@echo "    defer acctest.CleanupTracked()  // Only deletes resources THIS test created"
 	@echo ""
-	@echo "API Default Discovery (Issue #327):"
-	@echo "  make discover-defaults  - Discover API defaults for all resources"
-	@echo "  make discover-defaults-resource RESOURCE=xxx - Discover for specific resource"
-	@echo "  make validate-defaults  - Validate stored defaults against current API"
-	@echo "  make generate-mock-fixtures - Generate mock fixtures from defaults"
-	@echo "  make discover-all       - Full pipeline: discover → generate → test"
-	@echo ""
 	@echo "Environment Variables:"
 	@echo "  TF_ACC=1           - Enable real acceptance tests"
 	@echo "  F5XC_MOCK_MODE=1   - Enable mock server tests"
@@ -111,12 +104,19 @@ fmt:
 download-specs:
 	@echo "Downloading latest F5 XC API specs..."
 	@mkdir -p $(SPEC_DIR)
-	@LATEST=$$(gh release list --repo $(ENRICHED_REPO) --limit 1 --json tagName --jq '.[0].tagName'); \
+	@LATEST=$$(gh api repos/$(ENRICHED_REPO)/releases --jq '.[0].tag_name'); \
 	echo "Version: $$LATEST"; \
-	curl -sL "https://github.com/$(ENRICHED_REPO)/releases/download/$$LATEST/f5xc-api-specs-$$LATEST.zip" -o /tmp/specs.zip; \
+	ASSET_ID=$$(gh api repos/$(ENRICHED_REPO)/releases --jq \
+		'[.[0].assets[] | select(.name | startswith("f5xc-api-specs"))] | .[0].id'); \
+	gh api repos/$(ENRICHED_REPO)/releases/assets/$$ASSET_ID \
+		-H "Accept: application/octet-stream" > /tmp/specs.zip; \
 	rm -rf $(SPEC_DIR)/*; \
 	unzip -o /tmp/specs.zip -d $(SPEC_DIR); \
 	rm /tmp/specs.zip; \
+	AID=$$(gh api repos/$(ENRICHED_REPO)/releases --jq \
+		'[.[0].assets[] | select(.name=="api-catalog.json")] | .[0].id'); \
+	gh api repos/$(ENRICHED_REPO)/releases/assets/$$AID \
+		-H "Accept: application/octet-stream" > $(SPEC_DIR)/api-catalog.json; \
 	echo "Specs downloaded to $(SPEC_DIR)"
 
 # Generate resources from OpenAPI specs
@@ -125,11 +125,11 @@ generate: generate-schemas
 
 generate-schemas:
 	@echo "Generating schemas from OpenAPI specs..."
-	@if [ -d "$(SPEC_DIR)" ] && ls $(SPEC_DIR)/docs-cloud-f5-com.*.ves-swagger.json 1>/dev/null 2>&1; then \
+	@if [ -d "$(SPEC_DIR)" ] && [ -f "$(SPEC_DIR)/index.json" ] && [ -d "$(SPEC_DIR)/domains" ]; then \
 		$(GO) run $(TOOLS_DIR)/generate-all-schemas.go --spec-dir=$(SPEC_DIR); \
 	else \
-		echo "No OpenAPI specs found in $(SPEC_DIR). Skipping generation."; \
-		echo "To generate, download specs to $(SPEC_DIR) or set SPEC_DIR"; \
+		echo "No v2 OpenAPI specs found in $(SPEC_DIR). Skipping generation."; \
+		echo "Run 'make download-specs' first, or set SPEC_DIR to a directory with index.json + domains/"; \
 	fi
 
 # Generate Terraform documentation
@@ -213,7 +213,7 @@ ci: ci-generate ci-build ci-lint ci-test
 
 ci-generate:
 	@echo "CI: Generating schemas (if specs available)..."
-	@if [ -d "$(SPEC_DIR)" ] && ls $(SPEC_DIR)/docs-cloud-f5-com.*.ves-swagger.json 1>/dev/null 2>&1; then \
+	@if [ -d "$(SPEC_DIR)" ] && [ -f "$(SPEC_DIR)/index.json" ] && [ -d "$(SPEC_DIR)/domains" ]; then \
 		$(GO) run $(TOOLS_DIR)/generate-all-schemas.go --spec-dir=$(SPEC_DIR); \
 	fi
 
@@ -317,84 +317,6 @@ test-report-md:
 clean-test-output:
 	@echo "Cleaning test output files..."
 	rm -f .test-output-*.txt .test-json-*.txt test-report.md test-report.json
-
-# =============================================================================
-# API Default Discovery (Issue #327)
-# =============================================================================
-# These targets help discover and maintain API default values for resources.
-# The discovery process requires VPN access to the F5 XC staging environment.
-#
-# Local Development:
-#   1. Connect to VPN
-#   2. Set environment variables (F5XC_API_URL, F5XC_P12_FILE, F5XC_P12_PASSWORD)
-#   3. Run: make discover-defaults
-#
-# CI/CD Note:
-#   The discover-defaults.yml workflow uses self-hosted runners with VPN access.
-#   Public GitHub runners cannot access the staging environment.
-
-.PHONY: discover-defaults discover-defaults-resource validate-defaults generate-mock-fixtures
-
-# Discover API defaults for all resources
-# Requires: VPN access + F5XC_API_URL + F5XC_P12_FILE + F5XC_P12_PASSWORD
-discover-defaults:
-	@echo "Discovering API defaults for all resources..."
-	@echo "This requires VPN access to the F5 XC staging environment."
-	@echo ""
-	@if [ -z "$$F5XC_API_URL" ]; then \
-		echo "Error: F5XC_API_URL not set"; \
-		echo "Set F5XC_API_URL, F5XC_P12_FILE, and F5XC_P12_PASSWORD"; \
-		exit 1; \
-	fi
-	$(GO) run $(TOOLS_DIR)/discover-defaults.go -all
-	@echo ""
-	@echo "Defaults saved to $(TOOLS_DIR)/api-defaults.json"
-	@echo "Run 'make generate-mock-fixtures' to update mock fixtures"
-
-# Discover API defaults for a specific resource
-# Usage: make discover-defaults-resource RESOURCE=namespace
-discover-defaults-resource:
-	@if [ -z "$(RESOURCE)" ]; then \
-		echo "Error: RESOURCE variable not set"; \
-		echo "Usage: make discover-defaults-resource RESOURCE=namespace"; \
-		exit 1; \
-	fi
-	@if [ -z "$$F5XC_API_URL" ]; then \
-		echo "Error: F5XC_API_URL not set"; \
-		exit 1; \
-	fi
-	$(GO) run $(TOOLS_DIR)/discover-defaults.go -resource=$(RESOURCE)
-
-# Validate stored defaults against current API
-# Compares tools/api-defaults.json against live API responses
-validate-defaults:
-	@echo "Validating stored API defaults..."
-	@if [ -z "$$F5XC_API_URL" ]; then \
-		echo "Error: F5XC_API_URL not set"; \
-		exit 1; \
-	fi
-	$(GO) run $(TOOLS_DIR)/discover-defaults.go -validate
-	@echo "Validation complete"
-
-# Generate mock fixtures from discovered defaults
-# This updates internal/mocks/generated_defaults.go
-generate-mock-fixtures:
-	@echo "Generating mock fixtures from API defaults..."
-	@if [ ! -f "$(TOOLS_DIR)/api-defaults.json" ]; then \
-		echo "Error: $(TOOLS_DIR)/api-defaults.json not found"; \
-		echo "Run 'make discover-defaults' first"; \
-		exit 1; \
-	fi
-	$(GO) run $(TOOLS_DIR)/generate-mock-fixtures.go
-	$(GOFMT) -s -w internal/mocks/generated_defaults.go
-	@echo ""
-	@echo "Mock fixtures updated. Run 'make test' to verify."
-
-# Full discovery pipeline: discover → generate fixtures → test
-discover-all: discover-defaults generate-mock-fixtures test
-	@echo ""
-	@echo "Full discovery pipeline complete"
-	@echo "Review changes and commit if satisfactory"
 
 # =============================================================================
 # Comprehensive Testing (CI/CD Ready)

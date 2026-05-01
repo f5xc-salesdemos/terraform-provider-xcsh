@@ -31,7 +31,6 @@ import (
 	"sort"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/namespace"
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/naming"
@@ -97,6 +96,25 @@ type SchemaDefinition struct {
 	} `json:"x-f5xc-required-for"`
 	XF5XCRecommendedValue     interface{} `json:"x-f5xc-recommended-value"`
 	XF5XCMinimumConfiguration interface{} `json:"x-f5xc-minimum-configuration"`
+
+	// Additional upstream extensions (new in v2.1.62)
+	XVesDeprecated   string            `json:"x-ves-deprecated"`
+	XVesDisplayOrder string            `json:"x-ves-displayorder"`
+	XVesProtoEnum    string            `json:"x-ves-proto-enum"`
+	XVesRequired     string            `json:"x-ves-required"`
+	XRequired        bool              `json:"x-required"`
+	XValidationRules map[string]string `json:"x-validation-rules"`
+
+	// Enrichment — actionable in generation (new in v2.1.62)
+	XF5XCConflictsWith           []string               `json:"x-f5xc-conflicts-with"`
+	XF5XCConstraints             map[string]interface{} `json:"x-f5xc-constraints"`
+	XF5XCRecommendedOneofVariant interface{}            `json:"x-f5xc-recommended-oneof-variant"`
+	XFieldMutability             string                 `json:"x-field-mutability"`
+	XOriginalMaxLength           int                    `json:"x-original-maxLength"`
+
+	// Provenance (new in v2.1.62)
+	XReconciledAt            string `json:"x-reconciled-at"`
+	XReconciledFromDiscovery bool   `json:"x-reconciled-from-discovery"`
 }
 
 type TerraformAttribute struct {
@@ -128,6 +146,10 @@ type TerraformAttribute struct {
 	ValidationRules       map[string]string      // Validation constraints (from x-ves-validation-rules)
 	Complexity            string                 // Complexity rating (from x-f5xc-complexity)
 	UseCases              []string               // Use case scenarios (from x-f5xc-use-cases)
+	DeprecationMessage string   // From x-ves-deprecated
+	ConflictsWith      []string // From x-f5xc-conflicts-with
+	MaxLength          int      // From x-original-maxLength
+	Immutable          bool     // From x-field-mutability == "immutable" or "create-only"
 }
 
 type ResourceTemplate struct {
@@ -150,6 +172,7 @@ type ResourceTemplate struct {
 	UsesInt64PlanModifier  bool   // True if any int64 attribute uses a plan modifier
 	UsesStringPlanModifier bool   // True if any string attribute uses a plan modifier
 	HasBlocks              bool   // True if the resource has any nested blocks
+	HasMaxLengthValidators bool   // True if any attribute has MaxLength > 0
 }
 
 type GenerationResult struct {
@@ -158,70 +181,6 @@ type GenerationResult struct {
 	Error        string
 	AttrCount    int
 	BlockCount   int
-}
-
-// =============================================================================
-// METADATA COLLECTION TYPES (for MCP Server consumption)
-// =============================================================================
-
-// MetadataCollection holds all extracted metadata for JSON output
-type MetadataCollection struct {
-	GeneratedAt string                       `json:"generated_at"`
-	Version     string                       `json:"version"`
-	Resources   map[string]*ResourceMetadata `json:"resources"`
-}
-
-// ResourceMetadata contains complete metadata for a single resource
-type ResourceMetadata struct {
-	Description  string                        `json:"description"`
-	Category     string                        `json:"category,omitempty"`
-	Tier         string                        `json:"tier,omitempty"`
-	ImportFormat string                        `json:"import_format,omitempty"` // "namespace/name" or "name"
-	OneOfGroups  map[string]*OneOfGroupInfo    `json:"oneof_groups,omitempty"`
-	Attributes   map[string]*AttributeMetadata `json:"attributes"`
-	Dependencies *DependencyInfo               `json:"dependencies,omitempty"`
-}
-
-// OneOfGroupInfo represents a mutually exclusive field group
-type OneOfGroupInfo struct {
-	Fields      []string `json:"fields"`
-	Description string   `json:"description,omitempty"`
-	Default     string   `json:"default,omitempty"` // Recommended default field
-}
-
-// AttributeMetadata contains metadata for a single attribute
-type AttributeMetadata struct {
-	Type         string      `json:"type"`
-	Required     bool        `json:"required"`
-	Optional     bool        `json:"optional,omitempty"`
-	Computed     bool        `json:"computed,omitempty"`
-	Sensitive    bool        `json:"sensitive,omitempty"`
-	IsBlock      bool        `json:"is_block,omitempty"`
-	PlanModifier string      `json:"plan_modifier,omitempty"`
-	Validation   string      `json:"validation,omitempty"`
-	Enum         []string    `json:"enum,omitempty"`
-	Default      interface{} `json:"default,omitempty"`
-	OneOfGroup        string      `json:"oneof_group,omitempty"`
-	Description       string      `json:"description"`
-	ServerDefault     bool        `json:"server_default,omitempty"`      // True if server applies default when field is omitted
-	ServerDefaultDesc string      `json:"server_default_desc,omitempty"` // Description of what server default behavior is
-	// Enhanced metadata from enriched API specs
-	MinimumConfigRequired bool              `json:"minimum_config_required,omitempty"` // True if required for minimal config
-	RecommendedValue      interface{}       `json:"recommended_value,omitempty"`       // Suggested value (not enforced)
-	ValidationRules       map[string]string `json:"validation_rules,omitempty"`        // Validation constraints
-	Complexity            string            `json:"complexity,omitempty"`              // Complexity rating
-	UseCases              []string          `json:"use_cases,omitempty"`               // Use case scenarios
-}
-
-// DependencyInfo holds resource relationship information
-type DependencyInfo struct {
-	References   []string `json:"references,omitempty"`    // Resources this resource references
-	ReferencedBy []string `json:"referenced_by,omitempty"` // Resources that reference this
-}
-
-// Global metadata collection (populated during generation)
-var metadataCollection = &MetadataCollection{
-	Resources: make(map[string]*ResourceMetadata),
 }
 
 // Global maps from index.json for resource metadata enrichment
@@ -307,13 +266,6 @@ func main() {
 		generateProviderRegistration(results)
 	}
 
-	// Write metadata files for MCP server
-	if !dryRun {
-		if err := writeMetadataFiles(); err != nil {
-			fmt.Printf("⚠️  Warning: Failed to write metadata files: %v\n", err)
-		}
-	}
-
 	fmt.Println("\n🎉 Batch generation complete!")
 }
 
@@ -327,7 +279,7 @@ func processV2Specs(specDir string) ([]GenerationResult, int, int) {
 	}
 
 	fmt.Printf("📋 Spec version: %s\n", index.Version)
-	fmt.Printf("📋 Generated at: %s\n", index.GeneratedAt)
+	fmt.Printf("📋 Generated at: %s\n", index.Timestamp)
 	fmt.Printf("📄 Found %d domain specifications (v2 format)\n\n", len(index.Specifications))
 
 	// Build global maps from index.json for metadata enrichment
@@ -601,11 +553,6 @@ func generateResourceFromSchema(resourceName string, schemaName string, schema *
 			return GenerationResult{ResourceName: resourceName, Success: false, Error: err.Error()}
 		}
 
-		// Collect metadata for MCP server
-		collectResourceMetadata(resource, category, requiresTier)
-
-		// Collect operation-level metadata from spec (v2.0.33 extensions)
-		collectOperationMetadata(resourceName, apiPath, specFile)
 	}
 
 	fmt.Printf("✅ %s: %d attrs, %d blocks\n", resourceName, attrCount, blockCount)
@@ -901,6 +848,9 @@ func extractResourceSchema(spec *OpenAPI3Spec, resourceName string) (*ResourceTe
 	// AttrTypes (which use attr.Type) are generated for any block with nested attributes
 	hasBlocks := hasNestedModelsWithAttrTypes(attributes)
 
+	// Check for max length validators (including nested attributes)
+	hasMaxLengthValidators := hasMaxLengthValidatorsAny(attributes)
+
 	return &ResourceTemplate{
 		Name:                   resourceName,
 		TitleCase:              toTitleCase(resourceName),
@@ -917,6 +867,7 @@ func extractResourceSchema(spec *OpenAPI3Spec, resourceName string) (*ResourceTe
 		UsesInt64PlanModifier:  usesInt64,
 		UsesStringPlanModifier: usesString,
 		HasBlocks:              hasBlocks,
+		HasMaxLengthValidators: hasMaxLengthValidators,
 	}, nil
 }
 
@@ -932,6 +883,22 @@ func hasNestedModelsWithAttrTypes(attributes []TerraformAttribute) bool {
 			}
 			// Note: Even if NestedAttributes is empty, we don't need to recurse
 			// because empty blocks use EmptyModel which doesn't have AttrTypes
+		}
+	}
+	return false
+}
+
+// hasMaxLengthValidatorsAny recursively checks if any attribute (top-level or nested)
+// has a non-zero MaxLength. This determines whether stringvalidator must be imported.
+func hasMaxLengthValidatorsAny(attributes []TerraformAttribute) bool {
+	for _, attr := range attributes {
+		if attr.MaxLength > 0 {
+			return true
+		}
+		if len(attr.NestedAttributes) > 0 {
+			if hasMaxLengthValidatorsAny(attr.NestedAttributes) {
+				return true
+			}
 		}
 	}
 	return false
@@ -1106,6 +1073,27 @@ func convertToTerraformAttributeWithDepth(name string, schema SchemaDefinition, 
 		ValidationRules:       schema.XVesValidationRules,
 		Complexity:            schema.XF5XCComplexity,
 		UseCases:              schema.XF5XCUseCases,
+		DeprecationMessage:    schema.XVesDeprecated,
+		ConflictsWith:         schema.XF5XCConflictsWith,
+		MaxLength:             schema.XOriginalMaxLength,
+		Immutable:             schema.XFieldMutability == "immutable" || schema.XFieldMutability == "create-only",
+	}
+
+	// Prefer x-validation-rules over x-ves-validation-rules when both present
+	if len(schema.XValidationRules) > 0 {
+		attr.ValidationRules = schema.XValidationRules
+	}
+	// x-required / x-ves-required are additional Required signals, but only
+	// apply at depth 0 (top-level resource spec attributes). For nested
+	// attributes inside optional blocks, Required: true causes Terraform
+	// Plugin Framework to fail validation even when the block is absent.
+	if depth == 0 && (schema.XRequired || schema.XVesRequired == "true") {
+		attr.Required = true
+		attr.Optional = false
+	}
+	// Set PlanModifier for immutable fields (reuses existing template infrastructure)
+	if attr.Immutable && attr.PlanModifier == "" {
+		attr.PlanModifier = "RequiresReplace"
 	}
 
 	// Build description with enrichment extension priority:
@@ -1254,6 +1242,14 @@ func extractNestedAttributes(schema SchemaDefinition, spec *OpenAPI3Spec, depth 
 		return nil
 	}
 
+	// Build the required set from the parent schema's "required" array.
+	// Note: x-required / x-ves-required enrichment overrides are intentionally
+	// restricted to depth 0 (see convertToTerraformAttributeWithDepth) so they
+	// do not cascade here and cause "Missing required argument" errors when the
+	// parent block is omitted from configuration. The OpenAPI spec's own
+	// "required" array at nested levels is preserved here because it reflects
+	// genuine schema constraints (e.g., a sub-object that truly requires certain
+	// fields when the block is present).
 	requiredSet := make(map[string]bool)
 	for _, r := range schema.Required {
 		requiredSet[r] = true
@@ -1265,6 +1261,9 @@ func extractNestedAttributes(schema SchemaDefinition, spec *OpenAPI3Spec, depth 
 		if parentPath != "" {
 			nestedPath = parentPath + "." + propName
 		}
+		// Pass the required status from the parent schema's "required" array.
+		// x-required/x-ves-required overrides are guarded at depth==0 so they
+		// will not fire here.
 		attr := convertToTerraformAttributeWithDepth(propName, propSchema, requiredSet[propName], "", spec, depth, nestedPath)
 
 		// Mark 'namespace', 'tenant', 'uid', and 'kind' fields as Computed in nested Object Reference blocks.
@@ -1352,8 +1351,10 @@ func cleanDescription(desc string, fieldPath string) string {
 
 	// Remove "Required: YES" or "Required: NO" annotations
 	desc = regexp.MustCompile(`\s*Required:\s*(YES|NO)\s*`).ReplaceAllString(desc, " ")
-	// Remove "Exclusive with [xxx]" patterns
-	desc = regexp.MustCompile(`\s*Exclusive with\s*\[[^\]]*\]\s*`).ReplaceAllString(desc, " ")
+	// Note: "Exclusive with [xxx]" patterns are intentionally preserved.
+	// This text is the only documentation hint about conflicting fields until
+	// ConflictsWith validators are rendered. Stripping it removes valuable
+	// user-facing documentation.
 
 	// Normalize generic empty message descriptions to user-friendly text
 	// "Empty. This can be used for messages where no values are needed" → "Enable this option"
@@ -1960,656 +1961,6 @@ func extractOneOfGroups(spec *OpenAPI3Spec, schemaKey string) map[string][]strin
 	}
 
 	return oneOfGroups
-}
-
-// =============================================================================
-// METADATA COLLECTION FUNCTIONS (for MCP Server)
-// =============================================================================
-
-// collectResourceMetadata extracts and stores metadata for a resource
-func collectResourceMetadata(resource *ResourceTemplate, category string, requiresTier string) {
-	if resource == nil {
-		return
-	}
-
-	// Determine tier: prefer resource-level from index.json, fall back to domain-level
-	tier := requiresTier
-	if resourceTier, ok := resourceTierMap[resource.Name]; ok && resourceTier != "" {
-		tier = resourceTier
-	}
-
-	// Determine category: prefer resource-level from index.json, fall back to domain-level
-	cat := category
-	if resourceCat, ok := resourceCategoryMap[resource.Name]; ok && resourceCat != "" {
-		cat = resourceCat
-	}
-
-	// Determine import format based on HasNamespaceInPath
-	importFormat := "name"
-	if resource.HasNamespaceInPath {
-		importFormat = "namespace/name"
-	}
-
-	metadata := &ResourceMetadata{
-		Description:  resource.Description,
-		Category:     cat,
-		Tier:         tier,
-		ImportFormat: importFormat,
-		OneOfGroups:  make(map[string]*OneOfGroupInfo),
-		Attributes:   make(map[string]*AttributeMetadata),
-	}
-
-	// Convert OneOfGroups from ResourceTemplate format to metadata format
-	for groupName, fields := range resource.OneOfGroups {
-		defaultField := determineOneOfDefault(groupName, fields)
-		metadata.OneOfGroups[groupName] = &OneOfGroupInfo{
-			Fields:  fields,
-			Default: defaultField,
-		}
-	}
-
-	// Extract attribute metadata
-	extractAttributeMetadata(resource.Attributes, metadata.Attributes, resource.OneOfGroups)
-
-	// Add dependency information from index.json
-	if deps, ok := resourceDependencyMap[resource.Name]; ok && deps != nil {
-		metadata.Dependencies = &DependencyInfo{
-			References: append(deps.Required, deps.Optional...),
-		}
-	}
-	// Add referenced_by information (reverse dependencies)
-	if referencedBy, ok := resourceReferencedByMap[resource.Name]; ok && len(referencedBy) > 0 {
-		if metadata.Dependencies == nil {
-			metadata.Dependencies = &DependencyInfo{}
-		}
-		metadata.Dependencies.ReferencedBy = referencedBy
-	}
-
-	// Store in global collection
-	metadataCollection.Resources[resource.Name] = metadata
-}
-
-// extractAttributeMetadata recursively extracts metadata from attributes
-func extractAttributeMetadata(attrs []TerraformAttribute, output map[string]*AttributeMetadata, oneOfGroups map[string][]string) {
-	// Build reverse lookup: field -> group name
-	fieldToGroup := make(map[string]string)
-	for groupName, fields := range oneOfGroups {
-		for _, field := range fields {
-			fieldToGroup[field] = groupName
-		}
-	}
-
-	for _, attr := range attrs {
-		attrMeta := &AttributeMetadata{
-			Type:          attr.Type,
-			Required:      attr.Required,
-			Optional:      attr.Optional,
-			Computed:      attr.Computed,
-			Sensitive:     attr.Sensitive,
-			IsBlock:       attr.IsBlock,
-			PlanModifier:  attr.PlanModifier,
-			Description:   attr.Description,
-			ServerDefault: attr.ServerDefault,
-			Default:       attr.Default, // Copy actual default value
-			// Enhanced metadata from enriched API specs
-			MinimumConfigRequired: attr.MinimumConfigRequired,
-			RecommendedValue:      attr.RecommendedValue,
-			ValidationRules:       attr.ValidationRules,
-			Complexity:            attr.Complexity,
-			UseCases:              attr.UseCases,
-		}
-
-		// Add OneOf group reference if applicable
-		if group, ok := fieldToGroup[attr.Name]; ok {
-			attrMeta.OneOfGroup = group
-		}
-
-		// Determine validation type based on field characteristics
-		attrMeta.Validation = inferValidationType(attr)
-
-		output[attr.Name] = attrMeta
-
-		// Note: We don't recursively extract nested attributes to keep the JSON manageable
-		// The descriptions contain constraint hints for nested fields
-	}
-}
-
-// inferValidationType determines the validation pattern name for an attribute
-func inferValidationType(attr TerraformAttribute) string {
-	switch attr.Name {
-	case "name":
-		if attr.UseDomainValidator {
-			return "domain"
-		}
-		return "name"
-	case "namespace":
-		return "name"
-	case "port", "listen_port":
-		return "port"
-	}
-
-	// Check type-based validations
-	if attr.Type == "int64" && strings.Contains(strings.ToLower(attr.Description), "port") {
-		return "port"
-	}
-
-	return ""
-}
-
-// writeMetadataFiles writes the collected metadata to JSON files for MCP server consumption
-func writeMetadataFiles() error {
-	// Create metadata directory
-	metadataDir := filepath.Join("tools", "metadata")
-	if err := os.MkdirAll(metadataDir, 0755); err != nil {
-		return fmt.Errorf("failed to create metadata directory: %w", err)
-	}
-
-	// Set generation metadata
-	metadataCollection.GeneratedAt = time.Now().UTC().Format(time.RFC3339)
-	metadataCollection.Version = "1.0.0"
-
-	// Write resource-metadata.json
-	resourceMetadataPath := filepath.Join(metadataDir, "resource-metadata.json")
-	resourceMetadataJSON, err := json.MarshalIndent(metadataCollection, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal resource metadata: %w", err)
-	}
-	if err := os.WriteFile(resourceMetadataPath, resourceMetadataJSON, 0644); err != nil {
-		return fmt.Errorf("failed to write resource metadata: %w", err)
-	}
-	fmt.Printf("📝 Wrote metadata for %d resources to %s\n", len(metadataCollection.Resources), resourceMetadataPath)
-
-	// Write validation-patterns.json
-	validationPatterns := getValidationPatterns()
-	validationPatternsPath := filepath.Join(metadataDir, "validation-patterns.json")
-	validationPatternsJSON, err := json.MarshalIndent(validationPatterns, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal validation patterns: %w", err)
-	}
-	if err := os.WriteFile(validationPatternsPath, validationPatternsJSON, 0644); err != nil {
-		return fmt.Errorf("failed to write validation patterns: %w", err)
-	}
-	fmt.Printf("📝 Wrote validation patterns to %s\n", validationPatternsPath)
-
-	// Write operations-metadata.json (v2.0.33 operation-level metadata)
-	operationsMetadataCollection.GeneratedAt = time.Now().UTC().Format(time.RFC3339)
-	operationsMetadataCollection.Version = "1.0.0"
-	operationsMetadataPath := filepath.Join(metadataDir, "operations-metadata.json")
-	operationsMetadataJSON, err := json.MarshalIndent(operationsMetadataCollection, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal operations metadata: %w", err)
-	}
-	if err := os.WriteFile(operationsMetadataPath, operationsMetadataJSON, 0644); err != nil {
-		return fmt.Errorf("failed to write operations metadata: %w", err)
-	}
-	fmt.Printf("📝 Wrote operations metadata for %d resources to %s\n", len(operationsMetadataCollection.Resources), operationsMetadataPath)
-
-	return nil
-}
-
-// ValidationPatterns defines validation patterns for MCP server
-type ValidationPatterns struct {
-	Version  string                        `json:"version"`
-	Patterns map[string]*ValidationPattern `json:"patterns"`
-}
-
-// ValidationPattern describes a single validation rule
-type ValidationPattern struct {
-	Type        string   `json:"type"`               // "regex" or "range"
-	Pattern     string   `json:"pattern,omitempty"`  // Regex pattern
-	Min         *int64   `json:"min,omitempty"`      // Minimum value for range
-	Max         *int64   `json:"max,omitempty"`      // Maximum value for range
-	Description string   `json:"description"`        // Human-readable description
-	Examples    []string `json:"examples,omitempty"` // Valid example values
-	Invalid     []string `json:"invalid,omitempty"`  // Invalid example values
-}
-
-// getValidationPatterns returns the validation patterns used by the provider
-// These are extracted from internal/validators/validators.go
-func getValidationPatterns() *ValidationPatterns {
-	minPort := int64(1)
-	maxPort := int64(65535)
-
-	return &ValidationPatterns{
-		Version: "1.0.0",
-		Patterns: map[string]*ValidationPattern{
-			"name": {
-				Type:        "regex",
-				Pattern:     `^[a-z][a-z0-9-]{0,62}[a-z0-9]$|^[a-z]$`,
-				Description: "Resource name: lowercase alphanumeric with hyphens, 1-64 characters, must start with letter and end with letter or number",
-				Examples:    []string{"my-resource", "example-lb", "ns1", "a"},
-				Invalid:     []string{"My-Resource", "123-start", "-invalid", "too-long-name-that-exceeds-sixty-four-characters-limit-for-names"},
-			},
-			"domain": {
-				Type:        "regex",
-				Pattern:     `^(\*\.)?[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$`,
-				Description: "Valid DNS domain name with optional wildcard prefix",
-				Examples:    []string{"example.com", "*.example.com", "sub.domain.example.com"},
-				Invalid:     []string{"-invalid.com", "example..com", ""},
-			},
-			"port": {
-				Type:        "range",
-				Min:         &minPort,
-				Max:         &maxPort,
-				Description: "Valid TCP/UDP port number between 1 and 65535",
-				Examples:    []string{"80", "443", "8080", "65535"},
-				Invalid:     []string{"0", "65536", "-1"},
-			},
-			"namespace": {
-				Type:        "regex",
-				Pattern:     `^[a-z][a-z0-9-]{0,62}[a-z0-9]$|^[a-z]$`,
-				Description: "Namespace name: same rules as resource name",
-				Examples:    []string{"default", "production", "dev-env"},
-				Invalid:     []string{"Default", "123", "_invalid"},
-			},
-		},
-	}
-}
-
-// =============================================================================
-// Operation Metadata Types (v2.0.33 extensions)
-// =============================================================================
-
-// OperationsMetadataCollection holds all operation-level metadata for JSON output
-type OperationsMetadataCollection struct {
-	GeneratedAt string                            `json:"generated_at"`
-	Version     string                            `json:"version"`
-	Resources   map[string]*ResourceOperationInfo `json:"resources"`
-}
-
-// ResourceOperationInfo holds operation metadata for a single resource
-type ResourceOperationInfo struct {
-	Resource      string                       `json:"resource"`
-	BasePath      string                       `json:"base_path,omitempty"`
-	Operations    map[string]*OperationMetadata `json:"operations"`
-	BestPractices *BestPracticesInfo           `json:"best_practices,omitempty"`
-	Workflows     []*GuidedWorkflowInfo        `json:"guided_workflows,omitempty"`
-}
-
-// OperationMetadata holds metadata for a single CRUD operation
-type OperationMetadata struct {
-	Method               string            `json:"method"`
-	Path                 string            `json:"path"`
-	DangerLevel          string            `json:"danger_level,omitempty"`
-	DiscoveredRespTime   *ResponseTimeInfo `json:"discovered_response_time,omitempty"`
-	RequiredFields       []string          `json:"required_fields,omitempty"`
-	ConfirmationRequired bool              `json:"confirmation_required,omitempty"`
-	SideEffects          *SideEffectsInfo  `json:"side_effects,omitempty"`
-	Purpose              string            `json:"purpose,omitempty"`
-}
-
-// ResponseTimeInfo holds response time metrics from API discovery
-type ResponseTimeInfo struct {
-	P50Ms       int    `json:"p50_ms"`
-	P95Ms       int    `json:"p95_ms"`
-	P99Ms       int    `json:"p99_ms"`
-	SampleCount int    `json:"sample_count"`
-	Source      string `json:"source"` // "measured" or "estimate"
-}
-
-// SideEffectsInfo describes what resources are affected by an operation
-type SideEffectsInfo struct {
-	Creates []string `json:"creates,omitempty"`
-	Modifies []string `json:"modifies,omitempty"`
-	Deletes []string `json:"deletes,omitempty"`
-}
-
-// BestPracticesInfo holds best practices for a resource
-type BestPracticesInfo struct {
-	CommonErrors []*CommonErrorInfo `json:"common_errors,omitempty"`
-}
-
-// CommonErrorInfo describes a common error and its resolution
-type CommonErrorInfo struct {
-	Code       int    `json:"code"`
-	Message    string `json:"message"`
-	Resolution string `json:"resolution"`
-	Prevention string `json:"prevention,omitempty"`
-}
-
-// GuidedWorkflowInfo describes a step-by-step workflow
-type GuidedWorkflowInfo struct {
-	Name        string              `json:"name"`
-	Description string              `json:"description"`
-	Steps       []*WorkflowStepInfo `json:"steps"`
-}
-
-// WorkflowStepInfo describes a single step in a workflow
-type WorkflowStepInfo struct {
-	Order       int      `json:"order"`
-	Action      string   `json:"action"`
-	Description string   `json:"description,omitempty"`
-	Fields      []string `json:"fields,omitempty"`
-	Validation  string   `json:"validation,omitempty"`
-}
-
-// Global collection for operation metadata
-var operationsMetadataCollection = &OperationsMetadataCollection{
-	Resources: make(map[string]*ResourceOperationInfo),
-}
-
-// collectOperationMetadata extracts operation-level metadata from a spec file for a resource
-func collectOperationMetadata(resourceName string, apiPath string, specFile string) {
-	data, err := os.ReadFile(specFile)
-	if err != nil {
-		return
-	}
-
-	var spec map[string]interface{}
-	if err := json.Unmarshal(data, &spec); err != nil {
-		return
-	}
-
-	paths, ok := spec["paths"].(map[string]interface{})
-	if !ok {
-		return
-	}
-
-	resourceInfo := &ResourceOperationInfo{
-		Resource:   resourceName,
-		BasePath:   apiPath,
-		Operations: make(map[string]*OperationMetadata),
-	}
-
-	// Extract operations from paths that match this resource
-	resourcePlural := resourceName + "s"
-	for pathKey, pathValue := range paths {
-		if !strings.Contains(pathKey, resourcePlural) && !strings.Contains(pathKey, resourceName) {
-			continue
-		}
-
-		if _, ok := pathValue.(map[string]interface{}); !ok {
-			continue
-		}
-
-		pathMethods := pathValue.(map[string]interface{})
-		for method, methodValue := range pathMethods {
-			if _, ok := methodValue.(map[string]interface{}); !ok {
-				continue
-			}
-
-			opType := mapMethodToOperationType(method, pathKey)
-			if opType == "" {
-				continue
-			}
-
-			opMeta := extractOperationMetadataFromRaw(methodValue.(map[string]interface{}), method, pathKey, opType, resourceName)
-			if opMeta != nil {
-				resourceInfo.Operations[opType] = opMeta
-			}
-		}
-	}
-
-	// Extract best practices and guided workflows from spec-level extensions
-	if bp := extractBestPracticesFromRaw(spec); bp != nil {
-		resourceInfo.BestPractices = bp
-	}
-	if workflows := extractGuidedWorkflowsFromRaw(spec); len(workflows) > 0 {
-		resourceInfo.Workflows = workflows
-	}
-
-	if len(resourceInfo.Operations) > 0 {
-		operationsMetadataCollection.Resources[resourceName] = resourceInfo
-	}
-}
-
-// mapMethodToOperationType maps HTTP method and path to CRUD operation type
-func mapMethodToOperationType(method string, pathKey string) string {
-	method = strings.ToUpper(method)
-
-	// Determine if this is a collection or item operation based on path pattern
-	isItemPath := strings.Contains(pathKey, "/{name}") || strings.HasSuffix(pathKey, "}") && !strings.HasSuffix(pathKey, "s}")
-
-	switch method {
-	case "POST":
-		return "create"
-	case "GET":
-		if isItemPath {
-			return "read"
-		}
-		return "list"
-	case "PUT":
-		return "update"
-	case "DELETE":
-		return "delete"
-	}
-	return ""
-}
-
-// extractOperationMetadataFromRaw extracts metadata from a raw operation map
-func extractOperationMetadataFromRaw(op map[string]interface{}, method string, path string, opType string, resourceName string) *OperationMetadata {
-	meta := &OperationMetadata{
-		Method: strings.ToUpper(method),
-		Path:   path,
-	}
-
-	// Extract x-f5xc-danger-level
-	if dl, ok := op["x-f5xc-danger-level"].(string); ok && dl != "" {
-		meta.DangerLevel = dl
-	} else {
-		// Assign default danger levels based on operation type
-		switch opType {
-		case "create":
-			meta.DangerLevel = "medium"
-		case "update":
-			meta.DangerLevel = "medium"
-		case "delete":
-			meta.DangerLevel = "high"
-		default:
-			meta.DangerLevel = "low"
-		}
-	}
-
-	// Extract x-f5xc-discovered-response-time
-	if rt, ok := op["x-f5xc-discovered-response-time"].(map[string]interface{}); ok {
-		meta.DiscoveredRespTime = &ResponseTimeInfo{
-			P50Ms:       getIntFromInterface(rt["p50_ms"]),
-			P95Ms:       getIntFromInterface(rt["p95_ms"]),
-			P99Ms:       getIntFromInterface(rt["p99_ms"]),
-			SampleCount: getIntFromInterface(rt["sample_count"]),
-			Source:      getStringFromInterface(rt["source"]),
-		}
-	} else {
-		// Assign estimated response times based on operation type
-		switch opType {
-		case "create":
-			meta.DiscoveredRespTime = &ResponseTimeInfo{P50Ms: 1000, P95Ms: 3000, P99Ms: 8000, Source: "estimate"}
-		case "update":
-			meta.DiscoveredRespTime = &ResponseTimeInfo{P50Ms: 800, P95Ms: 2500, P99Ms: 6000, Source: "estimate"}
-		case "delete":
-			meta.DiscoveredRespTime = &ResponseTimeInfo{P50Ms: 500, P95Ms: 1500, P99Ms: 4000, Source: "estimate"}
-		default:
-			meta.DiscoveredRespTime = &ResponseTimeInfo{P50Ms: 200, P95Ms: 800, P99Ms: 2000, Source: "estimate"}
-		}
-	}
-
-	// Extract x-f5xc-required-fields
-	if rf, ok := op["x-f5xc-required-fields"].([]interface{}); ok {
-		for _, f := range rf {
-			if s, ok := f.(string); ok {
-				meta.RequiredFields = append(meta.RequiredFields, s)
-			}
-		}
-	} else {
-		// Derive required fields from path parameters
-		params := extractPathParams(path)
-		for _, p := range params {
-			meta.RequiredFields = append(meta.RequiredFields, "path."+p)
-		}
-		if opType == "create" {
-			meta.RequiredFields = append(meta.RequiredFields, "metadata.name", "metadata.namespace")
-		}
-	}
-
-	// Extract x-f5xc-confirmation-required
-	if cr, ok := op["x-f5xc-confirmation-required"].(bool); ok {
-		meta.ConfirmationRequired = cr
-	} else if opType == "delete" {
-		meta.ConfirmationRequired = true
-	}
-
-	// Extract x-f5xc-side-effects
-	if se, ok := op["x-f5xc-side-effects"].(map[string]interface{}); ok {
-		meta.SideEffects = &SideEffectsInfo{}
-		if creates, ok := se["creates"].([]interface{}); ok {
-			for _, c := range creates {
-				if s, ok := c.(string); ok {
-					meta.SideEffects.Creates = append(meta.SideEffects.Creates, s)
-				}
-			}
-		}
-		if modifies, ok := se["modifies"].([]interface{}); ok {
-			for _, m := range modifies {
-				if s, ok := m.(string); ok {
-					meta.SideEffects.Modifies = append(meta.SideEffects.Modifies, s)
-				}
-			}
-		}
-		if deletes, ok := se["deletes"].([]interface{}); ok {
-			for _, d := range deletes {
-				if s, ok := d.(string); ok {
-					meta.SideEffects.Deletes = append(meta.SideEffects.Deletes, s)
-				}
-			}
-		}
-	} else {
-		// Assign default side effects based on operation type
-		switch opType {
-		case "create":
-			meta.SideEffects = &SideEffectsInfo{Creates: []string{resourceName}}
-		case "delete":
-			meta.SideEffects = &SideEffectsInfo{Deletes: []string{resourceName, "contained_resources"}}
-		}
-	}
-
-	// Extract purpose from summary or description
-	if summary, ok := op["summary"].(string); ok && summary != "" {
-		meta.Purpose = summary
-	} else if desc, ok := op["description"].(string); ok && desc != "" {
-		if len(desc) > 100 {
-			meta.Purpose = desc[:100] + "..."
-		} else {
-			meta.Purpose = desc
-		}
-	} else {
-		// Default purpose based on operation type
-		switch opType {
-		case "create":
-			meta.Purpose = "Resource creation operation"
-		case "read":
-			meta.Purpose = "Resource retrieval operation"
-		case "update":
-			meta.Purpose = "Resource modification operation"
-		case "delete":
-			meta.Purpose = "Resource deletion operation"
-		case "list":
-			meta.Purpose = "Resource retrieval operation"
-		}
-	}
-
-	return meta
-}
-
-// extractPathParams extracts parameter names from a path template
-func extractPathParams(path string) []string {
-	var params []string
-	re := regexp.MustCompile(`\{([^}]+)\}`)
-	matches := re.FindAllStringSubmatch(path, -1)
-	for _, m := range matches {
-		if len(m) > 1 {
-			params = append(params, m[1])
-		}
-	}
-	return params
-}
-
-// extractBestPracticesFromRaw extracts best practices from spec-level extensions
-func extractBestPracticesFromRaw(spec map[string]interface{}) *BestPracticesInfo {
-	bp, ok := spec["x-f5xc-best-practices"].(map[string]interface{})
-	if !ok {
-		return nil
-	}
-
-	result := &BestPracticesInfo{}
-	if errors, ok := bp["common_errors"].([]interface{}); ok {
-		for _, e := range errors {
-			if errMap, ok := e.(map[string]interface{}); ok {
-				errInfo := &CommonErrorInfo{
-					Code:       getIntFromInterface(errMap["code"]),
-					Message:    getStringFromInterface(errMap["message"]),
-					Resolution: getStringFromInterface(errMap["resolution"]),
-					Prevention: getStringFromInterface(errMap["prevention"]),
-				}
-				result.CommonErrors = append(result.CommonErrors, errInfo)
-			}
-		}
-	}
-
-	if len(result.CommonErrors) == 0 {
-		return nil
-	}
-	return result
-}
-
-// extractGuidedWorkflowsFromRaw extracts guided workflows from spec-level extensions
-func extractGuidedWorkflowsFromRaw(spec map[string]interface{}) []*GuidedWorkflowInfo {
-	workflows, ok := spec["x-f5xc-guided-workflows"].([]interface{})
-	if !ok {
-		return nil
-	}
-
-	var result []*GuidedWorkflowInfo
-	for _, w := range workflows {
-		if wMap, ok := w.(map[string]interface{}); ok {
-			workflow := &GuidedWorkflowInfo{
-				Name:        getStringFromInterface(wMap["name"]),
-				Description: getStringFromInterface(wMap["description"]),
-			}
-			if steps, ok := wMap["steps"].([]interface{}); ok {
-				for _, s := range steps {
-					if sMap, ok := s.(map[string]interface{}); ok {
-						step := &WorkflowStepInfo{
-							Order:       getIntFromInterface(sMap["order"]),
-							Action:      getStringFromInterface(sMap["action"]),
-							Description: getStringFromInterface(sMap["description"]),
-							Validation:  getStringFromInterface(sMap["validation"]),
-						}
-						if fields, ok := sMap["fields"].([]interface{}); ok {
-							for _, f := range fields {
-								if fs, ok := f.(string); ok {
-									step.Fields = append(step.Fields, fs)
-								}
-							}
-						}
-						workflow.Steps = append(workflow.Steps, step)
-					}
-				}
-			}
-			result = append(result, workflow)
-		}
-	}
-	return result
-}
-
-// getIntFromInterface safely extracts an int from an interface{}
-func getIntFromInterface(v interface{}) int {
-	switch val := v.(type) {
-	case int:
-		return val
-	case int64:
-		return int(val)
-	case float64:
-		return int(val)
-	}
-	return 0
-}
-
-// getStringFromInterface safely extracts a string from an interface{}
-func getStringFromInterface(v interface{}) string {
-	if s, ok := v.(string); ok {
-		return s
-	}
-	return ""
 }
 
 // addOneOfConstraint adds a OneOf constraint hint to the description with recommended default
@@ -4252,6 +3603,10 @@ func renderNestedAttributes(attrs []TerraformAttribute, indent string) string {
 		sb.WriteString(fmt.Sprintf("%s\t\"%s\": schema.%sAttribute{\n", indent, attr.TfsdkTag, attrType))
 		sb.WriteString(fmt.Sprintf("%s\t\tMarkdownDescription: \"%s\",\n", indent, desc))
 
+		if attr.DeprecationMessage != "" {
+			sb.WriteString(fmt.Sprintf("%s\t\tDeprecationMessage: \"%s\",\n", indent, escapeGoString(attr.DeprecationMessage)))
+		}
+
 		if attr.Required {
 			sb.WriteString(fmt.Sprintf("%s\t\tRequired: true,\n", indent))
 		} else {
@@ -4264,10 +3619,24 @@ func renderNestedAttributes(attrs []TerraformAttribute, indent string) string {
 			}
 		}
 
-		// Add PlanModifiers for attributes that need UseStateForUnknown (e.g., tenant, uid, kind in nested blocks)
-		if attr.PlanModifier != "" && attr.Type == "string" {
-			sb.WriteString(fmt.Sprintf("%s\t\tPlanModifiers: []planmodifier.String{\n", indent))
-			sb.WriteString(fmt.Sprintf("%s\t\t\tstringplanmodifier.UseStateForUnknown(),\n", indent))
+		if attr.PlanModifier != "" {
+			typeName := "String"
+			pkgName := "stringplanmodifier"
+			switch attr.Type {
+			case "bool":
+				typeName = "Bool"
+				pkgName = "boolplanmodifier"
+			case "int64":
+				typeName = "Int64"
+				pkgName = "int64planmodifier"
+			}
+			sb.WriteString(fmt.Sprintf("%s\t\tPlanModifiers: []planmodifier.%s{\n", indent, typeName))
+			switch attr.PlanModifier {
+			case "RequiresReplace":
+				sb.WriteString(fmt.Sprintf("%s\t\t\t%s.RequiresReplace(),\n", indent, pkgName))
+			default:
+				sb.WriteString(fmt.Sprintf("%s\t\t\t%s.UseStateForUnknown(),\n", indent, pkgName))
+			}
 			sb.WriteString(fmt.Sprintf("%s\t\t},\n", indent))
 		}
 
@@ -4281,6 +3650,13 @@ func renderNestedAttributes(attrs []TerraformAttribute, indent string) string {
 				elementTfType = "types.BoolType"
 			}
 			sb.WriteString(fmt.Sprintf("%s\t\tElementType: %s,\n", indent, elementTfType))
+		}
+
+		// Add MaxLength validator for string attributes with a non-zero limit
+		if attr.MaxLength > 0 && attr.Type == "string" {
+			sb.WriteString(fmt.Sprintf("%s\t\tValidators: []validator.String{\n", indent))
+			sb.WriteString(fmt.Sprintf("%s\t\t\tstringvalidator.LengthAtMost(%d),\n", indent, attr.MaxLength))
+			sb.WriteString(fmt.Sprintf("%s\t\t},\n", indent))
 		}
 
 		sb.WriteString(fmt.Sprintf("%s\t},\n", indent))
@@ -4994,6 +4370,9 @@ import (
 {{- if .HasBlocks}}
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 {{- end}}
+{{- if .HasMaxLengthValidators}}
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+{{- end}}
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -5041,6 +4420,9 @@ func (r *{{.TitleCase}}Resource) Schema(ctx context.Context, req resource.Schema
 {{- if not .IsBlock}}
 			"{{.TfsdkTag}}": schema.{{if eq .Type "string"}}String{{else if eq .Type "int64"}}Int64{{else if eq .Type "bool"}}Bool{{else if eq .Type "map"}}Map{{else if eq .Type "list"}}List{{else}}String{{end}}Attribute{
 				MarkdownDescription: "{{.Description}}",
+{{- if .DeprecationMessage}}
+				DeprecationMessage: "{{.DeprecationMessage}}",
+{{- end}}
 {{- if .Required}}
 				Required: true,
 {{- end}}
@@ -5076,6 +4458,10 @@ func (r *{{.TitleCase}}Resource) Schema(ctx context.Context, req resource.Schema
 {{- else if eq .TfsdkTag "namespace"}}
 				Validators: []validator.String{
 					validators.NamespaceValidator(),
+				},
+{{- else if and (gt .MaxLength 0) (eq .Type "string")}}
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost({{.MaxLength}}),
 				},
 {{- end}}
 			},

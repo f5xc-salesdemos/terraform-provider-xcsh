@@ -49,6 +49,25 @@ type Schema struct {
 	XF5XCIsPreview        bool     `json:"x-f5xc-is-preview"`
 	XF5XCIcon             string   `json:"x-f5xc-icon"`
 	XF5XCCLIDomain        string   `json:"x-f5xc-cli-domain"`
+
+	// Additional upstream extensions
+	XVesDeprecated   string            `json:"x-ves-deprecated"`
+	XVesDisplayOrder string            `json:"x-ves-displayorder"`
+	XVesProtoEnum    string            `json:"x-ves-proto-enum"`
+	XVesRequired     string            `json:"x-ves-required"`
+	XRequired        bool              `json:"x-required"`
+	XValidationRules map[string]string `json:"x-validation-rules"`
+
+	// Enrichment — actionable in generation
+	XF5XCConflictsWith           []string               `json:"x-f5xc-conflicts-with"`
+	XF5XCConstraints             map[string]interface{} `json:"x-f5xc-constraints"`
+	XF5XCRecommendedOneofVariant interface{}            `json:"x-f5xc-recommended-oneof-variant"`
+	XFieldMutability             string                 `json:"x-field-mutability"`
+	XOriginalMaxLength           int                    `json:"x-original-maxLength"`
+
+	// Provenance — parsed, not used in generation
+	XReconciledAt            string `json:"x-reconciled-at"`
+	XReconciledFromDiscovery bool   `json:"x-reconciled-from-discovery"`
 }
 
 // TerraformAttribute represents an attribute in a Terraform resource schema.
@@ -142,9 +161,13 @@ func (s *Schema) HasProperties() bool {
 // Index represents the index.json manifest file in v2 spec structure.
 // This file provides metadata about all domain specifications.
 type Index struct {
-	Version        string           `json:"version"`
-	GeneratedAt    string           `json:"generated_at"`
-	Specifications []DomainMetadata `json:"specifications"`
+	Version            string                 `json:"version"`
+	Timestamp          string                 `json:"timestamp"`
+	Specifications     []DomainMetadata       `json:"specifications"`
+	CriticalResources  []string               `json:"x-f5xc-critical-resources"`
+	ErrorResolution    map[string]interface{} `json:"x-f5xc-error-resolution"`
+	GuidedWorkflows    map[string]interface{} `json:"x-f5xc-guided-workflows"`
+	Acronyms           map[string]interface{} `json:"x-f5xc-acronyms"`
 }
 
 // DomainMetadata represents metadata about a domain specification file.
@@ -161,6 +184,9 @@ type DomainMetadata struct {
 	Complexity        string                      `json:"x-f5xc-complexity"`
 	IsPreview         bool                        `json:"x-f5xc-is-preview"`
 	CLIDomain         string                      `json:"x-f5xc-cli-domain"`
+	Title             string                      `json:"title"`
+	PathCount         int                         `json:"path_count"`
+	SchemaCount       int                         `json:"schema_count"`
 	RelatedDomains    []string                    `json:"x-f5xc-related-domains"`
 	UseCases          []string                    `json:"x-f5xc-use-cases"`
 	PrimaryResources  []PrimaryResourceMetadata   `json:"x-f5xc-primary-resources"`
@@ -223,10 +249,26 @@ type DomainInfo struct {
 	Version     string `json:"version"`
 
 	// Enrichment extensions at info level
-	XF5XCDescriptionShort  string `json:"x-f5xc-description-short"`
-	XF5XCDescriptionMedium string `json:"x-f5xc-description-medium"`
-	XF5XCIcon              string `json:"x-f5xc-icon"`
-	XF5XCLogoSVG           string `json:"x-f5xc-logo-svg"`
+	XF5XCDescriptionShort  string         `json:"x-f5xc-description-short"`
+	XF5XCDescriptionMedium string         `json:"x-f5xc-description-medium"`
+	XF5XCIcon              string         `json:"x-f5xc-icon"`
+	XF5XCLogoSVG           string         `json:"x-f5xc-logo-svg"`
+	XF5XCDescriptionLong   string         `json:"x-f5xc-description-long"`
+	XF5XCSummary           string         `json:"x-f5xc-summary"`
+	XF5XCBestPractices     *BestPractices `json:"x-f5xc-best-practices"`
+}
+
+// BestPractices contains operational guidance from the enriched spec.
+type BestPractices struct {
+	CommonErrors []ErrorPattern `json:"common_errors"`
+}
+
+// ErrorPattern describes a common API error and how to resolve it.
+type ErrorPattern struct {
+	Code       int    `json:"code"`
+	Message    string `json:"message"`
+	Resolution string `json:"resolution"`
+	Prevention string `json:"prevention"`
 }
 
 // SpecVersion represents the detected specification version.
