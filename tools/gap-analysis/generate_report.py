@@ -501,6 +501,7 @@ def _section_issue_templates(gap_items: list[dict]) -> str:
 # CLI entry point
 # =============================================================================
 
+
 def _cli_main() -> None:
     """Generate a sample report when run standalone."""
     sample_ext_map = {
