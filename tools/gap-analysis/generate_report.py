@@ -501,21 +501,23 @@ def _section_issue_templates(gap_items: list[dict]) -> str:
 # CLI entry point
 # =============================================================================
 
-if __name__ == "__main__":
-    # When run standalone, generate a report with sample data
+def _cli_main() -> None:
+    """Generate a sample report when run standalone."""
     sample_ext_map = {
         "x-f5xc-description-medium": "CONSUMED",
         "x-f5xc-server-default": "CONSUMED",
         "x-f5xc-constraints": "DEFINED_UNUSED",
         "x-f5xc-conflicts-with": "PARSED_NOT_RENDERED",
     }
-
     sample_coverage: list[dict] = []
     sample_op: dict[str, int] = {
         "total_operations": 0,
         "ops_with_danger_level": 0,
     }
-
     items = create_gap_items(sample_ext_map, sample_coverage)
     output = generate_markdown_report(sample_ext_map, sample_coverage, items, sample_op)
     print(output)  # noqa: T201
+
+
+if __name__ == "__main__":
+    _cli_main()
