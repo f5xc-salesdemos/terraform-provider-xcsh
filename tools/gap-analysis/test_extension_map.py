@@ -1,3 +1,4 @@
+# ruff: noqa: INP001, S101, D102, PLR2004
 # Copyright (c) 2026 Robin Mordasiewicz. MIT License.
 
 """Tests for extension_map.py - Extension Consumption Map Builder.
@@ -11,7 +12,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from extension_map import (
     CONSUMED_EXTENSIONS,
     DOMAIN_ONLY,
@@ -114,7 +114,7 @@ class TestFindTerraformAttributeUsage:
 class TestBuildExtensionMap:
     """Verify the full classification pipeline."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def ext_map(self) -> dict[str, str]:
         return build_extension_map(PROVIDER_ROOT, SPECS_ROOT)
 
@@ -137,7 +137,14 @@ class TestBuildExtensionMap:
         assert ext_map.get("x-f5xc-namespace-scope") == "NOT_EMITTED"
 
     def test_all_values_are_valid_statuses(self, ext_map: dict[str, str]) -> None:
-        valid = {"CONSUMED", "PARSED_NOT_RENDERED", "DOMAIN_ONLY", "DEFINED_UNUSED", "UNKNOWN", "NOT_EMITTED"}
+        valid = {
+            "CONSUMED",
+            "PARSED_NOT_RENDERED",
+            "DOMAIN_ONLY",
+            "DEFINED_UNUSED",
+            "UNKNOWN",
+            "NOT_EMITTED",
+        }
         for ext, status in ext_map.items():
             assert status in valid, f"{ext} has invalid status {status}"
 

@@ -1,3 +1,4 @@
+# ruff: noqa: INP001
 # Copyright (c) 2026 Robin Mordasiewicz. MIT License.
 
 """Gap Analysis Report Generator.
@@ -9,7 +10,6 @@ prioritized 8-section markdown gap report with GitHub Issue templates.
 from __future__ import annotations
 
 from collections import defaultdict
-
 
 # =============================================================================
 # Hardcoded gap definitions (10 items)
@@ -172,8 +172,8 @@ def compute_priority_score(
 
 
 def create_gap_items(
-    ext_map: dict[str, str],
-    coverage_data: list[dict],
+    ext_map: dict[str, str],  # noqa: ARG001
+    coverage_data: list[dict],  # noqa: ARG001
 ) -> list[dict]:
     """Create prioritized gap items from hardcoded definitions.
 
@@ -291,8 +291,10 @@ def _section_executive_summary(
     lines.append("### Extension Status Overview\n")
     lines.append("| Status | Count |")
     lines.append("|--------|-------|")
-    for status in sorted(status_counts.keys()):
-        lines.append(f"| {status} | {status_counts[status]} |")
+    lines.extend(
+        f"| {status} | {status_counts[status]} |"
+        for status in sorted(status_counts.keys())
+    )
     lines.append("")
 
     # Top 10 gaps table
@@ -316,8 +318,7 @@ def _section_extension_matrix(ext_map: dict[str, str]) -> str:
     lines.append("## 2. Extension Consumption Matrix\n")
     lines.append("| Extension | Status |")
     lines.append("|-----------|--------|")
-    for ext in sorted(ext_map.keys()):
-        lines.append(f"| {ext} | {ext_map[ext]} |")
+    lines.extend(f"| {ext} | {ext_map[ext]} |" for ext in sorted(ext_map.keys()))
     lines.append("")
     return "\n".join(lines)
 
@@ -336,12 +337,10 @@ def _section_resource_drilldowns(coverage_data: list[dict]) -> str:
     for category in sorted(by_category.keys()):
         lines.append(f"### {category}\n")
         lines.append(
-            "| Resource | Total Fields | Constraints % | "
-            "Descriptions % | Enums % |"
+            "| Resource | Total Fields | Constraints % | Descriptions % | Enums % |"
         )
         lines.append(
-            "|----------|-------------|--------------|"
-            "---------------|---------|"
+            "|----------|-------------|--------------|---------------|---------|"
         )
 
         for res in sorted(by_category[category], key=lambda r: r["resource_name"]):
@@ -433,18 +432,10 @@ def _section_enrichment_priorities() -> str:
 
     lines.append("| Config File | Purpose | Priority |")
     lines.append("|------------|---------|----------|")
-    lines.append(
-        "| extension_constants.py | Extension registry | High |"
-    )
-    lines.append(
-        "| index.json | Resource-to-domain map | High |"
-    )
-    lines.append(
-        "| Domain spec files | Per-field extensions | Medium |"
-    )
-    lines.append(
-        "| Operation metadata | Operation-level annotations | Medium |"
-    )
+    lines.append("| extension_constants.py | Extension registry | High |")
+    lines.append("| index.json | Resource-to-domain map | High |")
+    lines.append("| Domain spec files | Per-field extensions | Medium |")
+    lines.append("| Operation metadata | Operation-level annotations | Medium |")
     lines.append("")
 
     return "\n".join(lines)
@@ -457,22 +448,15 @@ def _section_downstream_impact() -> str:
 
     lines.append("| Consumer | Impact Area | Dependency |")
     lines.append("|----------|------------|------------|")
+    lines.append("| terraform-provider-f5xc | Schema generation | api-specs-enriched |")
     lines.append(
-        "| terraform-provider-f5xc | Schema generation | "
-        "api-specs-enriched |"
-    )
-    lines.append(
-        "| terraform-provider-f5xc | Validator generation | "
-        "x-f5xc-constraints, enum |"
+        "| terraform-provider-f5xc | Validator generation | x-f5xc-constraints, enum |"
     )
     lines.append(
         "| terraform-provider-f5xc | Documentation | "
         "x-f5xc-description-*, x-f5xc-best-practices |"
     )
-    lines.append(
-        "| api-specs-enriched | Extension emission | "
-        "extension_constants.py |"
-    )
+    lines.append("| api-specs-enriched | Extension emission | extension_constants.py |")
     lines.append("")
 
     return "\n".join(lines)
@@ -487,8 +471,7 @@ def _section_action_items(gap_items: list[dict]) -> str:
     lines.append("|------|--------|------|---------------|")
     for i, item in enumerate(gap_items, 1):
         lines.append(
-            f"| {i} | {item['title']} | {item['repo']} "
-            f"| {item['priority_score']:.1f} |"
+            f"| {i} | {item['title']} | {item['repo']} | {item['priority_score']:.1f} |"
         )
     lines.append("")
 
@@ -504,9 +487,11 @@ def _section_issue_templates(gap_items: list[dict]) -> str:
         lines.append(f"### {item['title']}\n")
         lines.append(f"**Repo**: {item['repo']}")
         lines.append(f"**Priority Score**: {item['priority_score']:.1f}")
-        lines.append(f"**User Impact**: {item['user_impact']} | "
-                      f"**Downstream Reach**: {item['downstream_reach']} | "
-                      f"**Effort**: {item['effort']}\n")
+        lines.append(
+            f"**User Impact**: {item['user_impact']} | "
+            f"**Downstream Reach**: {item['downstream_reach']} | "
+            f"**Effort**: {item['effort']}\n"
+        )
         lines.append(f"{item['description']}\n")
 
     return "\n".join(lines)
@@ -532,7 +517,5 @@ if __name__ == "__main__":
     }
 
     items = create_gap_items(sample_ext_map, sample_coverage)
-    report = generate_markdown_report(
-        sample_ext_map, sample_coverage, items, sample_op
-    )
-    print(report)
+    report = generate_markdown_report(sample_ext_map, sample_coverage, items, sample_op)
+    print(report)  # noqa: T201

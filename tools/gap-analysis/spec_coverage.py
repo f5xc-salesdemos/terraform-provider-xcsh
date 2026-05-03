@@ -1,3 +1,4 @@
+# ruff: noqa: INP001
 # Copyright (c) 2026 Robin Mordasiewicz. MIT License.
 
 """Spec Coverage Auditor.
@@ -37,7 +38,7 @@ def build_resource_domain_map(specs_dir: Path) -> dict[str, dict]:
             api_paths, tier.
     """
     index_path = specs_dir / "index.json"
-    with open(index_path, encoding="utf-8") as f:
+    with index_path.open(encoding="utf-8") as f:
         index_data = json.load(f)
 
     resource_map: dict[str, dict] = {}
@@ -92,7 +93,7 @@ def audit_resource_coverage(
         fields_with_server_default, fields_with_conflicts_with,
         fields_with_enum.
     """
-    with open(domain_file, encoding="utf-8") as f:
+    with domain_file.open(encoding="utf-8") as f:
         spec_data = json.load(f)
 
     schemas = spec_data.get("components", {}).get("schemas", {})
@@ -115,7 +116,7 @@ def audit_resource_coverage(
             continue
 
         properties = schema_def.get("properties", {})
-        for _prop_name, prop_def in properties.items():
+        for prop_def in properties.values():
             total_fields += 1
 
             if "x-f5xc-constraints" in prop_def:
@@ -169,7 +170,7 @@ def audit_operation_extensions(domain_file: Path) -> dict[str, int]:
         ops_with_danger_level, ops_with_confirmation_required,
         ops_with_side_effects, ops_with_required_fields.
     """
-    with open(domain_file, encoding="utf-8") as f:
+    with domain_file.open(encoding="utf-8") as f:
         spec_data = json.load(f)
 
     paths = spec_data.get("paths", {})
@@ -181,7 +182,7 @@ def audit_operation_extensions(domain_file: Path) -> dict[str, int]:
     ops_with_side_effects = 0
     ops_with_required_fields = 0
 
-    for _path, methods in paths.items():
+    for methods in paths.values():
         for method, operation in methods.items():
             if method.lower() not in _HTTP_METHODS:
                 continue
@@ -269,9 +270,11 @@ def audit_all_resources(specs_dir: Path) -> list[dict]:
 if __name__ == "__main__":
     import sys
 
-    specs = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(
-        "/workspace/api-specs-enriched/docs/specifications/api"
+    specs = (
+        Path(sys.argv[1])
+        if len(sys.argv) > 1
+        else Path("/workspace/api-specs-enriched/docs/specifications/api")
     )
 
     results = audit_all_resources(specs)
-    print(json.dumps(results, indent=2))
+    print(json.dumps(results, indent=2))  # noqa: T201

@@ -1,3 +1,4 @@
+# ruff: noqa: INP001
 # Copyright (c) 2026 Robin Mordasiewicz. MIT License.
 
 """Extension Consumption Map Builder.
@@ -18,7 +19,6 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-
 
 # =============================================================================
 # Hardcoded classification sets
@@ -259,9 +259,18 @@ def build_extension_map(
 if __name__ == "__main__":
     import sys
 
-    provider = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("/workspace/terraform-provider-f5xc")
-    specs = Path(sys.argv[2]) if len(sys.argv) > 2 else Path("/workspace/api-specs-enriched")
+    _MIN_ARGS_FOR_SPECS = 3
+    provider = (
+        Path(sys.argv[1])
+        if len(sys.argv) > 1
+        else Path("/workspace/terraform-provider-f5xc")
+    )
+    specs = (
+        Path(sys.argv[2])
+        if len(sys.argv) >= _MIN_ARGS_FOR_SPECS
+        else Path("/workspace/api-specs-enriched")
+    )
 
     ext_map = build_extension_map(provider, specs)
 
-    print(json.dumps(ext_map, indent=2))
+    print(json.dumps(ext_map, indent=2))  # noqa: T201

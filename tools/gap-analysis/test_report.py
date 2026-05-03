@@ -1,3 +1,4 @@
+# ruff: noqa: INP001, S101, D102, PLR2004, D415, RUF015
 # Copyright (c) 2026 Robin Mordasiewicz. MIT License.
 
 """Tests for generate_report.py - Gap Analysis Report Generator.
@@ -9,14 +10,12 @@ requiring real repository access.
 from __future__ import annotations
 
 import pytest
-
 from generate_report import (
     GAP_DEFINITIONS,
     compute_priority_score,
     create_gap_items,
     generate_markdown_report,
 )
-
 
 # =========================================================================
 # Test 1: compute_priority_score
@@ -132,11 +131,21 @@ class TestCreateGapItems:
     def test_each_item_has_required_fields(self) -> None:
         """Each gap item has title, description, repo, scores, key."""
         items = create_gap_items(SAMPLE_EXT_MAP, SAMPLE_COVERAGE_DATA)
-        required = {"title", "description", "repo", "user_impact",
-                     "downstream_reach", "effort", "priority_score", "key"}
+        required = {
+            "title",
+            "description",
+            "repo",
+            "user_impact",
+            "downstream_reach",
+            "effort",
+            "priority_score",
+            "key",
+        }
         for item in items:
             for field in required:
-                assert field in item, f"Missing field {field} in item {item.get('key', '?')}"
+                assert field in item, (
+                    f"Missing field {field} in item {item.get('key', '?')}"
+                )
 
     def test_constraints_gap_present(self) -> None:
         """x-f5xc-constraints gap item exists."""
@@ -193,7 +202,14 @@ class TestGapDefinitions:
 
     def test_each_definition_has_required_fields(self) -> None:
         """Each definition has title, description, repo, user_impact, downstream_reach, effort."""
-        required = {"title", "description", "repo", "user_impact", "downstream_reach", "effort"}
+        required = {
+            "title",
+            "description",
+            "repo",
+            "user_impact",
+            "downstream_reach",
+            "effort",
+        }
         for key, defn in GAP_DEFINITIONS.items():
             for field in required:
                 assert field in defn, f"Missing {field} in GAP_DEFINITIONS[{key}]"
@@ -218,11 +234,11 @@ SAMPLE_OP_DATA: dict[str, int] = {
 class TestGenerateMarkdownReport:
     """Verify markdown report generation."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def gap_items(self) -> list[dict]:
         return create_gap_items(SAMPLE_EXT_MAP, SAMPLE_COVERAGE_DATA)
 
-    @pytest.fixture()
+    @pytest.fixture
     def report(self, gap_items: list[dict]) -> str:
         return generate_markdown_report(
             SAMPLE_EXT_MAP,
@@ -295,7 +311,9 @@ class TestGenerateMarkdownReport:
         """Report contains GitHub Issue Templates section."""
         assert "## GitHub Issue Templates" in report
 
-    def test_issue_templates_contain_gap_titles(self, report: str, gap_items: list[dict]) -> None:
+    def test_issue_templates_contain_gap_titles(
+        self, report: str, gap_items: list[dict]
+    ) -> None:
         """Issue templates reference gap item titles."""
         for item in gap_items:
             assert item["title"] in report

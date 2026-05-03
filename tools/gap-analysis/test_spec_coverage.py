@@ -1,3 +1,4 @@
+# ruff: noqa: INP001, S101, D102
 # Copyright (c) 2026 Robin Mordasiewicz. MIT License.
 
 """Tests for spec_coverage.py - Spec Coverage Auditor.
@@ -10,7 +11,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from spec_coverage import (
     audit_all_resources,
     audit_operation_extensions,
@@ -29,7 +29,7 @@ SPECS_DIR = Path("/workspace/api-specs-enriched/docs/specifications/api")
 class TestBuildResourceDomainMap:
     """Verify build_resource_domain_map reads index.json correctly."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def resource_map(self) -> dict[str, dict]:
         return build_resource_domain_map(SPECS_DIR)
 
@@ -43,7 +43,9 @@ class TestBuildResourceDomainMap:
         """namespace_role resource should exist in the map."""
         assert "namespace_role" in resource_map
 
-    def test_http_loadbalancer_has_required_fields(self, resource_map: dict[str, dict]) -> None:
+    def test_http_loadbalancer_has_required_fields(
+        self, resource_map: dict[str, dict]
+    ) -> None:
         """http_loadbalancer entry has domain_file, domain_name, category, schema_components, api_paths, tier."""
         info = resource_map["http_loadbalancer"]
         assert "domain_file" in info
@@ -63,7 +65,9 @@ class TestBuildResourceDomainMap:
         assert isinstance(resource_map, dict)
         assert len(resource_map) > 0
 
-    def test_http_loadbalancer_domain_is_virtual(self, resource_map: dict[str, dict]) -> None:
+    def test_http_loadbalancer_domain_is_virtual(
+        self, resource_map: dict[str, dict]
+    ) -> None:
         """http_loadbalancer should be in the virtual domain."""
         info = resource_map["http_loadbalancer"]
         assert info["domain_name"] == "virtual"
@@ -77,7 +81,7 @@ class TestBuildResourceDomainMap:
 class TestAuditResourceCoverage:
     """Verify audit_resource_coverage counts extensions per schema component."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def coverage(self) -> dict[str, int]:
         domain_file = SPECS_DIR / "virtual.json"
         # Use views.http_loadbalancer which maps to viewshttp_loadbalancer* schemas
@@ -110,7 +114,9 @@ class TestAuditResourceCoverage:
         """fields_with_constraints should be >= 0."""
         assert coverage["fields_with_constraints"] >= 0
 
-    def test_description_medium_count_nonnegative(self, coverage: dict[str, int]) -> None:
+    def test_description_medium_count_nonnegative(
+        self, coverage: dict[str, int]
+    ) -> None:
         """fields_with_description_medium should be >= 0."""
         assert coverage["fields_with_description_medium"] >= 0
 
@@ -123,12 +129,14 @@ class TestAuditResourceCoverage:
 class TestAuditOperationExtensions:
     """Verify audit_operation_extensions counts operation-level extensions."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def op_coverage(self) -> dict[str, int]:
         domain_file = SPECS_DIR / "virtual.json"
         return audit_operation_extensions(domain_file)
 
-    def test_total_operations_greater_than_zero(self, op_coverage: dict[str, int]) -> None:
+    def test_total_operations_greater_than_zero(
+        self, op_coverage: dict[str, int]
+    ) -> None:
         """total_operations should be > 0 for virtual.json."""
         assert op_coverage["total_operations"] > 0
 
@@ -150,7 +158,9 @@ class TestAuditOperationExtensions:
         for key, value in op_coverage.items():
             assert isinstance(value, int), f"{key} is not an int"
 
-    def test_operation_metadata_count_nonnegative(self, op_coverage: dict[str, int]) -> None:
+    def test_operation_metadata_count_nonnegative(
+        self, op_coverage: dict[str, int]
+    ) -> None:
         """ops_with_operation_metadata should be >= 0."""
         assert op_coverage["ops_with_operation_metadata"] >= 0
 
@@ -163,7 +173,7 @@ class TestAuditOperationExtensions:
 class TestAuditAllResources:
     """Verify audit_all_resources iterates and aggregates coverage."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def all_coverage(self) -> list[dict]:
         return audit_all_resources(SPECS_DIR)
 
