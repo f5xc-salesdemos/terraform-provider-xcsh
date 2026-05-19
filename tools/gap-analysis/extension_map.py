@@ -26,28 +26,66 @@ from pathlib import Path
 
 CONSUMED_EXTENSIONS = frozenset(
     {
+        # SP-1: Parsed into openapi.Schema struct fields
+        # SP-4: Constraints pipeline fixed — validators emitted in generated code
+        "x-f5xc-constraints",
+        "x-f5xc-conflicts-with",
+        # SP-6: Required fields + server defaults wired into schema generation
+        "x-f5xc-required-for",
+        "x-f5xc-server-default",
+        # Pre-existing: consumed since initial generator
         "x-f5xc-description-medium",
         "x-f5xc-description-short",
-        "x-f5xc-server-default",
+        "x-f5xc-description",
         "x-f5xc-complexity",
         "x-f5xc-example",
         "x-f5xc-requires-tier",
         "x-f5xc-category",
         "x-f5xc-is-preview",
+        # SP-7: Operation extensions injected into docs
+        "x-f5xc-danger-level",
+        "x-f5xc-side-effects",
+        "x-f5xc-confirmation-required",
+        "x-f5xc-best-practices",
     }
 )
 
 PARSED_NOT_RENDERED = frozenset(
     {
-        "x-f5xc-conflicts-with",
-        "x-f5xc-required-for",
+        # Parsed into openapi.Schema but not yet rendered into output
         "x-f5xc-recommended-value",
+        "x-f5xc-recommended-oneof-variant",
+        "x-f5xc-minimum-configuration",
+        "x-f5xc-validation",
+        "x-f5xc-defaults",
+        "x-f5xc-conditions",
+        "x-f5xc-deprecated",
+        "x-f5xc-completion",
+        "x-f5xc-display-name",
+        "x-f5xc-examples",
+        "x-f5xc-required-for-operations",
+        "x-f5xc-displayorder",
+        "x-f5xc-uniqueness",
+        "x-f5xc-terraform-resource",
+        "x-f5xc-operation-metadata",
+        "x-f5xc-required-fields",
     }
 )
 
 DOMAIN_ONLY = frozenset(
     {
         "x-f5xc-use-cases",
+        "x-f5xc-related-domains",
+        "x-f5xc-icon",
+        "x-f5xc-logo-svg",
+        "x-f5xc-doc-section",
+        "x-f5xc-cli-domain",
+        "x-f5xc-cli-metadata",
+        "x-f5xc-glossary",
+        "x-f5xc-guided-workflows",
+        "x-f5xc-acronyms",
+        "x-f5xc-critical-resources",
+        "x-f5xc-primary-resources",
     }
 )
 
@@ -220,10 +258,16 @@ def build_extension_map(
         Dict mapping extension name to status string.
     """
     go_file = provider_root / "tools" / "generate-all-schemas.go"
+    types_file = provider_root / "tools" / "pkg" / "openapi" / "types.go"
+    transform_file = provider_root / "tools" / "transform-docs.go"
     specs_dir = specs_root / "docs" / "specifications" / "api"
 
-    # Gather data
+    # Gather data — scan multiple Go files since SP-2 modularized the generator
     go_fields = extract_go_struct_xf5xc_fields(go_file)
+    if types_file.exists():
+        go_fields |= extract_go_struct_xf5xc_fields(types_file)
+    if transform_file.exists():
+        go_fields |= extract_go_struct_xf5xc_fields(transform_file)
     registered = get_registered_extensions(specs_root)
     emitted = get_emitted_extensions(specs_dir)
 

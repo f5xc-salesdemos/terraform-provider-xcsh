@@ -6,12 +6,12 @@
 
 | Status | Count |
 |--------|-------|
-| CONSUMED | 8 |
+| CONSUMED | 16 |
 | DEFINED_UNUSED | 4 |
-| DOMAIN_ONLY | 1 |
-| NOT_EMITTED | 20 |
-| PARSED_NOT_RENDERED | 3 |
-| UNKNOWN | 21 |
+| DOMAIN_ONLY | 12 |
+| NOT_EMITTED | 8 |
+| PARSED_NOT_RENDERED | 16 |
+| UNKNOWN | 1 |
 
 ### Top 10 Gaps
 
@@ -32,63 +32,63 @@
 
 | Extension | Status |
 |-----------|--------|
-| x-f5xc-acronyms | UNKNOWN |
+| x-f5xc-acronyms | DOMAIN_ONLY |
 | x-f5xc-api-url | NOT_EMITTED |
-| x-f5xc-best-practices | UNKNOWN |
+| x-f5xc-best-practices | CONSUMED |
 | x-f5xc-category | CONSUMED |
-| x-f5xc-cli-domain | UNKNOWN |
-| x-f5xc-cli-metadata | UNKNOWN |
-| x-f5xc-completion | NOT_EMITTED |
+| x-f5xc-cli-domain | DOMAIN_ONLY |
+| x-f5xc-cli-metadata | DOMAIN_ONLY |
+| x-f5xc-completion | PARSED_NOT_RENDERED |
 | x-f5xc-complexity | CONSUMED |
-| x-f5xc-conditions | UNKNOWN |
-| x-f5xc-confirmation-required | UNKNOWN |
-| x-f5xc-conflicts-with | PARSED_NOT_RENDERED |
-| x-f5xc-constraints | DEFINED_UNUSED |
-| x-f5xc-critical-resources | UNKNOWN |
-| x-f5xc-danger-level | UNKNOWN |
-| x-f5xc-defaults | NOT_EMITTED |
-| x-f5xc-deprecated | NOT_EMITTED |
-| x-f5xc-description | NOT_EMITTED |
-| x-f5xc-description-long | UNKNOWN |
+| x-f5xc-conditions | PARSED_NOT_RENDERED |
+| x-f5xc-confirmation-required | CONSUMED |
+| x-f5xc-conflicts-with | CONSUMED |
+| x-f5xc-constraints | CONSUMED |
+| x-f5xc-critical-resources | DOMAIN_ONLY |
+| x-f5xc-danger-level | CONSUMED |
+| x-f5xc-defaults | PARSED_NOT_RENDERED |
+| x-f5xc-deprecated | PARSED_NOT_RENDERED |
+| x-f5xc-description | CONSUMED |
+| x-f5xc-description-long | DEFINED_UNUSED |
 | x-f5xc-description-medium | CONSUMED |
 | x-f5xc-description-short | CONSUMED |
 | x-f5xc-discovered-at | NOT_EMITTED |
 | x-f5xc-discovered-error-catalog | NOT_EMITTED |
 | x-f5xc-discovered-rate-limits | NOT_EMITTED |
 | x-f5xc-discovered-response-time | UNKNOWN |
-| x-f5xc-display-name | NOT_EMITTED |
-| x-f5xc-displayorder | NOT_EMITTED |
-| x-f5xc-doc-section | NOT_EMITTED |
+| x-f5xc-display-name | PARSED_NOT_RENDERED |
+| x-f5xc-displayorder | PARSED_NOT_RENDERED |
+| x-f5xc-doc-section | DOMAIN_ONLY |
 | x-f5xc-enriched-version | NOT_EMITTED |
-| x-f5xc-error-resolution | UNKNOWN |
+| x-f5xc-error-resolution | DEFINED_UNUSED |
 | x-f5xc-example | CONSUMED |
-| x-f5xc-examples | UNKNOWN |
-| x-f5xc-glossary | NOT_EMITTED |
-| x-f5xc-guided-workflows | UNKNOWN |
-| x-f5xc-icon | UNKNOWN |
+| x-f5xc-examples | PARSED_NOT_RENDERED |
+| x-f5xc-glossary | DOMAIN_ONLY |
+| x-f5xc-guided-workflows | DOMAIN_ONLY |
+| x-f5xc-icon | DOMAIN_ONLY |
 | x-f5xc-is-preview | CONSUMED |
-| x-f5xc-logo-svg | UNKNOWN |
-| x-f5xc-minimum-configuration | DEFINED_UNUSED |
-| x-f5xc-namespace-scope | NOT_EMITTED |
-| x-f5xc-operation-metadata | UNKNOWN |
-| x-f5xc-primary-resources | UNKNOWN |
-| x-f5xc-recommended-oneof-variant | DEFINED_UNUSED |
+| x-f5xc-logo-svg | DOMAIN_ONLY |
+| x-f5xc-minimum-configuration | PARSED_NOT_RENDERED |
+| x-f5xc-namespace-scope | DEFINED_UNUSED |
+| x-f5xc-operation-metadata | PARSED_NOT_RENDERED |
+| x-f5xc-primary-resources | DOMAIN_ONLY |
+| x-f5xc-recommended-oneof-variant | PARSED_NOT_RENDERED |
 | x-f5xc-recommended-value | PARSED_NOT_RENDERED |
-| x-f5xc-related-domains | DEFINED_UNUSED |
-| x-f5xc-required-fields | UNKNOWN |
-| x-f5xc-required-for | PARSED_NOT_RENDERED |
-| x-f5xc-required-for-operations | NOT_EMITTED |
+| x-f5xc-related-domains | DOMAIN_ONLY |
+| x-f5xc-required-fields | PARSED_NOT_RENDERED |
+| x-f5xc-required-for | CONSUMED |
+| x-f5xc-required-for-operations | PARSED_NOT_RENDERED |
 | x-f5xc-requires-tier | CONSUMED |
 | x-f5xc-response-time-ms | NOT_EMITTED |
 | x-f5xc-server-default | CONSUMED |
-| x-f5xc-side-effects | UNKNOWN |
-| x-f5xc-summary | UNKNOWN |
-| x-f5xc-terraform-resource | NOT_EMITTED |
-| x-f5xc-uniqueness | NOT_EMITTED |
+| x-f5xc-side-effects | CONSUMED |
+| x-f5xc-summary | DEFINED_UNUSED |
+| x-f5xc-terraform-resource | PARSED_NOT_RENDERED |
+| x-f5xc-uniqueness | PARSED_NOT_RENDERED |
 | x-f5xc-upstream-etag | NOT_EMITTED |
 | x-f5xc-upstream-timestamp | NOT_EMITTED |
 | x-f5xc-use-cases | DOMAIN_ONLY |
-| x-f5xc-validation | UNKNOWN |
+| x-f5xc-validation | PARSED_NOT_RENDERED |
 
 ## 3. Resource-Level Drill-Downs
 
@@ -126,17 +126,17 @@
 
 | Resource | Total Fields | Constraints % | Descriptions % | Enums % |
 |----------|-------------|--------------|---------------|---------|
-| app_firewall | 137 | 20% | 24% | 0% |
+| app_firewall | 137 | 21% | 24% | 0% |
 | cdn_loadbalancer | 223 | 20% | 23% | 0% |
 | cdn_origin_pool | 0 | 0% | 0% | 0% |
 | dns_domain | 59 | 31% | 32% | 0% |
 | dns_load_balancer | 85 | 31% | 47% | 0% |
 | dns_zone | 263 | 48% | 43% | 0% |
-| healthcheck | 70 | 29% | 51% | 0% |
+| healthcheck | 70 | 41% | 51% | 0% |
 | http_loadbalancer | 258 | 11% | 12% | 0% |
 | malicious_user_detection | 0 | 0% | 0% | 0% |
 | network_connector | 56 | 16% | 27% | 0% |
-| origin_pool | 53 | 23% | 30% | 0% |
+| origin_pool | 53 | 30% | 30% | 0% |
 | rate_limit_threshold | 48 | 25% | 42% | 0% |
 | rate_limiter | 57 | 25% | 40% | 0% |
 | rate_limiter_policy | 49 | 16% | 39% | 0% |
@@ -219,13 +219,13 @@
 
 ## 4. Validator Opportunity Analysis
 
-- **Constraint validators available**: 1786 fields across 95 resources
+- **Constraint validators available**: 1800 fields across 95 resources
 - **Enum validators available**: 0 fields with enum values that could generate stringvalidator.OneOf
 - **ConflictsWith validators available**: 77 fields with conflict declarations
 
 ## 5. Schema Fidelity Findings
 
-- 49 of 57 extensions are not fully consumed
+- 41 of 57 extensions are not fully consumed
 - 3338 fields lack enriched descriptions (of 5347 total)
 - 3707 of 3707 operations have danger level annotations (100%)
 

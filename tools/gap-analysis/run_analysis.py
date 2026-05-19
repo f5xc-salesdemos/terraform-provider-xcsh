@@ -1,6 +1,7 @@
 # ruff: noqa: INP001
 """Run the cross-repository gap analysis and generate the report."""
 
+import os
 import sys
 from pathlib import Path
 
@@ -14,7 +15,7 @@ from spec_coverage import audit_all_resources, audit_operation_extensions
 def main() -> None:
     """Run the full gap analysis pipeline and write the markdown report."""
     provider_root = Path(__file__).parent.parent.parent
-    specs_root = Path("/workspace/api-specs-enriched")
+    specs_root = Path(os.environ.get("API_SPECS_ROOT", "/Users/r.mordasiewicz/GIT/api-specs-enriched"))
     specs_dir = specs_root / "docs" / "specifications" / "api"
     output_path = provider_root / "docs" / "gap-analysis" / "cross-repo-gap-report.md"
 
