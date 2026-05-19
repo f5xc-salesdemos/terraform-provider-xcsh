@@ -17,6 +17,14 @@ type Components struct {
 	Schemas map[string]Schema `json:"schemas"`
 }
 
+// RequiredFor describes which operations a field is required for.
+type RequiredFor struct {
+	MinimumConfig bool `json:"minimum_config"`
+	Create        bool `json:"create"`
+	Update        bool `json:"update"`
+	Read          bool `json:"read"`
+}
+
 // Schema represents a schema definition in an OpenAPI spec.
 type Schema struct {
 	Type                 string            `json:"type"`
@@ -69,6 +77,33 @@ type Schema struct {
 	// Provenance — parsed, not used in generation
 	XReconciledAt            string `json:"x-reconciled-at"`
 	XReconciledFromDiscovery bool   `json:"x-reconciled-from-discovery"`
+
+	// ---- SP-1 additions: field-level extensions ----
+	XF5XCServerDefault        bool        `json:"x-f5xc-server-default"`
+	XF5XCRequiredFor          RequiredFor `json:"x-f5xc-required-for"`
+	XF5XCRecommendedValue     interface{} `json:"x-f5xc-recommended-value"`
+	XF5XCMinimumConfiguration interface{} `json:"x-f5xc-minimum-configuration"`
+
+	// ---- SP-1 additions: schema-level extensions ----
+	XF5XCValidation      map[string]interface{} `json:"x-f5xc-validation"`
+	XF5XCDefaults        map[string]interface{} `json:"x-f5xc-defaults"`
+	XF5XCConditions      map[string]interface{} `json:"x-f5xc-conditions"`
+	XF5XCDeprecated      string                 `json:"x-f5xc-deprecated"`
+	XF5XCCompletion      map[string]interface{} `json:"x-f5xc-completion"`
+	XF5XCDisplayName     string                 `json:"x-f5xc-display-name"`
+	XF5XCDescription     string                 `json:"x-f5xc-description"`
+	XF5XCExamples        []interface{}          `json:"x-f5xc-examples"`
+	XF5XCRequiredForOps  map[string]interface{} `json:"x-f5xc-required-for-operations"`
+	XF5XCDisplayOrder    int                    `json:"x-f5xc-displayorder"`
+	XF5XCUniqueness      string                 `json:"x-f5xc-uniqueness"`
+	XF5XCTerraformResource string                 `json:"x-f5xc-terraform-resource"`
+
+	// ---- SP-1 additions: operation-level extensions ----
+	XF5XCDangerLevel          string                 `json:"x-f5xc-danger-level"`
+	XF5XCConfirmationRequired bool                   `json:"x-f5xc-confirmation-required"`
+	XF5XCSideEffects          []string               `json:"x-f5xc-side-effects"`
+	XF5XCOperationMetadata    map[string]interface{} `json:"x-f5xc-operation-metadata"`
+	XF5XCRequiredFields       []string               `json:"x-f5xc-required-fields"`
 }
 
 // TerraformAttribute represents an attribute in a Terraform resource schema.
@@ -93,6 +128,24 @@ type TerraformAttribute struct {
 	JsonName           string // JSON field name from OpenAPI for API marshaling
 	GoType             string // Go type for client struct generation
 	UseDomainValidator bool   // True if name field should use DomainValidator (for DNS resources)
+
+	// ---- SP-1 additions: enrichment-driven attribute metadata ----
+	ServerDefault        bool              // x-f5xc-server-default
+	Default              interface{}       // Resolved default value
+	MinimumConfigRequired bool             // Derived from x-f5xc-required-for.minimum_config
+	RecommendedValue     interface{}       // x-f5xc-recommended-value
+	ValidationRules      map[string]string // Merged x-ves-validation-rules + x-validation-rules
+	Complexity           string            // x-f5xc-complexity
+	UseCases             []string          // x-f5xc-use-cases
+	DeprecationMessage   string            // x-f5xc-deprecated or x-ves-deprecated
+	ConflictsWith        []string          // x-f5xc-conflicts-with
+	MaxLength            int               // From x-original-maxLength or validation rules
+	Immutable            bool              // x-field-mutability == "immutable"
+	EnumValues           []string          // Resolved from enum + x-ves-proto-enum
+	MinLength            int               // From validation rules
+	Pattern              string            // From validation rules
+	MinItems             int               // From x-f5xc-constraints.min_items
+	MaxItems             int               // From x-f5xc-constraints.max_items
 }
 
 // ResourceTemplate contains data for generating a Terraform resource.
@@ -115,6 +168,15 @@ type ResourceTemplate struct {
 	UsesBoolPlanModifier   bool   // True if any bool attribute uses a plan modifier
 	UsesInt64PlanModifier  bool   // True if any int64 attribute uses a plan modifier
 	UsesStringPlanModifier bool   // True if any string attribute uses a plan modifier
+
+	// ---- SP-1 additions: generation control flags ----
+	HasBlocks              bool   // True if any attribute is a block
+	HasMaxLengthValidators bool   // True if any attribute has MaxLength > 0
+	HasEnumValidators      bool   // True if any attribute has EnumValues
+	HasPatternValidators   bool   // True if any attribute has Pattern
+	HasListSizeValidators  bool   // True if any attribute has MinItems or MaxItems
+	HasConflicts           bool   // True if any attribute has ConflictsWith
+	ConflictCheckCode      string // Generated Go code for conflict checks
 }
 
 // GenerationResult tracks the result of generating a resource.
@@ -123,6 +185,10 @@ type GenerationResult struct {
 	Success      bool
 	Error        string
 	FilePath     string
+
+	// ---- SP-1 additions: generation metrics ----
+	AttrCount  int // Number of attributes generated
+	BlockCount int // Number of nested blocks generated
 }
 
 // IsRef returns true if the schema is a reference to another schema.
@@ -206,6 +272,10 @@ type PrimaryResourceMetadata struct {
 	SupportsMetrics  bool                 `json:"supports_metrics"`
 	Dependencies     ResourceDependencies `json:"dependencies"`
 	RelationshipHints []string            `json:"relationship_hints"`
+
+	// ---- SP-1 additions: schema and API path references ----
+	SchemaComponents []string `json:"schema_components"`
+	APIPaths         []string `json:"api_paths"`
 }
 
 // ResourceDependencies represents the dependencies of a resource.
@@ -242,6 +312,13 @@ type DomainSpec struct {
 	XF5XCRelatedDomains []string `json:"x-f5xc-related-domains"`
 	XF5XCUseCases       []string `json:"x-f5xc-use-cases"`
 	XF5XCNamespaceScope string   `json:"x-f5xc-namespace-scope"` // Valid: "system", "shared", "any", "application"
+
+	// ---- SP-1 additions: domain-level spec metadata ----
+	XF5XCDocSection        string                    `json:"x-f5xc-doc-section"`
+	XF5XCPrimaryResources  []PrimaryResourceMetadata `json:"x-f5xc-primary-resources"`
+	XF5XCCriticalResources []string                  `json:"x-f5xc-critical-resources"`
+	XF5XCLogoSVG           string                    `json:"x-f5xc-logo-svg"`
+	XF5XCIcon              string                    `json:"x-f5xc-icon"`
 }
 
 // DomainInfo represents the info section of a domain spec.
@@ -259,6 +336,12 @@ type DomainInfo struct {
 	XF5XCSummary           string         `json:"x-f5xc-summary"`
 	XF5XCBestPractices     *BestPractices `json:"x-f5xc-best-practices"`
 	XF5XCNamespaceScope    string         `json:"x-f5xc-namespace-scope"` // Valid: "system", "shared", "any", "application"
+
+	// ---- SP-1 additions: spec-level domain metadata ----
+	XF5XCCLIMetadata     map[string]interface{} `json:"x-f5xc-cli-metadata"`
+	XF5XCGlossary        map[string]interface{} `json:"x-f5xc-glossary"`
+	XF5XCGuidedWorkflows []interface{}          `json:"x-f5xc-guided-workflows"`
+	XF5XCAcronyms        map[string]interface{} `json:"x-f5xc-acronyms"`
 }
 
 // BestPractices contains operational guidance from the enriched spec.

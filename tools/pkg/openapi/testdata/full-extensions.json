@@ -1,0 +1,95 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Full Extensions Test API",
+    "version": "1.0.0"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "FullExtensionsSchema": {
+        "type": "object",
+        "description": "Schema with all extension fields populated",
+        "title": "Full Extensions Schema",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Resource name",
+            "x-f5xc-server-default": false,
+            "x-f5xc-required-for": {
+              "minimum_config": true,
+              "create": true,
+              "update": false,
+              "read": false
+            },
+            "x-f5xc-recommended-value": "my-resource",
+            "x-f5xc-minimum-configuration": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Resource description"
+          }
+        },
+        "x-displayname": "Full Extensions",
+        "x-ves-example": "ves-example-value",
+        "x-ves-validation-rules": {"max_length": "256", "min_length": "1"},
+        "x-ves-proto-message": "ves.io.schema.full_extensions.Object",
+        "x-f5xc-category": "security",
+        "x-f5xc-requires-tier": "Standard",
+        "x-f5xc-complexity": "advanced",
+        "x-f5xc-example": "f5xc-example-value",
+        "x-f5xc-description-short": "Short description",
+        "x-f5xc-description-medium": "Medium length description",
+        "x-f5xc-use-cases": ["use-case-1", "use-case-2"],
+        "x-f5xc-related-domains": ["domain-a", "domain-b"],
+        "x-f5xc-is-preview": true,
+        "x-f5xc-namespace-scope": "system",
+        "x-f5xc-icon": "shield-icon",
+        "x-f5xc-cli-domain": "security",
+        "x-ves-deprecated": "Use v2 endpoint instead",
+        "x-ves-displayorder": "5",
+        "x-ves-proto-enum": "ves.io.schema.SomeEnum",
+        "x-ves-required": "true",
+        "x-required": true,
+        "x-validation-rules": {"pattern": "^[a-z]+$"},
+        "x-f5xc-conflicts-with": ["field_a", "field_b"],
+        "x-f5xc-constraints": {"min_items": 1},
+        "x-f5xc-recommended-oneof-variant": "option_a",
+        "x-field-mutability": "immutable",
+        "x-original-maxLength": 256,
+        "x-reconciled-at": "2026-04-23T09:16:13Z",
+        "x-reconciled-from-discovery": true,
+
+        "x-f5xc-server-default": true,
+        "x-f5xc-required-for": {
+          "minimum_config": true,
+          "create": true,
+          "update": false,
+          "read": true
+        },
+        "x-f5xc-recommended-value": "recommended-default",
+        "x-f5xc-minimum-configuration": {"field": "name", "required": true},
+
+        "x-f5xc-validation": {"min_length": 1, "max_length": 256},
+        "x-f5xc-defaults": {"timeout": 30, "retries": 3},
+        "x-f5xc-conditions": {"requires": "parent_enabled"},
+        "x-f5xc-deprecated": "Deprecated: use new_field instead",
+        "x-f5xc-completion": {"suggestions": ["val1", "val2"]},
+        "x-f5xc-display-name": "Full Extensions Display Name",
+        "x-f5xc-description": "Full enriched description for display",
+        "x-f5xc-examples": ["example1", "example2", "example3"],
+        "x-f5xc-required-for-operations": {"create": true, "update": false},
+        "x-f5xc-displayorder": 10,
+        "x-f5xc-uniqueness": "global",
+        "x-f5xc-terraform-resource": "f5xc_full_extensions",
+
+        "x-f5xc-danger-level": "high",
+        "x-f5xc-confirmation-required": true,
+        "x-f5xc-side-effects": ["restart", "downtime"],
+        "x-f5xc-operation-metadata": {"rollback_supported": true},
+        "x-f5xc-required-fields": ["name", "namespace"]
+      }
+    }
+  }
+}

@@ -374,8 +374,11 @@ func (s *Schema) GetExampleValue() string {
 }
 
 // GetBestDescription returns the best available description for a schema.
-// Priority: x-f5xc-description-medium > x-f5xc-description-short > description.
+// Priority: x-f5xc-description > x-f5xc-description-medium > x-f5xc-description-short > description.
 func (s *Schema) GetBestDescription() string {
+	if s.XF5XCDescription != "" {
+		return s.XF5XCDescription
+	}
 	if s.XF5XCDescriptionMed != "" {
 		return s.XF5XCDescriptionMed
 	}
