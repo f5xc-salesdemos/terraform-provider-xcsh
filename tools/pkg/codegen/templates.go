@@ -36,6 +36,9 @@ import (
 {{- if .HasListSizeValidators}}
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 {{- end}}
+{{- if .HasInt64RangeValidators}}
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+{{- end}}
 {{- if .HasPatternValidators}}
 	"regexp"
 {{- end}}
@@ -149,6 +152,16 @@ func (r *{{.TitleCase}}Resource) Schema(ctx context.Context, req resource.Schema
 					listvalidator.SizeAtMost({{.MaxItems}}),
 {{- else}}
 					listvalidator.SizeAtLeast({{.MinItems}}),
+{{- end}}
+				},
+{{- else if and (eq .Type "int64") (or (gt .Minimum 0) (gt .Maximum 0))}}
+				Validators: []validator.Int64{
+{{- if and (gt .Minimum 0) (gt .Maximum 0)}}
+					int64validator.Between({{.Minimum}}, {{.Maximum}}),
+{{- else if gt .Maximum 0}}
+					int64validator.AtMost({{.Maximum}}),
+{{- else}}
+					int64validator.AtLeast({{.Minimum}}),
 {{- end}}
 				},
 {{- end}}

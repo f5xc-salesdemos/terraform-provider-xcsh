@@ -151,3 +151,73 @@ func TestParse(t *testing.T) {
 		})
 	}
 }
+
+func TestParse_TopLevelDeterministic(t *testing.T) {
+	input := map[string]interface{}{
+		"constraintType": "string",
+		"category":       "naming",
+		"maxLength":      float64(1024),
+		"minLength":      float64(1),
+		"pattern":        "^[a-z]([-a-z0-9]*[a-z0-9])?$",
+		"deterministic":  true,
+		"metadata": map[string]interface{}{
+			"source":     "api-probed",
+			"confidence": 0.99,
+		},
+	}
+	result := Parse(input)
+	if result == nil {
+		t.Fatal("Parse() returned nil for top-level deterministic=true constraint")
+	}
+	if result.MinLength != 1 {
+		t.Errorf("MinLength = %d, want 1", result.MinLength)
+	}
+	if result.MaxLength != 1024 {
+		t.Errorf("MaxLength = %d, want 1024", result.MaxLength)
+	}
+	if result.Pattern != "^[a-z]([-a-z0-9]*[a-z0-9])?$" {
+		t.Errorf("Pattern = %q, want naming pattern", result.Pattern)
+	}
+}
+
+func TestParse_NumericConstraints(t *testing.T) {
+	input := map[string]interface{}{
+		"constraintType": "number",
+		"category":       "threshold",
+		"minimum":        float64(1),
+		"maximum":        float64(16),
+		"deterministic":  true,
+		"metadata": map[string]interface{}{
+			"source":     "api-probed",
+			"confidence": 0.99,
+		},
+	}
+	result := Parse(input)
+	if result == nil {
+		t.Fatal("Parse() returned nil for numeric constraint")
+	}
+	if result.Minimum != 1 {
+		t.Errorf("Minimum = %d, want 1", result.Minimum)
+	}
+	if result.Maximum != 16 {
+		t.Errorf("Maximum = %d, want 16", result.Maximum)
+	}
+}
+
+func TestParse_ConfidenceInMetadata_NoDeterministic(t *testing.T) {
+	input := map[string]interface{}{
+		"constraintType": "string",
+		"maxLength":      float64(1200),
+		"metadata": map[string]interface{}{
+			"source":     "inferred",
+			"confidence": float64(0.9),
+		},
+	}
+	result := Parse(input)
+	if result == nil {
+		t.Fatal("Parse() returned nil for confidence=0.9 constraint")
+	}
+	if result.MaxLength != 1200 {
+		t.Errorf("MaxLength = %d, want 1200", result.MaxLength)
+	}
+}

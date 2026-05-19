@@ -245,6 +245,12 @@ func ConvertToTerraformAttributeWithDepth(name string, schema openapi.Schema, re
 		if c.MaxItems > 0 {
 			attr.MaxItems = c.MaxItems
 		}
+		if c.Minimum > 0 {
+			attr.Minimum = c.Minimum
+		}
+		if c.Maximum > 0 {
+			attr.Maximum = c.Maximum
+		}
 	}
 
 	// Prefer x-validation-rules over x-ves-validation-rules when both present
