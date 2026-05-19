@@ -21,7 +21,7 @@ GO=go
 GOFMT=gofmt
 GOLINT=golangci-lint
 
-.PHONY: all build test lint fmt clean clean-generated regenerate generate docs install help download-specs sweep sweep-dry-run testacc testacc-mock testacc-real testacc-all test-report test-comprehensive test-comprehensive-mock test-comprehensive-real test-pr-subset
+.PHONY: all build test lint fmt clean clean-generated regenerate generate docs install help download-specs sweep sweep-dry-run testacc testacc-mock testacc-real testacc-staging testacc-all test-report test-comprehensive test-comprehensive-mock test-comprehensive-real test-pr-subset
 
 # Default target
 all: generate build lint test docs
@@ -46,8 +46,9 @@ help:
 	@echo "  make testacc      - Run all acceptance tests (requires F5XC credentials)"
 	@echo "  make testacc-real - Run REAL API tests only (TestAcc* prefix)"
 	@echo "  make testacc-mock - Run MOCK API tests only (TestMock* prefix)"
-	@echo "  make testacc-all  - Run both real and mock tests with report"
-	@echo "  make test-report  - Generate test report from last test run"
+	@echo "  make testacc-all     - Run both real and mock tests with report"
+	@echo "  make testacc-staging - Run curated staging tests (15 representative resources)"
+	@echo "  make test-report     - Generate test report from last test run"
 	@echo ""
 	@echo "Comprehensive Testing (CI/CD):"
 	@echo "  make test-comprehensive      - Full test suite with professional reports"
@@ -260,6 +261,21 @@ testacc-real:
 	TF_ACC=1 $(GO) test -v -timeout 120m ./internal/provider/... -run "^TestAcc" 2>&1 | tee .test-output-real.txt
 	@echo ""
 	@echo "Test output saved to .test-output-real.txt"
+
+# Run curated staging acceptance tests (representative subset across all domains)
+# Sequential execution to avoid rate limiting. Requires F5XC_API_URL and F5XC_API_TOKEN.
+# Covers 9 verified resources: Namespace, Healthcheck, OriginPool, AppFirewall,
+# VirtualSite, AlertPolicy, AlertReceiver, ServicePolicy, GlobalLogReceiver
+testacc-staging:
+	@echo "Running curated staging acceptance tests..."
+	@echo "Target: $${F5XC_API_URL}"
+	@echo ""
+	TF_ACC=1 $(GO) test -v -timeout 60m -count=1 -parallel=1 \
+		./internal/provider/... \
+		-run "^TestAcc(Namespace|Healthcheck|OriginPool|AppFirewall|VirtualSite|AlertPolicy|AlertReceiver|ServicePolicy|GlobalLogReceiver)Resource_basic$$" \
+		2>&1 | tee .test-output-staging.txt
+	@echo ""
+	@echo "Test output saved to .test-output-staging.txt"
 
 # Run MOCK API tests only (TestMock* prefix)
 # These tests use the mock server and don't require real credentials
