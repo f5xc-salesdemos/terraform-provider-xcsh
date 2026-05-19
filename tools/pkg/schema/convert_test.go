@@ -258,6 +258,72 @@ func TestConvertToTerraformAttribute_DescriptionReserved(t *testing.T) {
 	}
 }
 
+func TestConvertToTerraformAttribute_RequiredForCreate(t *testing.T) {
+	schema := openapi.Schema{
+		Type:        "string",
+		Description: "A domain name",
+		XF5XCRequiredFor: openapi.RequiredFor{
+			Create: true,
+		},
+	}
+	spec := &openapi.Spec{Components: openapi.Components{Schemas: map[string]openapi.Schema{}}}
+	attr := ConvertToTerraformAttributeWithDepth("domain", schema, false, "", spec, 0, "domain")
+	if !attr.Required {
+		t.Error("Expected Required=true when x-f5xc-required-for.create=true at depth 0")
+	}
+	if attr.Optional {
+		t.Error("Expected Optional=false when Required=true")
+	}
+}
+
+func TestConvertToTerraformAttribute_RequiredForCreate_NestedIgnored(t *testing.T) {
+	schema := openapi.Schema{
+		Type:        "string",
+		Description: "A nested field",
+		XF5XCRequiredFor: openapi.RequiredFor{Create: true},
+	}
+	spec := &openapi.Spec{Components: openapi.Components{Schemas: map[string]openapi.Schema{}}}
+	attr := ConvertToTerraformAttributeWithDepth("nested_field", schema, false, "", spec, 1, "parent.nested_field")
+	if attr.Required {
+		t.Error("x-f5xc-required-for.create should NOT set Required at depth > 0")
+	}
+}
+
+func TestConvertToTerraformAttribute_ServerDefault(t *testing.T) {
+	schema := openapi.Schema{
+		Type:               "string",
+		Description:        "A server-defaulted field",
+		XF5XCServerDefault: true,
+	}
+	spec := &openapi.Spec{Components: openapi.Components{Schemas: map[string]openapi.Schema{}}}
+	attr := ConvertToTerraformAttributeWithDepth("mode", schema, false, "", spec, 0, "mode")
+	if !attr.Computed {
+		t.Error("Expected Computed=true when x-f5xc-server-default=true")
+	}
+	if !attr.Optional {
+		t.Error("Expected Optional=true for server-default fields")
+	}
+	if attr.PlanModifier != "UseStateForUnknown" {
+		t.Errorf("Expected PlanModifier=UseStateForUnknown, got %q", attr.PlanModifier)
+	}
+}
+
+func TestConvertToTerraformAttribute_ServerDefault_RequiredNotOverridden(t *testing.T) {
+	schema := openapi.Schema{
+		Type:               "string",
+		Description:        "Required but server has default",
+		XF5XCServerDefault: true,
+	}
+	spec := &openapi.Spec{Components: openapi.Components{Schemas: map[string]openapi.Schema{}}}
+	attr := ConvertToTerraformAttributeWithDepth("name", schema, true, "", spec, 0, "name")
+	if !attr.Computed {
+		t.Error("Expected Computed=true for server-default field")
+	}
+	if !attr.Required {
+		t.Error("Required should not be overridden when field is in OpenAPI required array")
+	}
+}
+
 func TestExtractNestedAttributes(t *testing.T) {
 	spec := &openapi.Spec{
 		Components: openapi.Components{

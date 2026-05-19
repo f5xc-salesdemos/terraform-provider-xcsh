@@ -261,7 +261,7 @@ func ConvertToTerraformAttributeWithDepth(name string, schema openapi.Schema, re
 	// apply at depth 0 (top-level resource spec attributes). For nested
 	// attributes inside optional blocks, Required: true causes Terraform
 	// Plugin Framework to fail validation even when the block is absent.
-	if depth == 0 && (schema.XRequired || schema.XVesRequired == "true") {
+	if depth == 0 && (schema.XRequired || schema.XVesRequired == "true" || schema.XF5XCRequiredFor.Create) {
 		attr.Required = true
 		attr.Optional = false
 	}
@@ -322,6 +322,10 @@ func ConvertToTerraformAttributeWithDepth(name string, schema openapi.Schema, re
 	// Add server default note to description (x-f5xc-server-default extension)
 	// This indicates fields where F5XC server applies sensible defaults when omitted
 	if schema.XF5XCServerDefault {
+		attr.Computed = true
+		if attr.PlanModifier == "" {
+			attr.PlanModifier = "UseStateForUnknown"
+		}
 		attr.Description += " Server applies default when omitted."
 	}
 
