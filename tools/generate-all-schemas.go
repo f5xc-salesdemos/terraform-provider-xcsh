@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/codegen"
@@ -355,17 +356,26 @@ func extractResourceSchemaByName(spec *OpenAPI3Spec, resourceName string) (*Sche
 		}
 	}
 
+	// Sort schema names for deterministic fallback matching (map order is random in Go)
+	sortedNames := make([]string, 0, len(spec.Components.Schemas))
+	for name := range spec.Components.Schemas {
+		sortedNames = append(sortedNames, name)
+	}
+	sort.Strings(sortedNames)
+
 	// Try case-insensitive match for legacy .Object suffix
 	lowerName := strings.ToLower(resourceName)
-	for name, schema := range spec.Components.Schemas {
+	for _, name := range sortedNames {
 		if strings.Contains(strings.ToLower(name), lowerName) && strings.HasSuffix(name, ".Object") {
+			schema := spec.Components.Schemas[name]
 			return &schema, name
 		}
 	}
 
 	// Try case-insensitive match for v2 CreateSpecType suffix
-	for name, schema := range spec.Components.Schemas {
+	for _, name := range sortedNames {
 		if strings.Contains(strings.ToLower(name), lowerName) && strings.HasSuffix(name, "CreateSpecType") {
+			schema := spec.Components.Schemas[name]
 			return &schema, name
 		}
 	}
@@ -381,7 +391,14 @@ func extractAPIPathForResource(spec *OpenAPI3Spec, resourceName string) string {
 		plural = strings.TrimSuffix(resourceName, "y") + "ies"
 	}
 
+	// Sort paths for deterministic matching (map order is random in Go)
+	paths := make([]string, 0, len(spec.Paths))
 	for path := range spec.Paths {
+		paths = append(paths, path)
+	}
+	sort.Strings(paths)
+
+	for _, path := range paths {
 		if strings.Contains(path, "/"+plural) {
 			return path
 		}
@@ -502,8 +519,16 @@ func parseOpenAPISpec(specFile string) (*OpenAPI3Spec, error) {
 func extractAPIPath(spec *OpenAPI3Spec, resourceName string) (basePath string, itemPath string, hasNamespace bool) {
 	resourcePlural := resourceName + "s"
 
+	// Sort path keys for deterministic matching (map order is random in Go)
+	sortedPaths := make([]string, 0, len(spec.Paths))
+	for path := range spec.Paths {
+		sortedPaths = append(sortedPaths, path)
+	}
+	sort.Strings(sortedPaths)
+
 	// Look for CRUD paths in the spec
-	for path, pathObj := range spec.Paths {
+	for _, path := range sortedPaths {
+		pathObj := spec.Paths[path]
 		pathMap, ok := pathObj.(map[string]interface{})
 		if !ok {
 			continue

@@ -164,7 +164,7 @@ func TestScanPlanModifierUsage(t *testing.T) {
 			{Type: "int64", PlanModifier: "UseStateForUnknown"},
 		}},
 	}
-	usesBool, usesInt64, usesString := ScanPlanModifierUsage(attrs)
+	usesBool, usesInt64, usesString, usesList, usesMap := ScanPlanModifierUsage(attrs)
 	if !usesBool {
 		t.Error("Should detect bool plan modifier")
 	}
@@ -173,5 +173,35 @@ func TestScanPlanModifierUsage(t *testing.T) {
 	}
 	if !usesString {
 		t.Error("Should detect string plan modifier")
+	}
+	if usesList {
+		t.Error("Should not detect list plan modifier (none present)")
+	}
+	if usesMap {
+		t.Error("Should not detect map plan modifier (none present)")
+	}
+}
+
+func TestScanPlanModifierUsage_ListAndMap(t *testing.T) {
+	attrs := []openapi.TerraformAttribute{
+		{Type: "list", PlanModifier: "UseStateForUnknown"},
+		{Type: "map", PlanModifier: "UseStateForUnknown"},
+	}
+	_, _, _, usesList, usesMap := ScanPlanModifierUsage(attrs)
+	if !usesList {
+		t.Error("Should detect list plan modifier")
+	}
+	if !usesMap {
+		t.Error("Should detect map plan modifier")
+	}
+}
+
+func TestScanPlanModifierUsage_SkipsBlocks(t *testing.T) {
+	attrs := []openapi.TerraformAttribute{
+		{Type: "list", PlanModifier: "UseStateForUnknown", IsBlock: true},
+	}
+	_, _, _, usesList, _ := ScanPlanModifierUsage(attrs)
+	if usesList {
+		t.Error("Should not detect list plan modifier on block attributes")
 	}
 }

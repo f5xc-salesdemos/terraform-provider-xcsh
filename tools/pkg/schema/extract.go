@@ -30,7 +30,15 @@ func ExtractResourceSchema(spec *openapi.Spec, resourceName string, extractAPIPa
 	var found bool
 	var createSpecKey string
 
-	for key, schema := range spec.Components.Schemas {
+	// Sort schema keys for deterministic iteration (map order is random in Go)
+	schemaKeys := make([]string, 0, len(spec.Components.Schemas))
+	for key := range spec.Components.Schemas {
+		schemaKeys = append(schemaKeys, key)
+	}
+	sort.Strings(schemaKeys)
+
+	for _, key := range schemaKeys {
+		schema := spec.Components.Schemas[key]
 		keyLower := strings.ToLower(key)
 		if strings.Contains(keyLower, strings.ToLower(resourceName)) &&
 			strings.Contains(keyLower, "createspectype") {
@@ -231,7 +239,7 @@ func ExtractResourceSchema(spec *openapi.Spec, resourceName string, extractAPIPa
 	apiPath, apiPathItem, hasNamespace := extractAPIPath(spec, resourceName)
 
 	// Scan attributes to determine which plan modifier imports are needed
-	usesBool, usesInt64, usesString := ScanPlanModifierUsage(attributes)
+	usesBool, usesInt64, usesString, usesList, usesMap := ScanPlanModifierUsage(attributes)
 
 	// Check if the resource has any nested models that would generate AttrTypes
 	// AttrTypes (which use attr.Type) are generated for any block with nested attributes
@@ -259,6 +267,8 @@ func ExtractResourceSchema(spec *openapi.Spec, resourceName string, extractAPIPa
 		UsesBoolPlanModifier:   usesBool,
 		UsesInt64PlanModifier:  usesInt64,
 		UsesStringPlanModifier: usesString,
+		UsesListPlanModifier:   usesList,
+		UsesMapPlanModifier:    usesMap,
 		HasBlocks:              hasBlocks,
 		HasMaxLengthValidators: hasMaxLengthValidators,
 		HasEnumValidators:      HasEnumValidatorsAny(attributes),

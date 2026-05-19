@@ -25,6 +25,12 @@ import (
 {{- if .UsesInt64PlanModifier}}
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 {{- end}}
+{{- if .UsesListPlanModifier}}
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+{{- end}}
+{{- if .UsesMapPlanModifier}}
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
+{{- end}}
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 {{- if .HasBlocks}}

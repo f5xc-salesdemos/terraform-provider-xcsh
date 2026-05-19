@@ -66,6 +66,7 @@ func IsMetadataField(name string) bool {
 		"description": true,
 		"id":          true,
 		"timeouts":    true,
+		"disable":     true,
 	}
 	return metadataFields[name]
 }
@@ -202,6 +203,10 @@ func ConvertToTerraformAttributeWithDepth(name string, schema openapi.Schema, re
 	if strings.ToLower(name) == "description" {
 		goName = "DescriptionSpec"
 		tfsdkName = "description_spec"
+	}
+	if strings.ToLower(name) == "disable" {
+		goName = "DisableSpec"
+		tfsdkName = "disable_spec"
 	}
 
 	attr := openapi.TerraformAttribute{

@@ -130,9 +130,9 @@ func HasInt64RangeValidatorsAny(attributes []openapi.TerraformAttribute) bool {
 }
 
 // ScanPlanModifierUsage recursively scans attributes to determine which plan modifier imports are needed.
-func ScanPlanModifierUsage(attributes []openapi.TerraformAttribute) (usesBool, usesInt64, usesString bool) {
+func ScanPlanModifierUsage(attributes []openapi.TerraformAttribute) (usesBool, usesInt64, usesString, usesList, usesMap bool) {
 	for _, attr := range attributes {
-		if attr.PlanModifier != "" {
+		if attr.PlanModifier != "" && !attr.IsBlock {
 			switch attr.Type {
 			case "bool":
 				usesBool = true
@@ -140,14 +140,19 @@ func ScanPlanModifierUsage(attributes []openapi.TerraformAttribute) (usesBool, u
 				usesInt64 = true
 			case "string":
 				usesString = true
+			case "list", "set":
+				usesList = true
+			case "map":
+				usesMap = true
 			}
 		}
-		// Recursively scan nested attributes
 		if len(attr.NestedAttributes) > 0 {
-			nestedBool, nestedInt64, nestedString := ScanPlanModifierUsage(attr.NestedAttributes)
-			usesBool = usesBool || nestedBool
-			usesInt64 = usesInt64 || nestedInt64
-			usesString = usesString || nestedString
+			nb, ni, ns, nl, nm := ScanPlanModifierUsage(attr.NestedAttributes)
+			usesBool = usesBool || nb
+			usesInt64 = usesInt64 || ni
+			usesString = usesString || ns
+			usesList = usesList || nl
+			usesMap = usesMap || nm
 		}
 	}
 	return
