@@ -228,6 +228,74 @@ func TestGetInfo(t *testing.T) {
 	}
 }
 
+func TestAICategories(t *testing.T) {
+	tests := []struct {
+		resourceName string
+		expected     string
+	}{
+		{"http_loadbalancer", "Load Balancing"},
+		{"tcp_loadbalancer", "Load Balancing"},
+		{"origin_pool", "Load Balancing"},
+		{"app_firewall", "Security"},
+		{"service_policy", "Security"},
+		{"network_connector", "Networking"},
+		{"virtual_network", "Networking"},
+		{"aws_vpc_site", "Sites"},
+		{"dns_zone", "DNS"},
+		{"k8s_cluster", "Kubernetes"},
+		{"authentication", "Authentication"},
+		{"certificate", "Certificates"},
+		{"log_receiver", "Monitoring"},
+		{"api_definition", "API Security"},
+		{"namespace", "Organization"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.resourceName, func(t *testing.T) {
+			result, ok := AICategories[tt.resourceName]
+			if !ok {
+				t.Errorf("AICategories[%q] not found", tt.resourceName)
+				return
+			}
+			if result != tt.expected {
+				t.Errorf("AICategories[%q] = %q, want %q", tt.resourceName, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestDependencies(t *testing.T) {
+	tests := []struct {
+		resourceName string
+		expectedDeps []string
+	}{
+		{"http_loadbalancer", []string{"namespace", "origin_pool"}},
+		{"origin_pool", []string{"namespace", "healthcheck"}},
+		{"healthcheck", []string{"namespace"}},
+		{"dns_zone", []string{}},
+		{"namespace", []string{}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.resourceName, func(t *testing.T) {
+			deps, ok := Dependencies[tt.resourceName]
+			if !ok {
+				t.Errorf("Dependencies[%q] not found", tt.resourceName)
+				return
+			}
+			if len(deps) != len(tt.expectedDeps) {
+				t.Errorf("Dependencies[%q] has %d deps, want %d", tt.resourceName, len(deps), len(tt.expectedDeps))
+				return
+			}
+			for i, d := range deps {
+				if d != tt.expectedDeps[i] {
+					t.Errorf("Dependencies[%q][%d] = %q, want %q", tt.resourceName, i, d, tt.expectedDeps[i])
+				}
+			}
+		})
+	}
+}
+
 func TestAllCategories(t *testing.T) {
 	categories := AllCategories()
 

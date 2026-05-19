@@ -75,6 +75,46 @@ func ToSnakeCase(s string) string {
 	return result.String()
 }
 
+// TerraformReservedNames maps Terraform reserved attribute names to safe replacements.
+// These names conflict with Terraform meta-arguments and must be renamed.
+var TerraformReservedNames = map[string]string{
+	"count":       "item_count",
+	"for_each":    "for_each_items",
+	"depends_on":  "depends_on_refs",
+	"provider":    "provider_ref",
+	"lifecycle":   "lifecycle_config",
+	"provisioner": "provisioner_config",
+	"connection":  "connection_config",
+	"locals":      "locals_config",
+}
+
+// ToSnakeCaseTerraform converts a CamelCase or PascalCase string to snake_case
+// for use as Terraform attribute names. Unlike ToSnakeCase, this function also
+// handles reserved Terraform attribute names by mapping them to safe alternatives.
+// Example: "AWAFPayG3Gbps" -> "awaf_pay_g3_gbps", "Count" -> "item_count"
+func ToSnakeCaseTerraform(s string) string {
+	// Insert underscores before uppercase letters that follow lowercase letters or digits
+	var result strings.Builder
+	for i, r := range s {
+		if i > 0 && r >= 'A' && r <= 'Z' {
+			prev := rune(s[i-1])
+			// Add underscore if previous char is lowercase or a digit
+			if (prev >= 'a' && prev <= 'z') || (prev >= '0' && prev <= '9') {
+				result.WriteRune('_')
+			}
+		}
+		result.WriteRune(r)
+	}
+	// Convert to lowercase
+	name := strings.ToLower(result.String())
+
+	// Handle reserved Terraform attribute names
+	if replacement, ok := TerraformReservedNames[name]; ok {
+		return replacement
+	}
+	return name
+}
+
 // ToHumanName converts a resource name to human-readable format.
 // Example: "http_loadbalancer" -> "HTTP Loadbalancer"
 func ToHumanName(resourceName string) string {

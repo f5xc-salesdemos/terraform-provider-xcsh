@@ -80,6 +80,48 @@ func TestToSnakeCase(t *testing.T) {
 	}
 }
 
+func TestToSnakeCaseTerraform(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"AWAFPayG3Gbps", "awafpay_g3_gbps"},
+		{"HTTPLoadBalancer", "httpload_balancer"},
+		{"SimpleTest", "simple_test"},
+		{"bgpAsn", "bgp_asn"},
+		{"ipAddress", "ip_address"},
+		{"TLSConfig", "tlsconfig"},
+		// Reserved Terraform attribute names
+		{"Count", "item_count"},
+		{"ForEach", "for_each_items"},
+		{"DependsOn", "depends_on_refs"},
+		{"Provider", "provider_ref"},
+		{"Lifecycle", "lifecycle_config"},
+		{"Provisioner", "provisioner_config"},
+		{"Connection", "connection_config"},
+		{"Locals", "locals_config"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			result := ToSnakeCaseTerraform(tt.input)
+			if result != tt.expected {
+				t.Errorf("ToSnakeCaseTerraform(%q) = %q, want %q", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestTerraformReservedNames(t *testing.T) {
+	// Verify all reserved names are mapped
+	expectedReserved := []string{"count", "for_each", "depends_on", "provider", "lifecycle", "provisioner", "connection", "locals"}
+	for _, name := range expectedReserved {
+		if _, ok := TerraformReservedNames[name]; !ok {
+			t.Errorf("TerraformReservedNames missing expected entry %q", name)
+		}
+	}
+}
+
 func TestToHumanName(t *testing.T) {
 	tests := []struct {
 		input    string
