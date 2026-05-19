@@ -114,6 +114,21 @@ func CollectConflictAttrs(attributes []openapi.TerraformAttribute) ([]conflicts.
 	return result, goNameLookup
 }
 
+// HasInt64RangeValidatorsAny returns true if any attribute or nested attribute has Minimum or Maximum set.
+func HasInt64RangeValidatorsAny(attributes []openapi.TerraformAttribute) bool {
+	for _, attr := range attributes {
+		if attr.Minimum > 0 || attr.Maximum > 0 {
+			return true
+		}
+		for _, nested := range attr.NestedAttributes {
+			if nested.Minimum > 0 || nested.Maximum > 0 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // ScanPlanModifierUsage recursively scans attributes to determine which plan modifier imports are needed.
 func ScanPlanModifierUsage(attributes []openapi.TerraformAttribute) (usesBool, usesInt64, usesString bool) {
 	for _, attr := range attributes {

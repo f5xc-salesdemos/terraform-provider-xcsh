@@ -146,6 +146,8 @@ type TerraformAttribute struct {
 	Pattern              string            // From validation rules
 	MinItems             int               // From x-f5xc-constraints.min_items
 	MaxItems             int               // From x-f5xc-constraints.max_items
+	Minimum  int
+	Maximum  int
 }
 
 // ResourceTemplate contains data for generating a Terraform resource.
@@ -175,6 +177,7 @@ type ResourceTemplate struct {
 	HasEnumValidators      bool   // True if any attribute has EnumValues
 	HasPatternValidators   bool   // True if any attribute has Pattern
 	HasListSizeValidators  bool   // True if any attribute has MinItems or MaxItems
+	HasInt64RangeValidators bool
 	HasConflicts           bool   // True if any attribute has ConflictsWith
 	ConflictCheckCode      string // Generated Go code for conflict checks
 }

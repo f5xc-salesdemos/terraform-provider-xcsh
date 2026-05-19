@@ -264,6 +264,7 @@ func ExtractResourceSchema(spec *openapi.Spec, resourceName string, extractAPIPa
 		HasEnumValidators:      HasEnumValidatorsAny(attributes),
 		HasPatternValidators:   HasPatternValidatorsAny(attributes),
 		HasListSizeValidators:  HasListSizeValidatorsAny(attributes),
+		HasInt64RangeValidators: HasInt64RangeValidatorsAny(attributes),
 		HasConflicts:           conflictCode != "",
 		ConflictCheckCode:      conflictCode,
 	}, nil

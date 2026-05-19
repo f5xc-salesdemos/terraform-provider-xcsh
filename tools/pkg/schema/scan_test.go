@@ -128,6 +128,33 @@ func TestCollectConflictAttrs(t *testing.T) {
 	}
 }
 
+func TestHasInt64RangeValidatorsAny(t *testing.T) {
+	withRange := []openapi.TerraformAttribute{
+		{Name: "no_range"},
+		{Name: "has_range", Minimum: 1, Maximum: 16},
+	}
+	if !HasInt64RangeValidatorsAny(withRange) {
+		t.Error("HasInt64RangeValidatorsAny should detect Minimum/Maximum > 0")
+	}
+
+	withoutRange := []openapi.TerraformAttribute{
+		{Name: "no_range"},
+		{Name: "also_no_range"},
+	}
+	if HasInt64RangeValidatorsAny(withoutRange) {
+		t.Error("HasInt64RangeValidatorsAny should return false when no range set")
+	}
+
+	nested := []openapi.TerraformAttribute{
+		{Name: "parent", NestedAttributes: []openapi.TerraformAttribute{
+			{Name: "child_range", Minimum: 1, Maximum: 100},
+		}},
+	}
+	if !HasInt64RangeValidatorsAny(nested) {
+		t.Error("HasInt64RangeValidatorsAny should detect nested Minimum/Maximum")
+	}
+}
+
 func TestScanPlanModifierUsage(t *testing.T) {
 	attrs := []openapi.TerraformAttribute{
 		{Type: "string", PlanModifier: "UseStateForUnknown"},
