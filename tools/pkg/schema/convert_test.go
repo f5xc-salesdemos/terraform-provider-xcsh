@@ -308,7 +308,7 @@ func TestConvertToTerraformAttribute_ServerDefault(t *testing.T) {
 	}
 }
 
-func TestConvertToTerraformAttribute_ServerDefault_RequiredNotOverridden(t *testing.T) {
+func TestConvertToTerraformAttribute_ServerDefault_RequiredSkipsComputed(t *testing.T) {
 	schema := openapi.Schema{
 		Type:               "string",
 		Description:        "Required but server has default",
@@ -316,11 +316,11 @@ func TestConvertToTerraformAttribute_ServerDefault_RequiredNotOverridden(t *test
 	}
 	spec := &openapi.Spec{Components: openapi.Components{Schemas: map[string]openapi.Schema{}}}
 	attr := ConvertToTerraformAttributeWithDepth("name", schema, true, "", spec, 0, "name")
-	if !attr.Computed {
-		t.Error("Expected Computed=true for server-default field")
+	if attr.Computed {
+		t.Error("Required fields should NOT be Computed (Terraform rejects Required+Computed)")
 	}
 	if !attr.Required {
-		t.Error("Required should not be overridden when field is in OpenAPI required array")
+		t.Error("Required should be preserved")
 	}
 }
 

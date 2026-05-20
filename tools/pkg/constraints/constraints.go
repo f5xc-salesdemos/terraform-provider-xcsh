@@ -2,6 +2,8 @@
 
 package constraints
 
+import "regexp"
+
 // Parsed represents extracted x-f5xc-constraints data.
 type Parsed struct {
 	MinLength int
@@ -54,7 +56,9 @@ func Parse(raw map[string]interface{}) *Parsed {
 		p.MaxLength = int(v)
 	}
 	if v, ok := raw["pattern"].(string); ok {
-		p.Pattern = v
+		if _, err := regexp.Compile(v); err == nil {
+			p.Pattern = v
+		}
 	}
 
 	// List/array constraints

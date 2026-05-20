@@ -58,16 +58,15 @@ func testAccFastACLImportStateIdFunc(resourceName string) resource.ImportStateId
 }
 
 func testAccFastACLConfig_basic(nsName, name string) string {
-	// Fast ACL must be in system namespace and requires site_choice (re_acl or site_acl)
-	_ = nsName // unused but kept for test signature consistency
+	_ = nsName
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
 resource "f5xc_fast_acl" "test" {
   name      = %[1]q
   namespace = "system"
-
-  re_acl {}
+  action    = "policer_action"
+  prefix    = "10.0.0.0/8"
 }
 `, name))
 }

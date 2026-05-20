@@ -325,8 +325,9 @@ func ConvertToTerraformAttributeWithDepth(name string, schema openapi.Schema, re
 	}
 
 	// Add server default note to description (x-f5xc-server-default extension)
-	// This indicates fields where F5XC server applies sensible defaults when omitted
-	if schema.XF5XCServerDefault {
+	// This indicates fields where F5XC server applies sensible defaults when omitted.
+	// Only Optional fields become Computed — Required fields cannot be both Required+Computed.
+	if schema.XF5XCServerDefault && !attr.Required {
 		attr.Computed = true
 		if attr.PlanModifier == "" {
 			attr.PlanModifier = "UseStateForUnknown"

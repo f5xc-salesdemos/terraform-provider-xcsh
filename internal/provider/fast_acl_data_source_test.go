@@ -36,15 +36,14 @@ func TestAccFastAclDataSource_basic(t *testing.T) {
 }
 
 func testAccFastAclDataSourceConfig_basic(name string) string {
-	// Fast ACL must be in system namespace and requires site_choice (re_acl or site_acl)
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
 resource "f5xc_fast_acl" "test" {
   name      = %[1]q
   namespace = "system"
-
-  re_acl {}
+  action    = "policer_action"
+  prefix    = "10.0.0.0/8"
 }
 
 data "f5xc_fast_acl" "test" {

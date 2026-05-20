@@ -64,8 +64,6 @@ func testAccCertificateImportStateIdFunc(resourceName string) resource.ImportSta
 }
 
 func testAccCertificateConfig_basic(nsName, name string, certs *acctest.TestCertificates) string {
-	// Use dynamically generated certificates for CI/CD compatibility
-	// F5 XC API requires certificate_url in "string:///BASE64_ENCODED_CERT" format
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
@@ -83,15 +81,9 @@ resource "f5xc_certificate" "test" {
   name       = %[2]q
   namespace  = f5xc_namespace.test.name
 
-  certificate_url = "string:///%[3]s"
-
-  private_key {
-    clear_secret_info {
-      url = "string:///%[4]s"
-    }
-  }
-
-  disable_ocsp_stapling {}
+  certificate_url       = "string:///%[3]s"
+  private_key           = "string:///%[4]s"
+  disable_ocsp_stapling = "true"
 }
 `, nsName, name, certs.ServerCertBase64, certs.ServerKeyBase64))
 }

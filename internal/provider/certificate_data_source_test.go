@@ -60,15 +60,9 @@ resource "f5xc_certificate" "test" {
   name       = %[2]q
   namespace  = f5xc_namespace.test.name
 
-  certificate_url = "string:///%[3]s"
-
-  private_key {
-    clear_secret_info {
-      url = "string:///%[4]s"
-    }
-  }
-
-  disable_ocsp_stapling {}
+  certificate_url       = "string:///%[3]s"
+  private_key           = "string:///%[4]s"
+  disable_ocsp_stapling = "true"
 }
 
 data "f5xc_certificate" "test" {
