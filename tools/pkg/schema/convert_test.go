@@ -3,6 +3,7 @@
 package schema
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/openapi"
@@ -361,5 +362,46 @@ func TestMaxNestedDepthGuard(t *testing.T) {
 	attrs := ExtractNestedAttributes(s, spec, MaxNestedDepth+1, "")
 	if attrs != nil {
 		t.Error("ExtractNestedAttributes should return nil when depth exceeds MaxNestedDepth")
+	}
+}
+
+func TestConvertToTerraformAttribute_RecommendedValue_Numeric(t *testing.T) {
+	schema := openapi.Schema{
+		Type:                  "integer",
+		Description:           "Health check interval in seconds.",
+		XF5XCRecommendedValue: float64(15),
+	}
+	spec := &openapi.Spec{Components: openapi.Components{Schemas: map[string]openapi.Schema{}}}
+	attr := ConvertToTerraformAttributeWithDepth("interval", schema, false, "", spec, 0, "interval")
+
+	if !strings.Contains(attr.Description, "Recommended: `15`") {
+		t.Errorf("Description should contain recommended value, got: %s", attr.Description)
+	}
+}
+
+func TestConvertToTerraformAttribute_RecommendedValue_String(t *testing.T) {
+	schema := openapi.Schema{
+		Type:                  "string",
+		Description:           "Backend port.",
+		XF5XCRecommendedValue: "443",
+	}
+	spec := &openapi.Spec{Components: openapi.Components{Schemas: map[string]openapi.Schema{}}}
+	attr := ConvertToTerraformAttributeWithDepth("port", schema, false, "", spec, 0, "port")
+
+	if !strings.Contains(attr.Description, "Recommended: `443`") {
+		t.Errorf("Description should contain recommended value, got: %s", attr.Description)
+	}
+}
+
+func TestConvertToTerraformAttribute_RecommendedValue_Nil(t *testing.T) {
+	schema := openapi.Schema{
+		Type:        "string",
+		Description: "No recommendation.",
+	}
+	spec := &openapi.Spec{Components: openapi.Components{Schemas: map[string]openapi.Schema{}}}
+	attr := ConvertToTerraformAttributeWithDepth("field", schema, false, "", spec, 0, "field")
+
+	if strings.Contains(attr.Description, "Recommended:") {
+		t.Errorf("Description should not contain Recommended when no value set, got: %s", attr.Description)
 	}
 }

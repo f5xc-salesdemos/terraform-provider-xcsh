@@ -71,6 +71,8 @@ type V2ResourceMetadata struct {
 	ConfirmationRequired bool     // x-f5xc-confirmation-required
 	BestPractices        string   // x-f5xc-best-practices summary
 	RequiredDependencies []string // dependencies from index.json primary-resources
+	MinimumConfigYAML    string   // minimum config example from tools/minimum-configs.json
+	MinimumConfigFields  []string // required fields for minimum config
 }
 
 // v2MetadataCache stores metadata from v2 spec x-f5xc-* extensions.
@@ -115,6 +117,41 @@ func loadV2SpecMetadata() {
 			}
 		}
 	}
+
+	// Load minimum configuration examples from tools/minimum-configs.json
+	loadMinimumConfigs()
+}
+
+// loadMinimumConfigs reads tools/minimum-configs.json and injects minimum config
+// examples into the v2 metadata cache for each resource that has one.
+func loadMinimumConfigs() {
+	type minConfigEntry struct {
+		RequiredFields []string `json:"required_fields"`
+		ExampleYAML    string   `json:"example_yaml"`
+	}
+	data, err := os.ReadFile("tools/minimum-configs.json")
+	if err != nil {
+		return
+	}
+	var configs map[string]minConfigEntry
+	if err := json.Unmarshal(data, &configs); err != nil {
+		return
+	}
+	count := 0
+	for resourceName, mc := range configs {
+		if mc.ExampleYAML == "" && len(mc.RequiredFields) == 0 {
+			continue
+		}
+		meta := v2MetadataCache[resourceName]
+		meta.MinimumConfigYAML = mc.ExampleYAML
+		for _, f := range mc.RequiredFields {
+			tf := strings.TrimPrefix(strings.TrimPrefix(f, "metadata."), "spec.")
+			meta.MinimumConfigFields = append(meta.MinimumConfigFields, tf)
+		}
+		v2MetadataCache[resourceName] = meta
+		count++
+	}
+	fmt.Printf("Loaded minimum configs for %d resources\n", count)
 }
 
 // loadV2MetadataFromDomains loads metadata from v2 domain-organized specs.
@@ -1542,6 +1579,19 @@ func transformDoc(filePath string) error {
 		}
 		if len(meta.RequiredDependencies) > 0 {
 			output.WriteString("~> **Dependencies** — This resource requires: `" + strings.Join(meta.RequiredDependencies, "`, `") + "`.\n\n")
+		}
+		if meta.MinimumConfigYAML != "" {
+			output.WriteString("### Minimum Configuration\n\n")
+			if len(meta.MinimumConfigFields) > 0 {
+				output.WriteString("Required fields:\n\n")
+				for _, field := range meta.MinimumConfigFields {
+					output.WriteString(fmt.Sprintf("- `%s`\n", field))
+				}
+				output.WriteString("\n")
+			}
+			output.WriteString("**Example (API format):**\n\n```yaml\n")
+			output.WriteString(meta.MinimumConfigYAML)
+			output.WriteString("\n```\n\n")
 		}
 	}
 

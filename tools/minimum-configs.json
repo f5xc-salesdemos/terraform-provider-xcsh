@@ -1,0 +1,133 @@
+{
+  "http_loadbalancer": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.domains"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: http_loadbalancer\nmetadata:\n  name: example-app\n  namespace: default\nspec:\n  domains:\n    - example.com\n  https_auto_cert:\n    port: 443\n    tls_config:\n      default_security: {}\n  advertise_on_public_default_vip: {}\n  routes:\n    - prefix: \"/\"\n      origin_pool:\n        pool_name: backend-pool\n"
+  },
+  "origin_pool": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.origin_servers",
+      "spec.port"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: origin_pool\nmetadata:\n  name: backend-pool\n  namespace: default\nspec:\n  origin_servers:\n    - public_name:\n        dns_name: backend1.example.com\n    - public_name:\n        dns_name: backend2.example.com\n  port: 8080\n"
+  },
+  "tcp_loadbalancer": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.origin_pools"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: tcp_loadbalancer\nmetadata:\n  name: database-lb\n  namespace: default\nspec:\n  listener:\n    port: 5432\n    protocol: \"TCP\"\n  origin_pools:\n    - pool_name: postgres-cluster\n  advertise:\n    - public_ip: true\n"
+  },
+  "healthcheck": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.interval",
+      "spec.timeout",
+      "spec.healthy_threshold",
+      "spec.unhealthy_threshold"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: healthcheck\nmetadata:\n  name: http-health\n  namespace: default\nspec:\n  http_health_check:\n    path: /health\n    use_origin_server_name: {}\n  interval: 15\n  timeout: 3\n  unhealthy_threshold: 1\n  healthy_threshold: 3\n  jitter_percent: 30\n"
+  },
+  "app_firewall": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: app_firewall\nmetadata:\n  name: default-waf\n  namespace: default\nspec:\n  blocking: {}\n"
+  },
+  "service_policy": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: service_policy\nmetadata:\n  name: allow-all\n  namespace: default\nspec:\n  allow_all_requests: {}\n"
+  },
+  "certificate": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.certificate_url",
+      "spec.private_key"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: certificate\nmetadata:\n  name: example-cert\n  namespace: default\nspec:\n  certificate_url: \"string:///BASE64_ENCODED_CERTIFICATE\"\n  private_key:\n    clear_secret_info:\n      url: \"string:///BASE64_ENCODED_PRIVATE_KEY\"\n      provider: \"\"\n"
+  },
+  "api_definition": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: api_definition\nmetadata:\n  name: example-api\n  namespace: default\nspec: {}\n"
+  },
+  "api_discovery": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.user_defined_api_discovery_policy"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: api_discovery\nmetadata:\n  name: example-discovery\n  namespace: default\nspec:\n  user_defined_api_discovery_policy: {}\n"
+  },
+  "policer": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.burst_size",
+      "spec.committed_information_rate"
+    ],
+    "example_yaml": ""
+  },
+  "rate_limiter_policy": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.burst_size",
+      "spec.committed_information_rate"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: rate_limiter_policy\nmetadata:\n  name: example-rl\n  namespace: default\nspec:\n  burst_size: 1\n  committed_information_rate: 1\n"
+  },
+  "waf_exclusion_policy": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.waf_exclusion_rules"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: waf_exclusion_policy\nmetadata:\n  name: example-waf-exclusion\n  namespace: default\nspec:\n  waf_exclusion_rules:\n    - metadata:\n        name: exclude-health\n      exact_path: \"/health\"\n"
+  },
+  "user_identification": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.rules"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: user_identification\nmetadata:\n  name: example-user-id\n  namespace: default\nspec:\n  rules:\n    - client_ip: {}\n"
+  },
+  "malicious_user_mitigation": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: malicious_user_mitigation\nmetadata:\n  name: example-mitigation\n  namespace: default\nspec: {}\n"
+  },
+  "sensitive_data_policy": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: sensitive_data_policy\nmetadata:\n  name: example-sensitive-data\n  namespace: default\nspec: {}\n"
+  },
+  "protocol_inspection": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.enable_disable_compliance_checks",
+      "spec.enable_disable_signatures"
+    ],
+    "example_yaml": "apiVersion: v1\nkind: protocol_inspection\nmetadata:\n  name: example-inspection\n  namespace: default\nspec:\n  enable_disable_compliance_checks:\n    disable_compliance_checks: {}\n  enable_disable_signatures:\n    enable_signature: {}\n"
+  }
+}

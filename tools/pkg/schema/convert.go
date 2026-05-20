@@ -335,6 +335,24 @@ func ConvertToTerraformAttributeWithDepth(name string, schema openapi.Schema, re
 		attr.Description += " Server applies default when omitted."
 	}
 
+	// Append recommended value hint from x-f5xc-recommended-value
+	if schema.XF5XCRecommendedValue != nil {
+		switch v := schema.XF5XCRecommendedValue.(type) {
+		case float64:
+			if v == float64(int64(v)) {
+				attr.Description += fmt.Sprintf(" Recommended: `%d`.", int64(v))
+			} else {
+				attr.Description += fmt.Sprintf(" Recommended: `%g`.", v)
+			}
+		case string:
+			if v != "" {
+				attr.Description += fmt.Sprintf(" Recommended: `%s`.", v)
+			}
+		case bool:
+			attr.Description += fmt.Sprintf(" Recommended: `%t`.", v)
+		}
+	}
+
 	// Determine type and extract nested attributes
 	switch schema.Type {
 	case "string":
