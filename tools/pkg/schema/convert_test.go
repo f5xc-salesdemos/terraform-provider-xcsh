@@ -405,3 +405,64 @@ func TestConvertToTerraformAttribute_RecommendedValue_Nil(t *testing.T) {
 		t.Errorf("Description should not contain Recommended when no value set, got: %s", attr.Description)
 	}
 }
+
+func TestConvertToTerraformAttribute_AllOfRef_ObjectBecomesBlock(t *testing.T) {
+	// allOf: [{$ref: "#/components/schemas/SomeObject"}] where SomeObject is an object
+	// The generator should treat this as a block, not a string attribute
+	spec := &openapi.Spec{
+		Components: openapi.Components{
+			Schemas: map[string]openapi.Schema{
+				"SomeObject": {
+					Type: "object",
+					Properties: map[string]openapi.Schema{
+						"mode": {Type: "string"},
+					},
+				},
+			},
+		},
+	}
+	// Property with allOf wrapping a $ref
+	schema := openapi.Schema{
+		AllOf: []openapi.Schema{
+			{Ref: "#/components/schemas/SomeObject"},
+		},
+	}
+	attr := ConvertToTerraformAttribute("my_setting", schema, false, "", spec)
+
+	if attr.Type != "object" {
+		t.Errorf("allOf-wrapped $ref to object should produce Type=object, got %q", attr.Type)
+	}
+	if !attr.IsBlock {
+		t.Error("allOf-wrapped $ref to object should produce IsBlock=true")
+	}
+	// Must not produce Required+Computed (Terraform rejects this)
+	if attr.Required && attr.Computed {
+		t.Error("allOf-wrapped $ref must not produce Required=true AND Computed=true")
+	}
+}
+
+func TestConvertToTerraformAttribute_AllOfRef_PreservesExtensions(t *testing.T) {
+	// Extensions on the property (like x-f5xc-description-short) should be preserved
+	// even when the actual type comes from allOf $ref
+	spec := &openapi.Spec{
+		Components: openapi.Components{
+			Schemas: map[string]openapi.Schema{
+				"StringType": {Type: "string"},
+			},
+		},
+	}
+	schema := openapi.Schema{
+		XF5XCDescriptionShort: "My field description",
+		AllOf: []openapi.Schema{
+			{Ref: "#/components/schemas/StringType"},
+		},
+	}
+	attr := ConvertToTerraformAttribute("my_field", schema, false, "", spec)
+
+	if !strings.Contains(attr.Description, "My field description") {
+		t.Errorf("Property-level extensions should be preserved after allOf resolution, got: %s", attr.Description)
+	}
+	if attr.Type != "string" {
+		t.Errorf("allOf-wrapped $ref to string should produce Type=string, got %q", attr.Type)
+	}
+}

@@ -114,14 +114,15 @@ func CollectConflictAttrs(attributes []openapi.TerraformAttribute) ([]conflicts.
 	return result, goNameLookup
 }
 
-// HasInt64RangeValidatorsAny returns true if any attribute or nested attribute has Minimum or Maximum set.
+// HasInt64RangeValidatorsAny returns true if any non-block int64 attribute has Minimum or Maximum set.
+// Block attributes are excluded because blocks use nested schema types that don't support int64validator.
 func HasInt64RangeValidatorsAny(attributes []openapi.TerraformAttribute) bool {
 	for _, attr := range attributes {
-		if attr.Minimum > 0 || attr.Maximum > 0 {
+		if !attr.IsBlock && (attr.Minimum > 0 || attr.Maximum > 0) {
 			return true
 		}
 		for _, nested := range attr.NestedAttributes {
-			if nested.Minimum > 0 || nested.Maximum > 0 {
+			if !nested.IsBlock && (nested.Minimum > 0 || nested.Maximum > 0) {
 				return true
 			}
 		}

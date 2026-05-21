@@ -8,11 +8,12 @@ package codegen
 import (
 	"bytes"
 	"fmt"
-	"go/format"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"golang.org/x/tools/imports"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/openapi"
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/schema"
@@ -59,7 +60,7 @@ func GenerateResourceFile(resource *openapi.ResourceTemplate, outputDir string) 
 	}
 
 	// Format the generated code with gofmt
-	formatted, err := format.Source(buf.Bytes())
+	formatted, err := imports.Process(outputPath, buf.Bytes(), nil)
 	if err != nil {
 		// If formatting fails, write unformatted code with warning
 		fmt.Printf("Warning: gofmt failed for %s: %v (writing unformatted)\n", outputPath, err)
@@ -93,7 +94,7 @@ func GenerateClientTypes(resource *openapi.ResourceTemplate, clientDir string) e
 	}
 
 	// Format the generated code with gofmt
-	formatted, err := format.Source(buf.Bytes())
+	formatted, err := imports.Process(outputPath, buf.Bytes(), nil)
 	if err != nil {
 		// If formatting fails, write unformatted code with warning
 		fmt.Printf("Warning: gofmt failed for %s: %v (writing unformatted)\n", outputPath, err)
@@ -120,7 +121,7 @@ func GenerateDataSource(resource *openapi.ResourceTemplate, outputDir string) er
 	}
 
 	// Format the generated code with gofmt
-	formatted, err := format.Source(buf.Bytes())
+	formatted, err := imports.Process(outputPath, buf.Bytes(), nil)
 	if err != nil {
 		// If formatting fails, write unformatted code with warning
 		fmt.Printf("Warning: gofmt failed for %s: %v (writing unformatted)\n", outputPath, err)
