@@ -121,6 +121,11 @@ func PromoteMinConfigRequired(attrs []openapi.TerraformAttribute, minFields map[
 		if minFields[attrs[i].TfsdkTag] && attrs[i].Optional && !attrs[i].Required {
 			attrs[i].Required = true
 			attrs[i].Optional = false
+			// Clear Computed — Terraform rejects Required+Computed
+			if attrs[i].Computed {
+				attrs[i].Computed = false
+				attrs[i].PlanModifier = ""
+			}
 		}
 	}
 }
@@ -160,6 +165,16 @@ func ConvertToTerraformAttributeWithDepth(name string, schema openapi.Schema, re
 	validationRules := schema.XVesValidationRules
 	complexity := schema.XF5XCComplexity
 	useCases := schema.XF5XCUseCases
+
+	// Handle allOf-wrapped $ref (OAS3 pattern for preserving sibling extensions alongside $ref)
+	if schema.Ref == "" && len(schema.AllOf) > 0 {
+		for _, item := range schema.AllOf {
+			if item.Ref != "" {
+				schema.Ref = item.Ref
+				break
+			}
+		}
+	}
 
 	if schema.Ref != "" {
 		schema = ResolveRef(schema.Ref, spec)

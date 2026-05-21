@@ -38,6 +38,8 @@ type Schema struct {
 	Ref                  string            `json:"$ref"`
 	Required             []string          `json:"required"`
 	AdditionalProperties interface{}       `json:"additionalProperties"`
+	// AllOf wraps $ref for OAS3 compliance (x-ves-* sibling preservation pattern)
+	AllOf                []Schema          `json:"allOf"`
 
 	// Original F5 vendor extensions (x-ves-*) - technical metadata from upstream
 	XDisplayName        string            `json:"x-displayname"`
