@@ -129,5 +129,31 @@
       "spec.enable_disable_signatures"
     ],
     "example_yaml": "apiVersion: v1\nkind: protocol_inspection\nmetadata:\n  name: example-inspection\n  namespace: default\nspec:\n  enable_disable_compliance_checks:\n    disable_compliance_checks: {}\n  enable_disable_signatures:\n    enable_signature: {}\n"
+  },
+  "global_log_receiver": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.log_type",
+      "spec.receiver_choice"
+    ],
+    "example_yaml": "metadata:\n  name: my-log-receiver\n  namespace: system\nspec:\n  request_logs: {}\n  http_receiver:\n    uri: http://logs.example.com/ingest"
+  },
+  "alert_receiver": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.receiver_choice"
+    ],
+    "example_yaml": "metadata:\n  name: my-alert-receiver\n  namespace: system\nspec:\n  email:\n    email_address: alerts@example.com"
+  },
+  "virtual_site": {
+    "required_fields": [
+      "metadata.name",
+      "metadata.namespace",
+      "spec.site_type",
+      "spec.site_selector"
+    ],
+    "example_yaml": "metadata:\n  name: my-virtual-site\n  namespace: default\nspec:\n  site_type: REGIONAL_EDGE\n  site_selector:\n    expressions:\n      - \"ves.io/siteName=any\""
   }
 }
