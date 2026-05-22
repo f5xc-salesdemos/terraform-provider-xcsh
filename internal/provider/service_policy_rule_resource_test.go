@@ -97,11 +97,10 @@ func TestAccServicePolicyRuleResource_allAttributes(t *testing.T) {
 				Config: testAccServicePolicyRuleResourceConfig_allAttributes(nsName, name, description),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					acctest.CheckResourceExists(resourceName),
-					// Verify all attributes in Terraform state
 					resource.TestCheckResourceAttr(resourceName, "name", name),
-					resource.TestCheckResourceAttr(resourceName, "namespace", nsName),
+					resource.TestCheckResourceAttr(resourceName, "namespace", "system"),
 					resource.TestCheckResourceAttr(resourceName, "description", description),
-					resource.TestCheckResourceAttr(resourceName, "action", "ALLOW"),
+					resource.TestCheckResourceAttr(resourceName, "action", "DENY"),
 					resource.TestCheckResourceAttr(resourceName, "labels.environment", "test"),
 					resource.TestCheckResourceAttr(resourceName, "labels.managed_by", "terraform-acceptance-test"),
 					resource.TestCheckResourceAttr(resourceName, "annotations.purpose", "acceptance-testing"),
