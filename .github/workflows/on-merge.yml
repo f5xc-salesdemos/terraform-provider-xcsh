@@ -299,6 +299,32 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.AUTO_MERGE_TOKEN }}
 
+      - name: Download specs if not present
+        env:
+          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
+          ENRICHED_REPO: f5xc-salesdemos/api-specs-enriched
+        run: |
+          SPEC_DIR="docs/specifications/api"
+          SPEC_COUNT=$(find "$SPEC_DIR" -name "*.json" -type f 2>/dev/null | wc -l)
+          if [ "$SPEC_COUNT" -eq "0" ]; then
+            echo "Specs not in tree (gitignored) — downloading latest from $ENRICHED_REPO"
+            mkdir -p "$SPEC_DIR"
+            ASSET_ID=$(gh api "repos/$ENRICHED_REPO/releases" --jq \
+              '[.[0].assets[] | select(.name | startswith("f5xc-api-specs"))] | .[0].id')
+            if [ -n "$ASSET_ID" ] && [ "$ASSET_ID" != "null" ]; then
+              gh api "repos/$ENRICHED_REPO/releases/assets/$ASSET_ID" \
+                -H "Accept: application/octet-stream" > /tmp/specs.zip
+              unzip -o /tmp/specs.zip -d "$SPEC_DIR"
+              rm /tmp/specs.zip
+              SPEC_COUNT=$(find "$SPEC_DIR" -name "*.json" -type f | wc -l)
+              echo "Downloaded $SPEC_COUNT spec files"
+            else
+              echo "::warning::Could not find spec asset in latest release"
+            fi
+          else
+            echo "Found $SPEC_COUNT existing spec files"
+          fi
+
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
