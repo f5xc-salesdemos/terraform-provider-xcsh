@@ -12,7 +12,7 @@ import (
 )
 
 func TestAccCertificateDataSource_basic(t *testing.T) {
-	t.Skip("Skipping: upstream spec gap — missing private_key. See api-specs-enriched#430")
+	t.Skip("Skipping: generated regex on private_key.clear_secret_info.url rejects string:/// scheme — needs generator fix")
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
