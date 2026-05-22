@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
 )
@@ -72,8 +71,8 @@ const (
 // DefaultAPIURL is the default F5XC API URL.
 const DefaultAPIURL = "https://console.ves.volterra.io"
 
-// DefaultTimeout is the default HTTP client timeout.
-const DefaultTimeout = 30 * time.Second
+// DefaultTimeout reuses the client package's standard HTTP timeout.
+const DefaultTimeout = client.DefaultTimeout
 
 // GetAuthConfigFromEnv reads authentication configuration from environment variables.
 // It checks for API token first, then falls back to P12 certificate authentication.
