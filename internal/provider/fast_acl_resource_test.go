@@ -13,7 +13,6 @@ import (
 )
 
 func TestAccFastACLResource_basic(t *testing.T) {
-	t.Skip("Skipping: generator matches wrong schema (schemafast_acl prefix) — re_acl/site_acl not in generated resource")
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
@@ -66,8 +65,8 @@ func testAccFastACLConfig_basic(nsName, name string) string {
 resource "f5xc_fast_acl" "test" {
   name      = %[1]q
   namespace = "system"
-  action    = "policer_action"
-  prefix    = "10.0.0.0/8"
+
+  re_acl {}
 }
 `, name))
 }

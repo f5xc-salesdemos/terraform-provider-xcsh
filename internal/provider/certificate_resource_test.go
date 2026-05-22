@@ -13,7 +13,6 @@ import (
 )
 
 func TestAccCertificateResource_basic(t *testing.T) {
-	t.Skip("Skipping: generated regex on private_key.clear_secret_info.url rejects string:/// scheme — needs generator fix")
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
@@ -82,9 +81,15 @@ resource "f5xc_certificate" "test" {
   name       = %[2]q
   namespace  = f5xc_namespace.test.name
 
-  certificate_url       = "string:///%[3]s"
-  private_key           = "string:///%[4]s"
-  disable_ocsp_stapling = "true"
+  certificate_url = "string:///%[3]s"
+
+  private_key {
+    clear_secret_info {
+      url = "string:///%[4]s"
+    }
+  }
+
+  disable_ocsp_stapling {}
 }
 `, nsName, name, certs.ServerCertBase64, certs.ServerKeyBase64))
 }

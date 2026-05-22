@@ -12,7 +12,6 @@ import (
 )
 
 func TestAccFastAclDataSource_basic(t *testing.T) {
-	t.Skip("Skipping: generator matches wrong schema (schemafast_acl prefix) — re_acl/site_acl not in generated resource")
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
