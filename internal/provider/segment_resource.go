@@ -52,7 +52,7 @@ type SegmentResourceModel struct {
 	Labels      types.Map          `tfsdk:"labels"`
 	ID          types.String       `tfsdk:"id"`
 	Timeouts    timeouts.Value     `tfsdk:"timeouts"`
-	Disable     *SegmentEmptyModel `tfsdk:"disable"`
+	DisableSpec *SegmentEmptyModel `tfsdk:"disable_spec"`
 	Enable      *SegmentEmptyModel `tfsdk:"enable"`
 }
 
@@ -113,7 +113,7 @@ func (r *SegmentResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Update: true,
 				Delete: true,
 			}),
-			"disable": schema.SingleNestedBlock{
+			"disable_spec": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: disable, enable] Enable this option",
 			},
 			"enable": schema.SingleNestedBlock{
@@ -225,9 +225,9 @@ func (r *SegmentResource) Create(ctx context.Context, req resource.CreateRequest
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.Disable != nil {
-		disableMap := make(map[string]interface{})
-		createReq.Spec["disable"] = disableMap
+	if data.DisableSpec != nil {
+		disable_specMap := make(map[string]interface{})
+		createReq.Spec["disable"] = disable_specMap
 	}
 	if data.Enable != nil {
 		enableMap := make(map[string]interface{})
@@ -246,9 +246,9 @@ func (r *SegmentResource) Create(ctx context.Context, req resource.CreateRequest
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["disable"].(map[string]interface{}); ok && isImport && data.Disable == nil {
+	if _, ok := apiResource.Spec["disable"].(map[string]interface{}); ok && isImport && data.DisableSpec == nil {
 		// Import case: populate from API since state is nil and psd is empty
-		data.Disable = &SegmentEmptyModel{}
+		data.DisableSpec = &SegmentEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["enable"].(map[string]interface{}); ok && isImport && data.Enable == nil {
@@ -336,9 +336,9 @@ func (r *SegmentResource) Read(ctx context.Context, req resource.ReadRequest, re
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["disable"].(map[string]interface{}); ok && isImport && data.Disable == nil {
+	if _, ok := apiResource.Spec["disable"].(map[string]interface{}); ok && isImport && data.DisableSpec == nil {
 		// Import case: populate from API since state is nil and psd is empty
-		data.Disable = &SegmentEmptyModel{}
+		data.DisableSpec = &SegmentEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["enable"].(map[string]interface{}); ok && isImport && data.Enable == nil {
@@ -397,9 +397,9 @@ func (r *SegmentResource) Update(ctx context.Context, req resource.UpdateRequest
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.Disable != nil {
-		disableMap := make(map[string]interface{})
-		apiResource.Spec["disable"] = disableMap
+	if data.DisableSpec != nil {
+		disable_specMap := make(map[string]interface{})
+		apiResource.Spec["disable"] = disable_specMap
 	}
 	if data.Enable != nil {
 		enableMap := make(map[string]interface{})
@@ -429,9 +429,9 @@ func (r *SegmentResource) Update(ctx context.Context, req resource.UpdateRequest
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["disable"].(map[string]interface{}); ok && isImport && data.Disable == nil {
+	if _, ok := apiResource.Spec["disable"].(map[string]interface{}); ok && isImport && data.DisableSpec == nil {
 		// Import case: populate from API since state is nil and psd is empty
-		data.Disable = &SegmentEmptyModel{}
+		data.DisableSpec = &SegmentEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["enable"].(map[string]interface{}); ok && isImport && data.Enable == nil {

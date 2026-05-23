@@ -1,6 +1,16 @@
 # Sensitive Data Policy Resource Example
 # Manages sensitive_data_policy creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Sensitive Data Policy configuration
 resource "f5xc_sensitive_data_policy" "example" {
   name      = "example-sensitive-data-policy"
@@ -25,3 +35,8 @@ resource "f5xc_sensitive_data_policy" "example" {
     # Configure custom_data_type_ref settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - compliances
+# - disabled_predefined_data_types
+# - custom_data_types

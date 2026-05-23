@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -43,6 +46,20 @@ type SiteMeshGroupResource struct {
 
 // SiteMeshGroupEmptyModel represents empty nested blocks
 type SiteMeshGroupEmptyModel struct {
+}
+
+// SiteMeshGroupBfdEnabledModel represents bfd_enabled block
+type SiteMeshGroupBfdEnabledModel struct {
+	Multiplier                   types.Int64 `tfsdk:"multiplier"`
+	ReceiveIntervalMilliseconds  types.Int64 `tfsdk:"receive_interval_milliseconds"`
+	TransmitIntervalMilliseconds types.Int64 `tfsdk:"transmit_interval_milliseconds"`
+}
+
+// SiteMeshGroupBfdEnabledModelAttrTypes defines the attribute types for SiteMeshGroupBfdEnabledModel
+var SiteMeshGroupBfdEnabledModelAttrTypes = map[string]attr.Type{
+	"multiplier":                     types.Int64Type,
+	"receive_interval_milliseconds":  types.Int64Type,
+	"transmit_interval_milliseconds": types.Int64Type,
 }
 
 // SiteMeshGroupFullMeshModel represents full_mesh block
@@ -116,20 +133,22 @@ var SiteMeshGroupVirtualSiteModelAttrTypes = map[string]attr.Type{
 }
 
 type SiteMeshGroupResourceModel struct {
-	Name              types.String                 `tfsdk:"name"`
-	Namespace         types.String                 `tfsdk:"namespace"`
-	Annotations       types.Map                    `tfsdk:"annotations"`
-	Description       types.String                 `tfsdk:"description"`
-	Disable           types.Bool                   `tfsdk:"disable"`
-	Labels            types.Map                    `tfsdk:"labels"`
-	ID                types.String                 `tfsdk:"id"`
-	Timeouts          timeouts.Value               `tfsdk:"timeouts"`
-	DisableREFallback *SiteMeshGroupEmptyModel     `tfsdk:"disable_re_fallback"`
-	EnableREFallback  *SiteMeshGroupEmptyModel     `tfsdk:"enable_re_fallback"`
-	FullMesh          *SiteMeshGroupFullMeshModel  `tfsdk:"full_mesh"`
-	HubMesh           *SiteMeshGroupHubMeshModel   `tfsdk:"hub_mesh"`
-	SpokeMesh         *SiteMeshGroupSpokeMeshModel `tfsdk:"spoke_mesh"`
-	VirtualSite       types.List                   `tfsdk:"virtual_site"`
+	Name              types.String                  `tfsdk:"name"`
+	Namespace         types.String                  `tfsdk:"namespace"`
+	Annotations       types.Map                     `tfsdk:"annotations"`
+	Description       types.String                  `tfsdk:"description"`
+	Disable           types.Bool                    `tfsdk:"disable"`
+	Labels            types.Map                     `tfsdk:"labels"`
+	ID                types.String                  `tfsdk:"id"`
+	Timeouts          timeouts.Value                `tfsdk:"timeouts"`
+	BfdDisabled       *SiteMeshGroupEmptyModel      `tfsdk:"bfd_disabled"`
+	BfdEnabled        *SiteMeshGroupBfdEnabledModel `tfsdk:"bfd_enabled"`
+	DisableREFallback *SiteMeshGroupEmptyModel      `tfsdk:"disable_re_fallback"`
+	EnableREFallback  *SiteMeshGroupEmptyModel      `tfsdk:"enable_re_fallback"`
+	FullMesh          *SiteMeshGroupFullMeshModel   `tfsdk:"full_mesh"`
+	HubMesh           *SiteMeshGroupHubMeshModel    `tfsdk:"hub_mesh"`
+	SpokeMesh         *SiteMeshGroupSpokeMeshModel  `tfsdk:"spoke_mesh"`
+	VirtualSite       types.List                    `tfsdk:"virtual_site"`
 }
 
 func (r *SiteMeshGroupResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -193,11 +212,31 @@ func (r *SiteMeshGroupResource) Schema(ctx context.Context, req resource.SchemaR
 				Update: true,
 				Delete: true,
 			}),
+			"bfd_disabled": schema.SingleNestedBlock{
+				MarkdownDescription: "[OneOf: bfd_disabled, bfd_enabled] Enable this option",
+			},
+			"bfd_enabled": schema.SingleNestedBlock{
+				MarkdownDescription: "BFD. BFD parameters.",
+				Attributes: map[string]schema.Attribute{
+					"multiplier": schema.Int64Attribute{
+						MarkdownDescription: "Specify Number of missed packets to bring session down' .",
+						Optional:            true,
+					},
+					"receive_interval_milliseconds": schema.Int64Attribute{
+						MarkdownDescription: "BFD receive interval timer, in milliseconds .",
+						Optional:            true,
+					},
+					"transmit_interval_milliseconds": schema.Int64Attribute{
+						MarkdownDescription: "BFD transmit interval timer, in milliseconds .",
+						Optional:            true,
+					},
+				},
+			},
 			"disable_re_fallback": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: disable_re_fallback, enable_re_fallback; Default: disable_re_fallback] Enable this option",
+				MarkdownDescription: "[OneOf: disable_re_fallback, enable_re_fallback; Default: disable_re_fallback] Configuration parameter for disable re fallback.",
 			},
 			"enable_re_fallback": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for enable re fallback.",
 			},
 			"full_mesh": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: full_mesh, hub_mesh, spoke_mesh] Full Mesh. Details of Full Mesh Group Type.",
@@ -239,6 +278,9 @@ func (r *SiteMeshGroupResource) Schema(ctx context.Context, req resource.SchemaR
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -247,6 +289,9 @@ func (r *SiteMeshGroupResource) Schema(ctx context.Context, req resource.SchemaR
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -254,6 +299,9 @@ func (r *SiteMeshGroupResource) Schema(ctx context.Context, req resource.SchemaR
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -275,6 +323,10 @@ func (r *SiteMeshGroupResource) Schema(ctx context.Context, req resource.SchemaR
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -282,6 +334,10 @@ func (r *SiteMeshGroupResource) Schema(ctx context.Context, req resource.SchemaR
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -409,6 +465,23 @@ func (r *SiteMeshGroupResource) Create(ctx context.Context, req resource.CreateR
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if data.BfdDisabled != nil {
+		bfd_disabledMap := make(map[string]interface{})
+		createReq.Spec["bfd_disabled"] = bfd_disabledMap
+	}
+	if data.BfdEnabled != nil {
+		bfd_enabledMap := make(map[string]interface{})
+		if !data.BfdEnabled.Multiplier.IsNull() && !data.BfdEnabled.Multiplier.IsUnknown() {
+			bfd_enabledMap["multiplier"] = data.BfdEnabled.Multiplier.ValueInt64()
+		}
+		if !data.BfdEnabled.ReceiveIntervalMilliseconds.IsNull() && !data.BfdEnabled.ReceiveIntervalMilliseconds.IsUnknown() {
+			bfd_enabledMap["receive_interval_milliseconds"] = data.BfdEnabled.ReceiveIntervalMilliseconds.ValueInt64()
+		}
+		if !data.BfdEnabled.TransmitIntervalMilliseconds.IsNull() && !data.BfdEnabled.TransmitIntervalMilliseconds.IsUnknown() {
+			bfd_enabledMap["transmit_interval_milliseconds"] = data.BfdEnabled.TransmitIntervalMilliseconds.ValueInt64()
+		}
+		createReq.Spec["bfd_enabled"] = bfd_enabledMap
+	}
 	if data.DisableREFallback != nil {
 		disable_re_fallbackMap := make(map[string]interface{})
 		createReq.Spec["disable_re_fallback"] = disable_re_fallbackMap
@@ -501,6 +574,63 @@ func (r *SiteMeshGroupResource) Create(ctx context.Context, req resource.CreateR
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["bfd_disabled"].(map[string]interface{}); ok && isImport && data.BfdDisabled == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.BfdDisabled = &SiteMeshGroupEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if blockData, ok := apiResource.Spec["bfd_enabled"].(map[string]interface{}); ok && (isImport || data.BfdEnabled != nil) {
+		data.BfdEnabled = &SiteMeshGroupBfdEnabledModel{
+			Multiplier: func() types.Int64 {
+				if !isImport && data.BfdEnabled != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BfdEnabled.Multiplier
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["multiplier"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			ReceiveIntervalMilliseconds: func() types.Int64 {
+				if !isImport && data.BfdEnabled != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BfdEnabled.ReceiveIntervalMilliseconds
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["receive_interval_milliseconds"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			TransmitIntervalMilliseconds: func() types.Int64 {
+				if !isImport && data.BfdEnabled != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BfdEnabled.TransmitIntervalMilliseconds
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["transmit_interval_milliseconds"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+		}
+	}
 	if _, ok := apiResource.Spec["disable_re_fallback"].(map[string]interface{}); ok && isImport && data.DisableREFallback == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.DisableREFallback = &SiteMeshGroupEmptyModel{}
@@ -658,6 +788,63 @@ func (r *SiteMeshGroupResource) Read(ctx context.Context, req resource.ReadReque
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["bfd_disabled"].(map[string]interface{}); ok && isImport && data.BfdDisabled == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.BfdDisabled = &SiteMeshGroupEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if blockData, ok := apiResource.Spec["bfd_enabled"].(map[string]interface{}); ok && (isImport || data.BfdEnabled != nil) {
+		data.BfdEnabled = &SiteMeshGroupBfdEnabledModel{
+			Multiplier: func() types.Int64 {
+				if !isImport && data.BfdEnabled != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BfdEnabled.Multiplier
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["multiplier"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			ReceiveIntervalMilliseconds: func() types.Int64 {
+				if !isImport && data.BfdEnabled != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BfdEnabled.ReceiveIntervalMilliseconds
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["receive_interval_milliseconds"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			TransmitIntervalMilliseconds: func() types.Int64 {
+				if !isImport && data.BfdEnabled != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BfdEnabled.TransmitIntervalMilliseconds
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["transmit_interval_milliseconds"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+		}
+	}
 	if _, ok := apiResource.Spec["disable_re_fallback"].(map[string]interface{}); ok && isImport && data.DisableREFallback == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.DisableREFallback = &SiteMeshGroupEmptyModel{}
@@ -786,6 +973,23 @@ func (r *SiteMeshGroupResource) Update(ctx context.Context, req resource.UpdateR
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if data.BfdDisabled != nil {
+		bfd_disabledMap := make(map[string]interface{})
+		apiResource.Spec["bfd_disabled"] = bfd_disabledMap
+	}
+	if data.BfdEnabled != nil {
+		bfd_enabledMap := make(map[string]interface{})
+		if !data.BfdEnabled.Multiplier.IsNull() && !data.BfdEnabled.Multiplier.IsUnknown() {
+			bfd_enabledMap["multiplier"] = data.BfdEnabled.Multiplier.ValueInt64()
+		}
+		if !data.BfdEnabled.ReceiveIntervalMilliseconds.IsNull() && !data.BfdEnabled.ReceiveIntervalMilliseconds.IsUnknown() {
+			bfd_enabledMap["receive_interval_milliseconds"] = data.BfdEnabled.ReceiveIntervalMilliseconds.ValueInt64()
+		}
+		if !data.BfdEnabled.TransmitIntervalMilliseconds.IsNull() && !data.BfdEnabled.TransmitIntervalMilliseconds.IsUnknown() {
+			bfd_enabledMap["transmit_interval_milliseconds"] = data.BfdEnabled.TransmitIntervalMilliseconds.ValueInt64()
+		}
+		apiResource.Spec["bfd_enabled"] = bfd_enabledMap
+	}
 	if data.DisableREFallback != nil {
 		disable_re_fallbackMap := make(map[string]interface{})
 		apiResource.Spec["disable_re_fallback"] = disable_re_fallbackMap
@@ -889,6 +1093,63 @@ func (r *SiteMeshGroupResource) Update(ctx context.Context, req resource.UpdateR
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["bfd_disabled"].(map[string]interface{}); ok && isImport && data.BfdDisabled == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.BfdDisabled = &SiteMeshGroupEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if blockData, ok := apiResource.Spec["bfd_enabled"].(map[string]interface{}); ok && (isImport || data.BfdEnabled != nil) {
+		data.BfdEnabled = &SiteMeshGroupBfdEnabledModel{
+			Multiplier: func() types.Int64 {
+				if !isImport && data.BfdEnabled != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BfdEnabled.Multiplier
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["multiplier"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			ReceiveIntervalMilliseconds: func() types.Int64 {
+				if !isImport && data.BfdEnabled != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BfdEnabled.ReceiveIntervalMilliseconds
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["receive_interval_milliseconds"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			TransmitIntervalMilliseconds: func() types.Int64 {
+				if !isImport && data.BfdEnabled != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BfdEnabled.TransmitIntervalMilliseconds
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["transmit_interval_milliseconds"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+		}
+	}
 	if _, ok := apiResource.Spec["disable_re_fallback"].(map[string]interface{}); ok && isImport && data.DisableREFallback == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.DisableREFallback = &SiteMeshGroupEmptyModel{}

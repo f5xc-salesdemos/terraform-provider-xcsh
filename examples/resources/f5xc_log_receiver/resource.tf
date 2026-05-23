@@ -1,6 +1,16 @@
 # Log Receiver Resource Example
 # Manages new Log Receiver object. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Log Receiver configuration
 resource "f5xc_log_receiver" "example" {
   name      = "example-log-receiver"

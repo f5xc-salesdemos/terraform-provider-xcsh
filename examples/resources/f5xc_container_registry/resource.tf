@@ -1,6 +1,16 @@
 # Container Registry Resource Example
 # Manages a Container Registry resource in F5 Distributed Cloud for container image registry configuration.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Container Registry configuration
 resource "f5xc_container_registry" "example" {
   name      = "example-container-registry"

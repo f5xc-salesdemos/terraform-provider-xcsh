@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -137,6 +138,9 @@ func (r *IPPrefixSetResource) Schema(ctx context.Context, req resource.SchemaReq
 						"description_spec": schema.StringAttribute{
 							MarkdownDescription: "Description. Human-readable description text",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(64),
+							},
 						},
 						"ipv4_prefix": schema.StringAttribute{
 							MarkdownDescription: "IPv4 Prefix. .",

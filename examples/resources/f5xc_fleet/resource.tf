@@ -1,6 +1,16 @@
 # Fleet Resource Example
 # Manages fleet will create a fleet object in 'system' namespace of the user. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Fleet configuration
 resource "f5xc_fleet" "example" {
   name      = "example-fleet"

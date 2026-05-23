@@ -1,6 +1,16 @@
 # WAF Exclusion Policy Resource Example
 # Manages WAF exclusion policy. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic WAF Exclusion Policy configuration
 resource "f5xc_waf_exclusion_policy" "example" {
   name      = "example-waf-exclusion-policy"

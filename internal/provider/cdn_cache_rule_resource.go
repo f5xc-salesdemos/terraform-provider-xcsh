@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -358,14 +359,17 @@ func (r *CDNCacheRuleResource) Schema(ctx context.Context, req resource.SchemaRe
 					"rule_name": schema.StringAttribute{
 						MarkdownDescription: "Rule Name. Name of the Cache Rule .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(128),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
 					"cache_bypass": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for cache bypass.",
 					},
 					"eligible_for_cache": schema.SingleNestedBlock{
-						MarkdownDescription: "Cache Action OPTIONS. List of OPTIONS for Cache Action.",
+						MarkdownDescription: "Configuration parameter for eligible for cache.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"scheme_proxy_host_request_uri": schema.SingleNestedBlock{
@@ -411,6 +415,9 @@ func (r *CDNCacheRuleResource) Schema(ctx context.Context, req resource.SchemaRe
 								"expression_name": schema.StringAttribute{
 									MarkdownDescription: "Name of the Expressions items that are ANDed .",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(128),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -426,6 +433,9 @@ func (r *CDNCacheRuleResource) Schema(ctx context.Context, req resource.SchemaRe
 														"name": schema.StringAttribute{
 															MarkdownDescription: "[Enum: PROXY_HOST|REFERER|SCHEME|USER_AGENT] - PROXY_HOST: Proxy Host Name of the proxied server - REFERER: Referer This is the address of the previous web page from which a link to the currently requested page was followed - SCHEME: Scheme The HTTP scheme used: HTTP or HTTPS - USER_AGENT: User Agent The user agent string of the user agent. Possible values are `PROXY_HOST`, `REFERER`, `SCHEME`, `USER_AGENT`. Defaults to `PROXY_HOST`.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.OneOf("PROXY_HOST", "REFERER", "SCHEME", "USER_AGENT"),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -433,39 +443,42 @@ func (r *CDNCacheRuleResource) Schema(ctx context.Context, req resource.SchemaRe
 															MarkdownDescription: "Operator",
 															Attributes: map[string]schema.Attribute{
 																"contains": schema.StringAttribute{
-																	MarkdownDescription: "Field must contain.",
+																	MarkdownDescription: "Exclusive with [DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must contain.",
 																	Optional:            true,
 																},
 																"does_not_contain": schema.StringAttribute{
-																	MarkdownDescription: "Field must not contain.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not contain.",
 																	Optional:            true,
 																},
 																"does_not_end_with": schema.StringAttribute{
-																	MarkdownDescription: "Field must not end with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not end with.",
 																	Optional:            true,
 																},
 																"does_not_equal": schema.StringAttribute{
-																	MarkdownDescription: "Field must not equal.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not equal.",
 																	Optional:            true,
 																},
 																"does_not_start_with": schema.StringAttribute{
-																	MarkdownDescription: "Field must not start with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual Endswith Equals MatchRegex Startswith] Field must not start with.",
 																	Optional:            true,
 																},
 																"endswith": schema.StringAttribute{
-																	MarkdownDescription: "Field must end with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Equals MatchRegex Startswith] Field must end with.",
 																	Optional:            true,
 																},
 																"equals": schema.StringAttribute{
-																	MarkdownDescription: "Field must exactly match.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith MatchRegex Startswith] Field must exactly match.",
 																	Optional:            true,
 																},
 																"match_regex": schema.StringAttribute{
-																	MarkdownDescription: "Field matches PCRE 1 compliant regular expression.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals Startswith] Field matches PCRE 1 compliant regular expression.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 256),
+																	},
 																},
 																"startswith": schema.StringAttribute{
-																	MarkdownDescription: "Field must start with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex] Field must start with.",
 																	Optional:            true,
 																},
 															},
@@ -480,6 +493,9 @@ func (r *CDNCacheRuleResource) Schema(ctx context.Context, req resource.SchemaRe
 														"name": schema.StringAttribute{
 															MarkdownDescription: "Case-sensitive cookie name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -487,39 +503,42 @@ func (r *CDNCacheRuleResource) Schema(ctx context.Context, req resource.SchemaRe
 															MarkdownDescription: "Operator",
 															Attributes: map[string]schema.Attribute{
 																"contains": schema.StringAttribute{
-																	MarkdownDescription: "Field must contain.",
+																	MarkdownDescription: "Exclusive with [DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must contain.",
 																	Optional:            true,
 																},
 																"does_not_contain": schema.StringAttribute{
-																	MarkdownDescription: "Field must not contain.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not contain.",
 																	Optional:            true,
 																},
 																"does_not_end_with": schema.StringAttribute{
-																	MarkdownDescription: "Field must not end with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not end with.",
 																	Optional:            true,
 																},
 																"does_not_equal": schema.StringAttribute{
-																	MarkdownDescription: "Field must not equal.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not equal.",
 																	Optional:            true,
 																},
 																"does_not_start_with": schema.StringAttribute{
-																	MarkdownDescription: "Field must not start with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual Endswith Equals MatchRegex Startswith] Field must not start with.",
 																	Optional:            true,
 																},
 																"endswith": schema.StringAttribute{
-																	MarkdownDescription: "Field must end with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Equals MatchRegex Startswith] Field must end with.",
 																	Optional:            true,
 																},
 																"equals": schema.StringAttribute{
-																	MarkdownDescription: "Field must exactly match.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith MatchRegex Startswith] Field must exactly match.",
 																	Optional:            true,
 																},
 																"match_regex": schema.StringAttribute{
-																	MarkdownDescription: "Field matches PCRE 1 compliant regular expression.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals Startswith] Field matches PCRE 1 compliant regular expression.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 256),
+																	},
 																},
 																"startswith": schema.StringAttribute{
-																	MarkdownDescription: "Field must start with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex] Field must start with.",
 																	Optional:            true,
 																},
 															},
@@ -535,39 +554,42 @@ func (r *CDNCacheRuleResource) Schema(ctx context.Context, req resource.SchemaRe
 														MarkdownDescription: "Operator",
 														Attributes: map[string]schema.Attribute{
 															"contains": schema.StringAttribute{
-																MarkdownDescription: "Field must contain.",
+																MarkdownDescription: "Exclusive with [DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must contain.",
 																Optional:            true,
 															},
 															"does_not_contain": schema.StringAttribute{
-																MarkdownDescription: "Field must not contain.",
+																MarkdownDescription: "Exclusive with [Contains DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not contain.",
 																Optional:            true,
 															},
 															"does_not_end_with": schema.StringAttribute{
-																MarkdownDescription: "Field must not end with.",
+																MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not end with.",
 																Optional:            true,
 															},
 															"does_not_equal": schema.StringAttribute{
-																MarkdownDescription: "Field must not equal.",
+																MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not equal.",
 																Optional:            true,
 															},
 															"does_not_start_with": schema.StringAttribute{
-																MarkdownDescription: "Field must not start with.",
+																MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual Endswith Equals MatchRegex Startswith] Field must not start with.",
 																Optional:            true,
 															},
 															"endswith": schema.StringAttribute{
-																MarkdownDescription: "Field must end with.",
+																MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Equals MatchRegex Startswith] Field must end with.",
 																Optional:            true,
 															},
 															"equals": schema.StringAttribute{
-																MarkdownDescription: "Field must exactly match.",
+																MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith MatchRegex Startswith] Field must exactly match.",
 																Optional:            true,
 															},
 															"match_regex": schema.StringAttribute{
-																MarkdownDescription: "Field matches PCRE 1 compliant regular expression.",
+																MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals Startswith] Field matches PCRE 1 compliant regular expression.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 256),
+																},
 															},
 															"startswith": schema.StringAttribute{
-																MarkdownDescription: "Field must start with.",
+																MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex] Field must start with.",
 																Optional:            true,
 															},
 														},
@@ -581,6 +603,9 @@ func (r *CDNCacheRuleResource) Schema(ctx context.Context, req resource.SchemaRe
 														"key": schema.StringAttribute{
 															MarkdownDescription: "Query parameter key In the above example, assignee_username is the key .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -588,39 +613,42 @@ func (r *CDNCacheRuleResource) Schema(ctx context.Context, req resource.SchemaRe
 															MarkdownDescription: "Operator",
 															Attributes: map[string]schema.Attribute{
 																"contains": schema.StringAttribute{
-																	MarkdownDescription: "Field must contain.",
+																	MarkdownDescription: "Exclusive with [DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must contain.",
 																	Optional:            true,
 																},
 																"does_not_contain": schema.StringAttribute{
-																	MarkdownDescription: "Field must not contain.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not contain.",
 																	Optional:            true,
 																},
 																"does_not_end_with": schema.StringAttribute{
-																	MarkdownDescription: "Field must not end with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not end with.",
 																	Optional:            true,
 																},
 																"does_not_equal": schema.StringAttribute{
-																	MarkdownDescription: "Field must not equal.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotStartWith Endswith Equals MatchRegex Startswith] Field must not equal.",
 																	Optional:            true,
 																},
 																"does_not_start_with": schema.StringAttribute{
-																	MarkdownDescription: "Field must not start with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual Endswith Equals MatchRegex Startswith] Field must not start with.",
 																	Optional:            true,
 																},
 																"endswith": schema.StringAttribute{
-																	MarkdownDescription: "Field must end with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Equals MatchRegex Startswith] Field must end with.",
 																	Optional:            true,
 																},
 																"equals": schema.StringAttribute{
-																	MarkdownDescription: "Field must exactly match.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith MatchRegex Startswith] Field must exactly match.",
 																	Optional:            true,
 																},
 																"match_regex": schema.StringAttribute{
-																	MarkdownDescription: "Field matches PCRE 1 compliant regular expression.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals Startswith] Field matches PCRE 1 compliant regular expression.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 256),
+																	},
 																},
 																"startswith": schema.StringAttribute{
-																	MarkdownDescription: "Field must start with.",
+																	MarkdownDescription: "Exclusive with [Contains DoesNotContain DoesNotEndWith DoesNotEqual DoesNotStartWith Endswith Equals MatchRegex] Field must start with.",
 																	Optional:            true,
 																},
 															},

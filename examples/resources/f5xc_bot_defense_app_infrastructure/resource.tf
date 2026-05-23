@@ -1,6 +1,16 @@
 # Bot Defense App Infrastructure Resource Example
 # Manages Bot Defense App Infrastructure in a given namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Bot Defense App Infrastructure configuration
 resource "f5xc_bot_defense_app_infrastructure" "example" {
   name      = "example-bot-defense-app-infrastructure"

@@ -1,6 +1,16 @@
 # Authentication Resource Example
 # Manages a Authentication resource in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Authentication configuration
 resource "f5xc_authentication" "example" {
   name      = "example-authentication"

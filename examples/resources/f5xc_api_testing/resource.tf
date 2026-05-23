@@ -1,6 +1,16 @@
 # API Testing Resource Example
 # Manages a API Testing resource in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic API Testing configuration
 resource "f5xc_api_testing" "example" {
   name      = "example-api-testing"

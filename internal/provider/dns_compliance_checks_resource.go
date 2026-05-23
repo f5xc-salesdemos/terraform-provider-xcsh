@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -43,12 +44,12 @@ type DNSComplianceChecksResource struct {
 type DNSComplianceChecksResourceModel struct {
 	Name                             types.String   `tfsdk:"name"`
 	Namespace                        types.String   `tfsdk:"namespace"`
+	DomainDenylist                   types.List     `tfsdk:"domain_denylist"`
 	Annotations                      types.Map      `tfsdk:"annotations"`
 	Description                      types.String   `tfsdk:"description"`
 	Disable                          types.Bool     `tfsdk:"disable"`
 	DisallowedQueryTypeList          types.List     `tfsdk:"disallowed_query_type_list"`
 	DisallowedResourceRecordTypeList types.List     `tfsdk:"disallowed_resource_record_type_list"`
-	DomainDenylist                   types.List     `tfsdk:"domain_denylist"`
 	Labels                           types.Map      `tfsdk:"labels"`
 	ID                               types.String   `tfsdk:"id"`
 	Timeouts                         timeouts.Value `tfsdk:"timeouts"`
@@ -82,6 +83,14 @@ func (r *DNSComplianceChecksResource) Schema(ctx context.Context, req resource.S
 					validators.NamespaceValidator(),
 				},
 			},
+			"domain_denylist": schema.ListAttribute{
+				MarkdownDescription: "List of domains to be denied by configuration object .",
+				Required:            true,
+				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(30),
+				},
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -97,18 +106,19 @@ func (r *DNSComplianceChecksResource) Schema(ctx context.Context, req resource.S
 			},
 			"disallowed_query_type_list": schema.ListAttribute{
 				MarkdownDescription: "[Enum: QUERY|IQUERY|STATUS|NOTIFY|UPDATE] Disallowed Query Type Values. Disallowed Query Type Values. Possible values are `QUERY`, `IQUERY`, `STATUS`, `NOTIFY`, `UPDATE`. Defaults to `QUERY`.",
-				Optional:            true,
+				Required:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(8),
+				},
 			},
 			"disallowed_resource_record_type_list": schema.ListAttribute{
 				MarkdownDescription: "[Enum: T|A|NS|MD|MF|CNAME|SOA|MB|MG|MR|NULL|WKS|PTR|HINFO|MINFO|MX|TXT|RP|AFSDB|X25|ISDN|RT|NSAP|NSAP_PTR|SIG|KEY|PX|GPOS|AAAA|LOC|NXT|EID|NIMLOC|SRV|ATMA|NAPTR|KX|CERT|A6|DNAME|SINK|OPT|APL|DS|SSHFP|IPSECKEY|RRSIG|NSEC|DNSKEY|DHCID|NSEC3|NSEC3PARAM|TLSA|SMIMEA|HIP|NINFO|RKEY|TALINK|CDS|CDNSKEY|OPENPGPKEY|CSYNC|SPF|UINFO|UID|GID|UNSPEC|NID|L32|L64|LP|EUI48|EUI64|TKEY|TSIG|IXFR|AXFR|MAILB|MAILA|URI|CAA|TA|DLV] Disallowed Resource Record Types. Disallowed Resource Record Type List. Possible values are `T`, `A`, `NS`, `MD`, `MF`, `CNAME`, `SOA`, `MB`, `MG`, `MR`, `NULL`, `WKS`, `PTR`, `HINFO`, `MINFO`, `MX`, `TXT`, `RP`, `AFSDB`, `X25`, `ISDN`, `RT`, `NSAP`, `NSAP_PTR`, `SIG`, `KEY`, `PX`, `GPOS`, `AAAA`, `LOC`, `NXT`, `EID`, `NIMLOC`, `SRV`, `ATMA`, `NAPTR`, `KX`, `CERT`, `A6`, `DNAME`, `SINK`, `OPT`, `APL`, `DS`, `SSHFP`, `IPSECKEY`, `RRSIG`, `NSEC`, `DNSKEY`, `DHCID`, `NSEC3`, `NSEC3PARAM`, `TLSA`, `SMIMEA`, `HIP`, `NINFO`, `RKEY`, `TALINK`, `CDS`, `CDNSKEY`, `OPENPGPKEY`, `CSYNC`, `SPF`, `UINFO`, `UID`, `GID`, `UNSPEC`, `NID`, `L32`, `L64`, `LP`, `EUI48`, `EUI64`, `TKEY`, `TSIG`, `IXFR`, `AXFR`, `MAILB`, `MAILA`, `URI`, `CAA`, `TA`, `DLV`. Defaults to `T`.",
-				Optional:            true,
+				Required:            true,
 				ElementType:         types.StringType,
-			},
-			"domain_denylist": schema.ListAttribute{
-				MarkdownDescription: "List of domains to be denied by configuration object .",
-				Optional:            true,
-				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(8),
+				},
 			},
 			"labels": schema.MapAttribute{
 				MarkdownDescription: "Labels is a user defined key value map that can be attached to resources for organization and filtering.",
@@ -236,6 +246,13 @@ func (r *DNSComplianceChecksResource) Create(ctx context.Context, req resource.C
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.DomainDenylist.IsNull() && !data.DomainDenylist.IsUnknown() {
+		var domain_denylistList []string
+		resp.Diagnostics.Append(data.DomainDenylist.ElementsAs(ctx, &domain_denylistList, false)...)
+		if !resp.Diagnostics.HasError() {
+			createReq.Spec["domain_denylist"] = domain_denylistList
+		}
+	}
 	if !data.DisallowedQueryTypeList.IsNull() && !data.DisallowedQueryTypeList.IsUnknown() {
 		var disallowed_query_type_listList []string
 		resp.Diagnostics.Append(data.DisallowedQueryTypeList.ElementsAs(ctx, &disallowed_query_type_listList, false)...)
@@ -248,13 +265,6 @@ func (r *DNSComplianceChecksResource) Create(ctx context.Context, req resource.C
 		resp.Diagnostics.Append(data.DisallowedResourceRecordTypeList.ElementsAs(ctx, &disallowed_resource_record_type_listList, false)...)
 		if !resp.Diagnostics.HasError() {
 			createReq.Spec["disallowed_resource_record_type_list"] = disallowed_resource_record_type_listList
-		}
-	}
-	if !data.DomainDenylist.IsNull() && !data.DomainDenylist.IsUnknown() {
-		var domain_denylistList []string
-		resp.Diagnostics.Append(data.DomainDenylist.ElementsAs(ctx, &domain_denylistList, false)...)
-		if !resp.Diagnostics.HasError() {
-			createReq.Spec["domain_denylist"] = domain_denylistList
 		}
 	}
 
@@ -270,6 +280,21 @@ func (r *DNSComplianceChecksResource) Create(ctx context.Context, req resource.C
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["domain_denylist"].([]interface{}); ok && len(v) > 0 {
+		var domain_denylistList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				domain_denylistList = append(domain_denylistList, s)
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, domain_denylistList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.DomainDenylist = listVal
+		}
+	} else {
+		data.DomainDenylist = types.ListNull(types.StringType)
+	}
 	if v, ok := apiResource.Spec["disallowed_query_type_list"].([]interface{}); ok && len(v) > 0 {
 		var disallowed_query_type_listList []string
 		for _, item := range v {
@@ -299,21 +324,6 @@ func (r *DNSComplianceChecksResource) Create(ctx context.Context, req resource.C
 		}
 	} else {
 		data.DisallowedResourceRecordTypeList = types.ListNull(types.StringType)
-	}
-	if v, ok := apiResource.Spec["domain_denylist"].([]interface{}); ok && len(v) > 0 {
-		var domain_denylistList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				domain_denylistList = append(domain_denylistList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, domain_denylistList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.DomainDenylist = listVal
-		}
-	} else {
-		data.DomainDenylist = types.ListNull(types.StringType)
 	}
 
 	tflog.Trace(ctx, "created DNSComplianceChecks resource")
@@ -395,6 +405,21 @@ func (r *DNSComplianceChecksResource) Read(ctx context.Context, req resource.Rea
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["domain_denylist"].([]interface{}); ok && len(v) > 0 {
+		var domain_denylistList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				domain_denylistList = append(domain_denylistList, s)
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, domain_denylistList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.DomainDenylist = listVal
+		}
+	} else {
+		data.DomainDenylist = types.ListNull(types.StringType)
+	}
 	if v, ok := apiResource.Spec["disallowed_query_type_list"].([]interface{}); ok && len(v) > 0 {
 		var disallowed_query_type_listList []string
 		for _, item := range v {
@@ -424,21 +449,6 @@ func (r *DNSComplianceChecksResource) Read(ctx context.Context, req resource.Rea
 		}
 	} else {
 		data.DisallowedResourceRecordTypeList = types.ListNull(types.StringType)
-	}
-	if v, ok := apiResource.Spec["domain_denylist"].([]interface{}); ok && len(v) > 0 {
-		var domain_denylistList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				domain_denylistList = append(domain_denylistList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, domain_denylistList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.DomainDenylist = listVal
-		}
-	} else {
-		data.DomainDenylist = types.ListNull(types.StringType)
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -491,6 +501,13 @@ func (r *DNSComplianceChecksResource) Update(ctx context.Context, req resource.U
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.DomainDenylist.IsNull() && !data.DomainDenylist.IsUnknown() {
+		var domain_denylistList []string
+		resp.Diagnostics.Append(data.DomainDenylist.ElementsAs(ctx, &domain_denylistList, false)...)
+		if !resp.Diagnostics.HasError() {
+			apiResource.Spec["domain_denylist"] = domain_denylistList
+		}
+	}
 	if !data.DisallowedQueryTypeList.IsNull() && !data.DisallowedQueryTypeList.IsUnknown() {
 		var disallowed_query_type_listList []string
 		resp.Diagnostics.Append(data.DisallowedQueryTypeList.ElementsAs(ctx, &disallowed_query_type_listList, false)...)
@@ -503,13 +520,6 @@ func (r *DNSComplianceChecksResource) Update(ctx context.Context, req resource.U
 		resp.Diagnostics.Append(data.DisallowedResourceRecordTypeList.ElementsAs(ctx, &disallowed_resource_record_type_listList, false)...)
 		if !resp.Diagnostics.HasError() {
 			apiResource.Spec["disallowed_resource_record_type_list"] = disallowed_resource_record_type_listList
-		}
-	}
-	if !data.DomainDenylist.IsNull() && !data.DomainDenylist.IsUnknown() {
-		var domain_denylistList []string
-		resp.Diagnostics.Append(data.DomainDenylist.ElementsAs(ctx, &domain_denylistList, false)...)
-		if !resp.Diagnostics.HasError() {
-			apiResource.Spec["domain_denylist"] = domain_denylistList
 		}
 	}
 
@@ -536,6 +546,21 @@ func (r *DNSComplianceChecksResource) Update(ctx context.Context, req resource.U
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["domain_denylist"].([]interface{}); ok && len(v) > 0 {
+		var domain_denylistList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				domain_denylistList = append(domain_denylistList, s)
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, domain_denylistList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.DomainDenylist = listVal
+		}
+	} else {
+		data.DomainDenylist = types.ListNull(types.StringType)
+	}
 	if v, ok := apiResource.Spec["disallowed_query_type_list"].([]interface{}); ok && len(v) > 0 {
 		var disallowed_query_type_listList []string
 		for _, item := range v {
@@ -565,21 +590,6 @@ func (r *DNSComplianceChecksResource) Update(ctx context.Context, req resource.U
 		}
 	} else {
 		data.DisallowedResourceRecordTypeList = types.ListNull(types.StringType)
-	}
-	if v, ok := apiResource.Spec["domain_denylist"].([]interface{}); ok && len(v) > 0 {
-		var domain_denylistList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				domain_denylistList = append(domain_denylistList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, domain_denylistList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.DomainDenylist = listVal
-		}
-	} else {
-		data.DomainDenylist = types.ListNull(types.StringType)
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

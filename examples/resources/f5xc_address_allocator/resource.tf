@@ -1,6 +1,16 @@
 # Address Allocator Resource Example
 # Manages Address Allocator will create an address allocator object in 'system' namespace of the user. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Address Allocator configuration
 resource "f5xc_address_allocator" "example" {
   name      = "example-address-allocator"

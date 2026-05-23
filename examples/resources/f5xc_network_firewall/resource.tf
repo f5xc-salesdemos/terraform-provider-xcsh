@@ -1,6 +1,16 @@
 # Network Firewall Resource Example
 # Manages a Network Firewall resource in F5 Distributed Cloud for network firewall is created by users in system namespace. configuration.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Network Firewall configuration
 resource "f5xc_network_firewall" "example" {
   name      = "example-network-firewall"
@@ -29,3 +39,8 @@ resource "f5xc_network_firewall" "example" {
     # Configure active_fast_acls settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - disable_fast_acl
+# - disable_forward_proxy_policy
+# - disable_network_policy

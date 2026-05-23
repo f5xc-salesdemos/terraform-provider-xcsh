@@ -1,6 +1,16 @@
 # Azure VNET Site Resource Example
 # Manages a Azure VNET Site resource in F5 Distributed Cloud for deploying F5 sites within Azure Virtual Network environments.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Azure VNET Site configuration
 resource "f5xc_azure_vnet_site" "example" {
   name      = "example-azure-vnet-site"
@@ -59,3 +69,10 @@ resource "f5xc_azure_vnet_site" "example" {
   # No worker nodes by default
   no_worker_nodes {}
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - disk_size
+# - block_all_services
+# - logs_streaming_disabled
+# - no_worker_nodes
+# - tags

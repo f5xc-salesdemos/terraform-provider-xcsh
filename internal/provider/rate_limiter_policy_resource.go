@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -43,6 +47,28 @@ type RateLimiterPolicyResource struct {
 
 // RateLimiterPolicyEmptyModel represents empty nested blocks
 type RateLimiterPolicyEmptyModel struct {
+}
+
+// RateLimiterPolicyServerNameMatcherModel represents server_name_matcher block
+type RateLimiterPolicyServerNameMatcherModel struct {
+	ExactValues types.List `tfsdk:"exact_values"`
+	RegexValues types.List `tfsdk:"regex_values"`
+}
+
+// RateLimiterPolicyServerNameMatcherModelAttrTypes defines the attribute types for RateLimiterPolicyServerNameMatcherModel
+var RateLimiterPolicyServerNameMatcherModelAttrTypes = map[string]attr.Type{
+	"exact_values": types.ListType{ElemType: types.StringType},
+	"regex_values": types.ListType{ElemType: types.StringType},
+}
+
+// RateLimiterPolicyServerSelectorModel represents server_selector block
+type RateLimiterPolicyServerSelectorModel struct {
+	Expressions types.List `tfsdk:"expressions"`
+}
+
+// RateLimiterPolicyServerSelectorModelAttrTypes defines the attribute types for RateLimiterPolicyServerSelectorModel
+var RateLimiterPolicyServerSelectorModelAttrTypes = map[string]attr.Type{
+	"expressions": types.ListType{ElemType: types.StringType},
 }
 
 // RateLimiterPolicyRulesModel represents rules block
@@ -289,28 +315,6 @@ var RateLimiterPolicyRulesSpecPathModelAttrTypes = map[string]attr.Type{
 	"transformers":   types.ListType{ElemType: types.StringType},
 }
 
-// RateLimiterPolicyServerNameMatcherModel represents server_name_matcher block
-type RateLimiterPolicyServerNameMatcherModel struct {
-	ExactValues types.List `tfsdk:"exact_values"`
-	RegexValues types.List `tfsdk:"regex_values"`
-}
-
-// RateLimiterPolicyServerNameMatcherModelAttrTypes defines the attribute types for RateLimiterPolicyServerNameMatcherModel
-var RateLimiterPolicyServerNameMatcherModelAttrTypes = map[string]attr.Type{
-	"exact_values": types.ListType{ElemType: types.StringType},
-	"regex_values": types.ListType{ElemType: types.StringType},
-}
-
-// RateLimiterPolicyServerSelectorModel represents server_selector block
-type RateLimiterPolicyServerSelectorModel struct {
-	Expressions types.List `tfsdk:"expressions"`
-}
-
-// RateLimiterPolicyServerSelectorModelAttrTypes defines the attribute types for RateLimiterPolicyServerSelectorModel
-var RateLimiterPolicyServerSelectorModelAttrTypes = map[string]attr.Type{
-	"expressions": types.ListType{ElemType: types.StringType},
-}
-
 type RateLimiterPolicyResourceModel struct {
 	Name              types.String                             `tfsdk:"name"`
 	Namespace         types.String                             `tfsdk:"namespace"`
@@ -322,9 +326,9 @@ type RateLimiterPolicyResourceModel struct {
 	ServerName        types.String                             `tfsdk:"server_name"`
 	Timeouts          timeouts.Value                           `tfsdk:"timeouts"`
 	AnyServer         *RateLimiterPolicyEmptyModel             `tfsdk:"any_server"`
-	Rules             types.List                               `tfsdk:"rules"`
 	ServerNameMatcher *RateLimiterPolicyServerNameMatcherModel `tfsdk:"server_name_matcher"`
 	ServerSelector    *RateLimiterPolicyServerSelectorModel    `tfsdk:"server_selector"`
+	Rules             types.List                               `tfsdk:"rules"`
 }
 
 func (r *RateLimiterPolicyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -381,11 +385,14 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 				},
 			},
 			"server_name": schema.StringAttribute{
-				MarkdownDescription: "The expected name of the server. The actual names for the server are extracted from the HTTP Host header and the name of the virtual_host for the request.",
+				MarkdownDescription: "Exclusive with [any_server server_name_matcher server_selector] The expected name of the server. The actual names for the server are extracted from the HTTP Host header and the name of the virtual_host for the request.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(256),
 				},
 			},
 		},
@@ -399,6 +406,40 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 			"any_server": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: any_server, server_name, server_name_matcher, server_selector] Enable this option",
 			},
+			"server_name_matcher": schema.SingleNestedBlock{
+				MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
+				Attributes: map[string]schema.Attribute{
+					"exact_values": schema.ListAttribute{
+						MarkdownDescription: "List of exact values to match the input against.",
+						Optional:            true,
+						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(64),
+						},
+					},
+					"regex_values": schema.ListAttribute{
+						MarkdownDescription: "List of regular expressions to match the input against.",
+						Optional:            true,
+						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
+					},
+				},
+			},
+			"server_selector": schema.SingleNestedBlock{
+				MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+				Attributes: map[string]schema.Attribute{
+					"expressions": schema.ListAttribute{
+						MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
+						Optional:            true,
+						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(1),
+						},
+					},
+				},
+			},
 			"rules": schema.ListNestedBlock{
 				MarkdownDescription: "List of RateLimiterRules that are evaluated sequentially till a matching rule is identified. Defaults to `[]`. Server applies default when omitted.",
 				NestedObject: schema.NestedBlockObject{
@@ -410,10 +451,16 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 								"description_spec": schema.StringAttribute{
 									MarkdownDescription: "Description. Human readable description.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+									},
 								},
 							},
 						},
@@ -425,13 +472,13 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "Enable this option",
 								},
 								"any_country": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for any country.",
 								},
 								"any_ip": schema.SingleNestedBlock{
 									MarkdownDescription: "Enable this option",
 								},
 								"apply_rate_limiter": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for apply rate limiter.",
 								},
 								"asn_list": schema.SingleNestedBlock{
 									MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer.",
@@ -440,6 +487,9 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 											MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer.",
 											Optional:            true,
 											ElementType:         types.Int64Type,
+											Validators: []validator.List{
+												listvalidator.SizeBetween(1, 16),
+											},
 										},
 									},
 								},
@@ -462,6 +512,10 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -469,6 +523,10 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -493,7 +551,7 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 									},
 								},
 								"bypass_rate_limiter": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for bypass rate limiter.",
 								},
 								"country_list": schema.SingleNestedBlock{
 									MarkdownDescription: "Country Codes List. List of Country Codes to match against.",
@@ -502,6 +560,9 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 											MarkdownDescription: "[Enum: COUNTRY_NONE|COUNTRY_AD|COUNTRY_AE|COUNTRY_AF|COUNTRY_AG|COUNTRY_AI|COUNTRY_AL|COUNTRY_AM|COUNTRY_AN|COUNTRY_AO|COUNTRY_AQ|COUNTRY_AR|COUNTRY_AS|COUNTRY_AT|COUNTRY_AU|COUNTRY_AW|COUNTRY_AX|COUNTRY_AZ|COUNTRY_BA|COUNTRY_BB|COUNTRY_BD|COUNTRY_BE|COUNTRY_BF|COUNTRY_BG|COUNTRY_BH|COUNTRY_BI|COUNTRY_BJ|COUNTRY_BL|COUNTRY_BM|COUNTRY_BN|COUNTRY_BO|COUNTRY_BQ|COUNTRY_BR|COUNTRY_BS|COUNTRY_BT|COUNTRY_BV|COUNTRY_BW|COUNTRY_BY|COUNTRY_BZ|COUNTRY_CA|COUNTRY_CC|COUNTRY_CD|COUNTRY_CF|COUNTRY_CG|COUNTRY_CH|COUNTRY_CI|COUNTRY_CK|COUNTRY_CL|COUNTRY_CM|COUNTRY_CN|COUNTRY_CO|COUNTRY_CR|COUNTRY_CS|COUNTRY_CU|COUNTRY_CV|COUNTRY_CW|COUNTRY_CX|COUNTRY_CY|COUNTRY_CZ|COUNTRY_DE|COUNTRY_DJ|COUNTRY_DK|COUNTRY_DM|COUNTRY_DO|COUNTRY_DZ|COUNTRY_EC|COUNTRY_EE|COUNTRY_EG|COUNTRY_EH|COUNTRY_ER|COUNTRY_ES|COUNTRY_ET|COUNTRY_FI|COUNTRY_FJ|COUNTRY_FK|COUNTRY_FM|COUNTRY_FO|COUNTRY_FR|COUNTRY_GA|COUNTRY_GB|COUNTRY_GD|COUNTRY_GE|COUNTRY_GF|COUNTRY_GG|COUNTRY_GH|COUNTRY_GI|COUNTRY_GL|COUNTRY_GM|COUNTRY_GN|COUNTRY_GP|COUNTRY_GQ|COUNTRY_GR|COUNTRY_GS|COUNTRY_GT|COUNTRY_GU|COUNTRY_GW|COUNTRY_GY|COUNTRY_HK|COUNTRY_HM|COUNTRY_HN|COUNTRY_HR|COUNTRY_HT|COUNTRY_HU|COUNTRY_ID|COUNTRY_IE|COUNTRY_IL|COUNTRY_IM|COUNTRY_IN|COUNTRY_IO|COUNTRY_IQ|COUNTRY_IR|COUNTRY_IS|COUNTRY_IT|COUNTRY_JE|COUNTRY_JM|COUNTRY_JO|COUNTRY_JP|COUNTRY_KE|COUNTRY_KG|COUNTRY_KH|COUNTRY_KI|COUNTRY_KM|COUNTRY_KN|COUNTRY_KP|COUNTRY_KR|COUNTRY_KW|COUNTRY_KY|COUNTRY_KZ|COUNTRY_LA|COUNTRY_LB|COUNTRY_LC|COUNTRY_LI|COUNTRY_LK|COUNTRY_LR|COUNTRY_LS|COUNTRY_LT|COUNTRY_LU|COUNTRY_LV|COUNTRY_LY|COUNTRY_MA|COUNTRY_MC|COUNTRY_MD|COUNTRY_ME|COUNTRY_MF|COUNTRY_MG|COUNTRY_MH|COUNTRY_MK|COUNTRY_ML|COUNTRY_MM|COUNTRY_MN|COUNTRY_MO|COUNTRY_MP|COUNTRY_MQ|COUNTRY_MR|COUNTRY_MS|COUNTRY_MT|COUNTRY_MU|COUNTRY_MV|COUNTRY_MW|COUNTRY_MX|COUNTRY_MY|COUNTRY_MZ|COUNTRY_NA|COUNTRY_NC|COUNTRY_NE|COUNTRY_NF|COUNTRY_NG|COUNTRY_NI|COUNTRY_NL|COUNTRY_NO|COUNTRY_NP|COUNTRY_NR|COUNTRY_NU|COUNTRY_NZ|COUNTRY_OM|COUNTRY_PA|COUNTRY_PE|COUNTRY_PF|COUNTRY_PG|COUNTRY_PH|COUNTRY_PK|COUNTRY_PL|COUNTRY_PM|COUNTRY_PN|COUNTRY_PR|COUNTRY_PS|COUNTRY_PT|COUNTRY_PW|COUNTRY_PY|COUNTRY_QA|COUNTRY_RE|COUNTRY_RO|COUNTRY_RS|COUNTRY_RU|COUNTRY_RW|COUNTRY_SA|COUNTRY_SB|COUNTRY_SC|COUNTRY_SD|COUNTRY_SE|COUNTRY_SG|COUNTRY_SH|COUNTRY_SI|COUNTRY_SJ|COUNTRY_SK|COUNTRY_SL|COUNTRY_SM|COUNTRY_SN|COUNTRY_SO|COUNTRY_SR|COUNTRY_SS|COUNTRY_ST|COUNTRY_SV|COUNTRY_SX|COUNTRY_SY|COUNTRY_SZ|COUNTRY_TC|COUNTRY_TD|COUNTRY_TF|COUNTRY_TG|COUNTRY_TH|COUNTRY_TJ|COUNTRY_TK|COUNTRY_TL|COUNTRY_TM|COUNTRY_TN|COUNTRY_TO|COUNTRY_TR|COUNTRY_TT|COUNTRY_TV|COUNTRY_TW|COUNTRY_TZ|COUNTRY_UA|COUNTRY_UG|COUNTRY_UM|COUNTRY_US|COUNTRY_UY|COUNTRY_UZ|COUNTRY_VA|COUNTRY_VC|COUNTRY_VE|COUNTRY_VG|COUNTRY_VI|COUNTRY_VN|COUNTRY_VU|COUNTRY_WF|COUNTRY_WS|COUNTRY_XK|COUNTRY_XT|COUNTRY_YE|COUNTRY_YT|COUNTRY_ZA|COUNTRY_ZM|COUNTRY_ZW] Country Codes List. List of Country Codes . Possible values are `COUNTRY_NONE`, `COUNTRY_AD`, `COUNTRY_AE`, `COUNTRY_AF`, `COUNTRY_AG`, `COUNTRY_AI`, `COUNTRY_AL`, `COUNTRY_AM`, `COUNTRY_AN`, `COUNTRY_AO`, `COUNTRY_AQ`, `COUNTRY_AR`, `COUNTRY_AS`, `COUNTRY_AT`, `COUNTRY_AU`, `COUNTRY_AW`, `COUNTRY_AX`, `COUNTRY_AZ`, `COUNTRY_BA`, `COUNTRY_BB`, `COUNTRY_BD`, `COUNTRY_BE`, `COUNTRY_BF`, `COUNTRY_BG`, `COUNTRY_BH`, `COUNTRY_BI`, `COUNTRY_BJ`, `COUNTRY_BL`, `COUNTRY_BM`, `COUNTRY_BN`, `COUNTRY_BO`, `COUNTRY_BQ`, `COUNTRY_BR`, `COUNTRY_BS`, `COUNTRY_BT`, `COUNTRY_BV`, `COUNTRY_BW`, `COUNTRY_BY`, `COUNTRY_BZ`, `COUNTRY_CA`, `COUNTRY_CC`, `COUNTRY_CD`, `COUNTRY_CF`, `COUNTRY_CG`, `COUNTRY_CH`, `COUNTRY_CI`, `COUNTRY_CK`, `COUNTRY_CL`, `COUNTRY_CM`, `COUNTRY_CN`, `COUNTRY_CO`, `COUNTRY_CR`, `COUNTRY_CS`, `COUNTRY_CU`, `COUNTRY_CV`, `COUNTRY_CW`, `COUNTRY_CX`, `COUNTRY_CY`, `COUNTRY_CZ`, `COUNTRY_DE`, `COUNTRY_DJ`, `COUNTRY_DK`, `COUNTRY_DM`, `COUNTRY_DO`, `COUNTRY_DZ`, `COUNTRY_EC`, `COUNTRY_EE`, `COUNTRY_EG`, `COUNTRY_EH`, `COUNTRY_ER`, `COUNTRY_ES`, `COUNTRY_ET`, `COUNTRY_FI`, `COUNTRY_FJ`, `COUNTRY_FK`, `COUNTRY_FM`, `COUNTRY_FO`, `COUNTRY_FR`, `COUNTRY_GA`, `COUNTRY_GB`, `COUNTRY_GD`, `COUNTRY_GE`, `COUNTRY_GF`, `COUNTRY_GG`, `COUNTRY_GH`, `COUNTRY_GI`, `COUNTRY_GL`, `COUNTRY_GM`, `COUNTRY_GN`, `COUNTRY_GP`, `COUNTRY_GQ`, `COUNTRY_GR`, `COUNTRY_GS`, `COUNTRY_GT`, `COUNTRY_GU`, `COUNTRY_GW`, `COUNTRY_GY`, `COUNTRY_HK`, `COUNTRY_HM`, `COUNTRY_HN`, `COUNTRY_HR`, `COUNTRY_HT`, `COUNTRY_HU`, `COUNTRY_ID`, `COUNTRY_IE`, `COUNTRY_IL`, `COUNTRY_IM`, `COUNTRY_IN`, `COUNTRY_IO`, `COUNTRY_IQ`, `COUNTRY_IR`, `COUNTRY_IS`, `COUNTRY_IT`, `COUNTRY_JE`, `COUNTRY_JM`, `COUNTRY_JO`, `COUNTRY_JP`, `COUNTRY_KE`, `COUNTRY_KG`, `COUNTRY_KH`, `COUNTRY_KI`, `COUNTRY_KM`, `COUNTRY_KN`, `COUNTRY_KP`, `COUNTRY_KR`, `COUNTRY_KW`, `COUNTRY_KY`, `COUNTRY_KZ`, `COUNTRY_LA`, `COUNTRY_LB`, `COUNTRY_LC`, `COUNTRY_LI`, `COUNTRY_LK`, `COUNTRY_LR`, `COUNTRY_LS`, `COUNTRY_LT`, `COUNTRY_LU`, `COUNTRY_LV`, `COUNTRY_LY`, `COUNTRY_MA`, `COUNTRY_MC`, `COUNTRY_MD`, `COUNTRY_ME`, `COUNTRY_MF`, `COUNTRY_MG`, `COUNTRY_MH`, `COUNTRY_MK`, `COUNTRY_ML`, `COUNTRY_MM`, `COUNTRY_MN`, `COUNTRY_MO`, `COUNTRY_MP`, `COUNTRY_MQ`, `COUNTRY_MR`, `COUNTRY_MS`, `COUNTRY_MT`, `COUNTRY_MU`, `COUNTRY_MV`, `COUNTRY_MW`, `COUNTRY_MX`, `COUNTRY_MY`, `COUNTRY_MZ`, `COUNTRY_NA`, `COUNTRY_NC`, `COUNTRY_NE`, `COUNTRY_NF`, `COUNTRY_NG`, `COUNTRY_NI`, `COUNTRY_NL`, `COUNTRY_NO`, `COUNTRY_NP`, `COUNTRY_NR`, `COUNTRY_NU`, `COUNTRY_NZ`, `COUNTRY_OM`, `COUNTRY_PA`, `COUNTRY_PE`, `COUNTRY_PF`, `COUNTRY_PG`, `COUNTRY_PH`, `COUNTRY_PK`, `COUNTRY_PL`, `COUNTRY_PM`, `COUNTRY_PN`, `COUNTRY_PR`, `COUNTRY_PS`, `COUNTRY_PT`, `COUNTRY_PW`, `COUNTRY_PY`, `COUNTRY_QA`, `COUNTRY_RE`, `COUNTRY_RO`, `COUNTRY_RS`, `COUNTRY_RU`, `COUNTRY_RW`, `COUNTRY_SA`, `COUNTRY_SB`, `COUNTRY_SC`, `COUNTRY_SD`, `COUNTRY_SE`, `COUNTRY_SG`, `COUNTRY_SH`, `COUNTRY_SI`, `COUNTRY_SJ`, `COUNTRY_SK`, `COUNTRY_SL`, `COUNTRY_SM`, `COUNTRY_SN`, `COUNTRY_SO`, `COUNTRY_SR`, `COUNTRY_SS`, `COUNTRY_ST`, `COUNTRY_SV`, `COUNTRY_SX`, `COUNTRY_SY`, `COUNTRY_SZ`, `COUNTRY_TC`, `COUNTRY_TD`, `COUNTRY_TF`, `COUNTRY_TG`, `COUNTRY_TH`, `COUNTRY_TJ`, `COUNTRY_TK`, `COUNTRY_TL`, `COUNTRY_TM`, `COUNTRY_TN`, `COUNTRY_TO`, `COUNTRY_TR`, `COUNTRY_TT`, `COUNTRY_TV`, `COUNTRY_TW`, `COUNTRY_TZ`, `COUNTRY_UA`, `COUNTRY_UG`, `COUNTRY_UM`, `COUNTRY_US`, `COUNTRY_UY`, `COUNTRY_UZ`, `COUNTRY_VA`, `COUNTRY_VC`, `COUNTRY_VE`, `COUNTRY_VG`, `COUNTRY_VI`, `COUNTRY_VN`, `COUNTRY_VU`, `COUNTRY_WF`, `COUNTRY_WS`, `COUNTRY_XK`, `COUNTRY_XT`, `COUNTRY_YE`, `COUNTRY_YT`, `COUNTRY_ZA`, `COUNTRY_ZM`, `COUNTRY_ZW`. Defaults to `COUNTRY_NONE`.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeBetween(1, 64),
+											},
 										},
 										"invert_match": schema.BoolAttribute{
 											MarkdownDescription: "Invert Match Result. Invert the match result.",
@@ -515,6 +576,9 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -523,6 +587,9 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -530,6 +597,9 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -541,11 +611,17 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 											MarkdownDescription: "List of exact values to match the input against.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(64),
+											},
 										},
 										"regex_values": schema.ListAttribute{
 											MarkdownDescription: "List of regular expressions to match the input against.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 									},
 								},
@@ -560,14 +636,17 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 											"name": schema.StringAttribute{
 												MarkdownDescription: "Case-insensitive HTTP header name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 256),
+												},
 											},
 										},
 										Blocks: map[string]schema.Block{
 											"check_not_present": schema.SingleNestedBlock{
-												MarkdownDescription: "Enable this option",
+												MarkdownDescription: "Configuration parameter for check not present.",
 											},
 											"check_present": schema.SingleNestedBlock{
-												MarkdownDescription: "Enable this option",
+												MarkdownDescription: "Configuration parameter for check present.",
 											},
 											"item": schema.SingleNestedBlock{
 												MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -576,16 +655,25 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 														MarkdownDescription: "List of exact values to match the input against.",
 														Optional:            true,
 														ElementType:         types.StringType,
+														Validators: []validator.List{
+															listvalidator.SizeAtMost(64),
+														},
 													},
 													"regex_values": schema.ListAttribute{
 														MarkdownDescription: "List of regular expressions to match the input against.",
 														Optional:            true,
 														ElementType:         types.StringType,
+														Validators: []validator.List{
+															listvalidator.SizeAtMost(16),
+														},
 													},
 													"transformers": schema.ListAttribute{
-														MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+														MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 														Optional:            true,
 														ElementType:         types.StringType,
+														Validators: []validator.List{
+															listvalidator.SizeAtMost(9),
+														},
 													},
 												},
 											},
@@ -603,6 +691,9 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 											MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] List of methods values to match against. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 									},
 								},
@@ -630,6 +721,10 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -637,6 +732,10 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -671,6 +770,9 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 											MarkdownDescription: "IPv4 Prefix List. List of IPv4 prefix strings.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 									},
 								},
@@ -681,6 +783,9 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 											MarkdownDescription: "List of exact path values to match the input HTTP path against.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 										"invert_matcher": schema.BoolAttribute{
 											MarkdownDescription: "Invert Path Matcher. Invert the match result.",
@@ -690,51 +795,38 @@ func (r *RateLimiterPolicyResource) Schema(ctx context.Context, req resource.Sch
 											MarkdownDescription: "List of path prefix values to match the input HTTP path against.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 										"regex_values": schema.ListAttribute{
 											MarkdownDescription: "List of regular expressions to match the input HTTP path against.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 										"suffix_values": schema.ListAttribute{
 											MarkdownDescription: "List of path suffix values to match the input HTTP path against.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(64),
+											},
 										},
 										"transformers": schema.ListAttribute{
-											MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+											MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(9),
+											},
 										},
 									},
 								},
 							},
 						},
-					},
-				},
-			},
-			"server_name_matcher": schema.SingleNestedBlock{
-				MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
-				Attributes: map[string]schema.Attribute{
-					"exact_values": schema.ListAttribute{
-						MarkdownDescription: "List of exact values to match the input against.",
-						Optional:            true,
-						ElementType:         types.StringType,
-					},
-					"regex_values": schema.ListAttribute{
-						MarkdownDescription: "List of regular expressions to match the input against.",
-						Optional:            true,
-						ElementType:         types.StringType,
-					},
-				},
-			},
-			"server_selector": schema.SingleNestedBlock{
-				MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
-				Attributes: map[string]schema.Attribute{
-					"expressions": schema.ListAttribute{
-						MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
-						Optional:            true,
-						ElementType:         types.StringType,
 					},
 				},
 			},
@@ -847,6 +939,35 @@ func (r *RateLimiterPolicyResource) Create(ctx context.Context, req resource.Cre
 	if data.AnyServer != nil {
 		any_serverMap := make(map[string]interface{})
 		createReq.Spec["any_server"] = any_serverMap
+	}
+	if data.ServerNameMatcher != nil {
+		server_name_matcherMap := make(map[string]interface{})
+		if !data.ServerNameMatcher.ExactValues.IsNull() && !data.ServerNameMatcher.ExactValues.IsUnknown() {
+			var exact_valuesItems []string
+			diags := data.ServerNameMatcher.ExactValues.ElementsAs(ctx, &exact_valuesItems, false)
+			if !diags.HasError() {
+				server_name_matcherMap["exact_values"] = exact_valuesItems
+			}
+		}
+		if !data.ServerNameMatcher.RegexValues.IsNull() && !data.ServerNameMatcher.RegexValues.IsUnknown() {
+			var regex_valuesItems []string
+			diags := data.ServerNameMatcher.RegexValues.ElementsAs(ctx, &regex_valuesItems, false)
+			if !diags.HasError() {
+				server_name_matcherMap["regex_values"] = regex_valuesItems
+			}
+		}
+		createReq.Spec["server_name_matcher"] = server_name_matcherMap
+	}
+	if data.ServerSelector != nil {
+		server_selectorMap := make(map[string]interface{})
+		if !data.ServerSelector.Expressions.IsNull() && !data.ServerSelector.Expressions.IsUnknown() {
+			var expressionsItems []string
+			diags := data.ServerSelector.Expressions.ElementsAs(ctx, &expressionsItems, false)
+			if !diags.HasError() {
+				server_selectorMap["expressions"] = expressionsItems
+			}
+		}
+		createReq.Spec["server_selector"] = server_selectorMap
 	}
 	if !data.Rules.IsNull() && !data.Rules.IsUnknown() {
 		var rulesItems []RateLimiterPolicyRulesModel
@@ -1040,35 +1161,6 @@ func (r *RateLimiterPolicyResource) Create(ctx context.Context, req resource.Cre
 			createReq.Spec["rules"] = rulesList
 		}
 	}
-	if data.ServerNameMatcher != nil {
-		server_name_matcherMap := make(map[string]interface{})
-		if !data.ServerNameMatcher.ExactValues.IsNull() && !data.ServerNameMatcher.ExactValues.IsUnknown() {
-			var exact_valuesItems []string
-			diags := data.ServerNameMatcher.ExactValues.ElementsAs(ctx, &exact_valuesItems, false)
-			if !diags.HasError() {
-				server_name_matcherMap["exact_values"] = exact_valuesItems
-			}
-		}
-		if !data.ServerNameMatcher.RegexValues.IsNull() && !data.ServerNameMatcher.RegexValues.IsUnknown() {
-			var regex_valuesItems []string
-			diags := data.ServerNameMatcher.RegexValues.ElementsAs(ctx, &regex_valuesItems, false)
-			if !diags.HasError() {
-				server_name_matcherMap["regex_values"] = regex_valuesItems
-			}
-		}
-		createReq.Spec["server_name_matcher"] = server_name_matcherMap
-	}
-	if data.ServerSelector != nil {
-		server_selectorMap := make(map[string]interface{})
-		if !data.ServerSelector.Expressions.IsNull() && !data.ServerSelector.Expressions.IsUnknown() {
-			var expressionsItems []string
-			diags := data.ServerSelector.Expressions.ElementsAs(ctx, &expressionsItems, false)
-			if !diags.HasError() {
-				server_selectorMap["expressions"] = expressionsItems
-			}
-		}
-		createReq.Spec["server_selector"] = server_selectorMap
-	}
 	if !data.ServerName.IsNull() && !data.ServerName.IsUnknown() {
 		createReq.Spec["server_name"] = data.ServerName.ValueString()
 	}
@@ -1090,6 +1182,53 @@ func (r *RateLimiterPolicyResource) Create(ctx context.Context, req resource.Cre
 		data.AnyServer = &RateLimiterPolicyEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
+	if blockData, ok := apiResource.Spec["server_name_matcher"].(map[string]interface{}); ok && (isImport || data.ServerNameMatcher != nil) {
+		data.ServerNameMatcher = &RateLimiterPolicyServerNameMatcherModel{
+			ExactValues: func() types.List {
+				if v, ok := blockData["exact_values"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+			RegexValues: func() types.List {
+				if v, ok := blockData["regex_values"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+		}
+	}
+	if blockData, ok := apiResource.Spec["server_selector"].(map[string]interface{}); ok && (isImport || data.ServerSelector != nil) {
+		data.ServerSelector = &RateLimiterPolicyServerSelectorModel{
+			Expressions: func() types.List {
+				if v, ok := blockData["expressions"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+		}
+	}
 	if listData, ok := apiResource.Spec["rules"].([]interface{}); ok && len(listData) > 0 {
 		var rulesList []RateLimiterPolicyRulesModel
 		var existingRulesItems []RateLimiterPolicyRulesModel
@@ -1167,53 +1306,6 @@ func (r *RateLimiterPolicyResource) Create(ctx context.Context, req resource.Cre
 	} else {
 		// No data from API - set to null list
 		data.Rules = types.ListNull(types.ObjectType{AttrTypes: RateLimiterPolicyRulesModelAttrTypes})
-	}
-	if blockData, ok := apiResource.Spec["server_name_matcher"].(map[string]interface{}); ok && (isImport || data.ServerNameMatcher != nil) {
-		data.ServerNameMatcher = &RateLimiterPolicyServerNameMatcherModel{
-			ExactValues: func() types.List {
-				if v, ok := blockData["exact_values"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-			RegexValues: func() types.List {
-				if v, ok := blockData["regex_values"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-		}
-	}
-	if blockData, ok := apiResource.Spec["server_selector"].(map[string]interface{}); ok && (isImport || data.ServerSelector != nil) {
-		data.ServerSelector = &RateLimiterPolicyServerSelectorModel{
-			Expressions: func() types.List {
-				if v, ok := blockData["expressions"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-		}
 	}
 	if v, ok := apiResource.Spec["server_name"].(string); ok && v != "" {
 		data.ServerName = types.StringValue(v)
@@ -1305,6 +1397,53 @@ func (r *RateLimiterPolicyResource) Read(ctx context.Context, req resource.ReadR
 		data.AnyServer = &RateLimiterPolicyEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
+	if blockData, ok := apiResource.Spec["server_name_matcher"].(map[string]interface{}); ok && (isImport || data.ServerNameMatcher != nil) {
+		data.ServerNameMatcher = &RateLimiterPolicyServerNameMatcherModel{
+			ExactValues: func() types.List {
+				if v, ok := blockData["exact_values"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+			RegexValues: func() types.List {
+				if v, ok := blockData["regex_values"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+		}
+	}
+	if blockData, ok := apiResource.Spec["server_selector"].(map[string]interface{}); ok && (isImport || data.ServerSelector != nil) {
+		data.ServerSelector = &RateLimiterPolicyServerSelectorModel{
+			Expressions: func() types.List {
+				if v, ok := blockData["expressions"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+		}
+	}
 	if listData, ok := apiResource.Spec["rules"].([]interface{}); ok && len(listData) > 0 {
 		var rulesList []RateLimiterPolicyRulesModel
 		var existingRulesItems []RateLimiterPolicyRulesModel
@@ -1383,53 +1522,6 @@ func (r *RateLimiterPolicyResource) Read(ctx context.Context, req resource.ReadR
 		// No data from API - set to null list
 		data.Rules = types.ListNull(types.ObjectType{AttrTypes: RateLimiterPolicyRulesModelAttrTypes})
 	}
-	if blockData, ok := apiResource.Spec["server_name_matcher"].(map[string]interface{}); ok && (isImport || data.ServerNameMatcher != nil) {
-		data.ServerNameMatcher = &RateLimiterPolicyServerNameMatcherModel{
-			ExactValues: func() types.List {
-				if v, ok := blockData["exact_values"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-			RegexValues: func() types.List {
-				if v, ok := blockData["regex_values"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-		}
-	}
-	if blockData, ok := apiResource.Spec["server_selector"].(map[string]interface{}); ok && (isImport || data.ServerSelector != nil) {
-		data.ServerSelector = &RateLimiterPolicyServerSelectorModel{
-			Expressions: func() types.List {
-				if v, ok := blockData["expressions"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-		}
-	}
 	if v, ok := apiResource.Spec["server_name"].(string); ok && v != "" {
 		data.ServerName = types.StringValue(v)
 	} else {
@@ -1489,6 +1581,35 @@ func (r *RateLimiterPolicyResource) Update(ctx context.Context, req resource.Upd
 	if data.AnyServer != nil {
 		any_serverMap := make(map[string]interface{})
 		apiResource.Spec["any_server"] = any_serverMap
+	}
+	if data.ServerNameMatcher != nil {
+		server_name_matcherMap := make(map[string]interface{})
+		if !data.ServerNameMatcher.ExactValues.IsNull() && !data.ServerNameMatcher.ExactValues.IsUnknown() {
+			var exact_valuesItems []string
+			diags := data.ServerNameMatcher.ExactValues.ElementsAs(ctx, &exact_valuesItems, false)
+			if !diags.HasError() {
+				server_name_matcherMap["exact_values"] = exact_valuesItems
+			}
+		}
+		if !data.ServerNameMatcher.RegexValues.IsNull() && !data.ServerNameMatcher.RegexValues.IsUnknown() {
+			var regex_valuesItems []string
+			diags := data.ServerNameMatcher.RegexValues.ElementsAs(ctx, &regex_valuesItems, false)
+			if !diags.HasError() {
+				server_name_matcherMap["regex_values"] = regex_valuesItems
+			}
+		}
+		apiResource.Spec["server_name_matcher"] = server_name_matcherMap
+	}
+	if data.ServerSelector != nil {
+		server_selectorMap := make(map[string]interface{})
+		if !data.ServerSelector.Expressions.IsNull() && !data.ServerSelector.Expressions.IsUnknown() {
+			var expressionsItems []string
+			diags := data.ServerSelector.Expressions.ElementsAs(ctx, &expressionsItems, false)
+			if !diags.HasError() {
+				server_selectorMap["expressions"] = expressionsItems
+			}
+		}
+		apiResource.Spec["server_selector"] = server_selectorMap
 	}
 	if !data.Rules.IsNull() && !data.Rules.IsUnknown() {
 		var rulesItems []RateLimiterPolicyRulesModel
@@ -1682,35 +1803,6 @@ func (r *RateLimiterPolicyResource) Update(ctx context.Context, req resource.Upd
 			apiResource.Spec["rules"] = rulesList
 		}
 	}
-	if data.ServerNameMatcher != nil {
-		server_name_matcherMap := make(map[string]interface{})
-		if !data.ServerNameMatcher.ExactValues.IsNull() && !data.ServerNameMatcher.ExactValues.IsUnknown() {
-			var exact_valuesItems []string
-			diags := data.ServerNameMatcher.ExactValues.ElementsAs(ctx, &exact_valuesItems, false)
-			if !diags.HasError() {
-				server_name_matcherMap["exact_values"] = exact_valuesItems
-			}
-		}
-		if !data.ServerNameMatcher.RegexValues.IsNull() && !data.ServerNameMatcher.RegexValues.IsUnknown() {
-			var regex_valuesItems []string
-			diags := data.ServerNameMatcher.RegexValues.ElementsAs(ctx, &regex_valuesItems, false)
-			if !diags.HasError() {
-				server_name_matcherMap["regex_values"] = regex_valuesItems
-			}
-		}
-		apiResource.Spec["server_name_matcher"] = server_name_matcherMap
-	}
-	if data.ServerSelector != nil {
-		server_selectorMap := make(map[string]interface{})
-		if !data.ServerSelector.Expressions.IsNull() && !data.ServerSelector.Expressions.IsUnknown() {
-			var expressionsItems []string
-			diags := data.ServerSelector.Expressions.ElementsAs(ctx, &expressionsItems, false)
-			if !diags.HasError() {
-				server_selectorMap["expressions"] = expressionsItems
-			}
-		}
-		apiResource.Spec["server_selector"] = server_selectorMap
-	}
 	if !data.ServerName.IsNull() && !data.ServerName.IsUnknown() {
 		apiResource.Spec["server_name"] = data.ServerName.ValueString()
 	}
@@ -1750,6 +1842,53 @@ func (r *RateLimiterPolicyResource) Update(ctx context.Context, req resource.Upd
 		data.AnyServer = &RateLimiterPolicyEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
+	if blockData, ok := apiResource.Spec["server_name_matcher"].(map[string]interface{}); ok && (isImport || data.ServerNameMatcher != nil) {
+		data.ServerNameMatcher = &RateLimiterPolicyServerNameMatcherModel{
+			ExactValues: func() types.List {
+				if v, ok := blockData["exact_values"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+			RegexValues: func() types.List {
+				if v, ok := blockData["regex_values"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+		}
+	}
+	if blockData, ok := apiResource.Spec["server_selector"].(map[string]interface{}); ok && (isImport || data.ServerSelector != nil) {
+		data.ServerSelector = &RateLimiterPolicyServerSelectorModel{
+			Expressions: func() types.List {
+				if v, ok := blockData["expressions"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+		}
+	}
 	if listData, ok := apiResource.Spec["rules"].([]interface{}); ok && len(listData) > 0 {
 		var rulesList []RateLimiterPolicyRulesModel
 		var existingRulesItems []RateLimiterPolicyRulesModel
@@ -1827,53 +1966,6 @@ func (r *RateLimiterPolicyResource) Update(ctx context.Context, req resource.Upd
 	} else {
 		// No data from API - set to null list
 		data.Rules = types.ListNull(types.ObjectType{AttrTypes: RateLimiterPolicyRulesModelAttrTypes})
-	}
-	if blockData, ok := apiResource.Spec["server_name_matcher"].(map[string]interface{}); ok && (isImport || data.ServerNameMatcher != nil) {
-		data.ServerNameMatcher = &RateLimiterPolicyServerNameMatcherModel{
-			ExactValues: func() types.List {
-				if v, ok := blockData["exact_values"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-			RegexValues: func() types.List {
-				if v, ok := blockData["regex_values"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-		}
-	}
-	if blockData, ok := apiResource.Spec["server_selector"].(map[string]interface{}); ok && (isImport || data.ServerSelector != nil) {
-		data.ServerSelector = &RateLimiterPolicyServerSelectorModel{
-			Expressions: func() types.List {
-				if v, ok := blockData["expressions"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-		}
 	}
 	if v, ok := apiResource.Spec["server_name"].(string); ok && v != "" {
 		data.ServerName = types.StringValue(v)

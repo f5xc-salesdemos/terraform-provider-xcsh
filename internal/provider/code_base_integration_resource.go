@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -499,7 +502,7 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"azure_repos": schema.SingleNestedBlock{
-						MarkdownDescription: "Azure Repos Integration.",
+						MarkdownDescription: "Configuration parameter for azure repos.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"access_token": schema.SingleNestedBlock{
@@ -516,6 +519,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -533,6 +539,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -563,6 +572,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -580,6 +592,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -588,11 +603,15 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 						},
 					},
 					"bitbucket_server": schema.SingleNestedBlock{
-						MarkdownDescription: "BitBucket Server Integration.",
+						MarkdownDescription: "Configuration parameter for bitbucket server.",
 						Attributes: map[string]schema.Attribute{
 							"url": schema.StringAttribute{
 								MarkdownDescription: "BitBucket Server URL. .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 1024),
+									stringvalidator.RegexMatches(regexp.MustCompile(`^(https?|ftp)://[^\s/$.?#].[^\s]*$`), ""),
+								},
 							},
 							"username": schema.StringAttribute{
 								MarkdownDescription: "BitBucket Server Username. .",
@@ -618,6 +637,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -635,6 +657,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -669,6 +694,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -686,6 +714,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -694,11 +725,15 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 						},
 					},
 					"github_enterprise": schema.SingleNestedBlock{
-						MarkdownDescription: "GitHub Enterprise Integration.",
+						MarkdownDescription: "Configuration parameter for github enterprise.",
 						Attributes: map[string]schema.Attribute{
 							"hostname": schema.StringAttribute{
 								MarkdownDescription: "GitHub Hostname. .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 1024),
+									stringvalidator.RegexMatches(regexp.MustCompile(`^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`), ""),
+								},
 							},
 							"username": schema.StringAttribute{
 								MarkdownDescription: "GitHub Username. .",
@@ -720,6 +755,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -737,6 +775,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -762,6 +803,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -779,6 +823,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -787,11 +834,15 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 						},
 					},
 					"gitlab_enterprise": schema.SingleNestedBlock{
-						MarkdownDescription: "GitLab Enterprise Integration.",
+						MarkdownDescription: "Configuration parameter for gitlab enterprise.",
 						Attributes: map[string]schema.Attribute{
 							"url": schema.StringAttribute{
 								MarkdownDescription: "GitLab URL. .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 1024),
+									stringvalidator.RegexMatches(regexp.MustCompile(`^(https?|ftp)://[^\s/$.?#].[^\s]*$`), ""),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -809,6 +860,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -826,6 +880,9 @@ func (r *CodeBaseIntegrationResource) Schema(ctx context.Context, req resource.S
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},

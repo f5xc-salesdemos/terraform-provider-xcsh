@@ -9,11 +9,12 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -59,15 +60,15 @@ var CRLHTTPAccessModelAttrTypes = map[string]attr.Type{
 type CRLResourceModel struct {
 	Name            types.String        `tfsdk:"name"`
 	Namespace       types.String        `tfsdk:"namespace"`
+	RefreshInterval types.Int64         `tfsdk:"refresh_interval"`
+	ServerAddress   types.String        `tfsdk:"server_address"`
+	ServerPort      types.Int64         `tfsdk:"server_port"`
+	Timeout         types.Int64         `tfsdk:"timeout"`
 	Annotations     types.Map           `tfsdk:"annotations"`
 	Description     types.String        `tfsdk:"description"`
 	Disable         types.Bool          `tfsdk:"disable"`
 	Labels          types.Map           `tfsdk:"labels"`
 	ID              types.String        `tfsdk:"id"`
-	RefreshInterval types.Int64         `tfsdk:"refresh_interval"`
-	ServerAddress   types.String        `tfsdk:"server_address"`
-	ServerPort      types.Int64         `tfsdk:"server_port"`
-	Timeout         types.Int64         `tfsdk:"timeout"`
 	Timeouts        timeouts.Value      `tfsdk:"timeouts"`
 	HTTPAccess      *CRLHTTPAccessModel `tfsdk:"http_access"`
 }
@@ -100,6 +101,28 @@ func (r *CRLResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 					validators.NamespaceValidator(),
 				},
 			},
+			"refresh_interval": schema.Int64Attribute{
+				MarkdownDescription: "CRL Refresh interval. CRL refresh interval, in hours.",
+				Required:            true,
+			},
+			"server_address": schema.StringAttribute{
+				MarkdownDescription: "CRL server address or hostname .",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(255),
+				},
+			},
+			"server_port": schema.Int64Attribute{
+				MarkdownDescription: "CRL Server Port. Set CRL Server port number.",
+				Required:            true,
+			},
+			"timeout": schema.Int64Attribute{
+				MarkdownDescription: "CRL download timeout. CRL download wait time, in seconds.",
+				Required:            true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 3600),
+				},
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -125,38 +148,6 @@ func (r *CRLResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"refresh_interval": schema.Int64Attribute{
-				MarkdownDescription: "CRL Refresh interval. CRL refresh interval, in hours.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
-			"server_address": schema.StringAttribute{
-				MarkdownDescription: "CRL server address or hostname .",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"server_port": schema.Int64Attribute{
-				MarkdownDescription: "CRL Server Port. Set CRL Server port number.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
-			"timeout": schema.Int64Attribute{
-				MarkdownDescription: "CRL download timeout. CRL download wait time, in seconds.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
 		},
 		Blocks: map[string]schema.Block{
 			"timeouts": timeouts.Block(ctx, timeouts.Opts{
@@ -166,11 +157,14 @@ func (r *CRLResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 				Delete: true,
 			}),
 			"http_access": schema.SingleNestedBlock{
-				MarkdownDescription: "HTTPAccessInfo.",
+				MarkdownDescription: "Configuration parameter for http access.",
 				Attributes: map[string]schema.Attribute{
 					"path": schema.StringAttribute{
 						MarkdownDescription: "CRL File path. CRL file location.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 256),
+						},
 					},
 				},
 			},
@@ -280,13 +274,6 @@ func (r *CRLResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.HTTPAccess != nil {
-		http_accessMap := make(map[string]interface{})
-		if !data.HTTPAccess.Path.IsNull() && !data.HTTPAccess.Path.IsUnknown() {
-			http_accessMap["path"] = data.HTTPAccess.Path.ValueString()
-		}
-		createReq.Spec["http_access"] = http_accessMap
-	}
 	if !data.RefreshInterval.IsNull() && !data.RefreshInterval.IsUnknown() {
 		createReq.Spec["refresh_interval"] = data.RefreshInterval.ValueInt64()
 	}
@@ -298,6 +285,13 @@ func (r *CRLResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 	if !data.Timeout.IsNull() && !data.Timeout.IsUnknown() {
 		createReq.Spec["timeout"] = data.Timeout.ValueInt64()
+	}
+	if data.HTTPAccess != nil {
+		http_accessMap := make(map[string]interface{})
+		if !data.HTTPAccess.Path.IsNull() && !data.HTTPAccess.Path.IsUnknown() {
+			http_accessMap["path"] = data.HTTPAccess.Path.ValueString()
+		}
+		createReq.Spec["http_access"] = http_accessMap
 	}
 
 	apiResource, err := r.client.CreateCRL(ctx, createReq)
@@ -312,16 +306,6 @@ func (r *CRLResource) Create(ctx context.Context, req resource.CreateRequest, re
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
-	if blockData, ok := apiResource.Spec["http_access"].(map[string]interface{}); ok && (isImport || data.HTTPAccess != nil) {
-		data.HTTPAccess = &CRLHTTPAccessModel{
-			Path: func() types.String {
-				if v, ok := blockData["path"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-		}
-	}
 	if v, ok := apiResource.Spec["refresh_interval"].(float64); ok {
 		data.RefreshInterval = types.Int64Value(int64(v))
 	} else {
@@ -341,6 +325,16 @@ func (r *CRLResource) Create(ctx context.Context, req resource.CreateRequest, re
 		data.Timeout = types.Int64Value(int64(v))
 	} else {
 		data.Timeout = types.Int64Null()
+	}
+	if blockData, ok := apiResource.Spec["http_access"].(map[string]interface{}); ok && (isImport || data.HTTPAccess != nil) {
+		data.HTTPAccess = &CRLHTTPAccessModel{
+			Path: func() types.String {
+				if v, ok := blockData["path"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+		}
 	}
 
 	tflog.Trace(ctx, "created CRL resource")
@@ -422,16 +416,6 @@ func (r *CRLResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
-	if blockData, ok := apiResource.Spec["http_access"].(map[string]interface{}); ok && (isImport || data.HTTPAccess != nil) {
-		data.HTTPAccess = &CRLHTTPAccessModel{
-			Path: func() types.String {
-				if v, ok := blockData["path"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-		}
-	}
 	if v, ok := apiResource.Spec["refresh_interval"].(float64); ok {
 		data.RefreshInterval = types.Int64Value(int64(v))
 	} else {
@@ -451,6 +435,16 @@ func (r *CRLResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		data.Timeout = types.Int64Value(int64(v))
 	} else {
 		data.Timeout = types.Int64Null()
+	}
+	if blockData, ok := apiResource.Spec["http_access"].(map[string]interface{}); ok && (isImport || data.HTTPAccess != nil) {
+		data.HTTPAccess = &CRLHTTPAccessModel{
+			Path: func() types.String {
+				if v, ok := blockData["path"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -503,13 +497,6 @@ func (r *CRLResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.HTTPAccess != nil {
-		http_accessMap := make(map[string]interface{})
-		if !data.HTTPAccess.Path.IsNull() && !data.HTTPAccess.Path.IsUnknown() {
-			http_accessMap["path"] = data.HTTPAccess.Path.ValueString()
-		}
-		apiResource.Spec["http_access"] = http_accessMap
-	}
 	if !data.RefreshInterval.IsNull() && !data.RefreshInterval.IsUnknown() {
 		apiResource.Spec["refresh_interval"] = data.RefreshInterval.ValueInt64()
 	}
@@ -521,6 +508,13 @@ func (r *CRLResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	}
 	if !data.Timeout.IsNull() && !data.Timeout.IsUnknown() {
 		apiResource.Spec["timeout"] = data.Timeout.ValueInt64()
+	}
+	if data.HTTPAccess != nil {
+		http_accessMap := make(map[string]interface{})
+		if !data.HTTPAccess.Path.IsNull() && !data.HTTPAccess.Path.IsUnknown() {
+			http_accessMap["path"] = data.HTTPAccess.Path.ValueString()
+		}
+		apiResource.Spec["http_access"] = http_accessMap
 	}
 
 	_, err := r.client.UpdateCRL(ctx, apiResource)
@@ -541,49 +535,11 @@ func (r *CRLResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["refresh_interval"].(float64); ok {
-		data.RefreshInterval = types.Int64Value(int64(v))
-	} else if data.RefreshInterval.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.RefreshInterval = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["server_address"].(string); ok && v != "" {
-		data.ServerAddress = types.StringValue(v)
-	} else if data.ServerAddress.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.ServerAddress = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["server_port"].(float64); ok {
-		data.ServerPort = types.Int64Value(int64(v))
-	} else if data.ServerPort.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.ServerPort = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["timeout"].(float64); ok {
-		data.Timeout = types.Int64Value(int64(v))
-	} else if data.Timeout.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Timeout = types.Int64Null()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
-	if blockData, ok := apiResource.Spec["http_access"].(map[string]interface{}); ok && (isImport || data.HTTPAccess != nil) {
-		data.HTTPAccess = &CRLHTTPAccessModel{
-			Path: func() types.String {
-				if v, ok := blockData["path"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-		}
-	}
 	if v, ok := apiResource.Spec["refresh_interval"].(float64); ok {
 		data.RefreshInterval = types.Int64Value(int64(v))
 	} else {
@@ -603,6 +559,16 @@ func (r *CRLResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		data.Timeout = types.Int64Value(int64(v))
 	} else {
 		data.Timeout = types.Int64Null()
+	}
+	if blockData, ok := apiResource.Spec["http_access"].(map[string]interface{}); ok && (isImport || data.HTTPAccess != nil) {
+		data.HTTPAccess = &CRLHTTPAccessModel{
+			Path: func() types.String {
+				if v, ok := blockData["path"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

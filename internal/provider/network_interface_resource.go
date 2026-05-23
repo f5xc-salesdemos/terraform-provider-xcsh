@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -581,19 +583,25 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 				Delete: true,
 			}),
 			"dedicated_interface": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: dedicated_interface, dedicated_management_interface, ethernet_interface, layer2_interface, tunnel_interface] Dedicated Interface. Dedicated Interface Configuration.",
+				MarkdownDescription: "[OneOf: dedicated_interface, dedicated_management_interface, ethernet_interface, layer2_interface, tunnel_interface] Configuration parameter for dedicated interface.",
 				Attributes: map[string]schema.Attribute{
 					"device": schema.StringAttribute{
 						MarkdownDescription: "Name of the device for which interface is configured. Use wwan0 for 4G/LTE.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"mtu": schema.Int64Attribute{
 						MarkdownDescription: "Maximum packet size (Maximum Transfer Unit) of the interface When configured, MTU must be between 512 and 16384.",
 						Optional:            true,
 					},
 					"node": schema.StringAttribute{
-						MarkdownDescription: "Configuration will apply to a device on the given node of the site.",
+						MarkdownDescription: "Exclusive with [cluster] Configuration will apply to a device on the given node of the site.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"priority": schema.Int64Attribute{
 						MarkdownDescription: "Priority of the network interface when multiple network interfaces are present in outside network Greater the value, higher the priority.",
@@ -614,24 +622,30 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 						MarkdownDescription: "Enable this option",
 					},
 					"not_primary": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for not primary.",
 					},
 				},
 			},
 			"dedicated_management_interface": schema.SingleNestedBlock{
-				MarkdownDescription: "Dedicated Management Interface. Dedicated Interface Configuration.",
+				MarkdownDescription: "Configuration parameter for dedicated management interface.",
 				Attributes: map[string]schema.Attribute{
 					"device": schema.StringAttribute{
 						MarkdownDescription: "Name of the device for which interface is configured .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"mtu": schema.Int64Attribute{
 						MarkdownDescription: "Maximum packet size (Maximum Transfer Unit) of the interface When configured, MTU must be between 512 and 16384.",
 						Optional:            true,
 					},
 					"node": schema.StringAttribute{
-						MarkdownDescription: "Configuration will apply to a device on the given node of the site.",
+						MarkdownDescription: "Exclusive with [cluster] Configuration will apply to a device on the given node of the site.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -641,26 +655,32 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 				},
 			},
 			"ethernet_interface": schema.SingleNestedBlock{
-				MarkdownDescription: "Ethernet Interface. Ethernet Interface Configuration.",
+				MarkdownDescription: "Configuration parameter for ethernet interface.",
 				Attributes: map[string]schema.Attribute{
 					"device": schema.StringAttribute{
 						MarkdownDescription: "Interface configuration for the ethernet device .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"mtu": schema.Int64Attribute{
 						MarkdownDescription: "Maximum packet size (Maximum Transfer Unit) of the interface When configured, MTU must be between 512 and 16384.",
 						Optional:            true,
 					},
 					"node": schema.StringAttribute{
-						MarkdownDescription: "Configuration will apply to a device on the given node.",
+						MarkdownDescription: "Exclusive with [cluster] Configuration will apply to a device on the given node.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"priority": schema.Int64Attribute{
 						MarkdownDescription: "Priority of the network interface when multiple network interfaces are present in outside network Greater the value, higher the priority.",
 						Optional:            true,
 					},
 					"vlan_id": schema.Int64Attribute{
-						MarkdownDescription: "Configure a VLAN tagged ethernet interface.",
+						MarkdownDescription: "Exclusive with [untagged] Configure a VLAN tagged ethernet interface.",
 						Optional:            true,
 					},
 				},
@@ -672,34 +692,43 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 						MarkdownDescription: "Enable this option",
 					},
 					"dhcp_server": schema.SingleNestedBlock{
-						MarkdownDescription: "DHCPServerParametersType.",
+						MarkdownDescription: "Configuration parameter for dhcp server.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"automatic_from_end": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for automatic from end.",
 							},
 							"automatic_from_start": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for automatic from start.",
 							},
 							"dhcp_networks": schema.ListNestedBlock{
 								MarkdownDescription: "List of networks from which DHCP Server can allocate IPv4 Addresses .",
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"dgw_address": schema.StringAttribute{
-											MarkdownDescription: "Enter a IPv4 address from the network prefix to be used as the default gateway.",
+											MarkdownDescription: "Exclusive with [first_address last_address] Enter a IPv4 address from the network prefix to be used as the default gateway.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"dns_address": schema.StringAttribute{
-											MarkdownDescription: "Enter a IPv4 address from the network prefix to be used as the DNS server.",
+											MarkdownDescription: "Exclusive with [same_as_dgw] Enter a IPv4 address from the network prefix to be used as the DNS server.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"network_prefix": schema.StringAttribute{
-											MarkdownDescription: "Set the network prefix for the site. Ex: 10.1.1.0/24.",
+											MarkdownDescription: "Exclusive with [] Set the network prefix for the site. Ex: 10.1.1.0/24.",
 											Optional:            true,
 										},
 										"pool_settings": schema.StringAttribute{
 											MarkdownDescription: "[Enum: INCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS|EXCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS] Identifies the how to pick the network for Interface. Address ranges in DHCP pool list are used for IP Address allocation Address ranges in DHCP pool list are excluded from IP Address allocation. Possible values are `INCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS`, `EXCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS`. Defaults to `INCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("INCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS", "EXCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -716,16 +745,22 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 													"end_ip": schema.StringAttribute{
 														MarkdownDescription: "Ending IP of the pool range. In case of address allocator, offset is derived based on network prefix. 10.1.1.200 with prefix length of 24, end offset is 0.0.0.200.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"start_ip": schema.StringAttribute{
 														MarkdownDescription: "Starting IP of the pool range. In case of address allocator, offset is derived based on network prefix. 10.1.1.5 with prefix length of 24, start offset is 0.0.0.5.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 												},
 											},
 										},
 										"same_as_dgw": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for same as dgw.",
 										},
 									},
 								},
@@ -749,14 +784,17 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"host": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Hostname or IP address of the target server.",
 							},
 							"router": schema.SingleNestedBlock{
 								MarkdownDescription: "IPV6AutoConfigRouterType.",
 								Attributes: map[string]schema.Attribute{
 									"network_prefix": schema.StringAttribute{
-										MarkdownDescription: "Nework prefix that is used as Prefix information Allowed only /64 prefix length as per RFC 4862.",
+										MarkdownDescription: "Exclusive with [stateful] Nework prefix that is used as Prefix information Allowed only /64 prefix length as per RFC 4862.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -771,6 +809,9 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 														MarkdownDescription: "List of IPv6 Addresses acting as DNS servers .",
 														Optional:            true,
 														ElementType:         types.StringType,
+														Validators: []validator.List{
+															listvalidator.SizeBetween(1, 4),
+														},
 													},
 												},
 											},
@@ -778,8 +819,11 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 												MarkdownDescription: "IPV6LocalDnsAddress.",
 												Attributes: map[string]schema.Attribute{
 													"configured_address": schema.StringAttribute{
-														MarkdownDescription: "Configured address from the network prefix is chosen as DNS server.",
+														MarkdownDescription: "Exclusive with [first_address last_address] Configured address from the network prefix is chosen as DNS server.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
@@ -798,22 +842,25 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 										Attributes:          map[string]schema.Attribute{},
 										Blocks: map[string]schema.Block{
 											"automatic_from_end": schema.SingleNestedBlock{
-												MarkdownDescription: "Enable this option",
+												MarkdownDescription: "Configuration parameter for automatic from end.",
 											},
 											"automatic_from_start": schema.SingleNestedBlock{
-												MarkdownDescription: "Enable this option",
+												MarkdownDescription: "Configuration parameter for automatic from start.",
 											},
 											"dhcp_networks": schema.ListNestedBlock{
 												MarkdownDescription: "List of networks from which DHCP server can allocate IP addresses .",
 												NestedObject: schema.NestedBlockObject{
 													Attributes: map[string]schema.Attribute{
 														"network_prefix": schema.StringAttribute{
-															MarkdownDescription: "Network Prefix to be used for IPv6 address auto configuration.",
+															MarkdownDescription: "Exclusive with [] Network Prefix to be used for IPv6 address auto configuration.",
 															Optional:            true,
 														},
 														"pool_settings": schema.StringAttribute{
 															MarkdownDescription: "[Enum: INCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS|EXCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS] Identifies the how to pick the network for Interface. Address ranges in DHCP pool list are used for IP Address allocation Address ranges in DHCP pool list are excluded from IP Address allocation. Possible values are `INCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS`, `EXCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS`. Defaults to `INCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS`.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.OneOf("INCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS", "EXCLUDE_IP_ADDRESSES_FROM_DHCP_POOLS"),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -824,10 +871,16 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 																	"end_ip": schema.StringAttribute{
 																		MarkdownDescription: "Ending IPv6 address of the pool range. In case of address allocator, offset is derived based on network prefix.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(1024),
+																		},
 																	},
 																	"start_ip": schema.StringAttribute{
 																		MarkdownDescription: "Starting IPv6 address of the pool range. In case of address allocator, offset is derived based on network prefix. 2001::1 with prefix length of 64, start offset is 5.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(1024),
+																		},
 																	},
 																},
 															},
@@ -866,7 +919,7 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 						MarkdownDescription: "Enable this option",
 					},
 					"not_primary": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for not primary.",
 					},
 					"site_local_inside_network": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
@@ -893,10 +946,16 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 									"default_gw": schema.StringAttribute{
 										MarkdownDescription: "Default Gateway. IP address of the default gateway.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"ip_address": schema.StringAttribute{
 										MarkdownDescription: "IP address of the interface and prefix length .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(7, 1024),
+										},
 									},
 								},
 							},
@@ -921,17 +980,23 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 									"default_gw": schema.StringAttribute{
 										MarkdownDescription: "Default Gateway. IP address of the default gateway.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"ip_address": schema.StringAttribute{
 										MarkdownDescription: "IP address of the interface and prefix length .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(7, 1024),
+										},
 									},
 								},
 							},
 						},
 					},
 					"storage_network": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for storage network.",
 					},
 					"untagged": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
@@ -939,18 +1004,21 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 				},
 			},
 			"layer2_interface": schema.SingleNestedBlock{
-				MarkdownDescription: "Layer2 Interface. Layer2 Interface Configuration.",
+				MarkdownDescription: "Configuration parameter for layer2 interface.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"l2sriov_interface": schema.SingleNestedBlock{
-						MarkdownDescription: "Layer2 SR-IOV Interface. Layer2 SR-IOV Interface Configuration.",
+						MarkdownDescription: "Configuration parameter for l2sriov interface.",
 						Attributes: map[string]schema.Attribute{
 							"device": schema.StringAttribute{
 								MarkdownDescription: "Physical ethernet interface .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"vlan_id": schema.Int64Attribute{
-								MarkdownDescription: "Configure a VLAN tagged interface.",
+								MarkdownDescription: "Exclusive with [untagged] Configure a VLAN tagged interface.",
 								Optional:            true,
 							},
 						},
@@ -961,11 +1029,14 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 						},
 					},
 					"l2vlan_interface": schema.SingleNestedBlock{
-						MarkdownDescription: "Layer2 VLAN Interface. Layer2 VLAN Interface Configuration.",
+						MarkdownDescription: "Configuration parameter for l2vlan interface.",
 						Attributes: map[string]schema.Attribute{
 							"device": schema.StringAttribute{
 								MarkdownDescription: "Physical ethernet interface .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"vlan_id": schema.Int64Attribute{
 								MarkdownDescription: "VLAN ID. VLAN ID .",
@@ -985,15 +1056,18 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 				},
 			},
 			"tunnel_interface": schema.SingleNestedBlock{
-				MarkdownDescription: "Tunnel Interface. Tunnel Interface Configuration.",
+				MarkdownDescription: "Configuration parameter for tunnel interface.",
 				Attributes: map[string]schema.Attribute{
 					"mtu": schema.Int64Attribute{
 						MarkdownDescription: "Maximum packet size (Maximum Transfer Unit) of the interface When configured, MTU must be between 512 and 16384.",
 						Optional:            true,
 					},
 					"node": schema.StringAttribute{
-						MarkdownDescription: "Configuration will apply to a given device on the given node.",
+						MarkdownDescription: "Exclusive with [] Configuration will apply to a given device on the given node.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"priority": schema.Int64Attribute{
 						MarkdownDescription: "Priority of the network interface when multiple network interfaces are present in outside network Greater the value, higher the priority.",
@@ -1026,10 +1100,16 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 									"default_gw": schema.StringAttribute{
 										MarkdownDescription: "Default Gateway. IP address of the default gateway.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"ip_address": schema.StringAttribute{
 										MarkdownDescription: "IP address of the interface and prefix length .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(7, 1024),
+										},
 									},
 								},
 							},
@@ -1041,6 +1121,9 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1049,6 +1132,9 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1056,6 +1142,9 @@ func (r *NetworkInterfaceResource) Schema(ctx context.Context, req resource.Sche
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},

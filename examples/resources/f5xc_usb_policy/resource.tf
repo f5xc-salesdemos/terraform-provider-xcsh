@@ -1,6 +1,16 @@
 # Usb Policy Resource Example
 # Manages new USB policy object. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Usb Policy configuration
 resource "f5xc_usb_policy" "example" {
   name      = "example-usb-policy"

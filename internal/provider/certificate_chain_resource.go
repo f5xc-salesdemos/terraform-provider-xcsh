@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -43,12 +44,12 @@ type CertificateChainResource struct {
 type CertificateChainResourceModel struct {
 	Name           types.String   `tfsdk:"name"`
 	Namespace      types.String   `tfsdk:"namespace"`
+	CertificateURL types.String   `tfsdk:"certificate_url"`
 	Annotations    types.Map      `tfsdk:"annotations"`
 	Description    types.String   `tfsdk:"description"`
 	Disable        types.Bool     `tfsdk:"disable"`
 	Labels         types.Map      `tfsdk:"labels"`
 	ID             types.String   `tfsdk:"id"`
-	CertificateURL types.String   `tfsdk:"certificate_url"`
 	Timeouts       timeouts.Value `tfsdk:"timeouts"`
 }
 
@@ -80,6 +81,13 @@ func (r *CertificateChainResource) Schema(ctx context.Context, req resource.Sche
 					validators.NamespaceValidator(),
 				},
 			},
+			"certificate_url": schema.StringAttribute{
+				MarkdownDescription: "Certificate chain is the list of intermediate certificates in PEM format including the PEM headers.",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(1, 131072),
+				},
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -100,14 +108,6 @@ func (r *CertificateChainResource) Schema(ctx context.Context, req resource.Sche
 			},
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique identifier for the resource.",
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"certificate_url": schema.StringAttribute{
-				MarkdownDescription: "Certificate chain is the list of intermediate certificates in PEM format including the PEM headers.",
-				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -406,13 +406,6 @@ func (r *CertificateChainResource) Update(ctx context.Context, req resource.Upda
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["certificate_url"].(string); ok && v != "" {
-		data.CertificateURL = types.StringValue(v)
-	} else if data.CertificateURL.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.CertificateURL = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields

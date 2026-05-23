@@ -1,6 +1,16 @@
 # Alert Receiver Resource Example
 # Manages new Alert Receiver object. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Alert Receiver configuration
 resource "f5xc_alert_receiver" "example" {
   name      = "example-alert-receiver"

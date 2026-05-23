@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -594,12 +598,12 @@ var SecretManagementAccessWhereVirtualSiteRefModelAttrTypes = map[string]attr.Ty
 type SecretManagementAccessResourceModel struct {
 	Name         types.String                           `tfsdk:"name"`
 	Namespace    types.String                           `tfsdk:"namespace"`
+	ProviderName types.String                           `tfsdk:"provider_name"`
 	Annotations  types.Map                              `tfsdk:"annotations"`
 	Description  types.String                           `tfsdk:"description"`
 	Disable      types.Bool                             `tfsdk:"disable"`
 	Labels       types.Map                              `tfsdk:"labels"`
 	ID           types.String                           `tfsdk:"id"`
-	ProviderName types.String                           `tfsdk:"provider_name"`
 	Timeouts     timeouts.Value                         `tfsdk:"timeouts"`
 	AccessInfo   *SecretManagementAccessAccessInfoModel `tfsdk:"access_info"`
 	Where        *SecretManagementAccessWhereModel      `tfsdk:"where"`
@@ -633,6 +637,13 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 					validators.NamespaceValidator(),
 				},
 			},
+			"provider_name": schema.StringAttribute{
+				MarkdownDescription: "Name given to this secret management backend. site.provider needs to be unique, and will be referenced for using this object .",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(1, 256),
+				},
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -658,14 +669,6 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"provider_name": schema.StringAttribute{
-				MarkdownDescription: "Name given to this secret management backend. site.provider needs to be unique, and will be referenced for using this object .",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
 		},
 		Blocks: map[string]schema.Block{
 			"timeouts": timeouts.Block(ctx, timeouts.Opts{
@@ -680,10 +683,16 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 					"scheme": schema.StringAttribute{
 						MarkdownDescription: "[Enum: HTTP|HTTPS] SchemeType is used to indicate URL scheme HTTP:// scheme HTTPS:// scheme. Possible values are `HTTP`, `HTTPS`. Defaults to `HTTP`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("HTTP", "HTTPS"),
+						},
 					},
 					"server_endpoint": schema.StringAttribute{
 						MarkdownDescription: "Endpoint to connect to, in host:port format .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 256),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -714,6 +723,9 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -731,6 +743,9 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -762,12 +777,15 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 						MarkdownDescription: "TLS configuration for upstream connections.",
 						Attributes: map[string]schema.Attribute{
 							"max_session_keys": schema.Int64Attribute{
-								MarkdownDescription: "Number of session keys that are cached.",
+								MarkdownDescription: "Exclusive with [default_session_key_caching disable_session_key_caching] Number of session keys that are cached.",
 								Optional:            true,
 							},
 							"sni": schema.StringAttribute{
-								MarkdownDescription: "SNI value to be used.",
+								MarkdownDescription: "Exclusive with [disable_sni use_host_header_as_sni] SNI value to be used.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(256),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -782,10 +800,16 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 									"maximum_protocol_version": schema.StringAttribute{
 										MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+										},
 									},
 									"minimum_protocol_version": schema.StringAttribute{
 										MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -804,6 +828,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+														stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -811,6 +839,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+														stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 													},
 												},
 												"tenant": schema.StringAttribute{
@@ -840,8 +872,11 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 												Optional:            true,
 											},
 											"trusted_ca_url": schema.StringAttribute{
-												MarkdownDescription: "Inline Root CA Certificate.",
+												MarkdownDescription: "Exclusive with [trusted_ca] Inline Root CA Certificate.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(131072),
+												},
 											},
 											"verify_subject_alt_names": schema.ListAttribute{
 												MarkdownDescription: "List of acceptable Subject Alt Names/CN in the peer's certificate. When skip_hostname_verification is false and verify_subject_alt_names is empty, the hostname of the peer will be used for matching against SAN/CN of peer's certificate.",
@@ -869,6 +904,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 																"name": schema.StringAttribute{
 																	MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 1024),
+																		stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																	},
 																},
 																"namespace": schema.StringAttribute{
 																	MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -876,6 +915,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 																	Computed:            true,
 																	PlanModifiers: []planmodifier.String{
 																		stringplanmodifier.UseStateForUnknown(),
+																	},
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 1024),
+																		stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																	},
 																},
 																"tenant": schema.StringAttribute{
@@ -914,10 +957,16 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 									"maximum_protocol_version": schema.StringAttribute{
 										MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+										},
 									},
 									"minimum_protocol_version": schema.StringAttribute{
 										MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -928,6 +977,9 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 												"certificate_url": schema.StringAttribute{
 													MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 131072),
+													},
 												},
 												"description_spec": schema.StringAttribute{
 													MarkdownDescription: "Description. Description for the certificate.",
@@ -942,11 +994,14 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 															MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeBetween(1, 4),
+															},
 														},
 													},
 												},
 												"disable_ocsp_stapling": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 												},
 												"private_key": schema.SingleNestedBlock{
 													MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -962,6 +1017,9 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 																"location": schema.StringAttribute{
 																	MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(1024),
+																	},
 																},
 																"store_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -979,13 +1037,16 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 																"url": schema.StringAttribute{
 																	MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 131072),
+																	},
 																},
 															},
 														},
 													},
 												},
 												"use_system_defaults": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for use system defaults.",
 												},
 											},
 										},
@@ -998,8 +1059,11 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 												Optional:            true,
 											},
 											"trusted_ca_url": schema.StringAttribute{
-												MarkdownDescription: "Inline Root CA Certificate.",
+												MarkdownDescription: "Exclusive with [trusted_ca] Inline Root CA Certificate.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(131072),
+												},
 											},
 											"verify_subject_alt_names": schema.ListAttribute{
 												MarkdownDescription: "List of acceptable Subject Alt Names/CN in the peer's certificate. When skip_hostname_verification is false and verify_subject_alt_names is empty, the hostname of the peer will be used for matching against SAN/CN of peer's certificate.",
@@ -1027,6 +1091,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 																"name": schema.StringAttribute{
 																	MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 1024),
+																		stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																	},
 																},
 																"namespace": schema.StringAttribute{
 																	MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1034,6 +1102,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 																	Computed:            true,
 																	PlanModifiers: []planmodifier.String{
 																		stringplanmodifier.UseStateForUnknown(),
+																	},
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 1024),
+																		stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																	},
 																},
 																"tenant": schema.StringAttribute{
@@ -1062,13 +1134,13 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 								},
 							},
 							"default_session_key_caching": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for default session key caching.",
 							},
 							"disable_session_key_caching": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable session key caching.",
 							},
 							"disable_sni": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable sni.",
 							},
 							"use_host_header_as_sni": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -1102,6 +1174,9 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1119,6 +1194,9 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -1140,6 +1218,9 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1157,6 +1238,9 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -1174,8 +1258,11 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 						MarkdownDescription: "Specifies a direct reference to a site configuration object.",
 						Attributes: map[string]schema.Attribute{
 							"network_type": schema.StringAttribute{
-								MarkdownDescription: "[Enum: VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT] Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to.. Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`. Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`.",
+								MarkdownDescription: "[Enum: VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT|VIRTUAL_NETWORK_MANAGEMENT] Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to.. Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`, `VIRTUAL_NETWORK_MANAGEMENT`. Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.OneOf("VIRTUAL_NETWORK_SITE_LOCAL", "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE", "VIRTUAL_NETWORK_PER_SITE", "VIRTUAL_NETWORK_PUBLIC", "VIRTUAL_NETWORK_GLOBAL", "VIRTUAL_NETWORK_SITE_SERVICE", "VIRTUAL_NETWORK_VER_INTERNAL", "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE", "VIRTUAL_NETWORK_IP_AUTO", "VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK", "VIRTUAL_NETWORK_SRV6_NETWORK", "VIRTUAL_NETWORK_IP_FABRIC", "VIRTUAL_NETWORK_SEGMENT", "VIRTUAL_NETWORK_MANAGEMENT"),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -1200,6 +1287,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1207,6 +1298,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -1249,6 +1344,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1256,6 +1355,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -1283,8 +1386,11 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 						MarkdownDescription: "Virtual Site. A reference to virtual_site object.",
 						Attributes: map[string]schema.Attribute{
 							"network_type": schema.StringAttribute{
-								MarkdownDescription: "[Enum: VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT] Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to.. Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`. Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`.",
+								MarkdownDescription: "[Enum: VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT|VIRTUAL_NETWORK_MANAGEMENT] Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to.. Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`, `VIRTUAL_NETWORK_MANAGEMENT`. Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.OneOf("VIRTUAL_NETWORK_SITE_LOCAL", "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE", "VIRTUAL_NETWORK_PER_SITE", "VIRTUAL_NETWORK_PUBLIC", "VIRTUAL_NETWORK_GLOBAL", "VIRTUAL_NETWORK_SITE_SERVICE", "VIRTUAL_NETWORK_VER_INTERNAL", "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE", "VIRTUAL_NETWORK_IP_AUTO", "VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK", "VIRTUAL_NETWORK_SRV6_NETWORK", "VIRTUAL_NETWORK_IP_FABRIC", "VIRTUAL_NETWORK_SEGMENT", "VIRTUAL_NETWORK_MANAGEMENT"),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -1309,6 +1415,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1316,6 +1426,10 @@ func (r *SecretManagementAccessResource) Schema(ctx context.Context, req resourc
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -1447,6 +1561,9 @@ func (r *SecretManagementAccessResource) Create(ctx context.Context, req resourc
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.ProviderName.IsNull() && !data.ProviderName.IsUnknown() {
+		createReq.Spec["provider_name"] = data.ProviderName.ValueString()
+	}
 	if data.AccessInfo != nil {
 		access_infoMap := make(map[string]interface{})
 		if data.AccessInfo.RESTAuthInfo != nil {
@@ -1497,9 +1614,6 @@ func (r *SecretManagementAccessResource) Create(ctx context.Context, req resourc
 		}
 		createReq.Spec["where"] = whereMap
 	}
-	if !data.ProviderName.IsNull() && !data.ProviderName.IsUnknown() {
-		createReq.Spec["provider_name"] = data.ProviderName.ValueString()
-	}
 
 	apiResource, err := r.client.CreateSecretManagementAccess(ctx, createReq)
 	if err != nil {
@@ -1513,6 +1627,11 @@ func (r *SecretManagementAccessResource) Create(ctx context.Context, req resourc
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["provider_name"].(string); ok && v != "" {
+		data.ProviderName = types.StringValue(v)
+	} else {
+		data.ProviderName = types.StringNull()
+	}
 	if blockData, ok := apiResource.Spec["access_info"].(map[string]interface{}); ok && (isImport || data.AccessInfo != nil) {
 		data.AccessInfo = &SecretManagementAccessAccessInfoModel{
 			RESTAuthInfo: func() *SecretManagementAccessAccessInfoRESTAuthInfoModel {
@@ -1580,11 +1699,6 @@ func (r *SecretManagementAccessResource) Create(ctx context.Context, req resourc
 		data.Where = &SecretManagementAccessWhereModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["provider_name"].(string); ok && v != "" {
-		data.ProviderName = types.StringValue(v)
-	} else {
-		data.ProviderName = types.StringNull()
-	}
 
 	tflog.Trace(ctx, "created SecretManagementAccess resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -1665,6 +1779,11 @@ func (r *SecretManagementAccessResource) Read(ctx context.Context, req resource.
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["provider_name"].(string); ok && v != "" {
+		data.ProviderName = types.StringValue(v)
+	} else {
+		data.ProviderName = types.StringNull()
+	}
 	if blockData, ok := apiResource.Spec["access_info"].(map[string]interface{}); ok && (isImport || data.AccessInfo != nil) {
 		data.AccessInfo = &SecretManagementAccessAccessInfoModel{
 			RESTAuthInfo: func() *SecretManagementAccessAccessInfoRESTAuthInfoModel {
@@ -1732,11 +1851,6 @@ func (r *SecretManagementAccessResource) Read(ctx context.Context, req resource.
 		data.Where = &SecretManagementAccessWhereModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["provider_name"].(string); ok && v != "" {
-		data.ProviderName = types.StringValue(v)
-	} else {
-		data.ProviderName = types.StringNull()
-	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -1788,6 +1902,9 @@ func (r *SecretManagementAccessResource) Update(ctx context.Context, req resourc
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.ProviderName.IsNull() && !data.ProviderName.IsUnknown() {
+		apiResource.Spec["provider_name"] = data.ProviderName.ValueString()
+	}
 	if data.AccessInfo != nil {
 		access_infoMap := make(map[string]interface{})
 		if data.AccessInfo.RESTAuthInfo != nil {
@@ -1838,9 +1955,6 @@ func (r *SecretManagementAccessResource) Update(ctx context.Context, req resourc
 		}
 		apiResource.Spec["where"] = whereMap
 	}
-	if !data.ProviderName.IsNull() && !data.ProviderName.IsUnknown() {
-		apiResource.Spec["provider_name"] = data.ProviderName.ValueString()
-	}
 
 	_, err := r.client.UpdateSecretManagementAccess(ctx, apiResource)
 	if err != nil {
@@ -1860,18 +1974,16 @@ func (r *SecretManagementAccessResource) Update(ctx context.Context, req resourc
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["provider_name"].(string); ok && v != "" {
-		data.ProviderName = types.StringValue(v)
-	} else if data.ProviderName.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.ProviderName = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["provider_name"].(string); ok && v != "" {
+		data.ProviderName = types.StringValue(v)
+	} else {
+		data.ProviderName = types.StringNull()
+	}
 	if blockData, ok := apiResource.Spec["access_info"].(map[string]interface{}); ok && (isImport || data.AccessInfo != nil) {
 		data.AccessInfo = &SecretManagementAccessAccessInfoModel{
 			RESTAuthInfo: func() *SecretManagementAccessAccessInfoRESTAuthInfoModel {
@@ -1939,11 +2051,6 @@ func (r *SecretManagementAccessResource) Update(ctx context.Context, req resourc
 		data.Where = &SecretManagementAccessWhereModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["provider_name"].(string); ok && v != "" {
-		data.ProviderName = types.StringValue(v)
-	} else {
-		data.ProviderName = types.StringNull()
-	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

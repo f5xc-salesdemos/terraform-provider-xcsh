@@ -1,6 +1,16 @@
 # UDP Loadbalancer Resource Example
 # Manages a UDP Load Balancer resource in F5 Distributed Cloud for load balancing UDP traffic across origin pools.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic UDP Loadbalancer configuration
 resource "f5xc_udp_loadbalancer" "example" {
   name      = "example-udp-loadbalancer"

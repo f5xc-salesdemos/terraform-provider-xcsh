@@ -1,6 +1,16 @@
 # App Type Resource Example
 # Manages App type will create the configuration in namespace metadata.namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic App Type configuration
 resource "f5xc_app_type" "example" {
   name      = "example-app-type"
@@ -21,8 +31,8 @@ resource "f5xc_app_type" "example" {
     # Configure business_logic_markup_setting settings
   }
   # Enable this option
-  disable {
-    # Configure disable settings
+  disable_spec {
+    # Configure disable_spec settings
   }
   # Discovered API Settings. Configure Discovered API Settings.
   discovered_api_settings {

@@ -1,6 +1,16 @@
 # API Discovery Resource Example
 # Manages API discovery creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic API Discovery configuration
 resource "f5xc_api_discovery" "example" {
   name      = "example-api-discovery"
@@ -21,3 +31,6 @@ resource "f5xc_api_discovery" "example" {
     # Configure custom_auth_types settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - custom_auth_types

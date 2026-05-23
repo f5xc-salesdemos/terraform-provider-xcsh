@@ -1,6 +1,16 @@
 # Advertise Policy Resource Example
 # Manages a Advertise Policy resource in F5 Distributed Cloud for advertise_policy object controls how and where a service represented by a given virtual_host object is advertised to consumers. configuration.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Advertise Policy configuration
 resource "f5xc_advertise_policy" "example" {
   name      = "example-advertise-policy"

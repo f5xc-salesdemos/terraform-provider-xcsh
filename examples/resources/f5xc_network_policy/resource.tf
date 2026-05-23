@@ -1,6 +1,16 @@
 # Network Policy Resource Example
 # Manages new network policy with configured parameters in specified namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Network Policy configuration
 resource "f5xc_network_policy" "example" {
   name      = "example-network-policy"

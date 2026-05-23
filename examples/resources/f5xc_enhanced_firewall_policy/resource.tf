@@ -1,6 +1,16 @@
 # Enhanced Firewall Policy Resource Example
 # Manages a Enhanced Firewall Policy resource in F5 Distributed Cloud for enhanced firewall policy specification. configuration.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Enhanced Firewall Policy configuration
 resource "f5xc_enhanced_firewall_policy" "example" {
   name      = "example-enhanced-firewall-policy"
@@ -35,3 +45,6 @@ resource "f5xc_enhanced_firewall_policy" "example" {
     }
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - allow_all

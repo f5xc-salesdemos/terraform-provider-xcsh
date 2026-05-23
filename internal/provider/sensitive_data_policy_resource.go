@@ -9,10 +9,13 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -73,12 +76,12 @@ type SensitiveDataPolicyResourceModel struct {
 	Name                        types.String   `tfsdk:"name"`
 	Namespace                   types.String   `tfsdk:"namespace"`
 	Annotations                 types.Map      `tfsdk:"annotations"`
-	Compliances                 types.List     `tfsdk:"compliances"`
 	Description                 types.String   `tfsdk:"description"`
 	Disable                     types.Bool     `tfsdk:"disable"`
-	DisabledPredefinedDataTypes types.List     `tfsdk:"disabled_predefined_data_types"`
 	Labels                      types.Map      `tfsdk:"labels"`
 	ID                          types.String   `tfsdk:"id"`
+	Compliances                 types.List     `tfsdk:"compliances"`
+	DisabledPredefinedDataTypes types.List     `tfsdk:"disabled_predefined_data_types"`
 	Timeouts                    timeouts.Value `tfsdk:"timeouts"`
 	CustomDataTypes             types.List     `tfsdk:"custom_data_types"`
 }
@@ -116,11 +119,6 @@ func (r *SensitiveDataPolicyResource) Schema(ctx context.Context, req resource.S
 				Optional:            true,
 				ElementType:         types.StringType,
 			},
-			"compliances": schema.ListAttribute{
-				MarkdownDescription: "[Enum: GDPR|CCPA|PIPEDA|LGPD|DPA_UK|PDPA_SG|APPI|HIPAA|CPRA_2023|CPA_CO|SOC2|PCI_DSS|ISO_IEC_27001|ISO_IEC_27701|EPRIVACY_DIRECTIVE|GLBA|SOX] Select relevant compliance frameworks, such as GDPR, HIPAA, or PCI-DSS, to ensure monitoring under your sensitive data discovery. Possible values are `GDPR`, `CCPA`, `PIPEDA`, `LGPD`, `DPA_UK`, `PDPA_SG`, `APPI`, `HIPAA`, `CPRA_2023`, `CPA_CO`, `SOC2`, `PCI_DSS`, `ISO_IEC_27001`, `ISO_IEC_27701`, `EPRIVACY_DIRECTIVE`, `GLBA`, `SOX`.",
-				Optional:            true,
-				ElementType:         types.StringType,
-			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Human readable description for the object.",
 				Optional:            true,
@@ -128,11 +126,6 @@ func (r *SensitiveDataPolicyResource) Schema(ctx context.Context, req resource.S
 			"disable": schema.BoolAttribute{
 				MarkdownDescription: "A value of true will administratively disable the object.",
 				Optional:            true,
-			},
-			"disabled_predefined_data_types": schema.ListAttribute{
-				MarkdownDescription: "Select which pre-configured data types to disable, disabled data types will not be shown as sensitive in the API discovery.",
-				Optional:            true,
-				ElementType:         types.StringType,
 			},
 			"labels": schema.MapAttribute{
 				MarkdownDescription: "Labels is a user defined key value map that can be attached to resources for organization and filtering.",
@@ -146,6 +139,30 @@ func (r *SensitiveDataPolicyResource) Schema(ctx context.Context, req resource.S
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"compliances": schema.ListAttribute{
+				MarkdownDescription: "[Enum: GDPR|CCPA|PIPEDA|LGPD|DPA_UK|PDPA_SG|APPI|HIPAA|CPRA_2023|CPA_CO|SOC2|PCI_DSS|ISO_IEC_27001|ISO_IEC_27701|EPRIVACY_DIRECTIVE|GLBA|SOX] Select relevant compliance frameworks, such as GDPR, HIPAA, or PCI-DSS, to ensure monitoring under your sensitive data discovery. Defaults to `[]`. Server applies default when omitted. Possible values are `GDPR`, `CCPA`, `PIPEDA`, `LGPD`, `DPA_UK`, `PDPA_SG`, `APPI`, `HIPAA`, `CPRA_2023`, `CPA_CO`, `SOC2`, `PCI_DSS`, `ISO_IEC_27001`, `ISO_IEC_27701`, `EPRIVACY_DIRECTIVE`, `GLBA`, `SOX`.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(17),
+				},
+			},
+			"disabled_predefined_data_types": schema.ListAttribute{
+				MarkdownDescription: "Select which pre-configured data types to disable, disabled data types will not be shown as sensitive in the API discovery. Defaults to `[]`. Server applies default when omitted.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(100),
+				},
+			},
 		},
 		Blocks: map[string]schema.Block{
 			"timeouts": timeouts.Block(ctx, timeouts.Opts{
@@ -155,7 +172,7 @@ func (r *SensitiveDataPolicyResource) Schema(ctx context.Context, req resource.S
 				Delete: true,
 			}),
 			"custom_data_types": schema.ListNestedBlock{
-				MarkdownDescription: "Select your custom data types to be monitored in the API discovery.",
+				MarkdownDescription: "Select your custom data types to be monitored in the API discovery. Defaults to `[]`. Server applies default when omitted.",
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{},
 					Blocks: map[string]schema.Block{
@@ -165,6 +182,9 @@ func (r *SensitiveDataPolicyResource) Schema(ctx context.Context, req resource.S
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -173,6 +193,9 @@ func (r *SensitiveDataPolicyResource) Schema(ctx context.Context, req resource.S
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 								"tenant": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -180,6 +203,9 @@ func (r *SensitiveDataPolicyResource) Schema(ctx context.Context, req resource.S
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
 									},
 								},
 							},

@@ -1,6 +1,16 @@
 # Virtual Site Resource Example
 # Manages virtual site object in given namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Virtual Site configuration
 resource "f5xc_virtual_site" "example" {
   name      = "example-virtual-site"

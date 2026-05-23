@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -240,7 +241,7 @@ func (r *LogReceiverResource) Schema(ctx context.Context, req resource.SchemaReq
 				MarkdownDescription: "Syslog Server Configuration. Configuration for syslog server.",
 				Attributes: map[string]schema.Attribute{
 					"syslog_rfc5424": schema.Int64Attribute{
-						MarkdownDescription: "Select RFC5424 syslog format and maximum message length.",
+						MarkdownDescription: "Exclusive with [] Select RFC5424 syslog format and maximum message length.",
 						Optional:            true,
 					},
 				},
@@ -255,6 +256,9 @@ func (r *LogReceiverResource) Schema(ctx context.Context, req resource.SchemaReq
 							"server_name": schema.StringAttribute{
 								MarkdownDescription: "Server name is fully qualified domain name or IP address of the server .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(256),
+								},
 							},
 						},
 					},
@@ -262,16 +266,22 @@ func (r *LogReceiverResource) Schema(ctx context.Context, req resource.SchemaReq
 						MarkdownDescription: "TLS config for client of discovery service.",
 						Attributes: map[string]schema.Attribute{
 							"port": schema.Int64Attribute{
-								MarkdownDescription: "Custom port number used for communication.",
+								MarkdownDescription: "Exclusive with [default_https_port default_syslog_tls_port] Custom port number used for communication.",
 								Optional:            true,
 							},
 							"server_name": schema.StringAttribute{
 								MarkdownDescription: "ServerName is passed to the server for SNI and is used in the client to check server certificates against.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(256),
+								},
 							},
 							"trusted_ca_url": schema.StringAttribute{
-								MarkdownDescription: "The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
+								MarkdownDescription: "Exclusive with [volterra_ca] The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(131072),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -285,11 +295,14 @@ func (r *LogReceiverResource) Schema(ctx context.Context, req resource.SchemaReq
 								MarkdownDescription: "Enable this option",
 							},
 							"mtls_enable": schema.SingleNestedBlock{
-								MarkdownDescription: "MTLS Client Config. TLS config for client.",
+								MarkdownDescription: "Configuration parameter for mtls enable.",
 								Attributes: map[string]schema.Attribute{
 									"certificate": schema.StringAttribute{
 										MarkdownDescription: "Client certificate is PEM-encoded certificate or certificate-chain.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(100, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -307,6 +320,9 @@ func (r *LogReceiverResource) Schema(ctx context.Context, req resource.SchemaReq
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -324,6 +340,9 @@ func (r *LogReceiverResource) Schema(ctx context.Context, req resource.SchemaReq
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -332,7 +351,7 @@ func (r *LogReceiverResource) Schema(ctx context.Context, req resource.SchemaReq
 								},
 							},
 							"volterra_ca": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for volterra ca.",
 							},
 						},
 					},
@@ -346,6 +365,9 @@ func (r *LogReceiverResource) Schema(ctx context.Context, req resource.SchemaReq
 							"server_name": schema.StringAttribute{
 								MarkdownDescription: "Server name is fully qualified domain name or IP address of the server .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(256),
+								},
 							},
 						},
 					},

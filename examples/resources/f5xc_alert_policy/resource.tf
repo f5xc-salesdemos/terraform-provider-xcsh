@@ -1,6 +1,16 @@
 # Alert Policy Resource Example
 # Manages new Alert Policy Object. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Alert Policy configuration
 resource "f5xc_alert_policy" "example" {
   name      = "example-alert-policy"

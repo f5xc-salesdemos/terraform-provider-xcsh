@@ -1,6 +1,16 @@
 # Fast ACL Rule Resource Example
 # Manages new Fast ACL rule, has specification to match source IP, source port and action to apply. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Fast ACL Rule configuration
 resource "f5xc_fast_acl_rule" "example" {
   name      = "example-fast-acl-rule"
@@ -16,16 +26,16 @@ resource "f5xc_fast_acl_rule" "example" {
   }
 
   # Resource-specific configuration
-  # FastAclRuleAction specifies possible action to be applied...
-  action {
-    # Configure action settings
+  # Source Ports. L4 port numbers to match .
+  port {
+    # Configure port settings
   }
-  # Policer Reference. Reference to policer object.
-  policer_action {
-    # Configure policer_action settings
+  # Enable this option
+  all {
+    # Configure all settings
   }
-  # Reference. A policer direct reference.
-  ref {
-    # Configure ref settings
+  # Enable this option
+  dns {
+    # Configure dns settings
   }
 }

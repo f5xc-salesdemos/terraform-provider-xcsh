@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -43,30 +44,6 @@ type SubnetResource struct {
 
 // SubnetEmptyModel represents empty nested blocks
 type SubnetEmptyModel struct {
-}
-
-// SubnetConnectToLayer2Model represents connect_to_layer2 block
-type SubnetConnectToLayer2Model struct {
-	Layer2IntfRef *SubnetConnectToLayer2Layer2IntfRefModel `tfsdk:"layer2_intf_ref"`
-}
-
-// SubnetConnectToLayer2ModelAttrTypes defines the attribute types for SubnetConnectToLayer2Model
-var SubnetConnectToLayer2ModelAttrTypes = map[string]attr.Type{
-	"layer2_intf_ref": types.ObjectType{AttrTypes: SubnetConnectToLayer2Layer2IntfRefModelAttrTypes},
-}
-
-// SubnetConnectToLayer2Layer2IntfRefModel represents layer2_intf_ref block
-type SubnetConnectToLayer2Layer2IntfRefModel struct {
-	Name      types.String `tfsdk:"name"`
-	Namespace types.String `tfsdk:"namespace"`
-	Tenant    types.String `tfsdk:"tenant"`
-}
-
-// SubnetConnectToLayer2Layer2IntfRefModelAttrTypes defines the attribute types for SubnetConnectToLayer2Layer2IntfRefModel
-var SubnetConnectToLayer2Layer2IntfRefModelAttrTypes = map[string]attr.Type{
-	"name":      types.StringType,
-	"namespace": types.StringType,
-	"tenant":    types.StringType,
 }
 
 // SubnetSiteSubnetParamsModel represents site_subnet_params block
@@ -119,6 +96,30 @@ var SubnetSiteSubnetParamsSubnetDHCPServerParamsDHCPNetworksModelAttrTypes = map
 	"network_prefix": types.StringType,
 }
 
+// SubnetConnectToLayer2Model represents connect_to_layer2 block
+type SubnetConnectToLayer2Model struct {
+	Layer2IntfRef *SubnetConnectToLayer2Layer2IntfRefModel `tfsdk:"layer2_intf_ref"`
+}
+
+// SubnetConnectToLayer2ModelAttrTypes defines the attribute types for SubnetConnectToLayer2Model
+var SubnetConnectToLayer2ModelAttrTypes = map[string]attr.Type{
+	"layer2_intf_ref": types.ObjectType{AttrTypes: SubnetConnectToLayer2Layer2IntfRefModelAttrTypes},
+}
+
+// SubnetConnectToLayer2Layer2IntfRefModel represents layer2_intf_ref block
+type SubnetConnectToLayer2Layer2IntfRefModel struct {
+	Name      types.String `tfsdk:"name"`
+	Namespace types.String `tfsdk:"namespace"`
+	Tenant    types.String `tfsdk:"tenant"`
+}
+
+// SubnetConnectToLayer2Layer2IntfRefModelAttrTypes defines the attribute types for SubnetConnectToLayer2Layer2IntfRefModel
+var SubnetConnectToLayer2Layer2IntfRefModelAttrTypes = map[string]attr.Type{
+	"name":      types.StringType,
+	"namespace": types.StringType,
+	"tenant":    types.StringType,
+}
+
 type SubnetResourceModel struct {
 	Name             types.String                `tfsdk:"name"`
 	Namespace        types.String                `tfsdk:"namespace"`
@@ -128,10 +129,10 @@ type SubnetResourceModel struct {
 	Labels           types.Map                   `tfsdk:"labels"`
 	ID               types.String                `tfsdk:"id"`
 	Timeouts         timeouts.Value              `tfsdk:"timeouts"`
+	SiteSubnetParams types.List                  `tfsdk:"site_subnet_params"`
 	ConnectToLayer2  *SubnetConnectToLayer2Model `tfsdk:"connect_to_layer2"`
 	ConnectToSlo     *SubnetEmptyModel           `tfsdk:"connect_to_slo"`
 	IsolatedNw       *SubnetEmptyModel           `tfsdk:"isolated_nw"`
-	SiteSubnetParams types.List                  `tfsdk:"site_subnet_params"`
 }
 
 func (r *SubnetResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -195,43 +196,6 @@ func (r *SubnetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 				Update: true,
 				Delete: true,
 			}),
-			"connect_to_layer2": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: connect_to_layer2, connect_to_slo, isolated_nw] Subnet connection to Layer2 Interface.",
-				Attributes:          map[string]schema.Attribute{},
-				Blocks: map[string]schema.Block{
-					"layer2_intf_ref": schema.SingleNestedBlock{
-						MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-						Attributes: map[string]schema.Attribute{
-							"name": schema.StringAttribute{
-								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-								Optional:            true,
-							},
-							"namespace": schema.StringAttribute{
-								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-								Optional:            true,
-								Computed:            true,
-								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
-								},
-							},
-							"tenant": schema.StringAttribute{
-								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-								Optional:            true,
-								Computed:            true,
-								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
-								},
-							},
-						},
-					},
-				},
-			},
-			"connect_to_slo": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
-			},
-			"isolated_nw": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
-			},
 			"site_subnet_params": schema.ListNestedBlock{
 				MarkdownDescription: "Configure subnet parameters per site .",
 				NestedObject: schema.NestedBlockObject{
@@ -246,6 +210,9 @@ func (r *SubnetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -254,6 +221,9 @@ func (r *SubnetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 								"tenant": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -261,6 +231,9 @@ func (r *SubnetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
 									},
 								},
 							},
@@ -277,7 +250,7 @@ func (r *SubnetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 									NestedObject: schema.NestedBlockObject{
 										Attributes: map[string]schema.Attribute{
 											"network_prefix": schema.StringAttribute{
-												MarkdownDescription: "Network prefix for subnet.",
+												MarkdownDescription: "Exclusive with [] Network prefix for subnet.",
 												Optional:            true,
 											},
 										},
@@ -287,6 +260,52 @@ func (r *SubnetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 						},
 					},
 				},
+			},
+			"connect_to_layer2": schema.SingleNestedBlock{
+				MarkdownDescription: "[OneOf: connect_to_layer2, connect_to_slo, isolated_nw] Configuration parameter for connect to layer2.",
+				Attributes:          map[string]schema.Attribute{},
+				Blocks: map[string]schema.Block{
+					"layer2_intf_ref": schema.SingleNestedBlock{
+						MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+						Attributes: map[string]schema.Attribute{
+							"name": schema.StringAttribute{
+								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
+							},
+							"namespace": schema.StringAttribute{
+								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
+							},
+							"tenant": schema.StringAttribute{
+								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
+							},
+						},
+					},
+				},
+			},
+			"connect_to_slo": schema.SingleNestedBlock{
+				MarkdownDescription: "Configuration parameter for connect to slo.",
+			},
+			"isolated_nw": schema.SingleNestedBlock{
+				MarkdownDescription: "Configuration parameter for isolated nw.",
 			},
 		},
 	}
@@ -394,31 +413,6 @@ func (r *SubnetResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.ConnectToLayer2 != nil {
-		connect_to_layer2Map := make(map[string]interface{})
-		if data.ConnectToLayer2.Layer2IntfRef != nil {
-			layer2_intf_refNestedMap := make(map[string]interface{})
-			if !data.ConnectToLayer2.Layer2IntfRef.Name.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Name.IsUnknown() {
-				layer2_intf_refNestedMap["name"] = data.ConnectToLayer2.Layer2IntfRef.Name.ValueString()
-			}
-			if !data.ConnectToLayer2.Layer2IntfRef.Namespace.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Namespace.IsUnknown() {
-				layer2_intf_refNestedMap["namespace"] = data.ConnectToLayer2.Layer2IntfRef.Namespace.ValueString()
-			}
-			if !data.ConnectToLayer2.Layer2IntfRef.Tenant.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Tenant.IsUnknown() {
-				layer2_intf_refNestedMap["tenant"] = data.ConnectToLayer2.Layer2IntfRef.Tenant.ValueString()
-			}
-			connect_to_layer2Map["layer2_intf_ref"] = layer2_intf_refNestedMap
-		}
-		createReq.Spec["connect_to_layer2"] = connect_to_layer2Map
-	}
-	if data.ConnectToSlo != nil {
-		connect_to_sloMap := make(map[string]interface{})
-		createReq.Spec["connect_to_slo"] = connect_to_sloMap
-	}
-	if data.IsolatedNw != nil {
-		isolated_nwMap := make(map[string]interface{})
-		createReq.Spec["isolated_nw"] = isolated_nwMap
-	}
 	if !data.SiteSubnetParams.IsNull() && !data.SiteSubnetParams.IsUnknown() {
 		var site_subnet_paramsItems []SubnetSiteSubnetParamsModel
 		diags := data.SiteSubnetParams.ElementsAs(ctx, &site_subnet_paramsItems, false)
@@ -466,6 +460,31 @@ func (r *SubnetResource) Create(ctx context.Context, req resource.CreateRequest,
 			createReq.Spec["site_subnet_params"] = site_subnet_paramsList
 		}
 	}
+	if data.ConnectToLayer2 != nil {
+		connect_to_layer2Map := make(map[string]interface{})
+		if data.ConnectToLayer2.Layer2IntfRef != nil {
+			layer2_intf_refNestedMap := make(map[string]interface{})
+			if !data.ConnectToLayer2.Layer2IntfRef.Name.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Name.IsUnknown() {
+				layer2_intf_refNestedMap["name"] = data.ConnectToLayer2.Layer2IntfRef.Name.ValueString()
+			}
+			if !data.ConnectToLayer2.Layer2IntfRef.Namespace.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Namespace.IsUnknown() {
+				layer2_intf_refNestedMap["namespace"] = data.ConnectToLayer2.Layer2IntfRef.Namespace.ValueString()
+			}
+			if !data.ConnectToLayer2.Layer2IntfRef.Tenant.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Tenant.IsUnknown() {
+				layer2_intf_refNestedMap["tenant"] = data.ConnectToLayer2.Layer2IntfRef.Tenant.ValueString()
+			}
+			connect_to_layer2Map["layer2_intf_ref"] = layer2_intf_refNestedMap
+		}
+		createReq.Spec["connect_to_layer2"] = connect_to_layer2Map
+	}
+	if data.ConnectToSlo != nil {
+		connect_to_sloMap := make(map[string]interface{})
+		createReq.Spec["connect_to_slo"] = connect_to_sloMap
+	}
+	if data.IsolatedNw != nil {
+		isolated_nwMap := make(map[string]interface{})
+		createReq.Spec["isolated_nw"] = isolated_nwMap
+	}
 
 	apiResource, err := r.client.CreateSubnet(ctx, createReq)
 	if err != nil {
@@ -479,21 +498,6 @@ func (r *SubnetResource) Create(ctx context.Context, req resource.CreateRequest,
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["connect_to_layer2"].(map[string]interface{}); ok && isImport && data.ConnectToLayer2 == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.ConnectToLayer2 = &SubnetConnectToLayer2Model{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["connect_to_slo"].(map[string]interface{}); ok && isImport && data.ConnectToSlo == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.ConnectToSlo = &SubnetEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["isolated_nw"].(map[string]interface{}); ok && isImport && data.IsolatedNw == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.IsolatedNw = &SubnetEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["site_subnet_params"].([]interface{}); ok && len(listData) > 0 {
 		var site_subnet_paramsList []SubnetSiteSubnetParamsModel
 		var existingSiteSubnetParamsItems []SubnetSiteSubnetParamsModel
@@ -559,6 +563,21 @@ func (r *SubnetResource) Create(ctx context.Context, req resource.CreateRequest,
 		// No data from API - set to null list
 		data.SiteSubnetParams = types.ListNull(types.ObjectType{AttrTypes: SubnetSiteSubnetParamsModelAttrTypes})
 	}
+	if _, ok := apiResource.Spec["connect_to_layer2"].(map[string]interface{}); ok && isImport && data.ConnectToLayer2 == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ConnectToLayer2 = &SubnetConnectToLayer2Model{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["connect_to_slo"].(map[string]interface{}); ok && isImport && data.ConnectToSlo == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ConnectToSlo = &SubnetEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["isolated_nw"].(map[string]interface{}); ok && isImport && data.IsolatedNw == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.IsolatedNw = &SubnetEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	tflog.Trace(ctx, "created Subnet resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -639,21 +658,6 @@ func (r *SubnetResource) Read(ctx context.Context, req resource.ReadRequest, res
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["connect_to_layer2"].(map[string]interface{}); ok && isImport && data.ConnectToLayer2 == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.ConnectToLayer2 = &SubnetConnectToLayer2Model{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["connect_to_slo"].(map[string]interface{}); ok && isImport && data.ConnectToSlo == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.ConnectToSlo = &SubnetEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["isolated_nw"].(map[string]interface{}); ok && isImport && data.IsolatedNw == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.IsolatedNw = &SubnetEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["site_subnet_params"].([]interface{}); ok && len(listData) > 0 {
 		var site_subnet_paramsList []SubnetSiteSubnetParamsModel
 		var existingSiteSubnetParamsItems []SubnetSiteSubnetParamsModel
@@ -719,6 +723,21 @@ func (r *SubnetResource) Read(ctx context.Context, req resource.ReadRequest, res
 		// No data from API - set to null list
 		data.SiteSubnetParams = types.ListNull(types.ObjectType{AttrTypes: SubnetSiteSubnetParamsModelAttrTypes})
 	}
+	if _, ok := apiResource.Spec["connect_to_layer2"].(map[string]interface{}); ok && isImport && data.ConnectToLayer2 == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ConnectToLayer2 = &SubnetConnectToLayer2Model{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["connect_to_slo"].(map[string]interface{}); ok && isImport && data.ConnectToSlo == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ConnectToSlo = &SubnetEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["isolated_nw"].(map[string]interface{}); ok && isImport && data.IsolatedNw == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.IsolatedNw = &SubnetEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -770,31 +789,6 @@ func (r *SubnetResource) Update(ctx context.Context, req resource.UpdateRequest,
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.ConnectToLayer2 != nil {
-		connect_to_layer2Map := make(map[string]interface{})
-		if data.ConnectToLayer2.Layer2IntfRef != nil {
-			layer2_intf_refNestedMap := make(map[string]interface{})
-			if !data.ConnectToLayer2.Layer2IntfRef.Name.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Name.IsUnknown() {
-				layer2_intf_refNestedMap["name"] = data.ConnectToLayer2.Layer2IntfRef.Name.ValueString()
-			}
-			if !data.ConnectToLayer2.Layer2IntfRef.Namespace.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Namespace.IsUnknown() {
-				layer2_intf_refNestedMap["namespace"] = data.ConnectToLayer2.Layer2IntfRef.Namespace.ValueString()
-			}
-			if !data.ConnectToLayer2.Layer2IntfRef.Tenant.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Tenant.IsUnknown() {
-				layer2_intf_refNestedMap["tenant"] = data.ConnectToLayer2.Layer2IntfRef.Tenant.ValueString()
-			}
-			connect_to_layer2Map["layer2_intf_ref"] = layer2_intf_refNestedMap
-		}
-		apiResource.Spec["connect_to_layer2"] = connect_to_layer2Map
-	}
-	if data.ConnectToSlo != nil {
-		connect_to_sloMap := make(map[string]interface{})
-		apiResource.Spec["connect_to_slo"] = connect_to_sloMap
-	}
-	if data.IsolatedNw != nil {
-		isolated_nwMap := make(map[string]interface{})
-		apiResource.Spec["isolated_nw"] = isolated_nwMap
-	}
 	if !data.SiteSubnetParams.IsNull() && !data.SiteSubnetParams.IsUnknown() {
 		var site_subnet_paramsItems []SubnetSiteSubnetParamsModel
 		diags := data.SiteSubnetParams.ElementsAs(ctx, &site_subnet_paramsItems, false)
@@ -842,6 +836,31 @@ func (r *SubnetResource) Update(ctx context.Context, req resource.UpdateRequest,
 			apiResource.Spec["site_subnet_params"] = site_subnet_paramsList
 		}
 	}
+	if data.ConnectToLayer2 != nil {
+		connect_to_layer2Map := make(map[string]interface{})
+		if data.ConnectToLayer2.Layer2IntfRef != nil {
+			layer2_intf_refNestedMap := make(map[string]interface{})
+			if !data.ConnectToLayer2.Layer2IntfRef.Name.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Name.IsUnknown() {
+				layer2_intf_refNestedMap["name"] = data.ConnectToLayer2.Layer2IntfRef.Name.ValueString()
+			}
+			if !data.ConnectToLayer2.Layer2IntfRef.Namespace.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Namespace.IsUnknown() {
+				layer2_intf_refNestedMap["namespace"] = data.ConnectToLayer2.Layer2IntfRef.Namespace.ValueString()
+			}
+			if !data.ConnectToLayer2.Layer2IntfRef.Tenant.IsNull() && !data.ConnectToLayer2.Layer2IntfRef.Tenant.IsUnknown() {
+				layer2_intf_refNestedMap["tenant"] = data.ConnectToLayer2.Layer2IntfRef.Tenant.ValueString()
+			}
+			connect_to_layer2Map["layer2_intf_ref"] = layer2_intf_refNestedMap
+		}
+		apiResource.Spec["connect_to_layer2"] = connect_to_layer2Map
+	}
+	if data.ConnectToSlo != nil {
+		connect_to_sloMap := make(map[string]interface{})
+		apiResource.Spec["connect_to_slo"] = connect_to_sloMap
+	}
+	if data.IsolatedNw != nil {
+		isolated_nwMap := make(map[string]interface{})
+		apiResource.Spec["isolated_nw"] = isolated_nwMap
+	}
 
 	_, err := r.client.UpdateSubnet(ctx, apiResource)
 	if err != nil {
@@ -866,21 +885,6 @@ func (r *SubnetResource) Update(ctx context.Context, req resource.UpdateRequest,
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["connect_to_layer2"].(map[string]interface{}); ok && isImport && data.ConnectToLayer2 == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.ConnectToLayer2 = &SubnetConnectToLayer2Model{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["connect_to_slo"].(map[string]interface{}); ok && isImport && data.ConnectToSlo == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.ConnectToSlo = &SubnetEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["isolated_nw"].(map[string]interface{}); ok && isImport && data.IsolatedNw == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.IsolatedNw = &SubnetEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["site_subnet_params"].([]interface{}); ok && len(listData) > 0 {
 		var site_subnet_paramsList []SubnetSiteSubnetParamsModel
 		var existingSiteSubnetParamsItems []SubnetSiteSubnetParamsModel
@@ -946,6 +950,21 @@ func (r *SubnetResource) Update(ctx context.Context, req resource.UpdateRequest,
 		// No data from API - set to null list
 		data.SiteSubnetParams = types.ListNull(types.ObjectType{AttrTypes: SubnetSiteSubnetParamsModelAttrTypes})
 	}
+	if _, ok := apiResource.Spec["connect_to_layer2"].(map[string]interface{}); ok && isImport && data.ConnectToLayer2 == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ConnectToLayer2 = &SubnetConnectToLayer2Model{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["connect_to_slo"].(map[string]interface{}); ok && isImport && data.ConnectToSlo == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ConnectToSlo = &SubnetEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["isolated_nw"].(map[string]interface{}); ok && isImport && data.IsolatedNw == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.IsolatedNw = &SubnetEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

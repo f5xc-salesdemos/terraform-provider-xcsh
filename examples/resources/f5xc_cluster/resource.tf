@@ -1,6 +1,16 @@
 # Cluster Resource Example
 # Manages cluster will create the object in the storage backend for namespace metadata.namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Cluster configuration
 resource "f5xc_cluster" "example" {
   name      = "example-cluster"

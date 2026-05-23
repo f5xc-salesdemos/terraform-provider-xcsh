@@ -1,6 +1,16 @@
 # App Firewall Resource Example
 # Manages Application Firewall. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic App Firewall configuration
 resource "f5xc_app_firewall" "example" {
   name      = "example-app-firewall"
@@ -43,7 +53,7 @@ resource "f5xc_app_firewall" "example" {
 # The following optional fields have server-applied defaults and can be omitted:
 # - allow_all_response_codes
 # - default_anonymization
-# - default_bot_setting
 # - default_detection_settings
+# - disable_ai_enhancements
 # - monitoring
 # - use_default_blocking_page

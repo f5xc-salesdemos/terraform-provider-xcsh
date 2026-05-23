@@ -9,11 +9,12 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -135,13 +136,13 @@ var CminstancePasswordClearSecretInfoModelAttrTypes = map[string]attr.Type{
 type CminstanceResourceModel struct {
 	Name        types.String             `tfsdk:"name"`
 	Namespace   types.String             `tfsdk:"namespace"`
+	Port        types.Int64              `tfsdk:"port"`
+	Username    types.String             `tfsdk:"username"`
 	Annotations types.Map                `tfsdk:"annotations"`
 	Description types.String             `tfsdk:"description"`
 	Disable     types.Bool               `tfsdk:"disable"`
 	Labels      types.Map                `tfsdk:"labels"`
 	ID          types.String             `tfsdk:"id"`
-	Port        types.Int64              `tfsdk:"port"`
-	Username    types.String             `tfsdk:"username"`
 	Timeouts    timeouts.Value           `tfsdk:"timeouts"`
 	APIToken    *CminstanceAPITokenModel `tfsdk:"api_token"`
 	IP          *CminstanceIPModel       `tfsdk:"ip"`
@@ -176,6 +177,20 @@ func (r *CminstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 					validators.NamespaceValidator(),
 				},
 			},
+			"port": schema.Int64Attribute{
+				MarkdownDescription: "Port of the Central Manager instance to connect to .",
+				Required:            true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 65535),
+				},
+			},
+			"username": schema.StringAttribute{
+				MarkdownDescription: "Username for the Central Manager instance .",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(4, 128),
+				},
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -196,22 +211,6 @@ func (r *CminstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique identifier for the resource.",
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"port": schema.Int64Attribute{
-				MarkdownDescription: "Port of the Central Manager instance to connect to .",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
-			"username": schema.StringAttribute{
-				MarkdownDescription: "Username for the Central Manager instance .",
-				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -239,6 +238,9 @@ func (r *CminstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"location": schema.StringAttribute{
 								MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(1024),
+								},
 							},
 							"store_provider": schema.StringAttribute{
 								MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -256,17 +258,23 @@ func (r *CminstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"url": schema.StringAttribute{
 								MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 131072),
+								},
 							},
 						},
 					},
 				},
 			},
 			"ip": schema.SingleNestedBlock{
-				MarkdownDescription: "IPv4 Address. IPv4 Address in dot-decimal notation.",
+				MarkdownDescription: "IPv4 address in dotted decimal notation (e.g., 192.0.2.1).",
 				Attributes: map[string]schema.Attribute{
 					"addr": schema.StringAttribute{
 						MarkdownDescription: "IPv4 Address in string form with dot-decimal notation.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(1024),
+						},
 					},
 				},
 			},
@@ -284,6 +292,9 @@ func (r *CminstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"location": schema.StringAttribute{
 								MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(1024),
+								},
 							},
 							"store_provider": schema.StringAttribute{
 								MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -301,6 +312,9 @@ func (r *CminstanceResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"url": schema.StringAttribute{
 								MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 131072),
+								},
 							},
 						},
 					},
@@ -412,6 +426,12 @@ func (r *CminstanceResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Port.IsNull() && !data.Port.IsUnknown() {
+		createReq.Spec["port"] = data.Port.ValueInt64()
+	}
+	if !data.Username.IsNull() && !data.Username.IsUnknown() {
+		createReq.Spec["username"] = data.Username.ValueString()
+	}
 	if data.APIToken != nil {
 		api_tokenMap := make(map[string]interface{})
 		if data.APIToken.BlindfoldSecretInfo != nil {
@@ -473,12 +493,6 @@ func (r *CminstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		}
 		createReq.Spec["password"] = passwordMap
 	}
-	if !data.Port.IsNull() && !data.Port.IsUnknown() {
-		createReq.Spec["port"] = data.Port.ValueInt64()
-	}
-	if !data.Username.IsNull() && !data.Username.IsUnknown() {
-		createReq.Spec["username"] = data.Username.ValueString()
-	}
 
 	apiResource, err := r.client.CreateCminstance(ctx, createReq)
 	if err != nil {
@@ -492,6 +506,16 @@ func (r *CminstanceResource) Create(ctx context.Context, req resource.CreateRequ
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["port"].(float64); ok {
+		data.Port = types.Int64Value(int64(v))
+	} else {
+		data.Port = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["username"].(string); ok && v != "" {
+		data.Username = types.StringValue(v)
+	} else {
+		data.Username = types.StringNull()
+	}
 	if _, ok := apiResource.Spec["api_token"].(map[string]interface{}); ok && isImport && data.APIToken == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.APIToken = &CminstanceAPITokenModel{}
@@ -512,16 +536,6 @@ func (r *CminstanceResource) Create(ctx context.Context, req resource.CreateRequ
 		data.Password = &CminstancePasswordModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["port"].(float64); ok {
-		data.Port = types.Int64Value(int64(v))
-	} else {
-		data.Port = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["username"].(string); ok && v != "" {
-		data.Username = types.StringValue(v)
-	} else {
-		data.Username = types.StringNull()
-	}
 
 	tflog.Trace(ctx, "created Cminstance resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -602,6 +616,16 @@ func (r *CminstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["port"].(float64); ok {
+		data.Port = types.Int64Value(int64(v))
+	} else {
+		data.Port = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["username"].(string); ok && v != "" {
+		data.Username = types.StringValue(v)
+	} else {
+		data.Username = types.StringNull()
+	}
 	if _, ok := apiResource.Spec["api_token"].(map[string]interface{}); ok && isImport && data.APIToken == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.APIToken = &CminstanceAPITokenModel{}
@@ -622,16 +646,6 @@ func (r *CminstanceResource) Read(ctx context.Context, req resource.ReadRequest,
 		data.Password = &CminstancePasswordModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["port"].(float64); ok {
-		data.Port = types.Int64Value(int64(v))
-	} else {
-		data.Port = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["username"].(string); ok && v != "" {
-		data.Username = types.StringValue(v)
-	} else {
-		data.Username = types.StringNull()
-	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -683,6 +697,12 @@ func (r *CminstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Port.IsNull() && !data.Port.IsUnknown() {
+		apiResource.Spec["port"] = data.Port.ValueInt64()
+	}
+	if !data.Username.IsNull() && !data.Username.IsUnknown() {
+		apiResource.Spec["username"] = data.Username.ValueString()
+	}
 	if data.APIToken != nil {
 		api_tokenMap := make(map[string]interface{})
 		if data.APIToken.BlindfoldSecretInfo != nil {
@@ -744,12 +764,6 @@ func (r *CminstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 		}
 		apiResource.Spec["password"] = passwordMap
 	}
-	if !data.Port.IsNull() && !data.Port.IsUnknown() {
-		apiResource.Spec["port"] = data.Port.ValueInt64()
-	}
-	if !data.Username.IsNull() && !data.Username.IsUnknown() {
-		apiResource.Spec["username"] = data.Username.ValueString()
-	}
 
 	_, err := r.client.UpdateCminstance(ctx, apiResource)
 	if err != nil {
@@ -769,25 +783,21 @@ func (r *CminstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["port"].(float64); ok {
-		data.Port = types.Int64Value(int64(v))
-	} else if data.Port.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Port = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["username"].(string); ok && v != "" {
-		data.Username = types.StringValue(v)
-	} else if data.Username.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Username = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["port"].(float64); ok {
+		data.Port = types.Int64Value(int64(v))
+	} else {
+		data.Port = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["username"].(string); ok && v != "" {
+		data.Username = types.StringValue(v)
+	} else {
+		data.Username = types.StringNull()
+	}
 	if _, ok := apiResource.Spec["api_token"].(map[string]interface{}); ok && isImport && data.APIToken == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.APIToken = &CminstanceAPITokenModel{}
@@ -808,16 +818,6 @@ func (r *CminstanceResource) Update(ctx context.Context, req resource.UpdateRequ
 		data.Password = &CminstancePasswordModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["port"].(float64); ok {
-		data.Port = types.Int64Value(int64(v))
-	} else {
-		data.Port = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["username"].(string); ok && v != "" {
-		data.Username = types.StringValue(v)
-	} else {
-		data.Username = types.StringNull()
-	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

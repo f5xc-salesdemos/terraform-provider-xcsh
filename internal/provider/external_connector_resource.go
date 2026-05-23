@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -57,6 +60,90 @@ var ExternalConnectorCESiteReferenceModelAttrTypes = map[string]attr.Type{
 	"name":      types.StringType,
 	"namespace": types.StringType,
 	"tenant":    types.StringType,
+}
+
+// ExternalConnectorGreModel represents gre block
+type ExternalConnectorGreModel struct {
+	GreParameters *ExternalConnectorGreGreParametersModel `tfsdk:"gre_parameters"`
+}
+
+// ExternalConnectorGreModelAttrTypes defines the attribute types for ExternalConnectorGreModel
+var ExternalConnectorGreModelAttrTypes = map[string]attr.Type{
+	"gre_parameters": types.ObjectType{AttrTypes: ExternalConnectorGreGreParametersModelAttrTypes},
+}
+
+// ExternalConnectorGreGreParametersModel represents gre_parameters block
+type ExternalConnectorGreGreParametersModel struct {
+	TunnelMTU              types.Int64                                          `tfsdk:"tunnel_mtu"`
+	PeerIPAddress          *ExternalConnectorGreGreParametersPeerIPAddressModel `tfsdk:"peer_ip_address"`
+	Segment                *ExternalConnectorGreGreParametersSegmentModel       `tfsdk:"segment"`
+	SiteLocalInsideNetwork *ExternalConnectorEmptyModel                         `tfsdk:"site_local_inside_network"`
+	SiteLocalNetwork       *ExternalConnectorEmptyModel                         `tfsdk:"site_local_network"`
+	TunnelEps              []ExternalConnectorGreGreParametersTunnelEpsModel    `tfsdk:"tunnel_eps"`
+}
+
+// ExternalConnectorGreGreParametersModelAttrTypes defines the attribute types for ExternalConnectorGreGreParametersModel
+var ExternalConnectorGreGreParametersModelAttrTypes = map[string]attr.Type{
+	"tunnel_mtu":                types.Int64Type,
+	"peer_ip_address":           types.ObjectType{AttrTypes: ExternalConnectorGreGreParametersPeerIPAddressModelAttrTypes},
+	"segment":                   types.ObjectType{AttrTypes: ExternalConnectorGreGreParametersSegmentModelAttrTypes},
+	"site_local_inside_network": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"site_local_network":        types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"tunnel_eps":                types.ListType{ElemType: types.ObjectType{AttrTypes: ExternalConnectorGreGreParametersTunnelEpsModelAttrTypes}},
+}
+
+// ExternalConnectorGreGreParametersPeerIPAddressModel represents peer_ip_address block
+type ExternalConnectorGreGreParametersPeerIPAddressModel struct {
+	Addr types.String `tfsdk:"addr"`
+}
+
+// ExternalConnectorGreGreParametersPeerIPAddressModelAttrTypes defines the attribute types for ExternalConnectorGreGreParametersPeerIPAddressModel
+var ExternalConnectorGreGreParametersPeerIPAddressModelAttrTypes = map[string]attr.Type{
+	"addr": types.StringType,
+}
+
+// ExternalConnectorGreGreParametersSegmentModel represents segment block
+type ExternalConnectorGreGreParametersSegmentModel struct {
+	Refs []ExternalConnectorGreGreParametersSegmentRefsModel `tfsdk:"refs"`
+}
+
+// ExternalConnectorGreGreParametersSegmentModelAttrTypes defines the attribute types for ExternalConnectorGreGreParametersSegmentModel
+var ExternalConnectorGreGreParametersSegmentModelAttrTypes = map[string]attr.Type{
+	"refs": types.ListType{ElemType: types.ObjectType{AttrTypes: ExternalConnectorGreGreParametersSegmentRefsModelAttrTypes}},
+}
+
+// ExternalConnectorGreGreParametersSegmentRefsModel represents refs block
+type ExternalConnectorGreGreParametersSegmentRefsModel struct {
+	Kind      types.String `tfsdk:"kind"`
+	Name      types.String `tfsdk:"name"`
+	Namespace types.String `tfsdk:"namespace"`
+	Tenant    types.String `tfsdk:"tenant"`
+	Uid       types.String `tfsdk:"uid"`
+}
+
+// ExternalConnectorGreGreParametersSegmentRefsModelAttrTypes defines the attribute types for ExternalConnectorGreGreParametersSegmentRefsModel
+var ExternalConnectorGreGreParametersSegmentRefsModelAttrTypes = map[string]attr.Type{
+	"kind":      types.StringType,
+	"name":      types.StringType,
+	"namespace": types.StringType,
+	"tenant":    types.StringType,
+	"uid":       types.StringType,
+}
+
+// ExternalConnectorGreGreParametersTunnelEpsModel represents tunnel_eps block
+type ExternalConnectorGreGreParametersTunnelEpsModel struct {
+	Interface      types.String `tfsdk:"interface"`
+	LocalTunnelIP  types.String `tfsdk:"local_tunnel_ip"`
+	Node           types.String `tfsdk:"node"`
+	RemoteTunnelIP types.String `tfsdk:"remote_tunnel_ip"`
+}
+
+// ExternalConnectorGreGreParametersTunnelEpsModelAttrTypes defines the attribute types for ExternalConnectorGreGreParametersTunnelEpsModel
+var ExternalConnectorGreGreParametersTunnelEpsModelAttrTypes = map[string]attr.Type{
+	"interface":        types.StringType,
+	"local_tunnel_ip":  types.StringType,
+	"node":             types.StringType,
+	"remote_tunnel_ip": types.StringType,
 }
 
 // ExternalConnectorIpsecModel represents ipsec block
@@ -255,6 +342,7 @@ type ExternalConnectorResourceModel struct {
 	ID              types.String                           `tfsdk:"id"`
 	Timeouts        timeouts.Value                         `tfsdk:"timeouts"`
 	CESiteReference *ExternalConnectorCESiteReferenceModel `tfsdk:"ce_site_reference"`
+	Gre             *ExternalConnectorGreModel             `tfsdk:"gre"`
 	Ipsec           *ExternalConnectorIpsecModel           `tfsdk:"ipsec"`
 }
 
@@ -325,6 +413,9 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -333,6 +424,9 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"tenant": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -340,6 +434,124 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
+					},
+				},
+			},
+			"gre": schema.SingleNestedBlock{
+				MarkdownDescription: "GRE. External Connector with GRE tunnel.",
+				Attributes:          map[string]schema.Attribute{},
+				Blocks: map[string]schema.Block{
+					"gre_parameters": schema.SingleNestedBlock{
+						MarkdownDescription: "X-displayName: 'GRE Tunnel Parameters' GRE configuration parameters required for GRE Connection type.",
+						Attributes: map[string]schema.Attribute{
+							"tunnel_mtu": schema.Int64Attribute{
+								MarkdownDescription: "X-displayName: 'Tunnel MTU' Configure MTU for the GRE tunnel interface.",
+								Optional:            true,
+							},
+						},
+						Blocks: map[string]schema.Block{
+							"peer_ip_address": schema.SingleNestedBlock{
+								MarkdownDescription: "IPv4 Address. IPv4 Address in dot-decimal notation.",
+								Attributes: map[string]schema.Attribute{
+									"addr": schema.StringAttribute{
+										MarkdownDescription: "IPv4 Address in string form with dot-decimal notation.",
+										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
+									},
+								},
+							},
+							"segment": schema.SingleNestedBlock{
+								MarkdownDescription: "Segment Reference Type. Reference to Segment Object.",
+								Attributes:          map[string]schema.Attribute{},
+								Blocks: map[string]schema.Block{
+									"refs": schema.ListNestedBlock{
+										MarkdownDescription: "Reference to Segment Object .",
+										NestedObject: schema.NestedBlockObject{
+											Attributes: map[string]schema.Attribute{
+												"kind": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then kind will hold the referred object's kind (e.g. 'route').",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+												},
+												"name": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+														stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+													},
+												},
+												"namespace": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+														stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+													},
+												},
+												"tenant": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+												},
+												"uid": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then uid will hold the referred object's(e.g. Route's) uid.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							"site_local_inside_network": schema.SingleNestedBlock{
+								MarkdownDescription: "Enable this option",
+							},
+							"site_local_network": schema.SingleNestedBlock{
+								MarkdownDescription: "Enable this option",
+							},
+							"tunnel_eps": schema.ListNestedBlock{
+								MarkdownDescription: "X-displayName: 'Tunnel Endpoint'Configure tunnel parameters, source, destination, IP addresses.",
+								NestedObject: schema.NestedBlockObject{
+									Attributes: map[string]schema.Attribute{
+										"interface": schema.StringAttribute{
+											MarkdownDescription: "For the chosen node, specify the interface that will be the tunnel source.",
+											Optional:            true,
+										},
+										"local_tunnel_ip": schema.StringAttribute{
+											MarkdownDescription: "For a particular tunnel on a node, specify the local tunnel IP Address i.e. The IP address of the tunnel on the CE node itself and a subnet prefix length .",
+											Optional:            true,
+										},
+										"node": schema.StringAttribute{
+											MarkdownDescription: "CE site is composed of multiple nodes. Choose a node that will be part of this external connection.",
+											Optional:            true,
+										},
+										"remote_tunnel_ip": schema.StringAttribute{
+											MarkdownDescription: "For a particular tunnel on a node, specify the remote tunnel IP Address i.e. The IP address of the tunnel on the remote gateway and a subnet prefix length .",
+											Optional:            true,
+										},
+									},
+								},
+							},
 						},
 					},
 				},
@@ -352,7 +564,7 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "IKE configuration parameters required for IPsec Connection type.",
 						Attributes: map[string]schema.Attribute{
 							"rm_hostname": schema.StringAttribute{
-								MarkdownDescription: "Configure an hostname Remote IKE ID.",
+								MarkdownDescription: "Exclusive with [rm_ip_address use_default_remote_ike_id] Configure an hostname Remote IKE ID.",
 								Optional:            true,
 							},
 						},
@@ -361,7 +573,7 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 								MarkdownDescription: "Enable this option",
 							},
 							"dpd_keep_alive_timer": schema.SingleNestedBlock{
-								MarkdownDescription: "Keepalive Timer.",
+								MarkdownDescription: "Configuration parameter for dpd keep alive timer.",
 								Attributes: map[string]schema.Attribute{
 									"timeout": schema.Int64Attribute{
 										MarkdownDescription: "Keepalive Timer. Operation timeout duration",
@@ -375,6 +587,9 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -383,6 +598,9 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
 										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
+										},
 									},
 									"tenant": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -390,6 +608,9 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
 										},
 									},
 								},
@@ -400,6 +621,9 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -408,6 +632,9 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
 										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
+										},
 									},
 									"tenant": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -415,6 +642,9 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
 										},
 									},
 								},
@@ -430,11 +660,14 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 								Attributes:          map[string]schema.Attribute{},
 								Blocks: map[string]schema.Block{
 									"ipv4": schema.SingleNestedBlock{
-										MarkdownDescription: "IPv4 Address. IPv4 Address in dot-decimal notation.",
+										MarkdownDescription: "IPv4 address in dotted decimal notation (e.g., 192.0.2.1).",
 										Attributes: map[string]schema.Attribute{
 											"addr": schema.StringAttribute{
 												MarkdownDescription: "IPv4 Address in string form with dot-decimal notation.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 										},
 									},
@@ -444,6 +677,9 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 											"addr": schema.StringAttribute{
 												MarkdownDescription: "IPv6 Address in form of string. IPv6 address must be specified as hexadecimal numbers separated by ':' The address can be compacted by suppressing zeros e.g. '2001:db8:0:0:0:0:2:1' becomes '2001:db8::2:1' or '2001:db8:0:0:0:2:0:0' becomes '2001:db8::2::'.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 										},
 									},
@@ -476,6 +712,9 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 									"addr": schema.StringAttribute{
 										MarkdownDescription: "IPv4 Address in string form with dot-decimal notation.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 								},
 							},
@@ -498,6 +737,10 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+														stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -505,6 +748,10 @@ func (r *ExternalConnectorResource) Schema(ctx context.Context, req resource.Sch
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+														stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 													},
 												},
 												"tenant": schema.StringAttribute{
@@ -680,6 +927,17 @@ func (r *ExternalConnectorResource) Create(ctx context.Context, req resource.Cre
 		}
 		createReq.Spec["ce_site_reference"] = ce_site_referenceMap
 	}
+	if data.Gre != nil {
+		greMap := make(map[string]interface{})
+		if data.Gre.GreParameters != nil {
+			gre_parametersNestedMap := make(map[string]interface{})
+			if !data.Gre.GreParameters.TunnelMTU.IsNull() && !data.Gre.GreParameters.TunnelMTU.IsUnknown() {
+				gre_parametersNestedMap["tunnel_mtu"] = data.Gre.GreParameters.TunnelMTU.ValueInt64()
+			}
+			greMap["gre_parameters"] = gre_parametersNestedMap
+		}
+		createReq.Spec["gre"] = greMap
+	}
 	if data.Ipsec != nil {
 		ipsecMap := make(map[string]interface{})
 		if data.Ipsec.IKEParameters != nil {
@@ -736,6 +994,11 @@ func (r *ExternalConnectorResource) Create(ctx context.Context, req resource.Cre
 			}(),
 		}
 	}
+	if _, ok := apiResource.Spec["gre"].(map[string]interface{}); ok && isImport && data.Gre == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.Gre = &ExternalConnectorGreModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["ipsec"].(map[string]interface{}); ok && isImport && data.Ipsec == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.Ipsec = &ExternalConnectorIpsecModel{}
@@ -843,6 +1106,11 @@ func (r *ExternalConnectorResource) Read(ctx context.Context, req resource.ReadR
 			}(),
 		}
 	}
+	if _, ok := apiResource.Spec["gre"].(map[string]interface{}); ok && isImport && data.Gre == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.Gre = &ExternalConnectorGreModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["ipsec"].(map[string]interface{}); ok && isImport && data.Ipsec == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.Ipsec = &ExternalConnectorIpsecModel{}
@@ -912,6 +1180,17 @@ func (r *ExternalConnectorResource) Update(ctx context.Context, req resource.Upd
 		}
 		apiResource.Spec["ce_site_reference"] = ce_site_referenceMap
 	}
+	if data.Gre != nil {
+		greMap := make(map[string]interface{})
+		if data.Gre.GreParameters != nil {
+			gre_parametersNestedMap := make(map[string]interface{})
+			if !data.Gre.GreParameters.TunnelMTU.IsNull() && !data.Gre.GreParameters.TunnelMTU.IsUnknown() {
+				gre_parametersNestedMap["tunnel_mtu"] = data.Gre.GreParameters.TunnelMTU.ValueInt64()
+			}
+			greMap["gre_parameters"] = gre_parametersNestedMap
+		}
+		apiResource.Spec["gre"] = greMap
+	}
 	if data.Ipsec != nil {
 		ipsecMap := make(map[string]interface{})
 		if data.Ipsec.IKEParameters != nil {
@@ -979,6 +1258,11 @@ func (r *ExternalConnectorResource) Update(ctx context.Context, req resource.Upd
 			}(),
 		}
 	}
+	if _, ok := apiResource.Spec["gre"].(map[string]interface{}); ok && isImport && data.Gre == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.Gre = &ExternalConnectorGreModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["ipsec"].(map[string]interface{}); ok && isImport && data.Ipsec == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.Ipsec = &ExternalConnectorIpsecModel{}

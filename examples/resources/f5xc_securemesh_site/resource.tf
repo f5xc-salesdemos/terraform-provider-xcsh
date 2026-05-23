@@ -1,6 +1,16 @@
 # Securemesh Site Resource Example
 # Manages a Securemesh Site resource in F5 Distributed Cloud for deploying secure mesh edge sites with distributed security capabilities.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Securemesh Site configuration
 resource "f5xc_securemesh_site" "example" {
   name      = "example-securemesh-site"

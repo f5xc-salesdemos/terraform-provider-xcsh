@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -329,7 +331,7 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 				Delete: true,
 			}),
 			"disable_forward_proxy": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: disable_forward_proxy, enable_forward_proxy; Default: disable_forward_proxy] Enable this option",
+				MarkdownDescription: "[OneOf: disable_forward_proxy, enable_forward_proxy; Default: disable_forward_proxy] Configuration parameter for disable forward proxy.",
 			},
 			"enable_forward_proxy": schema.SingleNestedBlock{
 				MarkdownDescription: "Fine tune forward proxy behavior Few configurations allowed are White listed ports and IP prefixes: Forward proxy does application protocol detection and server name(SNI) detection by peeking into the traffic on the incoming downstream connection. Few protocols doesn't have client sending the..",
@@ -346,32 +348,44 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 						MarkdownDescription: "Traffic to these destination TCP ports is not subjected to protocol parsing Example 'tmate' server port.",
 						Optional:            true,
 						ElementType:         types.Int64Type,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(64),
+						},
 					},
 					"white_listed_prefixes": schema.ListAttribute{
 						MarkdownDescription: "Traffic to these destination IP prefixes is not subjected to protocol parsing Example 'tmate' server IP.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(64),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
 					"no_interception": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for no interception.",
 					},
 					"tls_intercept": schema.SingleNestedBlock{
 						MarkdownDescription: "Configuration to enable TLS interception.",
 						Attributes: map[string]schema.Attribute{
 							"trusted_ca_url": schema.StringAttribute{
-								MarkdownDescription: "Custom Root CA Certificate for validating upstream server certificate.",
+								MarkdownDescription: "Exclusive with [volterra_trusted_ca] Custom Root CA Certificate for validating upstream server certificate.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(131072),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
 							"custom_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "TLS Certificate. Handle to fetch certificate and key.",
+								MarkdownDescription: "Configuration parameter for custom certificate.",
 								Attributes: map[string]schema.Attribute{
 									"certificate_url": schema.StringAttribute{
 										MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 									"description_spec": schema.StringAttribute{
 										MarkdownDescription: "Description. Description for the certificate.",
@@ -386,11 +400,14 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 												MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 												Optional:            true,
 												ElementType:         types.StringType,
+												Validators: []validator.List{
+													listvalidator.SizeBetween(1, 4),
+												},
 											},
 										},
 									},
 									"disable_ocsp_stapling": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 									},
 									"private_key": schema.SingleNestedBlock{
 										MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -406,6 +423,9 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -423,18 +443,21 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
 										},
 									},
 									"use_system_defaults": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for use system defaults.",
 									},
 								},
 							},
 							"enable_for_all_domains": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for enable for all domains.",
 							},
 							"policy": schema.SingleNestedBlock{
 								MarkdownDescription: "Policy to enable or disable TLS interception.",
@@ -446,27 +469,36 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 											Attributes: map[string]schema.Attribute{},
 											Blocks: map[string]schema.Block{
 												"disable_interception": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for disable interception.",
 												},
 												"domain_match": schema.SingleNestedBlock{
-													MarkdownDescription: "Domains. Domains names.",
+													MarkdownDescription: "Configuration parameter for domain match.",
 													Attributes: map[string]schema.Attribute{
 														"exact_value": schema.StringAttribute{
-															MarkdownDescription: "Exact domain name.",
+															MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"regex_value": schema.StringAttribute{
-															MarkdownDescription: "Regular Expression value for the domain name.",
+															MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"suffix_value": schema.StringAttribute{
-															MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+															MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
 												"enable_interception": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for enable interception.",
 												},
 											},
 										},
@@ -474,10 +506,10 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 								},
 							},
 							"volterra_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for volterra certificate.",
 							},
 							"volterra_trusted_ca": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for volterra trusted ca.",
 							},
 						},
 					},
@@ -493,6 +525,9 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -500,6 +535,9 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
 								},
 							},
 							"tenant": schema.StringAttribute{
@@ -509,17 +547,20 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 						},
 					},
 				},
 			},
 			"sli_to_slo_snat": schema.SingleNestedBlock{
-				MarkdownDescription: "SNAT Configuration. X-example: '' description.",
+				MarkdownDescription: "Configuration parameter for sli to slo snat.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"default_gw_snat": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for default gw snat.",
 					},
 					"interface_ip": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
@@ -536,6 +577,9 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -544,6 +588,9 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -551,6 +598,9 @@ func (r *NetworkConnectorResource) Schema(ctx context.Context, req resource.Sche
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},

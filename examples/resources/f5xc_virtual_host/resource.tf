@@ -1,6 +1,16 @@
 # Virtual Host Resource Example
 # Manages virtual host in a given namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}
+
 # Basic Virtual Host configuration
 resource "f5xc_virtual_host" "example" {
   name      = "example-virtual-host"
