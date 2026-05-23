@@ -10,7 +10,7 @@
 //   Changes to this file trigger the generate.yml workflow which regenerates all
 //   provider resources from the latest OpenAPI specifications.
 //
-// Pipeline Verification: 2026-05-23 - Verified against api-specs-enriched v2.1.104
+// Pipeline Verification: 2026-05-23T05:45Z - Verified against api-specs-enriched v2.1.104
 //
 // Usage: go run tools/generate-all-schemas.go [--spec-dir=/path/to/specs] [--dry-run]
 //
