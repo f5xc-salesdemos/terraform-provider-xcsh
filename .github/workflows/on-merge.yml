@@ -297,11 +297,11 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.AUTO_MERGE_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download specs if not present
         env:
-          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENRICHED_REPO: f5xc-salesdemos/api-specs-enriched
         run: |
           SPEC_DIR="docs/specifications/api"
@@ -400,7 +400,7 @@ jobs:
       - name: Close stale auto-regenerate PRs
         if: steps.check.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Find and close any open auto-regenerate PRs (they're superseded by this new regeneration)
           echo "Checking for stale auto-regenerate PRs..."
@@ -422,7 +422,7 @@ jobs:
         id: create-pr
         if: steps.check.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Create a unique branch name
           BRANCH_NAME="auto-regenerate/${{ github.sha }}"
@@ -446,7 +446,20 @@ jobs:
           # Push the branch
           git push origin "$BRANCH_NAME"
 
-          # Create the PR body
+          # Create a tracking issue (required by "Check linked issues" CI check)
+          ISSUE_URL=$(gh issue create \
+            --title "chore: auto-regenerate provider from ${{ github.sha }}" \
+            --body "Automated regeneration triggered by commit ${{ github.sha }}.
+
+          Changes:
+          - Provider code: ${{ needs.regenerate-provider.outputs.changed || 'false' }}
+          - Documentation: ${{ needs.regenerate-docs.outputs.changed || 'false' }}" \
+            --label "automated" \
+            --label "regeneration")
+          ISSUE_NUMBER=$(echo "$ISSUE_URL" | grep -oE '[0-9]+$')
+          echo "Created tracking issue #$ISSUE_NUMBER"
+
+          # Create the PR linking the issue
           PR_BODY="## Summary
           Automated regeneration of provider code and/or documentation.
 
@@ -457,12 +470,8 @@ jobs:
           - Provider code regenerated: ${{ needs.regenerate-provider.outputs.changed || 'false' }}
           - Documentation regenerated: ${{ needs.regenerate-docs.outputs.changed || 'false' }}
 
-          ## Note
-          This PR was automatically created. When merged, it will trigger the tag/release workflow.
+          Closes #${ISSUE_NUMBER}"
 
-          🤖 Generated with [Claude Code](https://claude.com/claude-code)"
-
-          # Create the PR
           PR_URL=$(gh pr create \
             --title "chore: auto-regenerate provider and documentation" \
             --body "$PR_BODY" \
@@ -479,7 +488,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "Created PR #$PR_NUMBER: $PR_URL"
 
-          # Enable auto-merge if available
+          # Enable auto-merge so PR merges once all checks pass
           gh pr merge "$PR_NUMBER" --auto --squash || echo "Auto-merge not available or already enabled"
 
       - name: No changes - skip PR creation
