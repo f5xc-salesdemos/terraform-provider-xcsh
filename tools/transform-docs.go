@@ -3359,11 +3359,13 @@ func wrapLongLines(content string, maxLen int) string {
 }
 
 // fixUpstreamTerminology corrects upstream API terminology to pass textlint rules.
+// Spelling corrections are handled by codespell --write-changes in the CI workflow.
 func fixUpstreamTerminology(content string) string {
-	replacer := strings.NewReplacer(
+	content = strings.NewReplacer(
 		"User Name", "username",
-	)
-	content = replacer.Replace(content)
+		"Host Name", "hostname",
+		"name space", "namespace",
+	).Replace(content)
 
 	cdnRegex := regexp.MustCompile(`\bcdn\b`)
 	content = cdnRegex.ReplaceAllString(content, "CDN")
