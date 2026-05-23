@@ -299,6 +299,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.AUTO_MERGE_TOKEN }}
+          persist-credentials: false
 
       - name: Download specs if not present
         env:
