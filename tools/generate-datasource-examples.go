@@ -59,6 +59,15 @@ func generateDataSourceExample(dataSourceName string) string {
 	sb.WriteString(fmt.Sprintf("# %s Data Source Example\n", humanName))
 	sb.WriteString(fmt.Sprintf("# Retrieves information about an existing %s\n\n", humanName))
 
+	sb.WriteString("terraform {\n")
+	sb.WriteString("  required_version = \">= 1.0\"\n\n")
+	sb.WriteString("  required_providers {\n")
+	sb.WriteString("    f5xc = {\n")
+	sb.WriteString("      source = \"f5xc-salesdemos/f5xc\"\n")
+	sb.WriteString("    }\n")
+	sb.WriteString("  }\n")
+	sb.WriteString("}\n\n")
+
 	// Basic lookup example
 	sb.WriteString(fmt.Sprintf("# Look up an existing %s by name\n", humanName))
 	sb.WriteString(fmt.Sprintf("data \"f5xc_%s\" \"example\" {\n", dataSourceName))

@@ -41,7 +41,25 @@
         "[Cc][Dd][Nn]",
         "[Cc]lick[Hh]ouse",
         "[Uu]ser ?[Nn]ame",
-        "[Ii]nternet"
+        "[Ii]nternet",
+        "[Aa]zure",
+        "[Bb]it[Bb]ucket",
+        "[Cc]assandra",
+        "[Cc]lient[- ]?[Ss]ide",
+        "[Cc]ode[- ]?[Bb]ase",
+        "[Dd]ocker",
+        "[Gg]it[Hh]ub",
+        "[Gg]it[Ll]ab",
+        "[Jj]ava[Ss]cript",
+        "[Mm][Aa][Cc] ?[Oo][Ss]",
+        "OS X",
+        "[Mm]ongo[Dd][Bb]",
+        "[Nn]ame ?[Ss]pace",
+        "[Ss]erver[- ]?[Ss]ide",
+        "[Ss]ub[- ]?[Cc]lass",
+        "[Ss][Dd][Kk]",
+        "[Uu]buntu",
+        "[Hh]ost ?[Nn]ame"
       ]
     }
   }
