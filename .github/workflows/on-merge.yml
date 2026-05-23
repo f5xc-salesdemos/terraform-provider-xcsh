@@ -386,6 +386,16 @@ jobs:
         run: |
           rm -f terraform-provider-f5xc
 
+      - name: Fix spelling in generated docs
+        run: |
+          pip install codespell --quiet
+          codespell --write-changes docs/ examples/ --quiet-level 2 || true
+          if [ -f tools/codespell-corrections.txt ]; then
+            codespell --write-changes docs/ examples/ \
+              --dictionary tools/codespell-corrections.txt \
+              --quiet-level 2 || true
+          fi
+
       - name: Check for changes
         id: check
         run: |
