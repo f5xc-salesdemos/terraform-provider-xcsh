@@ -389,11 +389,25 @@ jobs:
       - name: Fix spelling in generated docs
         run: |
           pip install codespell --quiet
+          # Auto-fix unambiguous typos
           codespell --write-changes docs/ examples/ --quiet-level 2 || true
-          if [ -f tools/codespell-corrections.txt ]; then
-            codespell --write-changes docs/ examples/ \
-              --dictionary tools/codespell-corrections.txt \
-              --quiet-level 2 || true
+          # Fix ambiguous typos that codespell skips (loaded from JSON corrections file)
+          if [ -f tools/codespell-corrections.json ]; then
+            python3 -c "
+          import json, os, re
+          with open('tools/codespell-corrections.json') as f:
+              data = json.load(f)
+          for wrong, right in data.get('corrections', {}).items():
+              for root in ['docs', 'examples']:
+                  for dirpath, _, filenames in os.walk(root):
+                      for fn in filenames:
+                          if fn.endswith(('.md', '.tf')):
+                              fp = os.path.join(dirpath, fn)
+                              txt = open(fp).read()
+                              fixed = txt.replace(wrong, right)
+                              if fixed != txt:
+                                  open(fp, 'w').write(fixed)
+          "
           fi
 
       - name: Check for changes

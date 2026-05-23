@@ -1,9 +1,0 @@
-# Codespell dictionary for ambiguous upstream API typos
-# Format: misspelling->correction
-# Used by on-merge.yml to auto-fix generated docs before committing
-sevice->service
-Sevice->Service
-adn->and
-ADN->AND
-hashi->hash
-Hashi->Hash

@@ -1,0 +1,22 @@
+{
+  "_comment": "Upstream API spelling corrections for generated docs. Used by on-merge.yml to fix ambiguous typos that codespell --write-changes skips. Format: misspelling -> correction.",
+  "corrections": {
+    "Sevice": "Service",
+    "sevice": "service",
+    " ADN ": " AND ",
+    "Cahce": "Cache",
+    "assesment": "assessment",
+    "expresssions": "expressions",
+    "detination": "destination",
+    "positve": "positive",
+    " bellow ": " below ",
+    " withing ": " within ",
+    "Nework": "Network",
+    " inclusing ": " including ",
+    " lables ": " labels ",
+    " Lables ": " Labels ",
+    " checkin ": " checking ",
+    " Checkin ": " Checking ",
+    " defin ": " define "
+  }
+}
