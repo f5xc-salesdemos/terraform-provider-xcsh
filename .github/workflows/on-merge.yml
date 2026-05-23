@@ -386,22 +386,22 @@ jobs:
         run: |
           rm -f terraform-provider-f5xc
 
-      - name: Fix spelling in generated docs
+      - name: Fix spelling in generated content
         run: |
           pip install codespell --quiet
-          # Auto-fix unambiguous typos
-          codespell --write-changes docs/ examples/ --quiet-level 2 || true
+          # Auto-fix unambiguous typos in all generated content
+          codespell --write-changes docs/ examples/ internal/provider/ --quiet-level 2 || true
           # Fix ambiguous typos that codespell skips (loaded from JSON corrections file)
           if [ -f tools/codespell-corrections.json ]; then
             python3 -c "
-          import json, os, re
+          import json, os
           with open('tools/codespell-corrections.json') as f:
               data = json.load(f)
           for wrong, right in data.get('corrections', {}).items():
-              for root in ['docs', 'examples']:
+              for root in ['docs', 'examples', 'internal/provider']:
                   for dirpath, _, filenames in os.walk(root):
                       for fn in filenames:
-                          if fn.endswith(('.md', '.tf')):
+                          if fn.endswith(('.md', '.tf', '.go')):
                               fp = os.path.join(dirpath, fn)
                               txt = open(fp).read()
                               fixed = txt.replace(wrong, right)
