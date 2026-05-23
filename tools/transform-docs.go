@@ -875,6 +875,9 @@ func transformIndexDoc(filePath string) error {
 	// Normalize multiple blank lines
 	text = normalizeBlankLines(text)
 
+	text = fixUpstreamTerminology(text)
+	text = wrapLongLines(text, 400)
+
 	return os.WriteFile(filePath, []byte(text), 0644)
 }
 
@@ -1224,6 +1227,12 @@ func transformAnchorsOnly(filePath string, content string) error {
 			}
 		}
 	}
+
+	// Fix upstream API terminology to pass textlint
+	result = fixUpstreamTerminology(result)
+
+	// Wrap long lines to pass MD013 (max 400 chars)
+	result = wrapLongLines(result, 400)
 
 	return os.WriteFile(filePath, []byte(result), 0644)
 }
@@ -2207,6 +2216,12 @@ func transformDoc(filePath string) error {
 			}
 		}
 	}
+
+	// Fix upstream API terminology to pass textlint
+	result = fixUpstreamTerminology(result)
+
+	// Wrap long lines to pass MD013 (max 400 chars)
+	result = wrapLongLines(result, 400)
 
 	return os.WriteFile(filePath, []byte(result), 0644)
 }
@@ -3303,6 +3318,62 @@ func enhanceTimeoutsSection(content, resourceName string) string {
 	}
 
 	return strings.Join(result, "\n")
+}
+
+// wrapLongLines breaks lines exceeding maxLen at word boundaries.
+// Lines inside code blocks (``` fences) and table rows (starting with |) are left untouched.
+func wrapLongLines(content string, maxLen int) string {
+	lines := strings.Split(content, "\n")
+	var result []string
+	inCodeBlock := false
+
+	for _, line := range lines {
+		if strings.HasPrefix(strings.TrimSpace(line), "```") {
+			inCodeBlock = !inCodeBlock
+			result = append(result, line)
+			continue
+		}
+		if inCodeBlock || strings.HasPrefix(strings.TrimSpace(line), "|") || len(line) <= maxLen {
+			result = append(result, line)
+			continue
+		}
+		// Wrap at word boundaries
+		for len(line) > maxLen {
+			cut := maxLen
+			for cut > 0 && line[cut] != ' ' {
+				cut--
+			}
+			if cut == 0 {
+				cut = strings.Index(line[maxLen:], " ")
+				if cut < 0 {
+					break
+				}
+				cut += maxLen
+			}
+			result = append(result, line[:cut])
+			line = line[cut+1:]
+		}
+		result = append(result, line)
+	}
+	return strings.Join(result, "\n")
+}
+
+// fixUpstreamTerminology corrects upstream API terminology to pass textlint rules.
+func fixUpstreamTerminology(content string) string {
+	replacer := strings.NewReplacer(
+		"User Name", "username",
+	)
+	content = replacer.Replace(content)
+
+	cdnRegex := regexp.MustCompile(`\bcdn\b`)
+	content = cdnRegex.ReplaceAllString(content, "CDN")
+
+	clickhouseRegex := regexp.MustCompile(`(?i)\bclickhouse\b`)
+	content = clickhouseRegex.ReplaceAllStringFunc(content, func(_ string) string {
+		return "ClickHouse"
+	})
+
+	return content
 }
 
 // stripAIMetadataFromDescriptions removes AI-generated metadata prefixes from documentation.

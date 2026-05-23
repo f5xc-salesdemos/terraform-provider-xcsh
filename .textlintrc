@@ -36,7 +36,12 @@
         "file-?type(s)?",
         "lock[- ]file(s)?",
         "re[- ]export(s|ing|ed)?",
-        "copy[- ]past(e|ed|ing)?"
+        "copy[- ]past(e|ed|ing)?",
+        "[Bb]ase64",
+        "[Cc][Dd][Nn]",
+        "[Cc]lick[Hh]ouse",
+        "[Uu]ser ?[Nn]ame",
+        "[Ii]nternet"
       ]
     }
   }

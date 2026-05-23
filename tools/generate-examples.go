@@ -319,6 +319,15 @@ func generateExample(resourceName string, schema *SchemaInfo) string {
 	sb.WriteString(fmt.Sprintf("# %s Resource Example\n", humanName))
 	sb.WriteString(fmt.Sprintf("# %s\n\n", schema.Description))
 
+	sb.WriteString("terraform {\n")
+	sb.WriteString("  required_version = \">= 1.0\"\n\n")
+	sb.WriteString("  required_providers {\n")
+	sb.WriteString("    f5xc = {\n")
+	sb.WriteString("      source = \"f5xc-salesdemos/f5xc\"\n")
+	sb.WriteString("    }\n")
+	sb.WriteString("  }\n")
+	sb.WriteString("}\n\n")
+
 	// Get the appropriate namespace for this resource type
 	_, namespace := getNamespaceForResource(resourceName)
 
