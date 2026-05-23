@@ -16,16 +16,16 @@ resource "f5xc_subnet" "example" {
   }
 
   # Resource-specific configuration
-  # [OneOf: connect_to_layer2, connect_to_slo, isolated_nw] S...
-  connect_to_layer2 {
-    # Configure connect_to_layer2 settings
-  }
-  # Type establishes a direct reference from one object(the r...
-  layer2_intf_ref {
-    # Configure layer2_intf_ref settings
+  # Configure subnet parameters per site .
+  site_subnet_params {
+    # Configure site_subnet_params settings
   }
   # Enable this option
-  connect_to_slo {
-    # Configure connect_to_slo settings
+  dhcp {
+    # Configure dhcp settings
+  }
+  # Type establishes a direct reference from one object(the r...
+  site {
+    # Configure site settings
   }
 }

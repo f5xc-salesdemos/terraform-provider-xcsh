@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -43,38 +47,6 @@ type AlertPolicyResource struct {
 
 // AlertPolicyEmptyModel represents empty nested blocks
 type AlertPolicyEmptyModel struct {
-}
-
-// AlertPolicyNotificationParametersModel represents notification_parameters block
-type AlertPolicyNotificationParametersModel struct {
-	GroupInterval  types.String                                  `tfsdk:"group_interval"`
-	GroupWait      types.String                                  `tfsdk:"group_wait"`
-	RepeatInterval types.String                                  `tfsdk:"repeat_interval"`
-	Custom         *AlertPolicyNotificationParametersCustomModel `tfsdk:"custom"`
-	Default        *AlertPolicyEmptyModel                        `tfsdk:"default"`
-	Individual     *AlertPolicyEmptyModel                        `tfsdk:"individual"`
-	VesIoGroup     *AlertPolicyEmptyModel                        `tfsdk:"ves_io_group"`
-}
-
-// AlertPolicyNotificationParametersModelAttrTypes defines the attribute types for AlertPolicyNotificationParametersModel
-var AlertPolicyNotificationParametersModelAttrTypes = map[string]attr.Type{
-	"group_interval":  types.StringType,
-	"group_wait":      types.StringType,
-	"repeat_interval": types.StringType,
-	"custom":          types.ObjectType{AttrTypes: AlertPolicyNotificationParametersCustomModelAttrTypes},
-	"default":         types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"individual":      types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"ves_io_group":    types.ObjectType{AttrTypes: map[string]attr.Type{}},
-}
-
-// AlertPolicyNotificationParametersCustomModel represents custom block
-type AlertPolicyNotificationParametersCustomModel struct {
-	Labels types.List `tfsdk:"labels"`
-}
-
-// AlertPolicyNotificationParametersCustomModelAttrTypes defines the attribute types for AlertPolicyNotificationParametersCustomModel
-var AlertPolicyNotificationParametersCustomModelAttrTypes = map[string]attr.Type{
-	"labels": types.ListType{ElemType: types.StringType},
 }
 
 // AlertPolicyReceiversModel represents receivers block
@@ -225,6 +197,38 @@ var AlertPolicyRoutesSeverityModelAttrTypes = map[string]attr.Type{
 	"severities": types.ListType{ElemType: types.StringType},
 }
 
+// AlertPolicyNotificationParametersModel represents notification_parameters block
+type AlertPolicyNotificationParametersModel struct {
+	GroupInterval  types.String                                  `tfsdk:"group_interval"`
+	GroupWait      types.String                                  `tfsdk:"group_wait"`
+	RepeatInterval types.String                                  `tfsdk:"repeat_interval"`
+	Custom         *AlertPolicyNotificationParametersCustomModel `tfsdk:"custom"`
+	Default        *AlertPolicyEmptyModel                        `tfsdk:"default"`
+	Individual     *AlertPolicyEmptyModel                        `tfsdk:"individual"`
+	VesIoGroup     *AlertPolicyEmptyModel                        `tfsdk:"ves_io_group"`
+}
+
+// AlertPolicyNotificationParametersModelAttrTypes defines the attribute types for AlertPolicyNotificationParametersModel
+var AlertPolicyNotificationParametersModelAttrTypes = map[string]attr.Type{
+	"group_interval":  types.StringType,
+	"group_wait":      types.StringType,
+	"repeat_interval": types.StringType,
+	"custom":          types.ObjectType{AttrTypes: AlertPolicyNotificationParametersCustomModelAttrTypes},
+	"default":         types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"individual":      types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"ves_io_group":    types.ObjectType{AttrTypes: map[string]attr.Type{}},
+}
+
+// AlertPolicyNotificationParametersCustomModel represents custom block
+type AlertPolicyNotificationParametersCustomModel struct {
+	Labels types.List `tfsdk:"labels"`
+}
+
+// AlertPolicyNotificationParametersCustomModelAttrTypes defines the attribute types for AlertPolicyNotificationParametersCustomModel
+var AlertPolicyNotificationParametersCustomModelAttrTypes = map[string]attr.Type{
+	"labels": types.ListType{ElemType: types.StringType},
+}
+
 type AlertPolicyResourceModel struct {
 	Name                   types.String                            `tfsdk:"name"`
 	Namespace              types.String                            `tfsdk:"namespace"`
@@ -234,9 +238,9 @@ type AlertPolicyResourceModel struct {
 	Labels                 types.Map                               `tfsdk:"labels"`
 	ID                     types.String                            `tfsdk:"id"`
 	Timeouts               timeouts.Value                          `tfsdk:"timeouts"`
-	NotificationParameters *AlertPolicyNotificationParametersModel `tfsdk:"notification_parameters"`
 	Receivers              types.List                              `tfsdk:"receivers"`
 	Routes                 types.List                              `tfsdk:"routes"`
+	NotificationParameters *AlertPolicyNotificationParametersModel `tfsdk:"notification_parameters"`
 }
 
 func (r *AlertPolicyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -300,44 +304,6 @@ func (r *AlertPolicyResource) Schema(ctx context.Context, req resource.SchemaReq
 				Update: true,
 				Delete: true,
 			}),
-			"notification_parameters": schema.SingleNestedBlock{
-				MarkdownDescription: "Set of notification parameters to decide how and when the alert notifications should be sent to the receivers.",
-				Attributes: map[string]schema.Attribute{
-					"group_interval": schema.StringAttribute{
-						MarkdownDescription: "Group Interval is used to specify how long to wait before sending a notification about new alerts that are added to the group for which an initial notification has already been sent. Format: [0-9][smhd], where s - seconds, m - minutes, h - hours, d - days If not specified, group_interval..",
-						Optional:            true,
-					},
-					"group_wait": schema.StringAttribute{
-						MarkdownDescription: "Time value used to specify how long to initially wait for an inhibiting alert to arrive or collect more alerts for the same group. Format: [0-9][smhd], where s - seconds, m - minutes, h - hours, d - days If not specified, group_wait defaults to '30s'.",
-						Optional:            true,
-					},
-					"repeat_interval": schema.StringAttribute{
-						MarkdownDescription: "Repeat Interval is used to specify how long to wait before sending a notification again if it has already been sent successfully. Format: [0-9][smhd], where s - seconds, m - minutes, h - hours, d - days If not specified, group_interval defaults to '4h'.",
-						Optional:            true,
-					},
-				},
-				Blocks: map[string]schema.Block{
-					"custom": schema.SingleNestedBlock{
-						MarkdownDescription: "Specify list of custom labels to group/aggregate the alerts.",
-						Attributes: map[string]schema.Attribute{
-							"labels": schema.ListAttribute{
-								MarkdownDescription: "Name of labels to group/aggregate the alerts.",
-								Optional:            true,
-								ElementType:         types.StringType,
-							},
-						},
-					},
-					"default": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
-					},
-					"individual": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
-					},
-					"ves_io_group": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
-					},
-				},
-			},
 			"receivers": schema.ListNestedBlock{
 				MarkdownDescription: "List of Alert Receivers where the alerts will be sent .",
 				NestedObject: schema.NestedBlockObject{
@@ -353,6 +319,10 @@ func (r *AlertPolicyResource) Schema(ctx context.Context, req resource.SchemaReq
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -360,6 +330,10 @@ func (r *AlertPolicyResource) Schema(ctx context.Context, req resource.SchemaReq
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -386,11 +360,14 @@ func (r *AlertPolicyResource) Schema(ctx context.Context, req resource.SchemaReq
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"alertname": schema.StringAttribute{
-							MarkdownDescription: "[Enum: SITE_CUSTOMER_TUNNEL_INTERFACE_DOWN|SITE_PHYSICAL_INTERFACE_DOWN|TUNNELS_TO_CUSTOMER_SITE_DOWN|SERVICE_SERVER_ERROR|SERVICE_CLIENT_ERROR|SERVICE_HEALTH_LOW|SERVICE_UNAVAILABLE|SERVICE_SERVER_ERROR_PER_SOURCE_SITE|SERVICE_CLIENT_ERROR_PER_SOURCE_SITE|SERVICE_ENDPOINT_HEALTHCHECK_FAILURE|SYNTHETIC_MONITOR_HEALTH_CRITICAL|MALICIOUS_USER_DETECTED|WAF_TOO_MANY_ATTACKS|API_SECURITY_TOO_MANY_ATTACKS|SERVICE_POLICY_TOO_MANY_ATTACKS|WAF_TOO_MANY_MALICIOUS_BOTS|BOT_DEFENSE_TOO_MANY_SECURITY_EVENTS|THREAT_CAMPAIGN|VES_CLIENT_SIDE_DEFENSE_SUSPICIOUS_DOMAIN|VES_CLIENT_SIDE_DEFENSE_SENSITIVE_FIELD_READ|ERROR_RATE_ANOMALY|REQUEST_RATE_ANOMALY|REQUEST_THROUGHPUT_ANOMALY|RESPONSE_LATENCY_ANOMALY|RESPONSE_THROUGHPUT_ANOMALY|TLS_AUTOMATIC_CERTIFICATE_RENEWAL_FAILURE|TLS_AUTOMATIC_CERTIFICATE_RENEWAL_STILL_FAILING|TLS_AUTOMATIC_CERTIFICATE_EXPIRED|TLS_CUSTOM_CERTIFICATE_EXPIRING|TLS_CUSTOM_CERTIFICATE_EXPIRING_SOON|TLS_CUSTOM_CERTIFICATE_EXPIRED|L7DDOS|DNS_ZONE_IGNORED_DUPLICATE_RECORD|API_SECURITY_UNUSED_API_DETECTED|API_SECURITY_SHADOW_API_DETECTED|API_SECURITY_SENSITIVE_DATA_IN_RESPONSE_DETECTED|API_SECURITY_RISK_SCORE_HIGH_DETECTED|ROUTED_DDOS_ALERT_NOTIFICATION|ROUTED_DDOS_MITIGATION_NOTIFICATION] List of Alert Names Customer tunnel interface down Physical Interface down Tunnel Interfaces to Customer Site Down Virutal Host server error Virtual Host client error Service Health Low Service Unavailable Virtual Host server error Virtual Host client error Endpoint Healthcheck failure Synthetic.. Possible values are `SITE_CUSTOMER_TUNNEL_INTERFACE_DOWN`, `SITE_PHYSICAL_INTERFACE_DOWN`, `TUNNELS_TO_CUSTOMER_SITE_DOWN`, `SERVICE_SERVER_ERROR`, `SERVICE_CLIENT_ERROR`, `SERVICE_HEALTH_LOW`, `SERVICE_UNAVAILABLE`, `SERVICE_SERVER_ERROR_PER_SOURCE_SITE`, `SERVICE_CLIENT_ERROR_PER_SOURCE_SITE`, `SERVICE_ENDPOINT_HEALTHCHECK_FAILURE`, `SYNTHETIC_MONITOR_HEALTH_CRITICAL`, `MALICIOUS_USER_DETECTED`, `WAF_TOO_MANY_ATTACKS`, `API_SECURITY_TOO_MANY_ATTACKS`, `SERVICE_POLICY_TOO_MANY_ATTACKS`, `WAF_TOO_MANY_MALICIOUS_BOTS`, `BOT_DEFENSE_TOO_MANY_SECURITY_EVENTS`, `THREAT_CAMPAIGN`, `VES_CLIENT_SIDE_DEFENSE_SUSPICIOUS_DOMAIN`, `VES_CLIENT_SIDE_DEFENSE_SENSITIVE_FIELD_READ`, `ERROR_RATE_ANOMALY`, `REQUEST_RATE_ANOMALY`, `REQUEST_THROUGHPUT_ANOMALY`, `RESPONSE_LATENCY_ANOMALY`, `RESPONSE_THROUGHPUT_ANOMALY`, `TLS_AUTOMATIC_CERTIFICATE_RENEWAL_FAILURE`, `TLS_AUTOMATIC_CERTIFICATE_RENEWAL_STILL_FAILING`, `TLS_AUTOMATIC_CERTIFICATE_EXPIRED`, `TLS_CUSTOM_CERTIFICATE_EXPIRING`, `TLS_CUSTOM_CERTIFICATE_EXPIRING_SOON`, `TLS_CUSTOM_CERTIFICATE_EXPIRED`, `L7DDOS`, `DNS_ZONE_IGNORED_DUPLICATE_RECORD`, `API_SECURITY_UNUSED_API_DETECTED`, `API_SECURITY_SHADOW_API_DETECTED`, `API_SECURITY_SENSITIVE_DATA_IN_RESPONSE_DETECTED`, `API_SECURITY_RISK_SCORE_HIGH_DETECTED`, `ROUTED_DDOS_ALERT_NOTIFICATION`, `ROUTED_DDOS_MITIGATION_NOTIFICATION`. Defaults to `SITE_CUSTOMER_TUNNEL_INTERFACE_DOWN`.",
+							MarkdownDescription: "[Enum: SITE_CUSTOMER_TUNNEL_INTERFACE_DOWN|SITE_PHYSICAL_INTERFACE_DOWN|TUNNELS_TO_CUSTOMER_SITE_DOWN|SERVICE_SERVER_ERROR|SERVICE_CLIENT_ERROR|SERVICE_HEALTH_LOW|SERVICE_UNAVAILABLE|SERVICE_SERVER_ERROR_PER_SOURCE_SITE|SERVICE_CLIENT_ERROR_PER_SOURCE_SITE|SERVICE_ENDPOINT_HEALTHCHECK_FAILURE|SYNTHETIC_MONITOR_HEALTH_CRITICAL|MALICIOUS_USER_DETECTED|WAF_TOO_MANY_ATTACKS|API_SECURITY_TOO_MANY_ATTACKS|SERVICE_POLICY_TOO_MANY_ATTACKS|WAF_TOO_MANY_MALICIOUS_BOTS|BOT_DEFENSE_TOO_MANY_SECURITY_EVENTS|THREAT_CAMPAIGN|VES_CLIENT_SIDE_DEFENSE_SUSPICIOUS_DOMAIN|VES_CLIENT_SIDE_DEFENSE_SENSITIVE_FIELD_READ|TLS_AUTOMATIC_CERTIFICATE_RENEWAL_FAILURE|TLS_AUTOMATIC_CERTIFICATE_RENEWAL_STILL_FAILING|TLS_AUTOMATIC_CERTIFICATE_EXPIRED|TLS_CUSTOM_CERTIFICATE_EXPIRING|TLS_CUSTOM_CERTIFICATE_EXPIRING_SOON|TLS_CUSTOM_CERTIFICATE_EXPIRED|L7DDOS|DNS_ZONE_IGNORED_DUPLICATE_RECORD|API_SECURITY_UNUSED_API_DETECTED|API_SECURITY_SHADOW_API_DETECTED|API_SECURITY_SENSITIVE_DATA_IN_RESPONSE_DETECTED|API_SECURITY_RISK_SCORE_HIGH_DETECTED|ROUTED_DDOS_ALERT_NOTIFICATION|ROUTED_DDOS_MITIGATION_NOTIFICATION] List of Alert Names Customer tunnel interface down Physical Interface down Tunnel Interfaces to Customer Site Down Virutal Host server error Virtual Host client error Service Health Low Service Unavailable Virtual Host server error Virtual Host client error Endpoint Healthcheck failure Synthetic.. Possible values are `SITE_CUSTOMER_TUNNEL_INTERFACE_DOWN`, `SITE_PHYSICAL_INTERFACE_DOWN`, `TUNNELS_TO_CUSTOMER_SITE_DOWN`, `SERVICE_SERVER_ERROR`, `SERVICE_CLIENT_ERROR`, `SERVICE_HEALTH_LOW`, `SERVICE_UNAVAILABLE`, `SERVICE_SERVER_ERROR_PER_SOURCE_SITE`, `SERVICE_CLIENT_ERROR_PER_SOURCE_SITE`, `SERVICE_ENDPOINT_HEALTHCHECK_FAILURE`, `SYNTHETIC_MONITOR_HEALTH_CRITICAL`, `MALICIOUS_USER_DETECTED`, `WAF_TOO_MANY_ATTACKS`, `API_SECURITY_TOO_MANY_ATTACKS`, `SERVICE_POLICY_TOO_MANY_ATTACKS`, `WAF_TOO_MANY_MALICIOUS_BOTS`, `BOT_DEFENSE_TOO_MANY_SECURITY_EVENTS`, `THREAT_CAMPAIGN`, `VES_CLIENT_SIDE_DEFENSE_SUSPICIOUS_DOMAIN`, `VES_CLIENT_SIDE_DEFENSE_SENSITIVE_FIELD_READ`, `TLS_AUTOMATIC_CERTIFICATE_RENEWAL_FAILURE`, `TLS_AUTOMATIC_CERTIFICATE_RENEWAL_STILL_FAILING`, `TLS_AUTOMATIC_CERTIFICATE_EXPIRED`, `TLS_CUSTOM_CERTIFICATE_EXPIRING`, `TLS_CUSTOM_CERTIFICATE_EXPIRING_SOON`, `TLS_CUSTOM_CERTIFICATE_EXPIRED`, `L7DDOS`, `DNS_ZONE_IGNORED_DUPLICATE_RECORD`, `API_SECURITY_UNUSED_API_DETECTED`, `API_SECURITY_SHADOW_API_DETECTED`, `API_SECURITY_SENSITIVE_DATA_IN_RESPONSE_DETECTED`, `API_SECURITY_RISK_SCORE_HIGH_DETECTED`, `ROUTED_DDOS_ALERT_NOTIFICATION`, `ROUTED_DDOS_MITIGATION_NOTIFICATION`. Defaults to `SITE_CUSTOMER_TUNNEL_INTERFACE_DOWN`.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf("SITE_CUSTOMER_TUNNEL_INTERFACE_DOWN", "SITE_PHYSICAL_INTERFACE_DOWN", "TUNNELS_TO_CUSTOMER_SITE_DOWN", "SERVICE_SERVER_ERROR", "SERVICE_CLIENT_ERROR", "SERVICE_HEALTH_LOW", "SERVICE_UNAVAILABLE", "SERVICE_SERVER_ERROR_PER_SOURCE_SITE", "SERVICE_CLIENT_ERROR_PER_SOURCE_SITE", "SERVICE_ENDPOINT_HEALTHCHECK_FAILURE", "SYNTHETIC_MONITOR_HEALTH_CRITICAL", "MALICIOUS_USER_DETECTED", "WAF_TOO_MANY_ATTACKS", "API_SECURITY_TOO_MANY_ATTACKS", "SERVICE_POLICY_TOO_MANY_ATTACKS", "WAF_TOO_MANY_MALICIOUS_BOTS", "BOT_DEFENSE_TOO_MANY_SECURITY_EVENTS", "THREAT_CAMPAIGN", "VES_CLIENT_SIDE_DEFENSE_SUSPICIOUS_DOMAIN", "VES_CLIENT_SIDE_DEFENSE_SENSITIVE_FIELD_READ", "TLS_AUTOMATIC_CERTIFICATE_RENEWAL_FAILURE", "TLS_AUTOMATIC_CERTIFICATE_RENEWAL_STILL_FAILING", "TLS_AUTOMATIC_CERTIFICATE_EXPIRED", "TLS_CUSTOM_CERTIFICATE_EXPIRING", "TLS_CUSTOM_CERTIFICATE_EXPIRING_SOON", "TLS_CUSTOM_CERTIFICATE_EXPIRED", "L7DDOS", "DNS_ZONE_IGNORED_DUPLICATE_RECORD", "API_SECURITY_UNUSED_API_DETECTED", "API_SECURITY_SHADOW_API_DETECTED", "API_SECURITY_SENSITIVE_DATA_IN_RESPONSE_DETECTED", "API_SECURITY_RISK_SCORE_HIGH_DETECTED", "ROUTED_DDOS_ALERT_NOTIFICATION", "ROUTED_DDOS_MITIGATION_NOTIFICATION"),
+							},
 						},
 						"alertname_regex": schema.StringAttribute{
-							MarkdownDescription: "Regular Expression match for the alertname.",
+							MarkdownDescription: "Exclusive with [alertname any custom group severity] Regular Expression match for the alertname.",
 							Optional:            true,
 						},
 					},
@@ -409,11 +386,11 @@ func (r *AlertPolicyResource) Schema(ctx context.Context, req resource.SchemaReq
 									MarkdownDescription: "Label Matcher.",
 									Attributes: map[string]schema.Attribute{
 										"exact_match": schema.StringAttribute{
-											MarkdownDescription: "Equality match value for the label.",
+											MarkdownDescription: "Exclusive with [regex_match] Equality match value for the label.",
 											Optional:            true,
 										},
 										"regex_match": schema.StringAttribute{
-											MarkdownDescription: "Regular expression match value for the label.",
+											MarkdownDescription: "Exclusive with [exact_match] Regular expression match value for the label.",
 											Optional:            true,
 										},
 									},
@@ -422,11 +399,11 @@ func (r *AlertPolicyResource) Schema(ctx context.Context, req resource.SchemaReq
 									MarkdownDescription: "Label Matcher.",
 									Attributes: map[string]schema.Attribute{
 										"exact_match": schema.StringAttribute{
-											MarkdownDescription: "Equality match value for the label.",
+											MarkdownDescription: "Exclusive with [regex_match] Equality match value for the label.",
 											Optional:            true,
 										},
 										"regex_match": schema.StringAttribute{
-											MarkdownDescription: "Regular expression match value for the label.",
+											MarkdownDescription: "Exclusive with [exact_match] Regular expression match value for the label.",
 											Optional:            true,
 										},
 									},
@@ -435,11 +412,11 @@ func (r *AlertPolicyResource) Schema(ctx context.Context, req resource.SchemaReq
 									MarkdownDescription: "Label Matcher.",
 									Attributes: map[string]schema.Attribute{
 										"exact_match": schema.StringAttribute{
-											MarkdownDescription: "Equality match value for the label.",
+											MarkdownDescription: "Exclusive with [regex_match] Equality match value for the label.",
 											Optional:            true,
 										},
 										"regex_match": schema.StringAttribute{
-											MarkdownDescription: "Regular expression match value for the label.",
+											MarkdownDescription: "Exclusive with [exact_match] Regular expression match value for the label.",
 											Optional:            true,
 										},
 									},
@@ -483,6 +460,9 @@ func (r *AlertPolicyResource) Schema(ctx context.Context, req resource.SchemaReq
 											MarkdownDescription: "Name of labels to group/aggregate the alerts.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(5),
+											},
 										},
 									},
 								},
@@ -493,7 +473,7 @@ func (r *AlertPolicyResource) Schema(ctx context.Context, req resource.SchemaReq
 									MarkdownDescription: "Enable this option",
 								},
 								"ves_io_group": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for ves io group.",
 								},
 							},
 						},
@@ -510,6 +490,47 @@ func (r *AlertPolicyResource) Schema(ctx context.Context, req resource.SchemaReq
 								},
 							},
 						},
+					},
+				},
+			},
+			"notification_parameters": schema.SingleNestedBlock{
+				MarkdownDescription: "Set of notification parameters to decide how and when the alert notifications should be sent to the receivers.",
+				Attributes: map[string]schema.Attribute{
+					"group_interval": schema.StringAttribute{
+						MarkdownDescription: "Group Interval is used to specify how long to wait before sending a notification about new alerts that are added to the group for which an initial notification has already been sent. Format: [0-9][smhd], where s - seconds, m - minutes, h - hours, d - days If not specified, group_interval..",
+						Optional:            true,
+					},
+					"group_wait": schema.StringAttribute{
+						MarkdownDescription: "Time value used to specify how long to initially wait for an inhibiting alert to arrive or collect more alerts for the same group. Format: [0-9][smhd], where s - seconds, m - minutes, h - hours, d - days If not specified, group_wait defaults to '30s'.",
+						Optional:            true,
+					},
+					"repeat_interval": schema.StringAttribute{
+						MarkdownDescription: "Repeat Interval is used to specify how long to wait before sending a notification again if it has already been sent successfully. Format: [0-9][smhd], where s - seconds, m - minutes, h - hours, d - days If not specified, group_interval defaults to '4h'.",
+						Optional:            true,
+					},
+				},
+				Blocks: map[string]schema.Block{
+					"custom": schema.SingleNestedBlock{
+						MarkdownDescription: "Specify list of custom labels to group/aggregate the alerts.",
+						Attributes: map[string]schema.Attribute{
+							"labels": schema.ListAttribute{
+								MarkdownDescription: "Name of labels to group/aggregate the alerts.",
+								Optional:            true,
+								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(5),
+								},
+							},
+						},
+					},
+					"default": schema.SingleNestedBlock{
+						MarkdownDescription: "Enable this option",
+					},
+					"individual": schema.SingleNestedBlock{
+						MarkdownDescription: "Enable this option",
+					},
+					"ves_io_group": schema.SingleNestedBlock{
+						MarkdownDescription: "Configuration parameter for ves io group.",
 					},
 				},
 			},
@@ -619,32 +640,6 @@ func (r *AlertPolicyResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.NotificationParameters != nil {
-		notification_parametersMap := make(map[string]interface{})
-		if data.NotificationParameters.Custom != nil {
-			customNestedMap := make(map[string]interface{})
-			notification_parametersMap["custom"] = customNestedMap
-		}
-		if data.NotificationParameters.Default != nil {
-			notification_parametersMap["default"] = map[string]interface{}{}
-		}
-		if !data.NotificationParameters.GroupInterval.IsNull() && !data.NotificationParameters.GroupInterval.IsUnknown() {
-			notification_parametersMap["group_interval"] = data.NotificationParameters.GroupInterval.ValueString()
-		}
-		if !data.NotificationParameters.GroupWait.IsNull() && !data.NotificationParameters.GroupWait.IsUnknown() {
-			notification_parametersMap["group_wait"] = data.NotificationParameters.GroupWait.ValueString()
-		}
-		if data.NotificationParameters.Individual != nil {
-			notification_parametersMap["individual"] = map[string]interface{}{}
-		}
-		if !data.NotificationParameters.RepeatInterval.IsNull() && !data.NotificationParameters.RepeatInterval.IsUnknown() {
-			notification_parametersMap["repeat_interval"] = data.NotificationParameters.RepeatInterval.ValueString()
-		}
-		if data.NotificationParameters.VesIoGroup != nil {
-			notification_parametersMap["ves_io_group"] = map[string]interface{}{}
-		}
-		createReq.Spec["notification_parameters"] = notification_parametersMap
-	}
 	if !data.Receivers.IsNull() && !data.Receivers.IsUnknown() {
 		var receiversItems []AlertPolicyReceiversModel
 		diags := data.Receivers.ElementsAs(ctx, &receiversItems, false)
@@ -793,6 +788,32 @@ func (r *AlertPolicyResource) Create(ctx context.Context, req resource.CreateReq
 			createReq.Spec["routes"] = routesList
 		}
 	}
+	if data.NotificationParameters != nil {
+		notification_parametersMap := make(map[string]interface{})
+		if data.NotificationParameters.Custom != nil {
+			customNestedMap := make(map[string]interface{})
+			notification_parametersMap["custom"] = customNestedMap
+		}
+		if data.NotificationParameters.Default != nil {
+			notification_parametersMap["default"] = map[string]interface{}{}
+		}
+		if !data.NotificationParameters.GroupInterval.IsNull() && !data.NotificationParameters.GroupInterval.IsUnknown() {
+			notification_parametersMap["group_interval"] = data.NotificationParameters.GroupInterval.ValueString()
+		}
+		if !data.NotificationParameters.GroupWait.IsNull() && !data.NotificationParameters.GroupWait.IsUnknown() {
+			notification_parametersMap["group_wait"] = data.NotificationParameters.GroupWait.ValueString()
+		}
+		if data.NotificationParameters.Individual != nil {
+			notification_parametersMap["individual"] = map[string]interface{}{}
+		}
+		if !data.NotificationParameters.RepeatInterval.IsNull() && !data.NotificationParameters.RepeatInterval.IsUnknown() {
+			notification_parametersMap["repeat_interval"] = data.NotificationParameters.RepeatInterval.ValueString()
+		}
+		if data.NotificationParameters.VesIoGroup != nil {
+			notification_parametersMap["ves_io_group"] = map[string]interface{}{}
+		}
+		createReq.Spec["notification_parameters"] = notification_parametersMap
+	}
 
 	apiResource, err := r.client.CreateAlertPolicy(ctx, createReq)
 	if err != nil {
@@ -806,89 +827,6 @@ func (r *AlertPolicyResource) Create(ctx context.Context, req resource.CreateReq
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
-	if blockData, ok := apiResource.Spec["notification_parameters"].(map[string]interface{}); ok && (isImport || data.NotificationParameters != nil) {
-		data.NotificationParameters = &AlertPolicyNotificationParametersModel{
-			Custom: func() *AlertPolicyNotificationParametersCustomModel {
-				if !isImport && data.NotificationParameters != nil && data.NotificationParameters.Custom != nil {
-					// Normal Read: preserve existing state value
-					return data.NotificationParameters.Custom
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["custom"].(map[string]interface{}); ok {
-					return &AlertPolicyNotificationParametersCustomModel{
-						Labels: func() types.List {
-							if v, ok := nestedBlockData["labels"].([]interface{}); ok && len(v) > 0 {
-								var items []string
-								for _, item := range v {
-									if s, ok := item.(string); ok {
-										items = append(items, s)
-									}
-								}
-								listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-								return listVal
-							}
-							return types.ListNull(types.StringType)
-						}(),
-					}
-				}
-				return nil
-			}(),
-			Default: func() *AlertPolicyEmptyModel {
-				if !isImport && data.NotificationParameters != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.NotificationParameters.Default
-				}
-				// Import case: read from API
-				if _, ok := blockData["default"].(map[string]interface{}); ok {
-					return &AlertPolicyEmptyModel{}
-				}
-				return nil
-			}(),
-			GroupInterval: func() types.String {
-				if v, ok := blockData["group_interval"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-			GroupWait: func() types.String {
-				if v, ok := blockData["group_wait"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-			Individual: func() *AlertPolicyEmptyModel {
-				if !isImport && data.NotificationParameters != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.NotificationParameters.Individual
-				}
-				// Import case: read from API
-				if _, ok := blockData["individual"].(map[string]interface{}); ok {
-					return &AlertPolicyEmptyModel{}
-				}
-				return nil
-			}(),
-			RepeatInterval: func() types.String {
-				if v, ok := blockData["repeat_interval"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-			VesIoGroup: func() *AlertPolicyEmptyModel {
-				if !isImport && data.NotificationParameters != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.NotificationParameters.VesIoGroup
-				}
-				// Import case: read from API
-				if _, ok := blockData["ves_io_group"].(map[string]interface{}); ok {
-					return &AlertPolicyEmptyModel{}
-				}
-				return nil
-			}(),
-		}
-	}
 	if listData, ok := apiResource.Spec["receivers"].([]interface{}); ok && len(listData) > 0 {
 		var receiversList []AlertPolicyReceiversModel
 		var existingReceiversItems []AlertPolicyReceiversModel
@@ -1088,6 +1026,89 @@ func (r *AlertPolicyResource) Create(ctx context.Context, req resource.CreateReq
 	} else {
 		// No data from API - set to null list
 		data.Routes = types.ListNull(types.ObjectType{AttrTypes: AlertPolicyRoutesModelAttrTypes})
+	}
+	if blockData, ok := apiResource.Spec["notification_parameters"].(map[string]interface{}); ok && (isImport || data.NotificationParameters != nil) {
+		data.NotificationParameters = &AlertPolicyNotificationParametersModel{
+			Custom: func() *AlertPolicyNotificationParametersCustomModel {
+				if !isImport && data.NotificationParameters != nil && data.NotificationParameters.Custom != nil {
+					// Normal Read: preserve existing state value
+					return data.NotificationParameters.Custom
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["custom"].(map[string]interface{}); ok {
+					return &AlertPolicyNotificationParametersCustomModel{
+						Labels: func() types.List {
+							if v, ok := nestedBlockData["labels"].([]interface{}); ok && len(v) > 0 {
+								var items []string
+								for _, item := range v {
+									if s, ok := item.(string); ok {
+										items = append(items, s)
+									}
+								}
+								listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+								return listVal
+							}
+							return types.ListNull(types.StringType)
+						}(),
+					}
+				}
+				return nil
+			}(),
+			Default: func() *AlertPolicyEmptyModel {
+				if !isImport && data.NotificationParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.NotificationParameters.Default
+				}
+				// Import case: read from API
+				if _, ok := blockData["default"].(map[string]interface{}); ok {
+					return &AlertPolicyEmptyModel{}
+				}
+				return nil
+			}(),
+			GroupInterval: func() types.String {
+				if v, ok := blockData["group_interval"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+			GroupWait: func() types.String {
+				if v, ok := blockData["group_wait"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+			Individual: func() *AlertPolicyEmptyModel {
+				if !isImport && data.NotificationParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.NotificationParameters.Individual
+				}
+				// Import case: read from API
+				if _, ok := blockData["individual"].(map[string]interface{}); ok {
+					return &AlertPolicyEmptyModel{}
+				}
+				return nil
+			}(),
+			RepeatInterval: func() types.String {
+				if v, ok := blockData["repeat_interval"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+			VesIoGroup: func() *AlertPolicyEmptyModel {
+				if !isImport && data.NotificationParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.NotificationParameters.VesIoGroup
+				}
+				// Import case: read from API
+				if _, ok := blockData["ves_io_group"].(map[string]interface{}); ok {
+					return &AlertPolicyEmptyModel{}
+				}
+				return nil
+			}(),
+		}
 	}
 
 	tflog.Trace(ctx, "created AlertPolicy resource")
@@ -1169,89 +1190,6 @@ func (r *AlertPolicyResource) Read(ctx context.Context, req resource.ReadRequest
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
-	if blockData, ok := apiResource.Spec["notification_parameters"].(map[string]interface{}); ok && (isImport || data.NotificationParameters != nil) {
-		data.NotificationParameters = &AlertPolicyNotificationParametersModel{
-			Custom: func() *AlertPolicyNotificationParametersCustomModel {
-				if !isImport && data.NotificationParameters != nil && data.NotificationParameters.Custom != nil {
-					// Normal Read: preserve existing state value
-					return data.NotificationParameters.Custom
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["custom"].(map[string]interface{}); ok {
-					return &AlertPolicyNotificationParametersCustomModel{
-						Labels: func() types.List {
-							if v, ok := nestedBlockData["labels"].([]interface{}); ok && len(v) > 0 {
-								var items []string
-								for _, item := range v {
-									if s, ok := item.(string); ok {
-										items = append(items, s)
-									}
-								}
-								listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-								return listVal
-							}
-							return types.ListNull(types.StringType)
-						}(),
-					}
-				}
-				return nil
-			}(),
-			Default: func() *AlertPolicyEmptyModel {
-				if !isImport && data.NotificationParameters != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.NotificationParameters.Default
-				}
-				// Import case: read from API
-				if _, ok := blockData["default"].(map[string]interface{}); ok {
-					return &AlertPolicyEmptyModel{}
-				}
-				return nil
-			}(),
-			GroupInterval: func() types.String {
-				if v, ok := blockData["group_interval"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-			GroupWait: func() types.String {
-				if v, ok := blockData["group_wait"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-			Individual: func() *AlertPolicyEmptyModel {
-				if !isImport && data.NotificationParameters != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.NotificationParameters.Individual
-				}
-				// Import case: read from API
-				if _, ok := blockData["individual"].(map[string]interface{}); ok {
-					return &AlertPolicyEmptyModel{}
-				}
-				return nil
-			}(),
-			RepeatInterval: func() types.String {
-				if v, ok := blockData["repeat_interval"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-			VesIoGroup: func() *AlertPolicyEmptyModel {
-				if !isImport && data.NotificationParameters != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.NotificationParameters.VesIoGroup
-				}
-				// Import case: read from API
-				if _, ok := blockData["ves_io_group"].(map[string]interface{}); ok {
-					return &AlertPolicyEmptyModel{}
-				}
-				return nil
-			}(),
-		}
-	}
 	if listData, ok := apiResource.Spec["receivers"].([]interface{}); ok && len(listData) > 0 {
 		var receiversList []AlertPolicyReceiversModel
 		var existingReceiversItems []AlertPolicyReceiversModel
@@ -1452,6 +1390,89 @@ func (r *AlertPolicyResource) Read(ctx context.Context, req resource.ReadRequest
 		// No data from API - set to null list
 		data.Routes = types.ListNull(types.ObjectType{AttrTypes: AlertPolicyRoutesModelAttrTypes})
 	}
+	if blockData, ok := apiResource.Spec["notification_parameters"].(map[string]interface{}); ok && (isImport || data.NotificationParameters != nil) {
+		data.NotificationParameters = &AlertPolicyNotificationParametersModel{
+			Custom: func() *AlertPolicyNotificationParametersCustomModel {
+				if !isImport && data.NotificationParameters != nil && data.NotificationParameters.Custom != nil {
+					// Normal Read: preserve existing state value
+					return data.NotificationParameters.Custom
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["custom"].(map[string]interface{}); ok {
+					return &AlertPolicyNotificationParametersCustomModel{
+						Labels: func() types.List {
+							if v, ok := nestedBlockData["labels"].([]interface{}); ok && len(v) > 0 {
+								var items []string
+								for _, item := range v {
+									if s, ok := item.(string); ok {
+										items = append(items, s)
+									}
+								}
+								listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+								return listVal
+							}
+							return types.ListNull(types.StringType)
+						}(),
+					}
+				}
+				return nil
+			}(),
+			Default: func() *AlertPolicyEmptyModel {
+				if !isImport && data.NotificationParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.NotificationParameters.Default
+				}
+				// Import case: read from API
+				if _, ok := blockData["default"].(map[string]interface{}); ok {
+					return &AlertPolicyEmptyModel{}
+				}
+				return nil
+			}(),
+			GroupInterval: func() types.String {
+				if v, ok := blockData["group_interval"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+			GroupWait: func() types.String {
+				if v, ok := blockData["group_wait"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+			Individual: func() *AlertPolicyEmptyModel {
+				if !isImport && data.NotificationParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.NotificationParameters.Individual
+				}
+				// Import case: read from API
+				if _, ok := blockData["individual"].(map[string]interface{}); ok {
+					return &AlertPolicyEmptyModel{}
+				}
+				return nil
+			}(),
+			RepeatInterval: func() types.String {
+				if v, ok := blockData["repeat_interval"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+			VesIoGroup: func() *AlertPolicyEmptyModel {
+				if !isImport && data.NotificationParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.NotificationParameters.VesIoGroup
+				}
+				// Import case: read from API
+				if _, ok := blockData["ves_io_group"].(map[string]interface{}); ok {
+					return &AlertPolicyEmptyModel{}
+				}
+				return nil
+			}(),
+		}
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -1503,32 +1524,6 @@ func (r *AlertPolicyResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.NotificationParameters != nil {
-		notification_parametersMap := make(map[string]interface{})
-		if data.NotificationParameters.Custom != nil {
-			customNestedMap := make(map[string]interface{})
-			notification_parametersMap["custom"] = customNestedMap
-		}
-		if data.NotificationParameters.Default != nil {
-			notification_parametersMap["default"] = map[string]interface{}{}
-		}
-		if !data.NotificationParameters.GroupInterval.IsNull() && !data.NotificationParameters.GroupInterval.IsUnknown() {
-			notification_parametersMap["group_interval"] = data.NotificationParameters.GroupInterval.ValueString()
-		}
-		if !data.NotificationParameters.GroupWait.IsNull() && !data.NotificationParameters.GroupWait.IsUnknown() {
-			notification_parametersMap["group_wait"] = data.NotificationParameters.GroupWait.ValueString()
-		}
-		if data.NotificationParameters.Individual != nil {
-			notification_parametersMap["individual"] = map[string]interface{}{}
-		}
-		if !data.NotificationParameters.RepeatInterval.IsNull() && !data.NotificationParameters.RepeatInterval.IsUnknown() {
-			notification_parametersMap["repeat_interval"] = data.NotificationParameters.RepeatInterval.ValueString()
-		}
-		if data.NotificationParameters.VesIoGroup != nil {
-			notification_parametersMap["ves_io_group"] = map[string]interface{}{}
-		}
-		apiResource.Spec["notification_parameters"] = notification_parametersMap
-	}
 	if !data.Receivers.IsNull() && !data.Receivers.IsUnknown() {
 		var receiversItems []AlertPolicyReceiversModel
 		diags := data.Receivers.ElementsAs(ctx, &receiversItems, false)
@@ -1677,6 +1672,32 @@ func (r *AlertPolicyResource) Update(ctx context.Context, req resource.UpdateReq
 			apiResource.Spec["routes"] = routesList
 		}
 	}
+	if data.NotificationParameters != nil {
+		notification_parametersMap := make(map[string]interface{})
+		if data.NotificationParameters.Custom != nil {
+			customNestedMap := make(map[string]interface{})
+			notification_parametersMap["custom"] = customNestedMap
+		}
+		if data.NotificationParameters.Default != nil {
+			notification_parametersMap["default"] = map[string]interface{}{}
+		}
+		if !data.NotificationParameters.GroupInterval.IsNull() && !data.NotificationParameters.GroupInterval.IsUnknown() {
+			notification_parametersMap["group_interval"] = data.NotificationParameters.GroupInterval.ValueString()
+		}
+		if !data.NotificationParameters.GroupWait.IsNull() && !data.NotificationParameters.GroupWait.IsUnknown() {
+			notification_parametersMap["group_wait"] = data.NotificationParameters.GroupWait.ValueString()
+		}
+		if data.NotificationParameters.Individual != nil {
+			notification_parametersMap["individual"] = map[string]interface{}{}
+		}
+		if !data.NotificationParameters.RepeatInterval.IsNull() && !data.NotificationParameters.RepeatInterval.IsUnknown() {
+			notification_parametersMap["repeat_interval"] = data.NotificationParameters.RepeatInterval.ValueString()
+		}
+		if data.NotificationParameters.VesIoGroup != nil {
+			notification_parametersMap["ves_io_group"] = map[string]interface{}{}
+		}
+		apiResource.Spec["notification_parameters"] = notification_parametersMap
+	}
 
 	_, err := r.client.UpdateAlertPolicy(ctx, apiResource)
 	if err != nil {
@@ -1701,89 +1722,6 @@ func (r *AlertPolicyResource) Update(ctx context.Context, req resource.UpdateReq
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
-	if blockData, ok := apiResource.Spec["notification_parameters"].(map[string]interface{}); ok && (isImport || data.NotificationParameters != nil) {
-		data.NotificationParameters = &AlertPolicyNotificationParametersModel{
-			Custom: func() *AlertPolicyNotificationParametersCustomModel {
-				if !isImport && data.NotificationParameters != nil && data.NotificationParameters.Custom != nil {
-					// Normal Read: preserve existing state value
-					return data.NotificationParameters.Custom
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["custom"].(map[string]interface{}); ok {
-					return &AlertPolicyNotificationParametersCustomModel{
-						Labels: func() types.List {
-							if v, ok := nestedBlockData["labels"].([]interface{}); ok && len(v) > 0 {
-								var items []string
-								for _, item := range v {
-									if s, ok := item.(string); ok {
-										items = append(items, s)
-									}
-								}
-								listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-								return listVal
-							}
-							return types.ListNull(types.StringType)
-						}(),
-					}
-				}
-				return nil
-			}(),
-			Default: func() *AlertPolicyEmptyModel {
-				if !isImport && data.NotificationParameters != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.NotificationParameters.Default
-				}
-				// Import case: read from API
-				if _, ok := blockData["default"].(map[string]interface{}); ok {
-					return &AlertPolicyEmptyModel{}
-				}
-				return nil
-			}(),
-			GroupInterval: func() types.String {
-				if v, ok := blockData["group_interval"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-			GroupWait: func() types.String {
-				if v, ok := blockData["group_wait"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-			Individual: func() *AlertPolicyEmptyModel {
-				if !isImport && data.NotificationParameters != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.NotificationParameters.Individual
-				}
-				// Import case: read from API
-				if _, ok := blockData["individual"].(map[string]interface{}); ok {
-					return &AlertPolicyEmptyModel{}
-				}
-				return nil
-			}(),
-			RepeatInterval: func() types.String {
-				if v, ok := blockData["repeat_interval"].(string); ok && v != "" {
-					return types.StringValue(v)
-				}
-				return types.StringNull()
-			}(),
-			VesIoGroup: func() *AlertPolicyEmptyModel {
-				if !isImport && data.NotificationParameters != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.NotificationParameters.VesIoGroup
-				}
-				// Import case: read from API
-				if _, ok := blockData["ves_io_group"].(map[string]interface{}); ok {
-					return &AlertPolicyEmptyModel{}
-				}
-				return nil
-			}(),
-		}
-	}
 	if listData, ok := apiResource.Spec["receivers"].([]interface{}); ok && len(listData) > 0 {
 		var receiversList []AlertPolicyReceiversModel
 		var existingReceiversItems []AlertPolicyReceiversModel
@@ -1983,6 +1921,89 @@ func (r *AlertPolicyResource) Update(ctx context.Context, req resource.UpdateReq
 	} else {
 		// No data from API - set to null list
 		data.Routes = types.ListNull(types.ObjectType{AttrTypes: AlertPolicyRoutesModelAttrTypes})
+	}
+	if blockData, ok := apiResource.Spec["notification_parameters"].(map[string]interface{}); ok && (isImport || data.NotificationParameters != nil) {
+		data.NotificationParameters = &AlertPolicyNotificationParametersModel{
+			Custom: func() *AlertPolicyNotificationParametersCustomModel {
+				if !isImport && data.NotificationParameters != nil && data.NotificationParameters.Custom != nil {
+					// Normal Read: preserve existing state value
+					return data.NotificationParameters.Custom
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["custom"].(map[string]interface{}); ok {
+					return &AlertPolicyNotificationParametersCustomModel{
+						Labels: func() types.List {
+							if v, ok := nestedBlockData["labels"].([]interface{}); ok && len(v) > 0 {
+								var items []string
+								for _, item := range v {
+									if s, ok := item.(string); ok {
+										items = append(items, s)
+									}
+								}
+								listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+								return listVal
+							}
+							return types.ListNull(types.StringType)
+						}(),
+					}
+				}
+				return nil
+			}(),
+			Default: func() *AlertPolicyEmptyModel {
+				if !isImport && data.NotificationParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.NotificationParameters.Default
+				}
+				// Import case: read from API
+				if _, ok := blockData["default"].(map[string]interface{}); ok {
+					return &AlertPolicyEmptyModel{}
+				}
+				return nil
+			}(),
+			GroupInterval: func() types.String {
+				if v, ok := blockData["group_interval"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+			GroupWait: func() types.String {
+				if v, ok := blockData["group_wait"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+			Individual: func() *AlertPolicyEmptyModel {
+				if !isImport && data.NotificationParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.NotificationParameters.Individual
+				}
+				// Import case: read from API
+				if _, ok := blockData["individual"].(map[string]interface{}); ok {
+					return &AlertPolicyEmptyModel{}
+				}
+				return nil
+			}(),
+			RepeatInterval: func() types.String {
+				if v, ok := blockData["repeat_interval"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+			VesIoGroup: func() *AlertPolicyEmptyModel {
+				if !isImport && data.NotificationParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.NotificationParameters.VesIoGroup
+				}
+				// Import case: read from API
+				if _, ok := blockData["ves_io_group"].(map[string]interface{}); ok {
+					return &AlertPolicyEmptyModel{}
+				}
+				return nil
+			}(),
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

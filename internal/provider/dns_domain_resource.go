@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -112,10 +113,9 @@ func (r *DNSDomainResource) Schema(ctx context.Context, req resource.SchemaReque
 			},
 			"dnssec_mode": schema.StringAttribute{
 				MarkdownDescription: "[Enum: DNSSEC_DISABLE|DNSSEC_ENABLE] Enable or disable DNSSEC on the DNS Domain DNSSEC is disabled DNSSEC is enabled. Possible values are `DNSSEC_DISABLE`, `DNSSEC_ENABLE`. Defaults to `DNSSEC_DISABLE`.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("DNSSEC_DISABLE", "DNSSEC_ENABLE"),
 				},
 			},
 		},
@@ -127,7 +127,7 @@ func (r *DNSDomainResource) Schema(ctx context.Context, req resource.SchemaReque
 				Delete: true,
 			}),
 			"volterra_managed": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for volterra managed.",
 			},
 		},
 	}
@@ -432,13 +432,6 @@ func (r *DNSDomainResource) Update(ctx context.Context, req resource.UpdateReque
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["dnssec_mode"].(string); ok && v != "" {
-		data.DnssecMode = types.StringValue(v)
-	} else if data.DnssecMode.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.DnssecMode = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields

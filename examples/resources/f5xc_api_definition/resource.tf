@@ -25,3 +25,7 @@ resource "f5xc_api_definition" "example" {
 
 # The following optional fields have server-applied defaults and can be omitted:
 # - swagger_specs
+# - api_inventory_exclusion_list
+# - api_inventory_inclusion_list
+# - non_api_endpoints
+# - strict_schema_origin

@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -43,6 +47,20 @@ type PolicyBasedRoutingResource struct {
 
 // PolicyBasedRoutingEmptyModel represents empty nested blocks
 type PolicyBasedRoutingEmptyModel struct {
+}
+
+// PolicyBasedRoutingForwardingClassListModel represents forwarding_class_list block
+type PolicyBasedRoutingForwardingClassListModel struct {
+	Name      types.String `tfsdk:"name"`
+	Namespace types.String `tfsdk:"namespace"`
+	Tenant    types.String `tfsdk:"tenant"`
+}
+
+// PolicyBasedRoutingForwardingClassListModelAttrTypes defines the attribute types for PolicyBasedRoutingForwardingClassListModel
+var PolicyBasedRoutingForwardingClassListModelAttrTypes = map[string]attr.Type{
+	"name":      types.StringType,
+	"namespace": types.StringType,
+	"tenant":    types.StringType,
 }
 
 // PolicyBasedRoutingForwardProxyPbrModel represents forward_proxy_pbr block
@@ -195,20 +213,6 @@ var PolicyBasedRoutingForwardProxyPbrForwardProxyPbrRulesTLSListTLSListModelAttr
 	"exact_value":  types.StringType,
 	"regex_value":  types.StringType,
 	"suffix_value": types.StringType,
-}
-
-// PolicyBasedRoutingForwardingClassListModel represents forwarding_class_list block
-type PolicyBasedRoutingForwardingClassListModel struct {
-	Name      types.String `tfsdk:"name"`
-	Namespace types.String `tfsdk:"namespace"`
-	Tenant    types.String `tfsdk:"tenant"`
-}
-
-// PolicyBasedRoutingForwardingClassListModelAttrTypes defines the attribute types for PolicyBasedRoutingForwardingClassListModel
-var PolicyBasedRoutingForwardingClassListModelAttrTypes = map[string]attr.Type{
-	"name":      types.StringType,
-	"namespace": types.StringType,
-	"tenant":    types.StringType,
 }
 
 // PolicyBasedRoutingNetworkPbrModel represents network_pbr block
@@ -372,8 +376,8 @@ type PolicyBasedRoutingResourceModel struct {
 	Labels              types.Map                               `tfsdk:"labels"`
 	ID                  types.String                            `tfsdk:"id"`
 	Timeouts            timeouts.Value                          `tfsdk:"timeouts"`
-	ForwardProxyPbr     *PolicyBasedRoutingForwardProxyPbrModel `tfsdk:"forward_proxy_pbr"`
 	ForwardingClassList types.List                              `tfsdk:"forwarding_class_list"`
+	ForwardProxyPbr     *PolicyBasedRoutingForwardProxyPbrModel `tfsdk:"forward_proxy_pbr"`
 	NetworkPbr          *PolicyBasedRoutingNetworkPbrModel      `tfsdk:"network_pbr"`
 }
 
@@ -438,8 +442,44 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 				Update: true,
 				Delete: true,
 			}),
+			"forwarding_class_list": schema.ListNestedBlock{
+				MarkdownDescription: "Ordered list of forwarding Class to be used if source application match and no rule match.",
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 128),
+							},
+						},
+						"namespace": schema.StringAttribute{
+							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+							Optional:            true,
+							Computed:            true,
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 64),
+							},
+						},
+						"tenant": schema.StringAttribute{
+							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+							Optional:            true,
+							Computed:            true,
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(64),
+							},
+						},
+					},
+				},
+			},
 			"forward_proxy_pbr": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: forward_proxy_pbr, network_pbr] L3/L4 routing rule. Network(L3/L4) routing policy rule.",
+				MarkdownDescription: "[OneOf: forward_proxy_pbr, network_pbr] Configuration parameter for forward proxy pbr.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"forward_proxy_pbr_rules": schema.ListNestedBlock{
@@ -448,10 +488,10 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 							Attributes: map[string]schema.Attribute{},
 							Blocks: map[string]schema.Block{
 								"all_destinations": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all destinations.",
 								},
 								"all_sources": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all sources.",
 								},
 								"forwarding_class_list": schema.ListNestedBlock{
 									MarkdownDescription: "Ordered list of forwarding Class to be used if no rule match.",
@@ -460,6 +500,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -468,6 +511,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -475,6 +521,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -489,28 +538,46 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 											NestedObject: schema.NestedBlockObject{
 												Attributes: map[string]schema.Attribute{
 													"exact_value": schema.StringAttribute{
-														MarkdownDescription: "Exact domain name.",
+														MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"path_exact_value": schema.StringAttribute{
-														MarkdownDescription: "Exact Path to match.",
+														MarkdownDescription: "Exclusive with [any_path path_prefix_value path_regex_value] Exact Path to match.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"path_prefix_value": schema.StringAttribute{
-														MarkdownDescription: "Prefix of Path e.g '/abc/xyz' will match '/abc/xyz/.*'.",
+														MarkdownDescription: "Exclusive with [any_path path_exact_value path_regex_value] Prefix of Path e.g '/abc/xyz' will match '/abc/xyz/.*'.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"path_regex_value": schema.StringAttribute{
-														MarkdownDescription: "Regular Expression value for the Path to match.",
+														MarkdownDescription: "Exclusive with [any_path path_exact_value path_prefix_value] Regular Expression value for the Path to match.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"regex_value": schema.StringAttribute{
-														MarkdownDescription: "Regular Expression value for the domain name.",
+														MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"suffix_value": schema.StringAttribute{
-														MarkdownDescription: "Suffix of domain names e.g 'xyz.com' will match '*.xyz.com'.",
+														MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain names e.g 'xyz.com' will match '*.xyz.com'.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
@@ -528,6 +595,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -536,6 +606,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -543,6 +616,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -554,6 +630,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 											MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(1),
+											},
 										},
 									},
 								},
@@ -563,10 +642,16 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Human readable description.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"name": schema.StringAttribute{
 											MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+											},
 										},
 									},
 								},
@@ -577,6 +662,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 									},
 								},
@@ -589,16 +677,25 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 											NestedObject: schema.NestedBlockObject{
 												Attributes: map[string]schema.Attribute{
 													"exact_value": schema.StringAttribute{
-														MarkdownDescription: "Exact domain name.",
+														MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"regex_value": schema.StringAttribute{
-														MarkdownDescription: "Regular Expression value for the domain name.",
+														MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"suffix_value": schema.StringAttribute{
-														MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+														MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 											},
@@ -610,35 +707,8 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 					},
 				},
 			},
-			"forwarding_class_list": schema.ListNestedBlock{
-				MarkdownDescription: "Ordered list of forwarding Class to be used if source application match and no rule match.",
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"name": schema.StringAttribute{
-							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-							Optional:            true,
-						},
-						"namespace": schema.StringAttribute{
-							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-							Optional:            true,
-							Computed:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.UseStateForUnknown(),
-							},
-						},
-						"tenant": schema.StringAttribute{
-							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-							Optional:            true,
-							Computed:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.UseStateForUnknown(),
-							},
-						},
-					},
-				},
-			},
 			"network_pbr": schema.SingleNestedBlock{
-				MarkdownDescription: "Network (L2/L3) routing Policy. Network(L3/L4) routing policy rule.",
+				MarkdownDescription: "Configuration parameter for network pbr.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"any": schema.SingleNestedBlock{
@@ -651,6 +721,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 								MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(1),
+								},
 							},
 						},
 					},
@@ -659,25 +732,28 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"dns_name": schema.StringAttribute{
-									MarkdownDescription: "Resolve hostname to GET the IP.",
+									MarkdownDescription: "Exclusive with [any ip_prefix_set prefix_list] Resolve hostname to GET the IP.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
 								"all_tcp_traffic": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all tcp traffic.",
 								},
 								"all_traffic": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all traffic.",
 								},
 								"all_udp_traffic": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all udp traffic.",
 								},
 								"any": schema.SingleNestedBlock{
 									MarkdownDescription: "Enable this option",
 								},
 								"applications": schema.SingleNestedBlock{
-									MarkdownDescription: "Applications. Application protocols like HTTP, SNMP.",
+									MarkdownDescription: "Configuration parameter for applications.",
 									Attributes: map[string]schema.Attribute{
 										"applications": schema.ListAttribute{
 											MarkdownDescription: "[Enum: APPLICATION_HTTP|APPLICATION_HTTPS|APPLICATION_SNMP|APPLICATION_DNS] Application Protocols. Application protocols like HTTP, SNMP. Possible values are `APPLICATION_HTTP`, `APPLICATION_HTTPS`, `APPLICATION_SNMP`, `APPLICATION_DNS`. Defaults to `APPLICATION_HTTP`.",
@@ -693,6 +769,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -701,6 +780,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -708,6 +790,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -732,6 +817,10 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -739,6 +828,10 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -768,10 +861,16 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Human readable description.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"name": schema.StringAttribute{
 											MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+											},
 										},
 									},
 								},
@@ -782,6 +881,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 									},
 								},
@@ -792,6 +894,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 											MarkdownDescription: "List of port ranges. Each range is a single port or a pair of start and end ports e.g. 8080-8192.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 										"protocol": schema.StringAttribute{
 											MarkdownDescription: "Protocol in IP packet to be used as match criteria Values are TCP, UDP, and icmp.",
@@ -809,6 +914,9 @@ func (r *PolicyBasedRoutingResource) Schema(ctx context.Context, req resource.Sc
 								MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(128),
+								},
 							},
 						},
 					},
@@ -920,6 +1028,28 @@ func (r *PolicyBasedRoutingResource) Create(ctx context.Context, req resource.Cr
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.ForwardingClassList.IsNull() && !data.ForwardingClassList.IsUnknown() {
+		var forwarding_class_listItems []PolicyBasedRoutingForwardingClassListModel
+		diags := data.ForwardingClassList.ElementsAs(ctx, &forwarding_class_listItems, false)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() && len(forwarding_class_listItems) > 0 {
+			var forwarding_class_listList []map[string]interface{}
+			for _, item := range forwarding_class_listItems {
+				itemMap := make(map[string]interface{})
+				if !item.Name.IsNull() && !item.Name.IsUnknown() {
+					itemMap["name"] = item.Name.ValueString()
+				}
+				if !item.Namespace.IsNull() && !item.Namespace.IsUnknown() {
+					itemMap["namespace"] = item.Namespace.ValueString()
+				}
+				if !item.Tenant.IsNull() && !item.Tenant.IsUnknown() {
+					itemMap["tenant"] = item.Tenant.ValueString()
+				}
+				forwarding_class_listList = append(forwarding_class_listList, itemMap)
+			}
+			createReq.Spec["forwarding_class_list"] = forwarding_class_listList
+		}
+	}
 	if data.ForwardProxyPbr != nil {
 		forward_proxy_pbrMap := make(map[string]interface{})
 		if len(data.ForwardProxyPbr.ForwardProxyPbrRules) > 0 {
@@ -976,28 +1106,6 @@ func (r *PolicyBasedRoutingResource) Create(ctx context.Context, req resource.Cr
 			forward_proxy_pbrMap["forward_proxy_pbr_rules"] = forward_proxy_pbr_rulesList
 		}
 		createReq.Spec["forward_proxy_pbr"] = forward_proxy_pbrMap
-	}
-	if !data.ForwardingClassList.IsNull() && !data.ForwardingClassList.IsUnknown() {
-		var forwarding_class_listItems []PolicyBasedRoutingForwardingClassListModel
-		diags := data.ForwardingClassList.ElementsAs(ctx, &forwarding_class_listItems, false)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() && len(forwarding_class_listItems) > 0 {
-			var forwarding_class_listList []map[string]interface{}
-			for _, item := range forwarding_class_listItems {
-				itemMap := make(map[string]interface{})
-				if !item.Name.IsNull() && !item.Name.IsUnknown() {
-					itemMap["name"] = item.Name.ValueString()
-				}
-				if !item.Namespace.IsNull() && !item.Namespace.IsUnknown() {
-					itemMap["namespace"] = item.Namespace.ValueString()
-				}
-				if !item.Tenant.IsNull() && !item.Tenant.IsUnknown() {
-					itemMap["tenant"] = item.Tenant.ValueString()
-				}
-				forwarding_class_listList = append(forwarding_class_listList, itemMap)
-			}
-			createReq.Spec["forwarding_class_list"] = forwarding_class_listList
-		}
 	}
 	if data.NetworkPbr != nil {
 		network_pbrMap := make(map[string]interface{})
@@ -1079,6 +1187,46 @@ func (r *PolicyBasedRoutingResource) Create(ctx context.Context, req resource.Cr
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if listData, ok := apiResource.Spec["forwarding_class_list"].([]interface{}); ok && len(listData) > 0 {
+		var forwarding_class_listList []PolicyBasedRoutingForwardingClassListModel
+		var existingForwardingClassListItems []PolicyBasedRoutingForwardingClassListModel
+		if !data.ForwardingClassList.IsNull() && !data.ForwardingClassList.IsUnknown() {
+			data.ForwardingClassList.ElementsAs(ctx, &existingForwardingClassListItems, false)
+		}
+		for listIdx, item := range listData {
+			_ = listIdx // May be unused if no empty marker blocks in list item
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				forwarding_class_listList = append(forwarding_class_listList, PolicyBasedRoutingForwardingClassListModel{
+					Name: func() types.String {
+						if v, ok := itemMap["name"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Namespace: func() types.String {
+						if v, ok := itemMap["namespace"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Tenant: func() types.String {
+						if v, ok := itemMap["tenant"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+				})
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes}, forwarding_class_listList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.ForwardingClassList = listVal
+		}
+	} else {
+		// No data from API - set to null list
+		data.ForwardingClassList = types.ListNull(types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes})
+	}
 	if blockData, ok := apiResource.Spec["forward_proxy_pbr"].(map[string]interface{}); ok && (isImport || data.ForwardProxyPbr != nil) {
 		data.ForwardProxyPbr = &PolicyBasedRoutingForwardProxyPbrModel{
 			ForwardProxyPbrRules: func() []PolicyBasedRoutingForwardProxyPbrForwardProxyPbrRulesModel {
@@ -1175,46 +1323,6 @@ func (r *PolicyBasedRoutingResource) Create(ctx context.Context, req resource.Cr
 				return nil
 			}(),
 		}
-	}
-	if listData, ok := apiResource.Spec["forwarding_class_list"].([]interface{}); ok && len(listData) > 0 {
-		var forwarding_class_listList []PolicyBasedRoutingForwardingClassListModel
-		var existingForwardingClassListItems []PolicyBasedRoutingForwardingClassListModel
-		if !data.ForwardingClassList.IsNull() && !data.ForwardingClassList.IsUnknown() {
-			data.ForwardingClassList.ElementsAs(ctx, &existingForwardingClassListItems, false)
-		}
-		for listIdx, item := range listData {
-			_ = listIdx // May be unused if no empty marker blocks in list item
-			if itemMap, ok := item.(map[string]interface{}); ok {
-				forwarding_class_listList = append(forwarding_class_listList, PolicyBasedRoutingForwardingClassListModel{
-					Name: func() types.String {
-						if v, ok := itemMap["name"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Namespace: func() types.String {
-						if v, ok := itemMap["namespace"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Tenant: func() types.String {
-						if v, ok := itemMap["tenant"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-				})
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes}, forwarding_class_listList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.ForwardingClassList = listVal
-		}
-	} else {
-		// No data from API - set to null list
-		data.ForwardingClassList = types.ListNull(types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes})
 	}
 	if blockData, ok := apiResource.Spec["network_pbr"].(map[string]interface{}); ok && (isImport || data.NetworkPbr != nil) {
 		data.NetworkPbr = &PolicyBasedRoutingNetworkPbrModel{
@@ -1455,6 +1563,46 @@ func (r *PolicyBasedRoutingResource) Read(ctx context.Context, req resource.Read
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if listData, ok := apiResource.Spec["forwarding_class_list"].([]interface{}); ok && len(listData) > 0 {
+		var forwarding_class_listList []PolicyBasedRoutingForwardingClassListModel
+		var existingForwardingClassListItems []PolicyBasedRoutingForwardingClassListModel
+		if !data.ForwardingClassList.IsNull() && !data.ForwardingClassList.IsUnknown() {
+			data.ForwardingClassList.ElementsAs(ctx, &existingForwardingClassListItems, false)
+		}
+		for listIdx, item := range listData {
+			_ = listIdx // May be unused if no empty marker blocks in list item
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				forwarding_class_listList = append(forwarding_class_listList, PolicyBasedRoutingForwardingClassListModel{
+					Name: func() types.String {
+						if v, ok := itemMap["name"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Namespace: func() types.String {
+						if v, ok := itemMap["namespace"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Tenant: func() types.String {
+						if v, ok := itemMap["tenant"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+				})
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes}, forwarding_class_listList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.ForwardingClassList = listVal
+		}
+	} else {
+		// No data from API - set to null list
+		data.ForwardingClassList = types.ListNull(types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes})
+	}
 	if blockData, ok := apiResource.Spec["forward_proxy_pbr"].(map[string]interface{}); ok && (isImport || data.ForwardProxyPbr != nil) {
 		data.ForwardProxyPbr = &PolicyBasedRoutingForwardProxyPbrModel{
 			ForwardProxyPbrRules: func() []PolicyBasedRoutingForwardProxyPbrForwardProxyPbrRulesModel {
@@ -1551,46 +1699,6 @@ func (r *PolicyBasedRoutingResource) Read(ctx context.Context, req resource.Read
 				return nil
 			}(),
 		}
-	}
-	if listData, ok := apiResource.Spec["forwarding_class_list"].([]interface{}); ok && len(listData) > 0 {
-		var forwarding_class_listList []PolicyBasedRoutingForwardingClassListModel
-		var existingForwardingClassListItems []PolicyBasedRoutingForwardingClassListModel
-		if !data.ForwardingClassList.IsNull() && !data.ForwardingClassList.IsUnknown() {
-			data.ForwardingClassList.ElementsAs(ctx, &existingForwardingClassListItems, false)
-		}
-		for listIdx, item := range listData {
-			_ = listIdx // May be unused if no empty marker blocks in list item
-			if itemMap, ok := item.(map[string]interface{}); ok {
-				forwarding_class_listList = append(forwarding_class_listList, PolicyBasedRoutingForwardingClassListModel{
-					Name: func() types.String {
-						if v, ok := itemMap["name"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Namespace: func() types.String {
-						if v, ok := itemMap["namespace"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Tenant: func() types.String {
-						if v, ok := itemMap["tenant"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-				})
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes}, forwarding_class_listList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.ForwardingClassList = listVal
-		}
-	} else {
-		// No data from API - set to null list
-		data.ForwardingClassList = types.ListNull(types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes})
 	}
 	if blockData, ok := apiResource.Spec["network_pbr"].(map[string]interface{}); ok && (isImport || data.NetworkPbr != nil) {
 		data.NetworkPbr = &PolicyBasedRoutingNetworkPbrModel{
@@ -1802,6 +1910,28 @@ func (r *PolicyBasedRoutingResource) Update(ctx context.Context, req resource.Up
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.ForwardingClassList.IsNull() && !data.ForwardingClassList.IsUnknown() {
+		var forwarding_class_listItems []PolicyBasedRoutingForwardingClassListModel
+		diags := data.ForwardingClassList.ElementsAs(ctx, &forwarding_class_listItems, false)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() && len(forwarding_class_listItems) > 0 {
+			var forwarding_class_listList []map[string]interface{}
+			for _, item := range forwarding_class_listItems {
+				itemMap := make(map[string]interface{})
+				if !item.Name.IsNull() && !item.Name.IsUnknown() {
+					itemMap["name"] = item.Name.ValueString()
+				}
+				if !item.Namespace.IsNull() && !item.Namespace.IsUnknown() {
+					itemMap["namespace"] = item.Namespace.ValueString()
+				}
+				if !item.Tenant.IsNull() && !item.Tenant.IsUnknown() {
+					itemMap["tenant"] = item.Tenant.ValueString()
+				}
+				forwarding_class_listList = append(forwarding_class_listList, itemMap)
+			}
+			apiResource.Spec["forwarding_class_list"] = forwarding_class_listList
+		}
+	}
 	if data.ForwardProxyPbr != nil {
 		forward_proxy_pbrMap := make(map[string]interface{})
 		if len(data.ForwardProxyPbr.ForwardProxyPbrRules) > 0 {
@@ -1858,28 +1988,6 @@ func (r *PolicyBasedRoutingResource) Update(ctx context.Context, req resource.Up
 			forward_proxy_pbrMap["forward_proxy_pbr_rules"] = forward_proxy_pbr_rulesList
 		}
 		apiResource.Spec["forward_proxy_pbr"] = forward_proxy_pbrMap
-	}
-	if !data.ForwardingClassList.IsNull() && !data.ForwardingClassList.IsUnknown() {
-		var forwarding_class_listItems []PolicyBasedRoutingForwardingClassListModel
-		diags := data.ForwardingClassList.ElementsAs(ctx, &forwarding_class_listItems, false)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() && len(forwarding_class_listItems) > 0 {
-			var forwarding_class_listList []map[string]interface{}
-			for _, item := range forwarding_class_listItems {
-				itemMap := make(map[string]interface{})
-				if !item.Name.IsNull() && !item.Name.IsUnknown() {
-					itemMap["name"] = item.Name.ValueString()
-				}
-				if !item.Namespace.IsNull() && !item.Namespace.IsUnknown() {
-					itemMap["namespace"] = item.Namespace.ValueString()
-				}
-				if !item.Tenant.IsNull() && !item.Tenant.IsUnknown() {
-					itemMap["tenant"] = item.Tenant.ValueString()
-				}
-				forwarding_class_listList = append(forwarding_class_listList, itemMap)
-			}
-			apiResource.Spec["forwarding_class_list"] = forwarding_class_listList
-		}
 	}
 	if data.NetworkPbr != nil {
 		network_pbrMap := make(map[string]interface{})
@@ -1972,6 +2080,46 @@ func (r *PolicyBasedRoutingResource) Update(ctx context.Context, req resource.Up
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if listData, ok := apiResource.Spec["forwarding_class_list"].([]interface{}); ok && len(listData) > 0 {
+		var forwarding_class_listList []PolicyBasedRoutingForwardingClassListModel
+		var existingForwardingClassListItems []PolicyBasedRoutingForwardingClassListModel
+		if !data.ForwardingClassList.IsNull() && !data.ForwardingClassList.IsUnknown() {
+			data.ForwardingClassList.ElementsAs(ctx, &existingForwardingClassListItems, false)
+		}
+		for listIdx, item := range listData {
+			_ = listIdx // May be unused if no empty marker blocks in list item
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				forwarding_class_listList = append(forwarding_class_listList, PolicyBasedRoutingForwardingClassListModel{
+					Name: func() types.String {
+						if v, ok := itemMap["name"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Namespace: func() types.String {
+						if v, ok := itemMap["namespace"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Tenant: func() types.String {
+						if v, ok := itemMap["tenant"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+				})
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes}, forwarding_class_listList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.ForwardingClassList = listVal
+		}
+	} else {
+		// No data from API - set to null list
+		data.ForwardingClassList = types.ListNull(types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes})
+	}
 	if blockData, ok := apiResource.Spec["forward_proxy_pbr"].(map[string]interface{}); ok && (isImport || data.ForwardProxyPbr != nil) {
 		data.ForwardProxyPbr = &PolicyBasedRoutingForwardProxyPbrModel{
 			ForwardProxyPbrRules: func() []PolicyBasedRoutingForwardProxyPbrForwardProxyPbrRulesModel {
@@ -2068,46 +2216,6 @@ func (r *PolicyBasedRoutingResource) Update(ctx context.Context, req resource.Up
 				return nil
 			}(),
 		}
-	}
-	if listData, ok := apiResource.Spec["forwarding_class_list"].([]interface{}); ok && len(listData) > 0 {
-		var forwarding_class_listList []PolicyBasedRoutingForwardingClassListModel
-		var existingForwardingClassListItems []PolicyBasedRoutingForwardingClassListModel
-		if !data.ForwardingClassList.IsNull() && !data.ForwardingClassList.IsUnknown() {
-			data.ForwardingClassList.ElementsAs(ctx, &existingForwardingClassListItems, false)
-		}
-		for listIdx, item := range listData {
-			_ = listIdx // May be unused if no empty marker blocks in list item
-			if itemMap, ok := item.(map[string]interface{}); ok {
-				forwarding_class_listList = append(forwarding_class_listList, PolicyBasedRoutingForwardingClassListModel{
-					Name: func() types.String {
-						if v, ok := itemMap["name"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Namespace: func() types.String {
-						if v, ok := itemMap["namespace"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Tenant: func() types.String {
-						if v, ok := itemMap["tenant"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-				})
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes}, forwarding_class_listList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.ForwardingClassList = listVal
-		}
-	} else {
-		// No data from API - set to null list
-		data.ForwardingClassList = types.ListNull(types.ObjectType{AttrTypes: PolicyBasedRoutingForwardingClassListModelAttrTypes})
 	}
 	if blockData, ok := apiResource.Spec["network_pbr"].(map[string]interface{}); ok && (isImport || data.NetworkPbr != nil) {
 		data.NetworkPbr = &PolicyBasedRoutingNetworkPbrModel{

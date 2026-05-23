@@ -38,3 +38,12 @@ resource "f5xc_tcp_loadbalancer" "example" {
   # No retract cluster by default
   retract_cluster {}
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - dns_volterra_managed
+# - idle_timeout
+# - hash_policy_choice_round_robin
+# - no_sni
+# - retract_cluster
+# - service_policies_from_namespace
+# - tcp

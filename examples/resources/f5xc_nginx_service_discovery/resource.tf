@@ -16,11 +16,11 @@ resource "f5xc_nginx_service_discovery" "example" {
   }
 
   # Resource-specific configuration
-  # Discovery Target.
+  # Configuration parameter for discovery target.
   discovery_target {
     # Configure discovery_target settings
   }
-  # ConfigSyncGroup Reference. Select new ConfigSyncGroup.
+  # Configuration parameter for config sync group.
   config_sync_group {
     # Configure config_sync_group settings
   }

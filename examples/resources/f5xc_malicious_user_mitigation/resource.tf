@@ -27,3 +27,6 @@ resource "f5xc_malicious_user_mitigation" "example" {
     }
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - mitigation_type

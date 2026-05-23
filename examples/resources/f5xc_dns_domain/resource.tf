@@ -16,7 +16,7 @@ resource "f5xc_dns_domain" "example" {
   }
 
   # Resource-specific configuration
-  # Enable this option
+  # Configuration parameter for volterra managed.
   volterra_managed {
     # Configure volterra_managed settings
   }

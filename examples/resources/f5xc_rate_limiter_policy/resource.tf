@@ -20,9 +20,13 @@ resource "f5xc_rate_limiter_policy" "example" {
   any_server {
     # Configure any_server settings
   }
-  # List of RateLimiterRules that are evaluated sequentially ...
-  rules {
-    # Configure rules settings
+  # Matcher specifies multiple criteria for matching an input...
+  server_name_matcher {
+    # Configure server_name_matcher settings
+  }
+  # Type can be used to establish a 'selector reference' from...
+  server_selector {
+    # Configure server_selector settings
   }
 }
 

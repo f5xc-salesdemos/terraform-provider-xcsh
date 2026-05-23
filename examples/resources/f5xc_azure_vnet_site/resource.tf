@@ -59,3 +59,10 @@ resource "f5xc_azure_vnet_site" "example" {
   # No worker nodes by default
   no_worker_nodes {}
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - disk_size
+# - block_all_services
+# - logs_streaming_disabled
+# - no_worker_nodes
+# - tags

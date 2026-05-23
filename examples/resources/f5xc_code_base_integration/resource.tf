@@ -20,7 +20,7 @@ resource "f5xc_code_base_integration" "example" {
   code_base_integration {
     # Configure code_base_integration settings
   }
-  # Azure Repos Integration.
+  # Configuration parameter for azure repos.
   azure_repos {
     # Configure azure_repos settings
   }

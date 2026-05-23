@@ -31,3 +31,7 @@ resource "f5xc_service_policy" "example" {
     }
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - port_matcher
+# - any_server

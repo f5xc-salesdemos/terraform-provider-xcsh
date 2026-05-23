@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -801,12 +805,12 @@ var RouteRoutesRouteRedirectModelAttrTypes = map[string]attr.Type{
 
 // RouteRoutesServicePolicyModel represents service_policy block
 type RouteRoutesServicePolicyModel struct {
-	Disable types.Bool `tfsdk:"disable"`
+	DisableSpec types.Bool `tfsdk:"disable_spec"`
 }
 
 // RouteRoutesServicePolicyModelAttrTypes defines the attribute types for RouteRoutesServicePolicyModel
 var RouteRoutesServicePolicyModelAttrTypes = map[string]attr.Type{
-	"disable": types.BoolType,
+	"disable_spec": types.BoolType,
 }
 
 // RouteRoutesWAFExclusionPolicyModel represents waf_exclusion_policy block
@@ -950,21 +954,33 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							MarkdownDescription: "List of keys of Cookies to be removed from the HTTP request being sent towards upstream.",
 							Optional:            true,
 							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.SizeAtMost(32),
+							},
 						},
 						"request_headers_to_remove": schema.ListAttribute{
 							MarkdownDescription: "List of keys of Headers to be removed from the HTTP request being sent towards upstream.",
 							Optional:            true,
 							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.SizeAtMost(32),
+							},
 						},
 						"response_cookies_to_remove": schema.ListAttribute{
 							MarkdownDescription: "List of name of Cookies to be removed from the HTTP response being sent towards downstream. Entire set-cookie header will be removed.",
 							Optional:            true,
 							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.SizeAtMost(32),
+							},
 						},
 						"response_headers_to_remove": schema.ListAttribute{
 							MarkdownDescription: "List of keys of Headers to be removed from the HTTP response being sent towards downstream.",
 							Optional:            true,
 							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.SizeAtMost(32),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -974,6 +990,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								"javascript_location": schema.StringAttribute{
 									MarkdownDescription: "[Enum: AFTER_HEAD|AFTER_TITLE_END|BEFORE_SCRIPT] All inside networks. Insert JavaScript after <HEAD> tag Insert JavaScript after </title> tag. Insert JavaScript before first &lt;script> tag. Possible values are `AFTER_HEAD`, `AFTER_TITLE_END`, `BEFORE_SCRIPT`. Defaults to `AFTER_HEAD`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("AFTER_HEAD", "AFTER_TITLE_END", "BEFORE_SCRIPT"),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -984,6 +1003,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 											"javascript_url": schema.StringAttribute{
 												MarkdownDescription: "Please enter the full URL (include domain and path), or relative path.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 2048),
+												},
 											},
 										},
 										Blocks: map[string]schema.Block{
@@ -994,10 +1016,16 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"javascript_tag": schema.StringAttribute{
 															MarkdownDescription: "[Enum: JS_ATTR_ID|JS_ATTR_CID|JS_ATTR_CN|JS_ATTR_API_DOMAIN|JS_ATTR_API_URL|JS_ATTR_API_PATH|JS_ATTR_ASYNC|JS_ATTR_DEFER] Select from one of the predefined tag attributes. Possible values are `JS_ATTR_ID`, `JS_ATTR_CID`, `JS_ATTR_CN`, `JS_ATTR_API_DOMAIN`, `JS_ATTR_API_URL`, `JS_ATTR_API_PATH`, `JS_ATTR_ASYNC`, `JS_ATTR_DEFER`. Defaults to `JS_ATTR_ID`.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.OneOf("JS_ATTR_ID", "JS_ATTR_CID", "JS_ATTR_CN", "JS_ATTR_API_DOMAIN", "JS_ATTR_API_URL", "JS_ATTR_API_PATH", "JS_ATTR_ASYNC", "JS_ATTR_DEFER"),
+															},
 														},
 														"tag_value": schema.StringAttribute{
 															MarkdownDescription: "Value. Add the tag attribute value.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 													},
 												},
@@ -1011,7 +1039,7 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							MarkdownDescription: "Enable this option",
 						},
 						"inherited_waf_exclusion": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for inherited waf exclusion.",
 						},
 						"match": schema.ListNestedBlock{
 							MarkdownDescription: "Match. Route match condition.",
@@ -1020,6 +1048,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									"http_method": schema.StringAttribute{
 										MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] Specifies the HTTP method used to access a resource. Any HTTP Method. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("ANY", "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH", "COPY"),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -1028,8 +1059,11 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										NestedObject: schema.NestedBlockObject{
 											Attributes: map[string]schema.Attribute{
 												"exact": schema.StringAttribute{
-													MarkdownDescription: "Header value to match exactly.",
+													MarkdownDescription: "Exclusive with [presence regex] Header value to match exactly.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"invert_match": schema.BoolAttribute{
 													MarkdownDescription: "Invert the result of the match to detect missing header or non-matching value.",
@@ -1038,14 +1072,20 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 												"name": schema.StringAttribute{
 													MarkdownDescription: "Name. Name of the header .",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 												"presence": schema.BoolAttribute{
-													MarkdownDescription: "If true, check for presence of header.",
+													MarkdownDescription: "Exclusive with [exact regex] If true, check for presence of header.",
 													Optional:            true,
 												},
 												"regex": schema.StringAttribute{
-													MarkdownDescription: "Regex match of the header value in re2 format.",
+													MarkdownDescription: "Exclusive with [exact presence] Regex match of the header value in re2 format.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 											},
 										},
@@ -1054,12 +1094,15 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										MarkdownDescription: "Port match of the request can be a range or a specific port.",
 										Attributes: map[string]schema.Attribute{
 											"port": schema.Int64Attribute{
-												MarkdownDescription: "Exact Port to match.",
+												MarkdownDescription: "Exclusive with [no_port_match port_ranges] Exact Port to match.",
 												Optional:            true,
 											},
 											"port_ranges": schema.StringAttribute{
-												MarkdownDescription: "Port range to match.",
+												MarkdownDescription: "Exclusive with [no_port_match port] Port range to match.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 32),
+												},
 											},
 										},
 										Blocks: map[string]schema.Block{
@@ -1072,16 +1115,25 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										MarkdownDescription: "Path match of the URI can be either be, Prefix match or exact match or regular expression match.",
 										Attributes: map[string]schema.Attribute{
 											"path": schema.StringAttribute{
-												MarkdownDescription: "Exact path value to match.",
+												MarkdownDescription: "Exclusive with [prefix regex] Exact path value to match.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 256),
+												},
 											},
 											"prefix": schema.StringAttribute{
-												MarkdownDescription: "Path prefix to match (e.g. The value / will match on all paths)",
+												MarkdownDescription: "Exclusive with [path regex] Path prefix to match (e.g. The value / will match on all paths)",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(256),
+												},
 											},
 											"regex": schema.StringAttribute{
-												MarkdownDescription: "Regular expression of path match (e.g. The value .* will match on all paths).",
+												MarkdownDescription: "Exclusive with [path prefix] Regular expression of path match (e.g. The value .* will match on all paths).",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 256),
+												},
 											},
 										},
 									},
@@ -1090,16 +1142,22 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										NestedObject: schema.NestedBlockObject{
 											Attributes: map[string]schema.Attribute{
 												"exact": schema.StringAttribute{
-													MarkdownDescription: "Exact match value for the query parameter key.",
+													MarkdownDescription: "Exclusive with [regex] Exact match value for the query parameter key.",
 													Optional:            true,
 												},
 												"key": schema.StringAttribute{
 													MarkdownDescription: "Query parameter key In the above example, assignee_username is the key .",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 												"regex": schema.StringAttribute{
-													MarkdownDescription: "Regex match value for the query parameter key.",
+													MarkdownDescription: "Exclusive with [exact] Regex match value for the query parameter key.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 											},
 										},
@@ -1114,14 +1172,20 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									"name": schema.StringAttribute{
 										MarkdownDescription: "Name of the cookie in Cookie header.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 256),
+										},
 									},
 									"overwrite": schema.BoolAttribute{
 										MarkdownDescription: "Should the value be overwritten? If true, the value is overwritten to existing values.  not overwrite. Defaults to `do`.",
 										Optional:            true,
 									},
 									"value": schema.StringAttribute{
-										MarkdownDescription: "Value of the Cookie header.",
+										MarkdownDescription: "Exclusive with [secret_value] Value of the Cookie header.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(8096),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -1139,6 +1203,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1156,6 +1223,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -1175,10 +1245,16 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									"name": schema.StringAttribute{
 										MarkdownDescription: "Name. Name of the HTTP header.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 256),
+										},
 									},
 									"value": schema.StringAttribute{
-										MarkdownDescription: "Value of the HTTP header.",
+										MarkdownDescription: "Exclusive with [secret_value] Value of the HTTP header.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(8096),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -1196,6 +1272,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1213,6 +1292,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -1226,58 +1308,73 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							NestedObject: schema.NestedBlockObject{
 								Attributes: map[string]schema.Attribute{
 									"add_domain": schema.StringAttribute{
-										MarkdownDescription: "Add domain attribute.",
+										MarkdownDescription: "Exclusive with [ignore_domain] Add domain attribute.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 256),
+										},
 									},
 									"add_expiry": schema.StringAttribute{
-										MarkdownDescription: "Add expiry attribute.",
+										MarkdownDescription: "Exclusive with [ignore_expiry] Add expiry attribute.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(256),
+										},
 									},
 									"add_path": schema.StringAttribute{
-										MarkdownDescription: "Add path attribute.",
+										MarkdownDescription: "Exclusive with [ignore_path] Add path attribute.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(256),
+										},
 									},
 									"max_age_value": schema.Int64Attribute{
-										MarkdownDescription: "Add max age attribute.",
+										MarkdownDescription: "Exclusive with [ignore_max_age] Add max age attribute.",
 										Optional:            true,
 									},
 									"name": schema.StringAttribute{
 										MarkdownDescription: "Name of the cookie in Cookie header.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 256),
+										},
 									},
 									"overwrite": schema.BoolAttribute{
 										MarkdownDescription: "Should the value be overwritten? If true, the value is overwritten to existing values.  not overwrite. Defaults to `do`.",
 										Optional:            true,
 									},
 									"value": schema.StringAttribute{
-										MarkdownDescription: "Value of the Cookie header.",
+										MarkdownDescription: "Exclusive with [ignore_value secret_value] Value of the Cookie header.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(8096),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
 									"add_httponly": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for add httponly.",
 									},
 									"add_partitioned": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for add partitioned.",
 									},
 									"add_secure": schema.SingleNestedBlock{
 										MarkdownDescription: "Enable this option",
 									},
 									"ignore_domain": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for ignore domain.",
 									},
 									"ignore_expiry": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for ignore expiry.",
 									},
 									"ignore_httponly": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for ignore httponly.",
 									},
 									"ignore_max_age": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for ignore max age.",
 									},
 									"ignore_partitioned": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for ignore partitioned.",
 									},
 									"ignore_path": schema.SingleNestedBlock{
 										MarkdownDescription: "Enable this option",
@@ -1289,7 +1386,7 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										MarkdownDescription: "Enable this option",
 									},
 									"ignore_value": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for ignore value.",
 									},
 									"samesite_lax": schema.SingleNestedBlock{
 										MarkdownDescription: "Enable this option",
@@ -1314,6 +1411,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1331,6 +1431,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -1350,10 +1453,16 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									"name": schema.StringAttribute{
 										MarkdownDescription: "Name. Name of the HTTP header.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 256),
+										},
 									},
 									"value": schema.StringAttribute{
-										MarkdownDescription: "Value of the HTTP header.",
+										MarkdownDescription: "Exclusive with [secret_value] Value of the HTTP header.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(8096),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -1371,6 +1480,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1388,6 +1500,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -1400,20 +1515,29 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							MarkdownDescription: "List of destination to choose if the route is match.",
 							Attributes: map[string]schema.Attribute{
 								"auto_host_rewrite": schema.BoolAttribute{
-									MarkdownDescription: "Indicates that during forwarding, the host header will be swapped with the hostname of the upstream host chosen by the cluster.",
+									MarkdownDescription: "Exclusive with [host_rewrite] Indicates that during forwarding, the host header will be swapped with the hostname of the upstream host chosen by the cluster.",
 									Optional:            true,
 								},
 								"host_rewrite": schema.StringAttribute{
-									MarkdownDescription: "Indicates that during forwarding, the host header will be swapped with this value.",
+									MarkdownDescription: "Exclusive with [auto_host_rewrite] Indicates that during forwarding, the host header will be swapped with this value.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"prefix_rewrite": schema.StringAttribute{
-									MarkdownDescription: "prefix_rewrite indicates that during forwarding, the matched prefix (or path) should be swapped with its value. When using regex path matching, the entire path (not including the query string) will be swapped with this value. This option allows application URLs to..",
+									MarkdownDescription: "Exclusive with [regex_rewrite] prefix_rewrite indicates that during forwarding, the matched prefix (or path) should be swapped with its value. When using regex path matching, the entire path (not including the query string) will be swapped with this value. This option allows application URLs to..",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"priority": schema.StringAttribute{
 									MarkdownDescription: "[Enum: DEFAULT|HIGH] Priority routing for each request. Different connection pools are used based on the priority selected for the request. Also, circuit-breaker configuration at destination cluster is chosen based on selected priority. Possible values are `DEFAULT`, `HIGH`. Defaults to `DEFAULT`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("DEFAULT", "HIGH"),
+									},
 								},
 								"timeout": schema.Int64Attribute{
 									MarkdownDescription: "Specifies the timeout for the route in milliseconds. This timeout includes all retries. For server side streaming, configure this field with higher value or leave it un-configured for infinite timeout.",
@@ -1453,11 +1577,17 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 											MarkdownDescription: "Specifies the origins that will be allowed to do CORS requests. An origin is allowed if either allow_origin or allow_origin_regex match.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 										"allow_origin_regex": schema.ListAttribute{
 											MarkdownDescription: "Specifies regex patterns that match allowed origins. An origin is allowed if either allow_origin or allow_origin_regex match.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 										"disabled": schema.BoolAttribute{
 											MarkdownDescription: "Disable the CorsPolicy for a particular route. This is useful when virtual-host has CorsPolicy, but we need to disable it on a specific route. The value of this field is ignored for virtual-host.",
@@ -1478,7 +1608,7 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									Attributes:          map[string]schema.Attribute{},
 									Blocks: map[string]schema.Block{
 										"all_load_balancer_domains": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for all load balancer domains.",
 										},
 										"custom_domain_list": schema.SingleNestedBlock{
 											MarkdownDescription: "List of domain names used for Host header matching.",
@@ -1487,6 +1617,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													MarkdownDescription: "List of domain names that will be matched to loadbalancer. These domains are not used for SNI match. Wildcard names are supported in the suffix or prefix form.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeBetween(1, 32),
+													},
 												},
 											},
 										},
@@ -1524,6 +1657,10 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"name": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+																stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+															},
 														},
 														"namespace": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1531,6 +1668,10 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 															Computed:            true,
 															PlanModifiers: []planmodifier.String{
 																stringplanmodifier.UseStateForUnknown(),
+															},
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+																stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 															},
 														},
 														"tenant": schema.StringAttribute{
@@ -1569,11 +1710,14 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									NestedObject: schema.NestedBlockObject{
 										Attributes: map[string]schema.Attribute{
 											"header_name": schema.StringAttribute{
-												MarkdownDescription: "The name or key of the request header that will be used to obtain the hash key.",
+												MarkdownDescription: "Exclusive with [cookie source_ip] The name or key of the request header that will be used to obtain the hash key.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 256),
+												},
 											},
 											"source_ip": schema.BoolAttribute{
-												MarkdownDescription: "Hash based on source IP address.",
+												MarkdownDescription: "Exclusive with [cookie header_name] Hash based on source IP address.",
 												Optional:            true,
 											},
 											"terminal": schema.BoolAttribute{
@@ -1588,6 +1732,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"name": schema.StringAttribute{
 														MarkdownDescription: "The name of the cookie that will be used to obtain the hash key. If the cookie is not present and TTL below is not set, no hash will be produced .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"path": schema.StringAttribute{
 														MarkdownDescription: "The name of the path for the cookie. If no path is specified here, no path will be set for the cookie.",
@@ -1600,13 +1747,13 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 												},
 												Blocks: map[string]schema.Block{
 													"add_httponly": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for add httponly.",
 													},
 													"add_secure": schema.SingleNestedBlock{
 														MarkdownDescription: "Enable this option",
 													},
 													"ignore_httponly": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for ignore httponly.",
 													},
 													"ignore_samesite": schema.SingleNestedBlock{
 														MarkdownDescription: "Enable this option",
@@ -1647,6 +1794,10 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1654,6 +1805,10 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -1681,6 +1836,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 												"denominator": schema.StringAttribute{
 													MarkdownDescription: "[Enum: HUNDRED|TEN_THOUSAND|MILLION] Denominator used in fraction where sampling percentages are needed. Example sampled requests Use hundred as denominator Use ten thousand as denominator Use million as denominator. Possible values are `HUNDRED`, `TEN_THOUSAND`, `MILLION`. Defaults to `HUNDRED`.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.OneOf("HUNDRED", "TEN_THOUSAND", "MILLION"),
+													},
 												},
 												"numerator": schema.Int64Attribute{
 													MarkdownDescription: "Sampled parts per denominator. If denominator was 10000, then value of 5 will be 5 in 10000 .",
@@ -1694,16 +1852,19 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									MarkdownDescription: "Handling of incoming query parameters in simple route.",
 									Attributes: map[string]schema.Attribute{
 										"replace_params": schema.StringAttribute{
-											MarkdownDescription: ".",
+											MarkdownDescription: "Exclusive with [remove_all_params retain_all_params].",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 256),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
 										"remove_all_params": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for remove all params.",
 										},
 										"retain_all_params": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for retain all params.",
 										},
 									},
 								},
@@ -1713,10 +1874,16 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"pattern": schema.StringAttribute{
 											MarkdownDescription: "The regular expression used to find portions of a string that should be replaced.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 256),
+											},
 										},
 										"substitution": schema.StringAttribute{
 											MarkdownDescription: "The string that should be substituted into matching portions of the subject string during a substitution operation to produce a new string.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 									},
 								},
@@ -1738,11 +1905,17 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 											MarkdownDescription: "HTTP status codes that should trigger a retry in addition to those specified by retry_on.",
 											Optional:            true,
 											ElementType:         types.Int64Type,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 										"retry_condition": schema.ListAttribute{
 											MarkdownDescription: "Specifies the conditions under which retry takes place. Retries can be on different types of condition depending on application requirements. For example, network failure, all 5xx response codes, idempotent 4xx response codes, etc The possible values are '5xx' : Retry will be done if the..",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeBetween(1, 7),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -1787,6 +1960,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								"response_body_encoded": schema.StringAttribute{
 									MarkdownDescription: "Response body to send. Currently supported URL schemes is string:/// for which message should be encoded in Base64 format. The message can be either plain text or HTML.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(65536),
+									},
 								},
 								"response_code": schema.Int64Attribute{
 									MarkdownDescription: "Response Code. Response code to send.",
@@ -1802,20 +1978,29 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									Optional:            true,
 								},
 								"path_redirect": schema.StringAttribute{
-									MarkdownDescription: "swap path part of incoming URL in redirect URL.",
+									MarkdownDescription: "Exclusive with [prefix_rewrite] swap path part of incoming URL in redirect URL.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"prefix_rewrite": schema.StringAttribute{
-									MarkdownDescription: "In Redirect response, the matched prefix (or path) should be swapped with this value. This option allows redirect URLs be dynamically created based on the request.",
+									MarkdownDescription: "Exclusive with [path_redirect] In Redirect response, the matched prefix (or path) should be swapped with this value. This option allows redirect URLs be dynamically created based on the request.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"proto_redirect": schema.StringAttribute{
 									MarkdownDescription: "Swap protocol part of incoming URL in redirect URL The protocol can be swapped with either HTTP or HTTPS When incoming-proto option is specified, swapping of protocol is not done.",
 									Optional:            true,
 								},
 								"replace_params": schema.StringAttribute{
-									MarkdownDescription: ".",
+									MarkdownDescription: "Exclusive with [remove_all_params retain_all_params].",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"response_code": schema.Int64Attribute{
 									MarkdownDescription: "The HTTP status code to use in the redirect response.",
@@ -1824,18 +2009,18 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							},
 							Blocks: map[string]schema.Block{
 								"remove_all_params": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for remove all params.",
 								},
 								"retain_all_params": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for retain all params.",
 								},
 							},
 						},
 						"service_policy": schema.SingleNestedBlock{
 							MarkdownDescription: "ServicePolicy configuration details at route level.",
 							Attributes: map[string]schema.Attribute{
-								"disable": schema.BoolAttribute{
-									MarkdownDescription: "disable service policy at route level, if it is configured at virtual-host level.",
+								"disable_spec": schema.BoolAttribute{
+									MarkdownDescription: "Exclusive with [] disable service policy at route level, if it is configured at virtual-host level.",
 									Optional:            true,
 								},
 							},
@@ -1846,6 +2031,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1854,6 +2042,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 								"tenant": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1861,6 +2052,9 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
 									},
 								},
 							},
@@ -1888,6 +2082,10 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1895,6 +2093,10 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -1919,10 +2121,10 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									},
 								},
 								"disable_waf": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for disable waf.",
 								},
 								"inherit_waf": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for inherit waf.",
 								},
 							},
 						},
@@ -2377,8 +2579,8 @@ func (r *RouteResource) Create(ctx context.Context, req resource.CreateRequest, 
 				}
 				if item.ServicePolicy != nil {
 					service_policyNestedMap := make(map[string]interface{})
-					if !item.ServicePolicy.Disable.IsNull() && !item.ServicePolicy.Disable.IsUnknown() {
-						service_policyNestedMap["disable"] = item.ServicePolicy.Disable.ValueBool()
+					if !item.ServicePolicy.DisableSpec.IsNull() && !item.ServicePolicy.DisableSpec.IsUnknown() {
+						service_policyNestedMap["disable"] = item.ServicePolicy.DisableSpec.ValueBool()
 					}
 					itemMap["service_policy"] = service_policyNestedMap
 				}
@@ -2819,7 +3021,7 @@ func (r *RouteResource) Create(ctx context.Context, req resource.CreateRequest, 
 					ServicePolicy: func() *RouteRoutesServicePolicyModel {
 						if nestedMap, ok := itemMap["service_policy"].(map[string]interface{}); ok {
 							return &RouteRoutesServicePolicyModel{
-								Disable: func() types.Bool {
+								DisableSpec: func() types.Bool {
 									if v, ok := nestedMap["disable"].(bool); ok {
 										return types.BoolValue(v)
 									}
@@ -3357,7 +3559,7 @@ func (r *RouteResource) Read(ctx context.Context, req resource.ReadRequest, resp
 					ServicePolicy: func() *RouteRoutesServicePolicyModel {
 						if nestedMap, ok := itemMap["service_policy"].(map[string]interface{}); ok {
 							return &RouteRoutesServicePolicyModel{
-								Disable: func() types.Bool {
+								DisableSpec: func() types.Bool {
 									if v, ok := nestedMap["disable"].(bool); ok {
 										return types.BoolValue(v)
 									}
@@ -3816,8 +4018,8 @@ func (r *RouteResource) Update(ctx context.Context, req resource.UpdateRequest, 
 				}
 				if item.ServicePolicy != nil {
 					service_policyNestedMap := make(map[string]interface{})
-					if !item.ServicePolicy.Disable.IsNull() && !item.ServicePolicy.Disable.IsUnknown() {
-						service_policyNestedMap["disable"] = item.ServicePolicy.Disable.ValueBool()
+					if !item.ServicePolicy.DisableSpec.IsNull() && !item.ServicePolicy.DisableSpec.IsUnknown() {
+						service_policyNestedMap["disable"] = item.ServicePolicy.DisableSpec.ValueBool()
 					}
 					itemMap["service_policy"] = service_policyNestedMap
 				}
@@ -4269,7 +4471,7 @@ func (r *RouteResource) Update(ctx context.Context, req resource.UpdateRequest, 
 					ServicePolicy: func() *RouteRoutesServicePolicyModel {
 						if nestedMap, ok := itemMap["service_policy"].(map[string]interface{}); ok {
 							return &RouteRoutesServicePolicyModel{
-								Disable: func() types.Bool {
+								DisableSpec: func() types.Bool {
 									if v, ok := nestedMap["disable"].(bool); ok {
 										return types.BoolValue(v)
 									}

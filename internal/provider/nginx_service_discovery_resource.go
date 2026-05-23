@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -200,11 +203,11 @@ func (r *NginxServiceDiscoveryResource) Schema(ctx context.Context, req resource
 				Delete: true,
 			}),
 			"discovery_target": schema.SingleNestedBlock{
-				MarkdownDescription: "Discovery Target.",
+				MarkdownDescription: "Configuration parameter for discovery target.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"config_sync_group": schema.SingleNestedBlock{
-						MarkdownDescription: "ConfigSyncGroup Reference. Select new ConfigSyncGroup.",
+						MarkdownDescription: "Configuration parameter for config sync group.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"config_sync_group": schema.ListNestedBlock{
@@ -222,6 +225,10 @@ func (r *NginxServiceDiscoveryResource) Schema(ctx context.Context, req resource
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -229,6 +236,10 @@ func (r *NginxServiceDiscoveryResource) Schema(ctx context.Context, req resource
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -271,6 +282,10 @@ func (r *NginxServiceDiscoveryResource) Schema(ctx context.Context, req resource
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -278,6 +293,10 @@ func (r *NginxServiceDiscoveryResource) Schema(ctx context.Context, req resource
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -310,10 +329,16 @@ func (r *NginxServiceDiscoveryResource) Schema(ctx context.Context, req resource
 						"name_regex": schema.StringAttribute{
 							MarkdownDescription: "Regular expression to match the server name or domain that must be discovered.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(256),
+							},
 						},
 						"port_ranges": schema.StringAttribute{
 							MarkdownDescription: "String containing a comma separated list of individual service ports or port ranges. Each port range consists of a single port or two ports separated by '-'. For example, 8000-8191.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(512),
+							},
 						},
 					},
 				},

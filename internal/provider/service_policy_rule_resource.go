@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -399,18 +403,6 @@ var ServicePolicyRulePathModelAttrTypes = map[string]attr.Type{
 	"transformers":   types.ListType{ElemType: types.StringType},
 }
 
-// ServicePolicyRulePortMatcherModel represents port_matcher block
-type ServicePolicyRulePortMatcherModel struct {
-	InvertMatcher types.Bool `tfsdk:"invert_matcher"`
-	Ports         types.List `tfsdk:"ports"`
-}
-
-// ServicePolicyRulePortMatcherModelAttrTypes defines the attribute types for ServicePolicyRulePortMatcherModel
-var ServicePolicyRulePortMatcherModelAttrTypes = map[string]attr.Type{
-	"invert_matcher": types.BoolType,
-	"ports":          types.ListType{ElemType: types.StringType},
-}
-
 // ServicePolicyRuleQueryParamsModel represents query_params block
 type ServicePolicyRuleQueryParamsModel struct {
 	InvertMatcher   types.Bool                             `tfsdk:"invert_matcher"`
@@ -665,6 +657,18 @@ var ServicePolicyRuleWAFActionAppFirewallDetectionControlExcludeViolationContext
 	"exclude_violation": types.StringType,
 }
 
+// ServicePolicyRulePortMatcherModel represents port_matcher block
+type ServicePolicyRulePortMatcherModel struct {
+	InvertMatcher types.Bool `tfsdk:"invert_matcher"`
+	Ports         types.List `tfsdk:"ports"`
+}
+
+// ServicePolicyRulePortMatcherModelAttrTypes defines the attribute types for ServicePolicyRulePortMatcherModel
+var ServicePolicyRulePortMatcherModelAttrTypes = map[string]attr.Type{
+	"invert_matcher": types.BoolType,
+	"ports":          types.ListType{ElemType: types.StringType},
+}
+
 type ServicePolicyRuleResourceModel struct {
 	Name                  types.String                                 `tfsdk:"name"`
 	Namespace             types.String                                 `tfsdk:"namespace"`
@@ -700,12 +704,12 @@ type ServicePolicyRuleResourceModel struct {
 	LabelMatcher          *ServicePolicyRuleLabelMatcherModel          `tfsdk:"label_matcher"`
 	MumAction             *ServicePolicyRuleMumActionModel             `tfsdk:"mum_action"`
 	Path                  *ServicePolicyRulePathModel                  `tfsdk:"path"`
-	PortMatcher           *ServicePolicyRulePortMatcherModel           `tfsdk:"port_matcher"`
 	QueryParams           types.List                                   `tfsdk:"query_params"`
 	RequestConstraints    *ServicePolicyRuleRequestConstraintsModel    `tfsdk:"request_constraints"`
 	SegmentPolicy         *ServicePolicyRuleSegmentPolicyModel         `tfsdk:"segment_policy"`
 	TLSFingerprintMatcher *ServicePolicyRuleTLSFingerprintMatcherModel `tfsdk:"tls_fingerprint_matcher"`
 	WAFAction             *ServicePolicyRuleWAFActionModel             `tfsdk:"waf_action"`
+	PortMatcher           *ServicePolicyRulePortMatcherModel           `tfsdk:"port_matcher"`
 }
 
 func (r *ServicePolicyRuleResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -768,13 +772,19 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
+				Validators: []validator.String{
+					stringvalidator.OneOf("DENY", "ALLOW", "NEXT_POLICY"),
+				},
 			},
 			"client_name": schema.StringAttribute{
-				MarkdownDescription: "The expected name of the client invoking the request API. The predicate evaluates to true if any of the actual names is the same as the expected client name.",
+				MarkdownDescription: "Exclusive with [any_client client_name_matcher client_selector ip_threat_category_list] The expected name of the client invoking the request API. The predicate evaluates to true if any of the actual names is the same as the expected client name.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(256),
 				},
 			},
 			"expiration_timestamp": schema.StringAttribute{
@@ -813,6 +823,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "List of exact values to match the input against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(64),
+						},
 					},
 				},
 			},
@@ -827,14 +840,17 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Case-sensitive JSON path in the HTTP request body.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
 						"check_not_present": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for check not present.",
 						},
 						"check_present": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for check present.",
 						},
 						"item": schema.SingleNestedBlock{
 							MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -843,16 +859,25 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "List of exact values to match the input against.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(64),
+									},
 								},
 								"regex_values": schema.ListAttribute{
 									MarkdownDescription: "List of regular expressions to match the input against.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(16),
+									},
 								},
 								"transformers": schema.ListAttribute{
-									MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+									MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(9),
+									},
 								},
 							},
 						},
@@ -866,6 +891,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer.",
 						Optional:            true,
 						ElementType:         types.Int64Type,
+						Validators: []validator.List{
+							listvalidator.SizeBetween(1, 16),
+						},
 					},
 				},
 			},
@@ -888,6 +916,10 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -895,6 +927,10 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -925,16 +961,25 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "List of exact values to match the input against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(64),
+						},
 					},
 					"regex_values": schema.ListAttribute{
 						MarkdownDescription: "List of regular expressions to match the input against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"transformers": schema.ListAttribute{
-						MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+						MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(9),
+						},
 					},
 				},
 			},
@@ -957,11 +1002,17 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "List of exact values to match the input against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(64),
+						},
 					},
 					"regex_values": schema.ListAttribute{
 						MarkdownDescription: "List of regular expressions to match the input against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 				},
 			},
@@ -972,6 +1023,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(1),
+						},
 					},
 				},
 			},
@@ -986,14 +1040,17 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Case-sensitive cookie name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
 						"check_not_present": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for check not present.",
 						},
 						"check_present": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for check present.",
 						},
 						"item": schema.SingleNestedBlock{
 							MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -1002,16 +1059,25 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "List of exact values to match the input against.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(64),
+									},
 								},
 								"regex_values": schema.ListAttribute{
 									MarkdownDescription: "List of regular expressions to match the input against.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(16),
+									},
 								},
 								"transformers": schema.ListAttribute{
-									MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+									MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(9),
+									},
 								},
 							},
 						},
@@ -1025,11 +1091,17 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "List of exact values to match the input against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(64),
+						},
 					},
 					"regex_values": schema.ListAttribute{
 						MarkdownDescription: "List of regular expressions to match the input against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 				},
 			},
@@ -1044,14 +1116,17 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Case-insensitive HTTP header name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
 						"check_not_present": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for check not present.",
 						},
 						"check_present": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for check present.",
 						},
 						"item": schema.SingleNestedBlock{
 							MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -1060,16 +1135,25 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "List of exact values to match the input against.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(64),
+									},
 								},
 								"regex_values": schema.ListAttribute{
 									MarkdownDescription: "List of regular expressions to match the input against.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(16),
+									},
 								},
 								"transformers": schema.ListAttribute{
-									MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+									MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(9),
+									},
 								},
 							},
 						},
@@ -1087,6 +1171,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] List of methods values to match against. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 				},
 			},
@@ -1114,6 +1201,10 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1121,6 +1212,10 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -1155,6 +1250,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "IPv4 Prefix List. List of IPv4 prefix strings.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(128),
+						},
 					},
 				},
 			},
@@ -1165,6 +1263,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "[Enum: SPAM_SOURCES|WINDOWS_EXPLOITS|WEB_ATTACKS|BOTNETS|SCANNERS|REPUTATION|PHISHING|PROXY|MOBILE_THREATS|TOR_PROXY|DENIAL_OF_SERVICE|NETWORK] The IP threat categories is obtained from the list and is used to auto-generate equivalent label selection expressions . Possible values are `SPAM_SOURCES`, `WINDOWS_EXPLOITS`, `WEB_ATTACKS`, `BOTNETS`, `SCANNERS`, `REPUTATION`, `PHISHING`, `PROXY`, `MOBILE_THREATS`, `TOR_PROXY`, `DENIAL_OF_SERVICE`, `NETWORK`. Defaults to `SPAM_SOURCES`.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(32),
+						},
 					},
 				},
 			},
@@ -1175,6 +1276,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "List of exact JA4 TLS fingerprint to match the input JA4 TLS fingerprint against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 				},
 			},
@@ -1189,14 +1293,17 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						"name": schema.StringAttribute{
 							MarkdownDescription: "JWT Claim Name. JWT claim name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
 						"check_not_present": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for check not present.",
 						},
 						"check_present": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for check present.",
 						},
 						"item": schema.SingleNestedBlock{
 							MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -1205,16 +1312,25 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "List of exact values to match the input against.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(64),
+									},
 								},
 								"regex_values": schema.ListAttribute{
 									MarkdownDescription: "List of regular expressions to match the input against.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(16),
+									},
 								},
 								"transformers": schema.ListAttribute{
-									MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+									MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(9),
+									},
 								},
 							},
 						},
@@ -1228,6 +1344,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "The list of label key names that have to match.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 				},
 			},
@@ -1250,6 +1369,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "List of exact path values to match the input HTTP path against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"invert_matcher": schema.BoolAttribute{
 						MarkdownDescription: "Invert Path Matcher. Invert the match result.",
@@ -1259,35 +1381,33 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "List of path prefix values to match the input HTTP path against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"regex_values": schema.ListAttribute{
 						MarkdownDescription: "List of regular expressions to match the input HTTP path against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"suffix_values": schema.ListAttribute{
 						MarkdownDescription: "List of path suffix values to match the input HTTP path against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(64),
+						},
 					},
 					"transformers": schema.ListAttribute{
-						MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+						MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 						Optional:            true,
 						ElementType:         types.StringType,
-					},
-				},
-			},
-			"port_matcher": schema.SingleNestedBlock{
-				MarkdownDescription: "Port matcher specifies a list of port ranges as match criteria. The match is considered successful if the input port falls within any of the port ranges. The result of the match is inverted if invert_matcher is true.",
-				Attributes: map[string]schema.Attribute{
-					"invert_matcher": schema.BoolAttribute{
-						MarkdownDescription: "Invert Port Matcher. Invert the match result.",
-						Optional:            true,
-					},
-					"ports": schema.ListAttribute{
-						MarkdownDescription: "List of strings, each of which is a single port value or a tuple of start and end port values separated by '-'. The start and end values are considered to be part of the range.",
-						Optional:            true,
-						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(9),
+						},
 					},
 				},
 			},
@@ -1302,14 +1422,17 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						"key": schema.StringAttribute{
 							MarkdownDescription: "Case-sensitive HTTP query parameter name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
 						"check_not_present": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for check not present.",
 						},
 						"check_present": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for check present.",
 						},
 						"item": schema.SingleNestedBlock{
 							MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -1318,16 +1441,25 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "List of exact values to match the input against.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(64),
+									},
 								},
 								"regex_values": schema.ListAttribute{
 									MarkdownDescription: "List of regular expressions to match the input against.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(16),
+									},
 								},
 								"transformers": schema.ListAttribute{
-									MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+									MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(9),
+									},
 								},
 							},
 						},
@@ -1335,97 +1467,97 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 				},
 			},
 			"request_constraints": schema.SingleNestedBlock{
-				MarkdownDescription: "Request Constraints.",
+				MarkdownDescription: "Configuration parameter for request constraints.",
 				Attributes: map[string]schema.Attribute{
 					"max_cookie_count_exceeds": schema.Int64Attribute{
-						MarkdownDescription: "Match on the Count for all Cookies that exceed this value.",
+						MarkdownDescription: "Match on the Count for all Cookies that exceed this value. Exclusive with [max_cookie_count_none]",
 						Optional:            true,
 					},
 					"max_cookie_key_size_exceeds": schema.Int64Attribute{
-						MarkdownDescription: ".",
+						MarkdownDescription: "Exclusive with [max_cookie_key_size_none].",
 						Optional:            true,
 					},
 					"max_cookie_value_size_exceeds": schema.Int64Attribute{
-						MarkdownDescription: ".",
+						MarkdownDescription: "Exclusive with [max_cookie_value_size_none].",
 						Optional:            true,
 					},
 					"max_header_count_exceeds": schema.Int64Attribute{
-						MarkdownDescription: "Match on the Count for all Headers that exceed this value.",
+						MarkdownDescription: "Match on the Count for all Headers that exceed this value. Exclusive with [max_header_count_none]",
 						Optional:            true,
 					},
 					"max_header_key_size_exceeds": schema.Int64Attribute{
-						MarkdownDescription: ".",
+						MarkdownDescription: "Exclusive with [max_header_key_size_none].",
 						Optional:            true,
 					},
 					"max_header_value_size_exceeds": schema.Int64Attribute{
-						MarkdownDescription: ".",
+						MarkdownDescription: "Exclusive with [max_header_value_size_none].",
 						Optional:            true,
 					},
 					"max_parameter_count_exceeds": schema.Int64Attribute{
-						MarkdownDescription: ".",
+						MarkdownDescription: "Exclusive with [max_parameter_count_none].",
 						Optional:            true,
 					},
 					"max_parameter_name_size_exceeds": schema.Int64Attribute{
-						MarkdownDescription: ".",
+						MarkdownDescription: "Exclusive with [max_parameter_name_size_none].",
 						Optional:            true,
 					},
 					"max_parameter_value_size_exceeds": schema.Int64Attribute{
-						MarkdownDescription: ".",
+						MarkdownDescription: "Exclusive with [max_parameter_value_size_none].",
 						Optional:            true,
 					},
 					"max_query_size_exceeds": schema.Int64Attribute{
-						MarkdownDescription: "Match on the URL Query Size that exceed this value.",
+						MarkdownDescription: "Match on the URL Query Size that exceed this value. Exclusive with [max_query_size_none]",
 						Optional:            true,
 					},
 					"max_request_line_size_exceeds": schema.Int64Attribute{
-						MarkdownDescription: ".",
+						MarkdownDescription: "Exclusive with [max_request_line_size_none].",
 						Optional:            true,
 					},
 					"max_request_size_exceeds": schema.Int64Attribute{
-						MarkdownDescription: "Match on the Request Size that exceed this value.",
+						MarkdownDescription: "Match on the Request Size that exceed this value. Exclusive with [max_request_size_none]",
 						Optional:            true,
 					},
 					"max_url_size_exceeds": schema.Int64Attribute{
-						MarkdownDescription: "Match on the URL Size that exceed this value.",
+						MarkdownDescription: "Match on the URL Size that exceed this value. Exclusive with [max_url_size_none]",
 						Optional:            true,
 					},
 				},
 				Blocks: map[string]schema.Block{
 					"max_cookie_count_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max cookie count none.",
 					},
 					"max_cookie_key_size_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max cookie key size none.",
 					},
 					"max_cookie_value_size_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max cookie value size none.",
 					},
 					"max_header_count_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max header count none.",
 					},
 					"max_header_key_size_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max header key size none.",
 					},
 					"max_header_value_size_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max header value size none.",
 					},
 					"max_parameter_count_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max parameter count none.",
 					},
 					"max_parameter_name_size_none": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
 					},
 					"max_parameter_value_size_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max parameter value size none.",
 					},
 					"max_query_size_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max query size none.",
 					},
 					"max_request_line_size_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max request line size none.",
 					},
 					"max_request_size_none": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for max request size none.",
 					},
 					"max_url_size_none": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
@@ -1440,16 +1572,19 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Enable this option",
 					},
 					"dst_segments": schema.SingleNestedBlock{
-						MarkdownDescription: "Segment List. List of references to Segments.",
+						MarkdownDescription: "X-displayName: 'Segment List' List of references to Segments.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"segments": schema.ListNestedBlock{
-								MarkdownDescription: "Segments. Select list of segments .",
+								MarkdownDescription: "X-displayName: 'Segments'Select list of segments.",
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1458,6 +1593,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1465,6 +1603,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -1473,22 +1614,25 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						},
 					},
 					"intra_segment": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for intra segment.",
 					},
 					"src_any": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
 					},
 					"src_segments": schema.SingleNestedBlock{
-						MarkdownDescription: "Segment List. List of references to Segments.",
+						MarkdownDescription: "X-displayName: 'Segment List' List of references to Segments.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"segments": schema.ListNestedBlock{
-								MarkdownDescription: "Segments. Select list of segments .",
+								MarkdownDescription: "X-displayName: 'Segments'Select list of segments.",
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1497,6 +1641,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1504,6 +1651,9 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -1520,16 +1670,25 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "[Enum: TLS_FINGERPRINT_NONE|ANY_MALICIOUS_FINGERPRINT|ADWARE|ADWIND|DRIDEX|GOOTKIT|GOZI|JBIFROST|QUAKBOT|RANSOMWARE|TROLDESH|TOFSEE|TORRENTLOCKER|TRICKBOT] List of known classes of TLS fingerprints to match the input TLS JA3 fingerprint against. Possible values are `TLS_FINGERPRINT_NONE`, `ANY_MALICIOUS_FINGERPRINT`, `ADWARE`, `ADWIND`, `DRIDEX`, `GOOTKIT`, `GOZI`, `JBIFROST`, `QUAKBOT`, `RANSOMWARE`, `TROLDESH`, `TOFSEE`, `TORRENTLOCKER`, `TRICKBOT`. Defaults to `TLS_FINGERPRINT_NONE`.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"exact_values": schema.ListAttribute{
 						MarkdownDescription: "List of exact TLS JA3 fingerprints to match the input TLS JA3 fingerprint against.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"excluded_values": schema.ListAttribute{
 						MarkdownDescription: "List of TLS JA3 fingerprints to be excluded when matching the input TLS JA3 fingerprint. This can be used to skip known false positives when using one or more known TLS fingerprint classes in the enclosing matcher.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(32),
+						},
 					},
 				},
 			},
@@ -1548,14 +1707,23 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 										"context": schema.StringAttribute{
 											MarkdownDescription: "[Enum: CONTEXT_ANY|CONTEXT_BODY|CONTEXT_REQUEST|CONTEXT_RESPONSE|CONTEXT_PARAMETER|CONTEXT_HEADER|CONTEXT_COOKIE|CONTEXT_URL|CONTEXT_URI] The available contexts for Exclusion rules. - CONTEXT_ANY: CONTEXT_ANY Detection will be excluded for all contexts. - CONTEXT_BODY: CONTEXT_BODY Detection will be excluded for the request body. - CONTEXT_REQUEST: CONTEXT_REQUEST Detection will be excluded for the request. - CONTEXT_RESPONSE.. Possible values are `CONTEXT_ANY`, `CONTEXT_BODY`, `CONTEXT_REQUEST`, `CONTEXT_RESPONSE`, `CONTEXT_PARAMETER`, `CONTEXT_HEADER`, `CONTEXT_COOKIE`, `CONTEXT_URL`, `CONTEXT_URI`. Defaults to `CONTEXT_ANY`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("CONTEXT_ANY", "CONTEXT_BODY", "CONTEXT_REQUEST", "CONTEXT_RESPONSE", "CONTEXT_PARAMETER", "CONTEXT_HEADER", "CONTEXT_COOKIE", "CONTEXT_URL", "CONTEXT_URI"),
+											},
 										},
 										"context_name": schema.StringAttribute{
 											MarkdownDescription: "Relevant only for contexts: Header, Cookie and Parameter. Name of the Context that the WAF Exclusion Rules will check. Wildcard matching can be used by prefixing or suffixing the context name with an wildcard asterisk (*).",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 										"exclude_attack_type": schema.StringAttribute{
 											MarkdownDescription: "[Enum: ATTACK_TYPE_NONE|ATTACK_TYPE_NON_BROWSER_CLIENT|ATTACK_TYPE_OTHER_APPLICATION_ATTACKS|ATTACK_TYPE_TROJAN_BACKDOOR_SPYWARE|ATTACK_TYPE_DETECTION_EVASION|ATTACK_TYPE_VULNERABILITY_SCAN|ATTACK_TYPE_ABUSE_OF_FUNCTIONALITY|ATTACK_TYPE_AUTHENTICATION_AUTHORIZATION_ATTACKS|ATTACK_TYPE_BUFFER_OVERFLOW|ATTACK_TYPE_PREDICTABLE_RESOURCE_LOCATION|ATTACK_TYPE_INFORMATION_LEAKAGE|ATTACK_TYPE_DIRECTORY_INDEXING|ATTACK_TYPE_PATH_TRAVERSAL|ATTACK_TYPE_XPATH_INJECTION|ATTACK_TYPE_LDAP_INJECTION|ATTACK_TYPE_SERVER_SIDE_CODE_INJECTION|ATTACK_TYPE_COMMAND_EXECUTION|ATTACK_TYPE_SQL_INJECTION|ATTACK_TYPE_CROSS_SITE_SCRIPTING|ATTACK_TYPE_DENIAL_OF_SERVICE|ATTACK_TYPE_HTTP_PARSER_ATTACK|ATTACK_TYPE_SESSION_HIJACKING|ATTACK_TYPE_HTTP_RESPONSE_SPLITTING|ATTACK_TYPE_FORCEFUL_BROWSING|ATTACK_TYPE_REMOTE_FILE_INCLUDE|ATTACK_TYPE_MALICIOUS_FILE_UPLOAD|ATTACK_TYPE_GRAPHQL_PARSER_ATTACK] List of all Attack Types ATTACK_TYPE_NONE ATTACK_TYPE_NON_BROWSER_CLIENT ATTACK_TYPE_OTHER_APPLICATION_ATTACKS ATTACK_TYPE_TROJAN_BACKDOOR_SPYWARE ATTACK_TYPE_DETECTION_EVASION ATTACK_TYPE_VULNERABILITY_SCAN ATTACK_TYPE_ABUSE_OF_FUNCTIONALITY ATTACK_TYPE_AUTHENTICATION_AUTHORIZATION_ATTACKS.. Possible values are `ATTACK_TYPE_NONE`, `ATTACK_TYPE_NON_BROWSER_CLIENT`, `ATTACK_TYPE_OTHER_APPLICATION_ATTACKS`, `ATTACK_TYPE_TROJAN_BACKDOOR_SPYWARE`, `ATTACK_TYPE_DETECTION_EVASION`, `ATTACK_TYPE_VULNERABILITY_SCAN`, `ATTACK_TYPE_ABUSE_OF_FUNCTIONALITY`, `ATTACK_TYPE_AUTHENTICATION_AUTHORIZATION_ATTACKS`, `ATTACK_TYPE_BUFFER_OVERFLOW`, `ATTACK_TYPE_PREDICTABLE_RESOURCE_LOCATION`, `ATTACK_TYPE_INFORMATION_LEAKAGE`, `ATTACK_TYPE_DIRECTORY_INDEXING`, `ATTACK_TYPE_PATH_TRAVERSAL`, `ATTACK_TYPE_XPATH_INJECTION`, `ATTACK_TYPE_LDAP_INJECTION`, `ATTACK_TYPE_SERVER_SIDE_CODE_INJECTION`, `ATTACK_TYPE_COMMAND_EXECUTION`, `ATTACK_TYPE_SQL_INJECTION`, `ATTACK_TYPE_CROSS_SITE_SCRIPTING`, `ATTACK_TYPE_DENIAL_OF_SERVICE`, `ATTACK_TYPE_HTTP_PARSER_ATTACK`, `ATTACK_TYPE_SESSION_HIJACKING`, `ATTACK_TYPE_HTTP_RESPONSE_SPLITTING`, `ATTACK_TYPE_FORCEFUL_BROWSING`, `ATTACK_TYPE_REMOTE_FILE_INCLUDE`, `ATTACK_TYPE_MALICIOUS_FILE_UPLOAD`, `ATTACK_TYPE_GRAPHQL_PARSER_ATTACK`. Defaults to `ATTACK_TYPE_NONE`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("ATTACK_TYPE_NONE", "ATTACK_TYPE_NON_BROWSER_CLIENT", "ATTACK_TYPE_OTHER_APPLICATION_ATTACKS", "ATTACK_TYPE_TROJAN_BACKDOOR_SPYWARE", "ATTACK_TYPE_DETECTION_EVASION", "ATTACK_TYPE_VULNERABILITY_SCAN", "ATTACK_TYPE_ABUSE_OF_FUNCTIONALITY", "ATTACK_TYPE_AUTHENTICATION_AUTHORIZATION_ATTACKS", "ATTACK_TYPE_BUFFER_OVERFLOW", "ATTACK_TYPE_PREDICTABLE_RESOURCE_LOCATION", "ATTACK_TYPE_INFORMATION_LEAKAGE", "ATTACK_TYPE_DIRECTORY_INDEXING", "ATTACK_TYPE_PATH_TRAVERSAL", "ATTACK_TYPE_XPATH_INJECTION", "ATTACK_TYPE_LDAP_INJECTION", "ATTACK_TYPE_SERVER_SIDE_CODE_INJECTION", "ATTACK_TYPE_COMMAND_EXECUTION", "ATTACK_TYPE_SQL_INJECTION", "ATTACK_TYPE_CROSS_SITE_SCRIPTING", "ATTACK_TYPE_DENIAL_OF_SERVICE", "ATTACK_TYPE_HTTP_PARSER_ATTACK", "ATTACK_TYPE_SESSION_HIJACKING", "ATTACK_TYPE_HTTP_RESPONSE_SPLITTING", "ATTACK_TYPE_FORCEFUL_BROWSING", "ATTACK_TYPE_REMOTE_FILE_INCLUDE", "ATTACK_TYPE_MALICIOUS_FILE_UPLOAD", "ATTACK_TYPE_GRAPHQL_PARSER_ATTACK"),
+											},
 										},
 									},
 								},
@@ -1578,10 +1746,16 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 										"context": schema.StringAttribute{
 											MarkdownDescription: "[Enum: CONTEXT_ANY|CONTEXT_BODY|CONTEXT_REQUEST|CONTEXT_RESPONSE|CONTEXT_PARAMETER|CONTEXT_HEADER|CONTEXT_COOKIE|CONTEXT_URL|CONTEXT_URI] The available contexts for Exclusion rules. - CONTEXT_ANY: CONTEXT_ANY Detection will be excluded for all contexts. - CONTEXT_BODY: CONTEXT_BODY Detection will be excluded for the request body. - CONTEXT_REQUEST: CONTEXT_REQUEST Detection will be excluded for the request. - CONTEXT_RESPONSE.. Possible values are `CONTEXT_ANY`, `CONTEXT_BODY`, `CONTEXT_REQUEST`, `CONTEXT_RESPONSE`, `CONTEXT_PARAMETER`, `CONTEXT_HEADER`, `CONTEXT_COOKIE`, `CONTEXT_URL`, `CONTEXT_URI`. Defaults to `CONTEXT_ANY`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("CONTEXT_ANY", "CONTEXT_BODY", "CONTEXT_REQUEST", "CONTEXT_RESPONSE", "CONTEXT_PARAMETER", "CONTEXT_HEADER", "CONTEXT_COOKIE", "CONTEXT_URL", "CONTEXT_URI"),
+											},
 										},
 										"context_name": schema.StringAttribute{
 											MarkdownDescription: "Relevant only for contexts: Header, Cookie and Parameter. Name of the Context that the WAF Exclusion Rules will check. Wildcard matching can be used by prefixing or suffixing the context name with an wildcard asterisk (*).",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 										"signature_id": schema.Int64Attribute{
 											MarkdownDescription: "The allowed values for signature ID are 0 and in the range of 200000001-299999999. 0 implies that all signatures will be excluded for the specified context.",
@@ -1597,14 +1771,23 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 										"context": schema.StringAttribute{
 											MarkdownDescription: "[Enum: CONTEXT_ANY|CONTEXT_BODY|CONTEXT_REQUEST|CONTEXT_RESPONSE|CONTEXT_PARAMETER|CONTEXT_HEADER|CONTEXT_COOKIE|CONTEXT_URL|CONTEXT_URI] The available contexts for Exclusion rules. - CONTEXT_ANY: CONTEXT_ANY Detection will be excluded for all contexts. - CONTEXT_BODY: CONTEXT_BODY Detection will be excluded for the request body. - CONTEXT_REQUEST: CONTEXT_REQUEST Detection will be excluded for the request. - CONTEXT_RESPONSE.. Possible values are `CONTEXT_ANY`, `CONTEXT_BODY`, `CONTEXT_REQUEST`, `CONTEXT_RESPONSE`, `CONTEXT_PARAMETER`, `CONTEXT_HEADER`, `CONTEXT_COOKIE`, `CONTEXT_URL`, `CONTEXT_URI`. Defaults to `CONTEXT_ANY`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("CONTEXT_ANY", "CONTEXT_BODY", "CONTEXT_REQUEST", "CONTEXT_RESPONSE", "CONTEXT_PARAMETER", "CONTEXT_HEADER", "CONTEXT_COOKIE", "CONTEXT_URL", "CONTEXT_URI"),
+											},
 										},
 										"context_name": schema.StringAttribute{
 											MarkdownDescription: "Relevant only for contexts: Header, Cookie and Parameter. Name of the Context that the WAF Exclusion Rules will check. Wildcard matching can be used by prefixing or suffixing the context name with an wildcard asterisk (*).",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 										"exclude_violation": schema.StringAttribute{
 											MarkdownDescription: "[Enum: VIOL_NONE|VIOL_FILETYPE|VIOL_METHOD|VIOL_MANDATORY_HEADER|VIOL_HTTP_RESPONSE_STATUS|VIOL_REQUEST_MAX_LENGTH|VIOL_FILE_UPLOAD|VIOL_FILE_UPLOAD_IN_BODY|VIOL_XML_MALFORMED|VIOL_JSON_MALFORMED|VIOL_ASM_COOKIE_MODIFIED|VIOL_HTTP_PROTOCOL_MULTIPLE_HOST_HEADERS|VIOL_HTTP_PROTOCOL_BAD_HOST_HEADER_VALUE|VIOL_HTTP_PROTOCOL_UNPARSABLE_REQUEST_CONTENT|VIOL_HTTP_PROTOCOL_NULL_IN_REQUEST|VIOL_HTTP_PROTOCOL_BAD_HTTP_VERSION|VIOL_HTTP_PROTOCOL_SEVERAL_CONTENT_LENGTH_HEADERS|VIOL_EVASION_DIRECTORY_TRAVERSALS|VIOL_MALFORMED_REQUEST|VIOL_EVASION_MULTIPLE_DECODING|VIOL_DATA_GUARD|VIOL_EVASION_APACHE_WHITESPACE|VIOL_COOKIE_MODIFIED|VIOL_EVASION_IIS_UNICODE_CODEPOINTS|VIOL_EVASION_IIS_BACKSLASHES|VIOL_EVASION_PERCENT_U_DECODING|VIOL_EVASION_BARE_BYTE_DECODING|VIOL_EVASION_BAD_UNESCAPE|VIOL_HTTP_PROTOCOL_BODY_IN_GET_OR_HEAD_REQUEST|VIOL_ENCODING|VIOL_COOKIE_MALFORMED|VIOL_GRAPHQL_FORMAT|VIOL_GRAPHQL_MALFORMED|VIOL_GRAPHQL_INTROSPECTION_QUERY] List of all supported Violation Types VIOL_NONE VIOL_FILETYPE VIOL_METHOD VIOL_MANDATORY_HEADER VIOL_HTTP_RESPONSE_STATUS VIOL_REQUEST_MAX_LENGTH VIOL_FILE_UPLOAD VIOL_FILE_UPLOAD_IN_BODY VIOL_XML_MALFORMED VIOL_JSON_MALFORMED VIOL_ASM_COOKIE_MODIFIED VIOL_HTTP_PROTOCOL_MULTIPLE_HOST_HEADERS.. Possible values are `VIOL_NONE`, `VIOL_FILETYPE`, `VIOL_METHOD`, `VIOL_MANDATORY_HEADER`, `VIOL_HTTP_RESPONSE_STATUS`, `VIOL_REQUEST_MAX_LENGTH`, `VIOL_FILE_UPLOAD`, `VIOL_FILE_UPLOAD_IN_BODY`, `VIOL_XML_MALFORMED`, `VIOL_JSON_MALFORMED`, `VIOL_ASM_COOKIE_MODIFIED`, `VIOL_HTTP_PROTOCOL_MULTIPLE_HOST_HEADERS`, `VIOL_HTTP_PROTOCOL_BAD_HOST_HEADER_VALUE`, `VIOL_HTTP_PROTOCOL_UNPARSABLE_REQUEST_CONTENT`, `VIOL_HTTP_PROTOCOL_NULL_IN_REQUEST`, `VIOL_HTTP_PROTOCOL_BAD_HTTP_VERSION`, `VIOL_HTTP_PROTOCOL_SEVERAL_CONTENT_LENGTH_HEADERS`, `VIOL_EVASION_DIRECTORY_TRAVERSALS`, `VIOL_MALFORMED_REQUEST`, `VIOL_EVASION_MULTIPLE_DECODING`, `VIOL_DATA_GUARD`, `VIOL_EVASION_APACHE_WHITESPACE`, `VIOL_COOKIE_MODIFIED`, `VIOL_EVASION_IIS_UNICODE_CODEPOINTS`, `VIOL_EVASION_IIS_BACKSLASHES`, `VIOL_EVASION_PERCENT_U_DECODING`, `VIOL_EVASION_BARE_BYTE_DECODING`, `VIOL_EVASION_BAD_UNESCAPE`, `VIOL_HTTP_PROTOCOL_BODY_IN_GET_OR_HEAD_REQUEST`, `VIOL_ENCODING`, `VIOL_COOKIE_MALFORMED`, `VIOL_GRAPHQL_FORMAT`, `VIOL_GRAPHQL_MALFORMED`, `VIOL_GRAPHQL_INTROSPECTION_QUERY`. Defaults to `VIOL_NONE`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("VIOL_NONE", "VIOL_FILETYPE", "VIOL_METHOD", "VIOL_MANDATORY_HEADER", "VIOL_HTTP_RESPONSE_STATUS", "VIOL_REQUEST_MAX_LENGTH", "VIOL_FILE_UPLOAD", "VIOL_FILE_UPLOAD_IN_BODY", "VIOL_XML_MALFORMED", "VIOL_JSON_MALFORMED", "VIOL_ASM_COOKIE_MODIFIED", "VIOL_HTTP_PROTOCOL_MULTIPLE_HOST_HEADERS", "VIOL_HTTP_PROTOCOL_BAD_HOST_HEADER_VALUE", "VIOL_HTTP_PROTOCOL_UNPARSABLE_REQUEST_CONTENT", "VIOL_HTTP_PROTOCOL_NULL_IN_REQUEST", "VIOL_HTTP_PROTOCOL_BAD_HTTP_VERSION", "VIOL_HTTP_PROTOCOL_SEVERAL_CONTENT_LENGTH_HEADERS", "VIOL_EVASION_DIRECTORY_TRAVERSALS", "VIOL_MALFORMED_REQUEST", "VIOL_EVASION_MULTIPLE_DECODING", "VIOL_DATA_GUARD", "VIOL_EVASION_APACHE_WHITESPACE", "VIOL_COOKIE_MODIFIED", "VIOL_EVASION_IIS_UNICODE_CODEPOINTS", "VIOL_EVASION_IIS_BACKSLASHES", "VIOL_EVASION_PERCENT_U_DECODING", "VIOL_EVASION_BARE_BYTE_DECODING", "VIOL_EVASION_BAD_UNESCAPE", "VIOL_HTTP_PROTOCOL_BODY_IN_GET_OR_HEAD_REQUEST", "VIOL_ENCODING", "VIOL_COOKIE_MALFORMED", "VIOL_GRAPHQL_FORMAT", "VIOL_GRAPHQL_MALFORMED", "VIOL_GRAPHQL_INTROSPECTION_QUERY"),
+											},
 										},
 									},
 								},
@@ -1616,6 +1799,23 @@ func (r *ServicePolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 					},
 					"waf_skip_processing": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
+					},
+				},
+			},
+			"port_matcher": schema.SingleNestedBlock{
+				MarkdownDescription: "Port matcher specifies a list of port ranges as match criteria. The match is considered successful if the input port falls within any of the port ranges. The result of the match is inverted if invert_matcher is true. Server applies default when omitted.",
+				Attributes: map[string]schema.Attribute{
+					"invert_matcher": schema.BoolAttribute{
+						MarkdownDescription: "Invert Port Matcher. Invert the match result.",
+						Optional:            true,
+					},
+					"ports": schema.ListAttribute{
+						MarkdownDescription: "List of strings, each of which is a single port value or a tuple of start and end port values separated by '-'. The start and end values are considered to be part of the range.",
+						Optional:            true,
+						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 				},
 			},
@@ -2214,20 +2414,6 @@ func (r *ServicePolicyRuleResource) Create(ctx context.Context, req resource.Cre
 		}
 		createReq.Spec["path"] = pathMap
 	}
-	if data.PortMatcher != nil {
-		port_matcherMap := make(map[string]interface{})
-		if !data.PortMatcher.InvertMatcher.IsNull() && !data.PortMatcher.InvertMatcher.IsUnknown() {
-			port_matcherMap["invert_matcher"] = data.PortMatcher.InvertMatcher.ValueBool()
-		}
-		if !data.PortMatcher.Ports.IsNull() && !data.PortMatcher.Ports.IsUnknown() {
-			var portsItems []string
-			diags := data.PortMatcher.Ports.ElementsAs(ctx, &portsItems, false)
-			if !diags.HasError() {
-				port_matcherMap["ports"] = portsItems
-			}
-		}
-		createReq.Spec["port_matcher"] = port_matcherMap
-	}
 	if !data.QueryParams.IsNull() && !data.QueryParams.IsUnknown() {
 		var query_paramsItems []ServicePolicyRuleQueryParamsModel
 		diags := data.QueryParams.ElementsAs(ctx, &query_paramsItems, false)
@@ -2428,6 +2614,20 @@ func (r *ServicePolicyRuleResource) Create(ctx context.Context, req resource.Cre
 	}
 	if !data.ExpirationTimestamp.IsNull() && !data.ExpirationTimestamp.IsUnknown() {
 		createReq.Spec["expiration_timestamp"] = data.ExpirationTimestamp.ValueString()
+	}
+	if data.PortMatcher != nil {
+		port_matcherMap := make(map[string]interface{})
+		if !data.PortMatcher.InvertMatcher.IsNull() && !data.PortMatcher.InvertMatcher.IsUnknown() {
+			port_matcherMap["invert_matcher"] = data.PortMatcher.InvertMatcher.ValueBool()
+		}
+		if !data.PortMatcher.Ports.IsNull() && !data.PortMatcher.Ports.IsUnknown() {
+			var portsItems []string
+			diags := data.PortMatcher.Ports.ElementsAs(ctx, &portsItems, false)
+			if !diags.HasError() {
+				port_matcherMap["ports"] = portsItems
+			}
+		}
+		createReq.Spec["port_matcher"] = port_matcherMap
 	}
 
 	apiResource, err := r.client.CreateServicePolicyRule(ctx, createReq)
@@ -3317,39 +3517,6 @@ func (r *ServicePolicyRuleResource) Create(ctx context.Context, req resource.Cre
 			}(),
 		}
 	}
-	if blockData, ok := apiResource.Spec["port_matcher"].(map[string]interface{}); ok && (isImport || data.PortMatcher != nil) {
-		data.PortMatcher = &ServicePolicyRulePortMatcherModel{
-			InvertMatcher: func() types.Bool {
-				if !isImport && data.PortMatcher != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults from overwriting user intent
-					return data.PortMatcher.InvertMatcher
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.BoolNull()
-				}
-				// Import case: read from API
-				if v, ok := blockData["invert_matcher"].(bool); ok {
-					return types.BoolValue(v)
-				}
-				return types.BoolNull()
-			}(),
-			Ports: func() types.List {
-				if v, ok := blockData["ports"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-		}
-	}
 	if listData, ok := apiResource.Spec["query_params"].([]interface{}); ok && len(listData) > 0 {
 		var query_paramsList []ServicePolicyRuleQueryParamsModel
 		var existingQueryParamsItems []ServicePolicyRuleQueryParamsModel
@@ -3877,6 +4044,39 @@ func (r *ServicePolicyRuleResource) Create(ctx context.Context, req resource.Cre
 		data.ExpirationTimestamp = types.StringValue(v)
 	} else {
 		data.ExpirationTimestamp = types.StringNull()
+	}
+	if blockData, ok := apiResource.Spec["port_matcher"].(map[string]interface{}); ok && (isImport || data.PortMatcher != nil) {
+		data.PortMatcher = &ServicePolicyRulePortMatcherModel{
+			InvertMatcher: func() types.Bool {
+				if !isImport && data.PortMatcher != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults from overwriting user intent
+					return data.PortMatcher.InvertMatcher
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.BoolNull()
+				}
+				// Import case: read from API
+				if v, ok := blockData["invert_matcher"].(bool); ok {
+					return types.BoolValue(v)
+				}
+				return types.BoolNull()
+			}(),
+			Ports: func() types.List {
+				if v, ok := blockData["ports"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+		}
 	}
 
 	tflog.Trace(ctx, "created ServicePolicyRule resource")
@@ -4833,39 +5033,6 @@ func (r *ServicePolicyRuleResource) Read(ctx context.Context, req resource.ReadR
 			}(),
 		}
 	}
-	if blockData, ok := apiResource.Spec["port_matcher"].(map[string]interface{}); ok && (isImport || data.PortMatcher != nil) {
-		data.PortMatcher = &ServicePolicyRulePortMatcherModel{
-			InvertMatcher: func() types.Bool {
-				if !isImport && data.PortMatcher != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults from overwriting user intent
-					return data.PortMatcher.InvertMatcher
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.BoolNull()
-				}
-				// Import case: read from API
-				if v, ok := blockData["invert_matcher"].(bool); ok {
-					return types.BoolValue(v)
-				}
-				return types.BoolNull()
-			}(),
-			Ports: func() types.List {
-				if v, ok := blockData["ports"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-		}
-	}
 	if listData, ok := apiResource.Spec["query_params"].([]interface{}); ok && len(listData) > 0 {
 		var query_paramsList []ServicePolicyRuleQueryParamsModel
 		var existingQueryParamsItems []ServicePolicyRuleQueryParamsModel
@@ -5393,6 +5560,39 @@ func (r *ServicePolicyRuleResource) Read(ctx context.Context, req resource.ReadR
 		data.ExpirationTimestamp = types.StringValue(v)
 	} else {
 		data.ExpirationTimestamp = types.StringNull()
+	}
+	if blockData, ok := apiResource.Spec["port_matcher"].(map[string]interface{}); ok && (isImport || data.PortMatcher != nil) {
+		data.PortMatcher = &ServicePolicyRulePortMatcherModel{
+			InvertMatcher: func() types.Bool {
+				if !isImport && data.PortMatcher != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults from overwriting user intent
+					return data.PortMatcher.InvertMatcher
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.BoolNull()
+				}
+				// Import case: read from API
+				if v, ok := blockData["invert_matcher"].(bool); ok {
+					return types.BoolValue(v)
+				}
+				return types.BoolNull()
+			}(),
+			Ports: func() types.List {
+				if v, ok := blockData["ports"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -5934,20 +6134,6 @@ func (r *ServicePolicyRuleResource) Update(ctx context.Context, req resource.Upd
 		}
 		apiResource.Spec["path"] = pathMap
 	}
-	if data.PortMatcher != nil {
-		port_matcherMap := make(map[string]interface{})
-		if !data.PortMatcher.InvertMatcher.IsNull() && !data.PortMatcher.InvertMatcher.IsUnknown() {
-			port_matcherMap["invert_matcher"] = data.PortMatcher.InvertMatcher.ValueBool()
-		}
-		if !data.PortMatcher.Ports.IsNull() && !data.PortMatcher.Ports.IsUnknown() {
-			var portsItems []string
-			diags := data.PortMatcher.Ports.ElementsAs(ctx, &portsItems, false)
-			if !diags.HasError() {
-				port_matcherMap["ports"] = portsItems
-			}
-		}
-		apiResource.Spec["port_matcher"] = port_matcherMap
-	}
 	if !data.QueryParams.IsNull() && !data.QueryParams.IsUnknown() {
 		var query_paramsItems []ServicePolicyRuleQueryParamsModel
 		diags := data.QueryParams.ElementsAs(ctx, &query_paramsItems, false)
@@ -6148,6 +6334,20 @@ func (r *ServicePolicyRuleResource) Update(ctx context.Context, req resource.Upd
 	}
 	if !data.ExpirationTimestamp.IsNull() && !data.ExpirationTimestamp.IsUnknown() {
 		apiResource.Spec["expiration_timestamp"] = data.ExpirationTimestamp.ValueString()
+	}
+	if data.PortMatcher != nil {
+		port_matcherMap := make(map[string]interface{})
+		if !data.PortMatcher.InvertMatcher.IsNull() && !data.PortMatcher.InvertMatcher.IsUnknown() {
+			port_matcherMap["invert_matcher"] = data.PortMatcher.InvertMatcher.ValueBool()
+		}
+		if !data.PortMatcher.Ports.IsNull() && !data.PortMatcher.Ports.IsUnknown() {
+			var portsItems []string
+			diags := data.PortMatcher.Ports.ElementsAs(ctx, &portsItems, false)
+			if !diags.HasError() {
+				port_matcherMap["ports"] = portsItems
+			}
+		}
+		apiResource.Spec["port_matcher"] = port_matcherMap
 	}
 
 	_, err := r.client.UpdateServicePolicyRule(ctx, apiResource)
@@ -7069,39 +7269,6 @@ func (r *ServicePolicyRuleResource) Update(ctx context.Context, req resource.Upd
 			}(),
 		}
 	}
-	if blockData, ok := apiResource.Spec["port_matcher"].(map[string]interface{}); ok && (isImport || data.PortMatcher != nil) {
-		data.PortMatcher = &ServicePolicyRulePortMatcherModel{
-			InvertMatcher: func() types.Bool {
-				if !isImport && data.PortMatcher != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults from overwriting user intent
-					return data.PortMatcher.InvertMatcher
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.BoolNull()
-				}
-				// Import case: read from API
-				if v, ok := blockData["invert_matcher"].(bool); ok {
-					return types.BoolValue(v)
-				}
-				return types.BoolNull()
-			}(),
-			Ports: func() types.List {
-				if v, ok := blockData["ports"].([]interface{}); ok && len(v) > 0 {
-					var items []string
-					for _, item := range v {
-						if s, ok := item.(string); ok {
-							items = append(items, s)
-						}
-					}
-					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
-					return listVal
-				}
-				return types.ListNull(types.StringType)
-			}(),
-		}
-	}
 	if listData, ok := apiResource.Spec["query_params"].([]interface{}); ok && len(listData) > 0 {
 		var query_paramsList []ServicePolicyRuleQueryParamsModel
 		var existingQueryParamsItems []ServicePolicyRuleQueryParamsModel
@@ -7629,6 +7796,39 @@ func (r *ServicePolicyRuleResource) Update(ctx context.Context, req resource.Upd
 		data.ExpirationTimestamp = types.StringValue(v)
 	} else {
 		data.ExpirationTimestamp = types.StringNull()
+	}
+	if blockData, ok := apiResource.Spec["port_matcher"].(map[string]interface{}); ok && (isImport || data.PortMatcher != nil) {
+		data.PortMatcher = &ServicePolicyRulePortMatcherModel{
+			InvertMatcher: func() types.Bool {
+				if !isImport && data.PortMatcher != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults from overwriting user intent
+					return data.PortMatcher.InvertMatcher
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.BoolNull()
+				}
+				// Import case: read from API
+				if v, ok := blockData["invert_matcher"].(bool); ok {
+					return types.BoolValue(v)
+				}
+				return types.BoolNull()
+			}(),
+			Ports: func() types.List {
+				if v, ok := blockData["ports"].([]interface{}); ok && len(v) > 0 {
+					var items []string
+					for _, item := range v {
+						if s, ok := item.(string); ok {
+							items = append(items, s)
+						}
+					}
+					listVal, _ := types.ListValueFrom(ctx, types.StringType, items)
+					return listVal
+				}
+				return types.ListNull(types.StringType)
+			}(),
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

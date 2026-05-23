@@ -43,7 +43,7 @@ resource "f5xc_app_firewall" "example" {
 # The following optional fields have server-applied defaults and can be omitted:
 # - allow_all_response_codes
 # - default_anonymization
-# - default_bot_setting
 # - default_detection_settings
+# - disable_ai_enhancements
 # - monitoring
 # - use_default_blocking_page

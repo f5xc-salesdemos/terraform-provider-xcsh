@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -55,6 +56,16 @@ var TenantConfigurationBasicConfigurationModelAttrTypes = map[string]attr.Type{
 	"display_name": types.StringType,
 }
 
+// TenantConfigurationBruteForceDetectionModel represents brute_force_detection block
+type TenantConfigurationBruteForceDetectionModel struct {
+	MaxLoginFailures types.Int64 `tfsdk:"max_login_failures"`
+}
+
+// TenantConfigurationBruteForceDetectionModelAttrTypes defines the attribute types for TenantConfigurationBruteForceDetectionModel
+var TenantConfigurationBruteForceDetectionModelAttrTypes = map[string]attr.Type{
+	"max_login_failures": types.Int64Type,
+}
+
 // TenantConfigurationBruteForceDetectionSettingsModel represents brute_force_detection_settings block
 type TenantConfigurationBruteForceDetectionSettingsModel struct {
 	MaxLoginFailures types.Int64 `tfsdk:"max_login_failures"`
@@ -89,6 +100,92 @@ var TenantConfigurationPasswordPolicyModelAttrTypes = map[string]attr.Type{
 	"uppercase_characters": types.Int64Type,
 }
 
+// TenantConfigurationTenantDetailsModel represents tenant_details block
+type TenantConfigurationTenantDetailsModel struct {
+	DisplayName types.String `tfsdk:"display_name"`
+}
+
+// TenantConfigurationTenantDetailsModelAttrTypes defines the attribute types for TenantConfigurationTenantDetailsModel
+var TenantConfigurationTenantDetailsModelAttrTypes = map[string]attr.Type{
+	"display_name": types.StringType,
+}
+
+// TenantConfigurationUserSessionExpirationModel represents user_session_expiration block
+type TenantConfigurationUserSessionExpirationModel struct {
+	AbsoluteTimeout *TenantConfigurationUserSessionExpirationAbsoluteTimeoutModel `tfsdk:"absolute_timeout"`
+	IdleTimeout     *TenantConfigurationUserSessionExpirationIdleTimeoutModel     `tfsdk:"idle_timeout"`
+}
+
+// TenantConfigurationUserSessionExpirationModelAttrTypes defines the attribute types for TenantConfigurationUserSessionExpirationModel
+var TenantConfigurationUserSessionExpirationModelAttrTypes = map[string]attr.Type{
+	"absolute_timeout": types.ObjectType{AttrTypes: TenantConfigurationUserSessionExpirationAbsoluteTimeoutModelAttrTypes},
+	"idle_timeout":     types.ObjectType{AttrTypes: TenantConfigurationUserSessionExpirationIdleTimeoutModelAttrTypes},
+}
+
+// TenantConfigurationUserSessionExpirationAbsoluteTimeoutModel represents absolute_timeout block
+type TenantConfigurationUserSessionExpirationAbsoluteTimeoutModel struct {
+	Hours   *TenantConfigurationUserSessionExpirationAbsoluteTimeoutHoursModel   `tfsdk:"hours"`
+	Minutes *TenantConfigurationUserSessionExpirationAbsoluteTimeoutMinutesModel `tfsdk:"minutes"`
+}
+
+// TenantConfigurationUserSessionExpirationAbsoluteTimeoutModelAttrTypes defines the attribute types for TenantConfigurationUserSessionExpirationAbsoluteTimeoutModel
+var TenantConfigurationUserSessionExpirationAbsoluteTimeoutModelAttrTypes = map[string]attr.Type{
+	"hours":   types.ObjectType{AttrTypes: TenantConfigurationUserSessionExpirationAbsoluteTimeoutHoursModelAttrTypes},
+	"minutes": types.ObjectType{AttrTypes: TenantConfigurationUserSessionExpirationAbsoluteTimeoutMinutesModelAttrTypes},
+}
+
+// TenantConfigurationUserSessionExpirationAbsoluteTimeoutHoursModel represents hours block
+type TenantConfigurationUserSessionExpirationAbsoluteTimeoutHoursModel struct {
+	Duration types.Int64 `tfsdk:"duration"`
+}
+
+// TenantConfigurationUserSessionExpirationAbsoluteTimeoutHoursModelAttrTypes defines the attribute types for TenantConfigurationUserSessionExpirationAbsoluteTimeoutHoursModel
+var TenantConfigurationUserSessionExpirationAbsoluteTimeoutHoursModelAttrTypes = map[string]attr.Type{
+	"duration": types.Int64Type,
+}
+
+// TenantConfigurationUserSessionExpirationAbsoluteTimeoutMinutesModel represents minutes block
+type TenantConfigurationUserSessionExpirationAbsoluteTimeoutMinutesModel struct {
+	Duration types.Int64 `tfsdk:"duration"`
+}
+
+// TenantConfigurationUserSessionExpirationAbsoluteTimeoutMinutesModelAttrTypes defines the attribute types for TenantConfigurationUserSessionExpirationAbsoluteTimeoutMinutesModel
+var TenantConfigurationUserSessionExpirationAbsoluteTimeoutMinutesModelAttrTypes = map[string]attr.Type{
+	"duration": types.Int64Type,
+}
+
+// TenantConfigurationUserSessionExpirationIdleTimeoutModel represents idle_timeout block
+type TenantConfigurationUserSessionExpirationIdleTimeoutModel struct {
+	Hours   *TenantConfigurationUserSessionExpirationIdleTimeoutHoursModel   `tfsdk:"hours"`
+	Minutes *TenantConfigurationUserSessionExpirationIdleTimeoutMinutesModel `tfsdk:"minutes"`
+}
+
+// TenantConfigurationUserSessionExpirationIdleTimeoutModelAttrTypes defines the attribute types for TenantConfigurationUserSessionExpirationIdleTimeoutModel
+var TenantConfigurationUserSessionExpirationIdleTimeoutModelAttrTypes = map[string]attr.Type{
+	"hours":   types.ObjectType{AttrTypes: TenantConfigurationUserSessionExpirationIdleTimeoutHoursModelAttrTypes},
+	"minutes": types.ObjectType{AttrTypes: TenantConfigurationUserSessionExpirationIdleTimeoutMinutesModelAttrTypes},
+}
+
+// TenantConfigurationUserSessionExpirationIdleTimeoutHoursModel represents hours block
+type TenantConfigurationUserSessionExpirationIdleTimeoutHoursModel struct {
+	Duration types.Int64 `tfsdk:"duration"`
+}
+
+// TenantConfigurationUserSessionExpirationIdleTimeoutHoursModelAttrTypes defines the attribute types for TenantConfigurationUserSessionExpirationIdleTimeoutHoursModel
+var TenantConfigurationUserSessionExpirationIdleTimeoutHoursModelAttrTypes = map[string]attr.Type{
+	"duration": types.Int64Type,
+}
+
+// TenantConfigurationUserSessionExpirationIdleTimeoutMinutesModel represents minutes block
+type TenantConfigurationUserSessionExpirationIdleTimeoutMinutesModel struct {
+	Duration types.Int64 `tfsdk:"duration"`
+}
+
+// TenantConfigurationUserSessionExpirationIdleTimeoutMinutesModelAttrTypes defines the attribute types for TenantConfigurationUserSessionExpirationIdleTimeoutMinutesModel
+var TenantConfigurationUserSessionExpirationIdleTimeoutMinutesModelAttrTypes = map[string]attr.Type{
+	"duration": types.Int64Type,
+}
+
 type TenantConfigurationResourceModel struct {
 	Name                        types.String                                         `tfsdk:"name"`
 	Namespace                   types.String                                         `tfsdk:"namespace"`
@@ -99,8 +196,11 @@ type TenantConfigurationResourceModel struct {
 	ID                          types.String                                         `tfsdk:"id"`
 	Timeouts                    timeouts.Value                                       `tfsdk:"timeouts"`
 	BasicConfiguration          *TenantConfigurationBasicConfigurationModel          `tfsdk:"basic_configuration"`
+	BruteForceDetection         *TenantConfigurationBruteForceDetectionModel         `tfsdk:"brute_force_detection"`
 	BruteForceDetectionSettings *TenantConfigurationBruteForceDetectionSettingsModel `tfsdk:"brute_force_detection_settings"`
 	PasswordPolicy              *TenantConfigurationPasswordPolicyModel              `tfsdk:"password_policy"`
+	TenantDetails               *TenantConfigurationTenantDetailsModel               `tfsdk:"tenant_details"`
+	UserSessionExpiration       *TenantConfigurationUserSessionExpirationModel       `tfsdk:"user_session_expiration"`
 }
 
 func (r *TenantConfigurationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -165,16 +265,28 @@ func (r *TenantConfigurationResource) Schema(ctx context.Context, req resource.S
 				Delete: true,
 			}),
 			"basic_configuration": schema.SingleNestedBlock{
-				MarkdownDescription: "BasicConfiguration.",
+				MarkdownDescription: "Configuration parameter for basic configuration.",
 				Attributes: map[string]schema.Attribute{
 					"display_name": schema.StringAttribute{
-						MarkdownDescription: "Tenant display name in the login screen.",
+						MarkdownDescription: "Changes the tenant name displayed during login without affecting your company’s domain name.",
+						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 255),
+						},
+					},
+				},
+			},
+			"brute_force_detection": schema.SingleNestedBlock{
+				MarkdownDescription: "Configuration parameter for brute force detection.",
+				Attributes: map[string]schema.Attribute{
+					"max_login_failures": schema.Int64Attribute{
+						MarkdownDescription: "How many failures before wait is triggered. When login failure count is hit, user will be temporarily locked for a max duration of 15 minutes.",
 						Optional:            true,
 					},
 				},
 			},
 			"brute_force_detection_settings": schema.SingleNestedBlock{
-				MarkdownDescription: "BruteForceDetectionSettings.",
+				MarkdownDescription: "Configuration parameter for brute force detection settings.",
 				Attributes: map[string]schema.Attribute{
 					"max_login_failures": schema.Int64Attribute{
 						MarkdownDescription: "How many failures before wait is triggered. When login failure count is hit, user will be temporarily locked for a max duration of 15 minutes.",
@@ -183,7 +295,7 @@ func (r *TenantConfigurationResource) Schema(ctx context.Context, req resource.S
 				},
 			},
 			"password_policy": schema.SingleNestedBlock{
-				MarkdownDescription: "PasswordPolicy.",
+				MarkdownDescription: "Policy configuration for this feature.",
 				Attributes: map[string]schema.Attribute{
 					"digits": schema.Int64Attribute{
 						MarkdownDescription: "The number of digits required to be in the password string.",
@@ -216,6 +328,72 @@ func (r *TenantConfigurationResource) Schema(ctx context.Context, req resource.S
 					"uppercase_characters": schema.Int64Attribute{
 						MarkdownDescription: "The number of upper case letters required to be in the password string.",
 						Optional:            true,
+					},
+				},
+			},
+			"tenant_details": schema.SingleNestedBlock{
+				MarkdownDescription: "BasicConfiguration.",
+				Attributes: map[string]schema.Attribute{
+					"display_name": schema.StringAttribute{
+						MarkdownDescription: "Changes the tenant name displayed during login without affecting your company’s domain name.",
+						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 255),
+						},
+					},
+				},
+			},
+			"user_session_expiration": schema.SingleNestedBlock{
+				MarkdownDescription: "Defines all session-related expiration for user sessions within a tenant's environment. Relationship between session_expiry and cookie_expiry: - session_expiry defines the 'absolute maximum duration' of a session and enforces RE-authentication after this time. - cookie_expiry defines the..",
+				Attributes:          map[string]schema.Attribute{},
+				Blocks: map[string]schema.Block{
+					"absolute_timeout": schema.SingleNestedBlock{
+						MarkdownDescription: "Represents the session expiration duration.",
+						Attributes:          map[string]schema.Attribute{},
+						Blocks: map[string]schema.Block{
+							"hours": schema.SingleNestedBlock{
+								MarkdownDescription: "Represents the session duration in hours.",
+								Attributes: map[string]schema.Attribute{
+									"duration": schema.Int64Attribute{
+										MarkdownDescription: "Duration.",
+										Optional:            true,
+									},
+								},
+							},
+							"minutes": schema.SingleNestedBlock{
+								MarkdownDescription: "Represents the session duration in minutes.",
+								Attributes: map[string]schema.Attribute{
+									"duration": schema.Int64Attribute{
+										MarkdownDescription: "Duration.",
+										Optional:            true,
+									},
+								},
+							},
+						},
+					},
+					"idle_timeout": schema.SingleNestedBlock{
+						MarkdownDescription: "Represents the cookie expiration duration.",
+						Attributes:          map[string]schema.Attribute{},
+						Blocks: map[string]schema.Block{
+							"hours": schema.SingleNestedBlock{
+								MarkdownDescription: "Represents the cookie duration in hours.",
+								Attributes: map[string]schema.Attribute{
+									"duration": schema.Int64Attribute{
+										MarkdownDescription: "Duration.",
+										Optional:            true,
+									},
+								},
+							},
+							"minutes": schema.SingleNestedBlock{
+								MarkdownDescription: "Represents the cookie duration in minutes.",
+								Attributes: map[string]schema.Attribute{
+									"duration": schema.Int64Attribute{
+										MarkdownDescription: "Duration.",
+										Optional:            true,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -332,6 +510,13 @@ func (r *TenantConfigurationResource) Create(ctx context.Context, req resource.C
 		}
 		createReq.Spec["basic_configuration"] = basic_configurationMap
 	}
+	if data.BruteForceDetection != nil {
+		brute_force_detectionMap := make(map[string]interface{})
+		if !data.BruteForceDetection.MaxLoginFailures.IsNull() && !data.BruteForceDetection.MaxLoginFailures.IsUnknown() {
+			brute_force_detectionMap["max_login_failures"] = data.BruteForceDetection.MaxLoginFailures.ValueInt64()
+		}
+		createReq.Spec["brute_force_detection"] = brute_force_detectionMap
+	}
 	if data.BruteForceDetectionSettings != nil {
 		brute_force_detection_settingsMap := make(map[string]interface{})
 		if !data.BruteForceDetectionSettings.MaxLoginFailures.IsNull() && !data.BruteForceDetectionSettings.MaxLoginFailures.IsUnknown() {
@@ -367,6 +552,25 @@ func (r *TenantConfigurationResource) Create(ctx context.Context, req resource.C
 		}
 		createReq.Spec["password_policy"] = password_policyMap
 	}
+	if data.TenantDetails != nil {
+		tenant_detailsMap := make(map[string]interface{})
+		if !data.TenantDetails.DisplayName.IsNull() && !data.TenantDetails.DisplayName.IsUnknown() {
+			tenant_detailsMap["display_name"] = data.TenantDetails.DisplayName.ValueString()
+		}
+		createReq.Spec["tenant_details"] = tenant_detailsMap
+	}
+	if data.UserSessionExpiration != nil {
+		user_session_expirationMap := make(map[string]interface{})
+		if data.UserSessionExpiration.AbsoluteTimeout != nil {
+			absolute_timeoutNestedMap := make(map[string]interface{})
+			user_session_expirationMap["absolute_timeout"] = absolute_timeoutNestedMap
+		}
+		if data.UserSessionExpiration.IdleTimeout != nil {
+			idle_timeoutNestedMap := make(map[string]interface{})
+			user_session_expirationMap["idle_timeout"] = idle_timeoutNestedMap
+		}
+		createReq.Spec["user_session_expiration"] = user_session_expirationMap
+	}
 
 	apiResource, err := r.client.CreateTenantConfiguration(ctx, createReq)
 	if err != nil {
@@ -387,6 +591,26 @@ func (r *TenantConfigurationResource) Create(ctx context.Context, req resource.C
 					return types.StringValue(v)
 				}
 				return types.StringNull()
+			}(),
+		}
+	}
+	if blockData, ok := apiResource.Spec["brute_force_detection"].(map[string]interface{}); ok && (isImport || data.BruteForceDetection != nil) {
+		data.BruteForceDetection = &TenantConfigurationBruteForceDetectionModel{
+			MaxLoginFailures: func() types.Int64 {
+				if !isImport && data.BruteForceDetection != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BruteForceDetection.MaxLoginFailures
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["max_login_failures"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
 			}(),
 		}
 	}
@@ -542,6 +766,21 @@ func (r *TenantConfigurationResource) Create(ctx context.Context, req resource.C
 			}(),
 		}
 	}
+	if blockData, ok := apiResource.Spec["tenant_details"].(map[string]interface{}); ok && (isImport || data.TenantDetails != nil) {
+		data.TenantDetails = &TenantConfigurationTenantDetailsModel{
+			DisplayName: func() types.String {
+				if v, ok := blockData["display_name"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+		}
+	}
+	if _, ok := apiResource.Spec["user_session_expiration"].(map[string]interface{}); ok && isImport && data.UserSessionExpiration == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.UserSessionExpiration = &TenantConfigurationUserSessionExpirationModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	tflog.Trace(ctx, "created TenantConfiguration resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -632,6 +871,26 @@ func (r *TenantConfigurationResource) Read(ctx context.Context, req resource.Rea
 			}(),
 		}
 	}
+	if blockData, ok := apiResource.Spec["brute_force_detection"].(map[string]interface{}); ok && (isImport || data.BruteForceDetection != nil) {
+		data.BruteForceDetection = &TenantConfigurationBruteForceDetectionModel{
+			MaxLoginFailures: func() types.Int64 {
+				if !isImport && data.BruteForceDetection != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BruteForceDetection.MaxLoginFailures
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["max_login_failures"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+		}
+	}
 	if blockData, ok := apiResource.Spec["brute_force_detection_settings"].(map[string]interface{}); ok && (isImport || data.BruteForceDetectionSettings != nil) {
 		data.BruteForceDetectionSettings = &TenantConfigurationBruteForceDetectionSettingsModel{
 			MaxLoginFailures: func() types.Int64 {
@@ -784,6 +1043,21 @@ func (r *TenantConfigurationResource) Read(ctx context.Context, req resource.Rea
 			}(),
 		}
 	}
+	if blockData, ok := apiResource.Spec["tenant_details"].(map[string]interface{}); ok && (isImport || data.TenantDetails != nil) {
+		data.TenantDetails = &TenantConfigurationTenantDetailsModel{
+			DisplayName: func() types.String {
+				if v, ok := blockData["display_name"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+		}
+	}
+	if _, ok := apiResource.Spec["user_session_expiration"].(map[string]interface{}); ok && isImport && data.UserSessionExpiration == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.UserSessionExpiration = &TenantConfigurationUserSessionExpirationModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -842,6 +1116,13 @@ func (r *TenantConfigurationResource) Update(ctx context.Context, req resource.U
 		}
 		apiResource.Spec["basic_configuration"] = basic_configurationMap
 	}
+	if data.BruteForceDetection != nil {
+		brute_force_detectionMap := make(map[string]interface{})
+		if !data.BruteForceDetection.MaxLoginFailures.IsNull() && !data.BruteForceDetection.MaxLoginFailures.IsUnknown() {
+			brute_force_detectionMap["max_login_failures"] = data.BruteForceDetection.MaxLoginFailures.ValueInt64()
+		}
+		apiResource.Spec["brute_force_detection"] = brute_force_detectionMap
+	}
 	if data.BruteForceDetectionSettings != nil {
 		brute_force_detection_settingsMap := make(map[string]interface{})
 		if !data.BruteForceDetectionSettings.MaxLoginFailures.IsNull() && !data.BruteForceDetectionSettings.MaxLoginFailures.IsUnknown() {
@@ -877,6 +1158,25 @@ func (r *TenantConfigurationResource) Update(ctx context.Context, req resource.U
 		}
 		apiResource.Spec["password_policy"] = password_policyMap
 	}
+	if data.TenantDetails != nil {
+		tenant_detailsMap := make(map[string]interface{})
+		if !data.TenantDetails.DisplayName.IsNull() && !data.TenantDetails.DisplayName.IsUnknown() {
+			tenant_detailsMap["display_name"] = data.TenantDetails.DisplayName.ValueString()
+		}
+		apiResource.Spec["tenant_details"] = tenant_detailsMap
+	}
+	if data.UserSessionExpiration != nil {
+		user_session_expirationMap := make(map[string]interface{})
+		if data.UserSessionExpiration.AbsoluteTimeout != nil {
+			absolute_timeoutNestedMap := make(map[string]interface{})
+			user_session_expirationMap["absolute_timeout"] = absolute_timeoutNestedMap
+		}
+		if data.UserSessionExpiration.IdleTimeout != nil {
+			idle_timeoutNestedMap := make(map[string]interface{})
+			user_session_expirationMap["idle_timeout"] = idle_timeoutNestedMap
+		}
+		apiResource.Spec["user_session_expiration"] = user_session_expirationMap
+	}
 
 	_, err := r.client.UpdateTenantConfiguration(ctx, apiResource)
 	if err != nil {
@@ -908,6 +1208,26 @@ func (r *TenantConfigurationResource) Update(ctx context.Context, req resource.U
 					return types.StringValue(v)
 				}
 				return types.StringNull()
+			}(),
+		}
+	}
+	if blockData, ok := apiResource.Spec["brute_force_detection"].(map[string]interface{}); ok && (isImport || data.BruteForceDetection != nil) {
+		data.BruteForceDetection = &TenantConfigurationBruteForceDetectionModel{
+			MaxLoginFailures: func() types.Int64 {
+				if !isImport && data.BruteForceDetection != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.BruteForceDetection.MaxLoginFailures
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["max_login_failures"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
 			}(),
 		}
 	}
@@ -1063,6 +1383,21 @@ func (r *TenantConfigurationResource) Update(ctx context.Context, req resource.U
 			}(),
 		}
 	}
+	if blockData, ok := apiResource.Spec["tenant_details"].(map[string]interface{}); ok && (isImport || data.TenantDetails != nil) {
+		data.TenantDetails = &TenantConfigurationTenantDetailsModel{
+			DisplayName: func() types.String {
+				if v, ok := blockData["display_name"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
+		}
+	}
+	if _, ok := apiResource.Spec["user_session_expiration"].(map[string]interface{}); ok && isImport && data.UserSessionExpiration == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.UserSessionExpiration = &TenantConfigurationUserSessionExpirationModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

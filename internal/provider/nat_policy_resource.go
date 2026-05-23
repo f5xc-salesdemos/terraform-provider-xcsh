@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -51,9 +55,10 @@ type NATPolicyRulesModel struct {
 	Action           *NATPolicyRulesActionModel           `tfsdk:"action"`
 	CloudConnect     *NATPolicyRulesCloudConnectModel     `tfsdk:"cloud_connect"`
 	Criteria         *NATPolicyRulesCriteriaModel         `tfsdk:"criteria"`
-	Disable          *NATPolicyEmptyModel                 `tfsdk:"disable"`
+	DisableSpec      *NATPolicyEmptyModel                 `tfsdk:"disable_spec"`
 	Enable           *NATPolicyEmptyModel                 `tfsdk:"enable"`
 	NetworkInterface *NATPolicyRulesNetworkInterfaceModel `tfsdk:"network_interface"`
+	NodeInterface    *NATPolicyRulesNodeInterfaceModel    `tfsdk:"node_interface"`
 	Segment          *NATPolicyRulesSegmentModel          `tfsdk:"segment"`
 	VirtualNetwork   *NATPolicyRulesVirtualNetworkModel   `tfsdk:"virtual_network"`
 }
@@ -64,9 +69,10 @@ var NATPolicyRulesModelAttrTypes = map[string]attr.Type{
 	"action":            types.ObjectType{AttrTypes: NATPolicyRulesActionModelAttrTypes},
 	"cloud_connect":     types.ObjectType{AttrTypes: NATPolicyRulesCloudConnectModelAttrTypes},
 	"criteria":          types.ObjectType{AttrTypes: NATPolicyRulesCriteriaModelAttrTypes},
-	"disable":           types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"disable_spec":      types.ObjectType{AttrTypes: map[string]attr.Type{}},
 	"enable":            types.ObjectType{AttrTypes: map[string]attr.Type{}},
 	"network_interface": types.ObjectType{AttrTypes: NATPolicyRulesNetworkInterfaceModelAttrTypes},
+	"node_interface":    types.ObjectType{AttrTypes: NATPolicyRulesNodeInterfaceModelAttrTypes},
 	"segment":           types.ObjectType{AttrTypes: NATPolicyRulesSegmentModelAttrTypes},
 	"virtual_network":   types.ObjectType{AttrTypes: NATPolicyRulesVirtualNetworkModelAttrTypes},
 }
@@ -163,32 +169,36 @@ var NATPolicyRulesCloudConnectRefsModelAttrTypes = map[string]attr.Type{
 
 // NATPolicyRulesCriteriaModel represents criteria block
 type NATPolicyRulesCriteriaModel struct {
-	DestinationCIDR types.List                                  `tfsdk:"destination_cidr"`
-	Protocol        types.String                                `tfsdk:"protocol"`
-	SourceCIDR      types.List                                  `tfsdk:"source_cidr"`
-	Any             *NATPolicyEmptyModel                        `tfsdk:"any"`
-	DestinationPort *NATPolicyRulesCriteriaDestinationPortModel `tfsdk:"destination_port"`
-	ICMP            *NATPolicyEmptyModel                        `tfsdk:"icmp"`
-	Segment         *NATPolicyRulesCriteriaSegmentModel         `tfsdk:"segment"`
-	SourcePort      *NATPolicyRulesCriteriaSourcePortModel      `tfsdk:"source_port"`
-	TCP             *NATPolicyRulesCriteriaTCPModel             `tfsdk:"tcp"`
-	UDP             *NATPolicyRulesCriteriaUDPModel             `tfsdk:"udp"`
-	VirtualNetwork  *NATPolicyRulesCriteriaVirtualNetworkModel  `tfsdk:"virtual_network"`
+	DestinationCIDR        types.List                                  `tfsdk:"destination_cidr"`
+	Protocol               types.String                                `tfsdk:"protocol"`
+	SourceCIDR             types.List                                  `tfsdk:"source_cidr"`
+	Any                    *NATPolicyEmptyModel                        `tfsdk:"any"`
+	DestinationPort        *NATPolicyRulesCriteriaDestinationPortModel `tfsdk:"destination_port"`
+	ICMP                   *NATPolicyEmptyModel                        `tfsdk:"icmp"`
+	Segment                *NATPolicyRulesCriteriaSegmentModel         `tfsdk:"segment"`
+	SiteLocalInsideNetwork *NATPolicyEmptyModel                        `tfsdk:"site_local_inside_network"`
+	SiteLocalNetwork       *NATPolicyEmptyModel                        `tfsdk:"site_local_network"`
+	SourcePort             *NATPolicyRulesCriteriaSourcePortModel      `tfsdk:"source_port"`
+	TCP                    *NATPolicyRulesCriteriaTCPModel             `tfsdk:"tcp"`
+	UDP                    *NATPolicyRulesCriteriaUDPModel             `tfsdk:"udp"`
+	VirtualNetwork         *NATPolicyRulesCriteriaVirtualNetworkModel  `tfsdk:"virtual_network"`
 }
 
 // NATPolicyRulesCriteriaModelAttrTypes defines the attribute types for NATPolicyRulesCriteriaModel
 var NATPolicyRulesCriteriaModelAttrTypes = map[string]attr.Type{
-	"destination_cidr": types.ListType{ElemType: types.StringType},
-	"protocol":         types.StringType,
-	"source_cidr":      types.ListType{ElemType: types.StringType},
-	"any":              types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"destination_port": types.ObjectType{AttrTypes: NATPolicyRulesCriteriaDestinationPortModelAttrTypes},
-	"icmp":             types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"segment":          types.ObjectType{AttrTypes: NATPolicyRulesCriteriaSegmentModelAttrTypes},
-	"source_port":      types.ObjectType{AttrTypes: NATPolicyRulesCriteriaSourcePortModelAttrTypes},
-	"tcp":              types.ObjectType{AttrTypes: NATPolicyRulesCriteriaTCPModelAttrTypes},
-	"udp":              types.ObjectType{AttrTypes: NATPolicyRulesCriteriaUDPModelAttrTypes},
-	"virtual_network":  types.ObjectType{AttrTypes: NATPolicyRulesCriteriaVirtualNetworkModelAttrTypes},
+	"destination_cidr":          types.ListType{ElemType: types.StringType},
+	"protocol":                  types.StringType,
+	"source_cidr":               types.ListType{ElemType: types.StringType},
+	"any":                       types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"destination_port":          types.ObjectType{AttrTypes: NATPolicyRulesCriteriaDestinationPortModelAttrTypes},
+	"icmp":                      types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"segment":                   types.ObjectType{AttrTypes: NATPolicyRulesCriteriaSegmentModelAttrTypes},
+	"site_local_inside_network": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"site_local_network":        types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"source_port":               types.ObjectType{AttrTypes: NATPolicyRulesCriteriaSourcePortModelAttrTypes},
+	"tcp":                       types.ObjectType{AttrTypes: NATPolicyRulesCriteriaTCPModelAttrTypes},
+	"udp":                       types.ObjectType{AttrTypes: NATPolicyRulesCriteriaUDPModelAttrTypes},
+	"virtual_network":           types.ObjectType{AttrTypes: NATPolicyRulesCriteriaVirtualNetworkModelAttrTypes},
 }
 
 // NATPolicyRulesCriteriaDestinationPortModel represents destination_port block
@@ -383,6 +393,46 @@ var NATPolicyRulesNetworkInterfaceRefsModelAttrTypes = map[string]attr.Type{
 	"uid":       types.StringType,
 }
 
+// NATPolicyRulesNodeInterfaceModel represents node_interface block
+type NATPolicyRulesNodeInterfaceModel struct {
+	List []NATPolicyRulesNodeInterfaceListModel `tfsdk:"list"`
+}
+
+// NATPolicyRulesNodeInterfaceModelAttrTypes defines the attribute types for NATPolicyRulesNodeInterfaceModel
+var NATPolicyRulesNodeInterfaceModelAttrTypes = map[string]attr.Type{
+	"list": types.ListType{ElemType: types.ObjectType{AttrTypes: NATPolicyRulesNodeInterfaceListModelAttrTypes}},
+}
+
+// NATPolicyRulesNodeInterfaceListModel represents list block
+type NATPolicyRulesNodeInterfaceListModel struct {
+	Node      types.String                                    `tfsdk:"node"`
+	Interface []NATPolicyRulesNodeInterfaceListInterfaceModel `tfsdk:"interface"`
+}
+
+// NATPolicyRulesNodeInterfaceListModelAttrTypes defines the attribute types for NATPolicyRulesNodeInterfaceListModel
+var NATPolicyRulesNodeInterfaceListModelAttrTypes = map[string]attr.Type{
+	"node":      types.StringType,
+	"interface": types.ListType{ElemType: types.ObjectType{AttrTypes: NATPolicyRulesNodeInterfaceListInterfaceModelAttrTypes}},
+}
+
+// NATPolicyRulesNodeInterfaceListInterfaceModel represents interface block
+type NATPolicyRulesNodeInterfaceListInterfaceModel struct {
+	Kind      types.String `tfsdk:"kind"`
+	Name      types.String `tfsdk:"name"`
+	Namespace types.String `tfsdk:"namespace"`
+	Tenant    types.String `tfsdk:"tenant"`
+	Uid       types.String `tfsdk:"uid"`
+}
+
+// NATPolicyRulesNodeInterfaceListInterfaceModelAttrTypes defines the attribute types for NATPolicyRulesNodeInterfaceListInterfaceModel
+var NATPolicyRulesNodeInterfaceListInterfaceModelAttrTypes = map[string]attr.Type{
+	"kind":      types.StringType,
+	"name":      types.StringType,
+	"namespace": types.StringType,
+	"tenant":    types.StringType,
+	"uid":       types.StringType,
+}
+
 // NATPolicyRulesSegmentModel represents segment block
 type NATPolicyRulesSegmentModel struct {
 	Refs []NATPolicyRulesSegmentRefsModel `tfsdk:"refs"`
@@ -548,6 +598,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Name. Name of the Rule .",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -555,8 +609,11 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 							MarkdownDescription: "Action to apply on the packet if the NAT rule is applied.",
 							Attributes: map[string]schema.Attribute{
 								"virtual_cidr": schema.StringAttribute{
-									MarkdownDescription: "Virtual Subnet NAT is static NAT that does a one-to-one translation between the real source IP CIDR in the policy and the virtual CIDR in a bidirectional fashion. The range of the real CIDR and virtual CIDRs should be the same (e.g. If the real CIDR has the CIDR..",
+									MarkdownDescription: "Exclusive with [dynamic] Virtual Subnet NAT is static NAT that does a one-to-one translation between the real source IP CIDR in the policy and the virtual CIDR in a bidirectional fashion. The range of the real CIDR and virtual CIDRs should be the same (e.g. If the real CIDR has the CIDR..",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -583,6 +640,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 															"name": schema.StringAttribute{
 																MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 1024),
+																	stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																},
 															},
 															"namespace": schema.StringAttribute{
 																MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -590,6 +651,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 																Computed:            true,
 																PlanModifiers: []planmodifier.String{
 																	stringplanmodifier.UseStateForUnknown(),
+																},
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 1024),
+																	stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																},
 															},
 															"tenant": schema.StringAttribute{
@@ -620,6 +685,9 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 													MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(128),
+													},
 												},
 											},
 										},
@@ -628,7 +696,7 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 							},
 						},
 						"cloud_connect": schema.SingleNestedBlock{
-							MarkdownDescription: "Cloud Connect Reference Type. Reference to Cloud connect Object.",
+							MarkdownDescription: "Configuration parameter for cloud connect.",
 							Attributes:          map[string]schema.Attribute{},
 							Blocks: map[string]schema.Block{
 								"refs": schema.ListNestedBlock{
@@ -646,6 +714,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -653,6 +725,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 												},
 											},
 											"tenant": schema.StringAttribute{
@@ -687,6 +763,9 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 								"protocol": schema.StringAttribute{
 									MarkdownDescription: "[Enum: ALL|ICMP|TCP|UDP] Protocols. Protocols like TCP, UDP. Possible values are `ALL`, `ICMP`, `TCP`, `UDP`. Defaults to `ALL`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("ALL", "ICMP", "TCP", "UDP"),
+									},
 								},
 								"source_cidr": schema.ListAttribute{
 									MarkdownDescription: "Source IP. Source IP of the packet to match.",
@@ -702,12 +781,15 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 									MarkdownDescription: "Port match of the request can be a range or a specific port.",
 									Attributes: map[string]schema.Attribute{
 										"port": schema.Int64Attribute{
-											MarkdownDescription: "Exact Port to match.",
+											MarkdownDescription: "Exclusive with [no_port_match port_ranges] Exact Port to match.",
 											Optional:            true,
 										},
 										"port_ranges": schema.StringAttribute{
-											MarkdownDescription: "Port range to match.",
+											MarkdownDescription: "Exclusive with [no_port_match port] Port range to match.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 32),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -738,6 +820,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -745,6 +831,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -768,16 +858,25 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 										},
 									},
 								},
+								"site_local_inside_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Enable this option",
+								},
+								"site_local_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Enable this option",
+								},
 								"source_port": schema.SingleNestedBlock{
 									MarkdownDescription: "Port match of the request can be a range or a specific port.",
 									Attributes: map[string]schema.Attribute{
 										"port": schema.Int64Attribute{
-											MarkdownDescription: "Exact Port to match.",
+											MarkdownDescription: "Exclusive with [no_port_match port_ranges] Exact Port to match.",
 											Optional:            true,
 										},
 										"port_ranges": schema.StringAttribute{
-											MarkdownDescription: "Port range to match.",
+											MarkdownDescription: "Exclusive with [no_port_match port] Port range to match.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 32),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -794,12 +893,15 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 											MarkdownDescription: "Port match of the request can be a range or a specific port.",
 											Attributes: map[string]schema.Attribute{
 												"port": schema.Int64Attribute{
-													MarkdownDescription: "Exact Port to match.",
+													MarkdownDescription: "Exclusive with [no_port_match port_ranges] Exact Port to match.",
 													Optional:            true,
 												},
 												"port_ranges": schema.StringAttribute{
-													MarkdownDescription: "Port range to match.",
+													MarkdownDescription: "Exclusive with [no_port_match port] Port range to match.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 32),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
@@ -812,12 +914,15 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 											MarkdownDescription: "Port match of the request can be a range or a specific port.",
 											Attributes: map[string]schema.Attribute{
 												"port": schema.Int64Attribute{
-													MarkdownDescription: "Exact Port to match.",
+													MarkdownDescription: "Exclusive with [no_port_match port_ranges] Exact Port to match.",
 													Optional:            true,
 												},
 												"port_ranges": schema.StringAttribute{
-													MarkdownDescription: "Port range to match.",
+													MarkdownDescription: "Exclusive with [no_port_match port] Port range to match.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 32),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
@@ -836,12 +941,15 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 											MarkdownDescription: "Port match of the request can be a range or a specific port.",
 											Attributes: map[string]schema.Attribute{
 												"port": schema.Int64Attribute{
-													MarkdownDescription: "Exact Port to match.",
+													MarkdownDescription: "Exclusive with [no_port_match port_ranges] Exact Port to match.",
 													Optional:            true,
 												},
 												"port_ranges": schema.StringAttribute{
-													MarkdownDescription: "Port range to match.",
+													MarkdownDescription: "Exclusive with [no_port_match port] Port range to match.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 32),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
@@ -854,12 +962,15 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 											MarkdownDescription: "Port match of the request can be a range or a specific port.",
 											Attributes: map[string]schema.Attribute{
 												"port": schema.Int64Attribute{
-													MarkdownDescription: "Exact Port to match.",
+													MarkdownDescription: "Exclusive with [no_port_match port_ranges] Exact Port to match.",
 													Optional:            true,
 												},
 												"port_ranges": schema.StringAttribute{
-													MarkdownDescription: "Port range to match.",
+													MarkdownDescription: "Exclusive with [no_port_match port] Port range to match.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 32),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
@@ -889,6 +1000,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -896,6 +1011,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -921,14 +1040,14 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 								},
 							},
 						},
-						"disable": schema.SingleNestedBlock{
+						"disable_spec": schema.SingleNestedBlock{
 							MarkdownDescription: "Enable this option",
 						},
 						"enable": schema.SingleNestedBlock{
 							MarkdownDescription: "Enable this option",
 						},
 						"network_interface": schema.SingleNestedBlock{
-							MarkdownDescription: "NetworkInterface Reference Type. Reference to Network Interface Object.",
+							MarkdownDescription: "Configuration parameter for network interface.",
 							Attributes:          map[string]schema.Attribute{},
 							Blocks: map[string]schema.Block{
 								"refs": schema.ListNestedBlock{
@@ -946,6 +1065,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -953,6 +1076,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 												},
 											},
 											"tenant": schema.StringAttribute{
@@ -969,6 +1096,76 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"node_interface": schema.SingleNestedBlock{
+							MarkdownDescription: "On multinode site, this type holds the information about per node interfaces.",
+							Attributes:          map[string]schema.Attribute{},
+							Blocks: map[string]schema.Block{
+								"list": schema.ListNestedBlock{
+									MarkdownDescription: "On a multinode site, this list holds the nodes and corresponding networking_interface.",
+									NestedObject: schema.NestedBlockObject{
+										Attributes: map[string]schema.Attribute{
+											"node": schema.StringAttribute{
+												MarkdownDescription: "X-displayName: 'Node' Node name on this site.",
+												Optional:            true,
+											},
+										},
+										Blocks: map[string]schema.Block{
+											"interface": schema.ListNestedBlock{
+												MarkdownDescription: "X-displayName: 'Interface' Interface reference on this node.",
+												NestedObject: schema.NestedBlockObject{
+													Attributes: map[string]schema.Attribute{
+														"kind": schema.StringAttribute{
+															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then kind will hold the referred object's kind (e.g. 'route').",
+															Optional:            true,
+															Computed:            true,
+															PlanModifiers: []planmodifier.String{
+																stringplanmodifier.UseStateForUnknown(),
+															},
+														},
+														"name": schema.StringAttribute{
+															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+																stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+															},
+														},
+														"namespace": schema.StringAttribute{
+															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+															Optional:            true,
+															Computed:            true,
+															PlanModifiers: []planmodifier.String{
+																stringplanmodifier.UseStateForUnknown(),
+															},
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+																stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+															},
+														},
+														"tenant": schema.StringAttribute{
+															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+															Optional:            true,
+															Computed:            true,
+															PlanModifiers: []planmodifier.String{
+																stringplanmodifier.UseStateForUnknown(),
+															},
+														},
+														"uid": schema.StringAttribute{
+															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then uid will hold the referred object's(e.g. Route's) uid.",
+															Optional:            true,
+															Computed:            true,
+															PlanModifiers: []planmodifier.String{
+																stringplanmodifier.UseStateForUnknown(),
+															},
+														},
+													},
 												},
 											},
 										},
@@ -995,6 +1192,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1002,6 +1203,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 												},
 											},
 											"tenant": schema.StringAttribute{
@@ -1044,6 +1249,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1051,6 +1260,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 												},
 											},
 											"tenant": schema.StringAttribute{
@@ -1096,6 +1309,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1103,6 +1320,10 @@ func (r *NATPolicyResource) Schema(ctx context.Context, req resource.SchemaReque
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -1313,6 +1534,12 @@ func (r *NATPolicyResource) Create(ctx context.Context, req resource.CreateReque
 						segmentDeepMap := make(map[string]interface{})
 						criteriaNestedMap["segment"] = segmentDeepMap
 					}
+					if item.Criteria.SiteLocalInsideNetwork != nil {
+						criteriaNestedMap["site_local_inside_network"] = map[string]interface{}{}
+					}
+					if item.Criteria.SiteLocalNetwork != nil {
+						criteriaNestedMap["site_local_network"] = map[string]interface{}{}
+					}
 					if !item.Criteria.SourceCIDR.IsNull() && !item.Criteria.SourceCIDR.IsUnknown() {
 						var SourceCIDRItems []string
 						diags := item.Criteria.SourceCIDR.ElementsAs(ctx, &SourceCIDRItems, false)
@@ -1347,7 +1574,7 @@ func (r *NATPolicyResource) Create(ctx context.Context, req resource.CreateReque
 					}
 					itemMap["criteria"] = criteriaNestedMap
 				}
-				if item.Disable != nil {
+				if item.DisableSpec != nil {
 					itemMap["disable"] = map[string]interface{}{}
 				}
 				if item.Enable != nil {
@@ -1382,6 +1609,21 @@ func (r *NATPolicyResource) Create(ctx context.Context, req resource.CreateReque
 						network_interfaceNestedMap["refs"] = refsDeepList
 					}
 					itemMap["network_interface"] = network_interfaceNestedMap
+				}
+				if item.NodeInterface != nil {
+					node_interfaceNestedMap := make(map[string]interface{})
+					if len(item.NodeInterface.List) > 0 {
+						var listDeepList []map[string]interface{}
+						for _, deepListItem := range item.NodeInterface.List {
+							deepListItemMap := make(map[string]interface{})
+							if !deepListItem.Node.IsNull() && !deepListItem.Node.IsUnknown() {
+								deepListItemMap["node"] = deepListItem.Node.ValueString()
+							}
+							listDeepList = append(listDeepList, deepListItemMap)
+						}
+						node_interfaceNestedMap["list"] = listDeepList
+					}
+					itemMap["node_interface"] = node_interfaceNestedMap
 				}
 				if item.Segment != nil {
 					segmentNestedMap := make(map[string]interface{})
@@ -1545,6 +1787,18 @@ func (r *NATPolicyResource) Create(ctx context.Context, req resource.CreateReque
 									}
 									return types.StringNull()
 								}(),
+								SiteLocalInsideNetwork: func() *NATPolicyEmptyModel {
+									if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].Criteria != nil && existingRulesItems[listIdx].Criteria.SiteLocalInsideNetwork != nil {
+										return &NATPolicyEmptyModel{}
+									}
+									return nil
+								}(),
+								SiteLocalNetwork: func() *NATPolicyEmptyModel {
+									if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].Criteria != nil && existingRulesItems[listIdx].Criteria.SiteLocalNetwork != nil {
+										return &NATPolicyEmptyModel{}
+									}
+									return nil
+								}(),
 								SourceCIDR: func() types.List {
 									if v, ok := nestedMap["source_cidr"].([]interface{}); ok && len(v) > 0 {
 										var items []string
@@ -1562,8 +1816,8 @@ func (r *NATPolicyResource) Create(ctx context.Context, req resource.CreateReque
 						}
 						return nil
 					}(),
-					Disable: func() *NATPolicyEmptyModel {
-						if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].Disable != nil {
+					DisableSpec: func() *NATPolicyEmptyModel {
+						if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].DisableSpec != nil {
 							return &NATPolicyEmptyModel{}
 						}
 						return nil
@@ -1583,6 +1837,12 @@ func (r *NATPolicyResource) Create(ctx context.Context, req resource.CreateReque
 					NetworkInterface: func() *NATPolicyRulesNetworkInterfaceModel {
 						if _, ok := itemMap["network_interface"].(map[string]interface{}); ok {
 							return &NATPolicyRulesNetworkInterfaceModel{}
+						}
+						return nil
+					}(),
+					NodeInterface: func() *NATPolicyRulesNodeInterfaceModel {
+						if _, ok := itemMap["node_interface"].(map[string]interface{}); ok {
+							return &NATPolicyRulesNodeInterfaceModel{}
 						}
 						return nil
 					}(),
@@ -1800,6 +2060,18 @@ func (r *NATPolicyResource) Read(ctx context.Context, req resource.ReadRequest, 
 									}
 									return types.StringNull()
 								}(),
+								SiteLocalInsideNetwork: func() *NATPolicyEmptyModel {
+									if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].Criteria != nil && existingRulesItems[listIdx].Criteria.SiteLocalInsideNetwork != nil {
+										return &NATPolicyEmptyModel{}
+									}
+									return nil
+								}(),
+								SiteLocalNetwork: func() *NATPolicyEmptyModel {
+									if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].Criteria != nil && existingRulesItems[listIdx].Criteria.SiteLocalNetwork != nil {
+										return &NATPolicyEmptyModel{}
+									}
+									return nil
+								}(),
 								SourceCIDR: func() types.List {
 									if v, ok := nestedMap["source_cidr"].([]interface{}); ok && len(v) > 0 {
 										var items []string
@@ -1817,8 +2089,8 @@ func (r *NATPolicyResource) Read(ctx context.Context, req resource.ReadRequest, 
 						}
 						return nil
 					}(),
-					Disable: func() *NATPolicyEmptyModel {
-						if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].Disable != nil {
+					DisableSpec: func() *NATPolicyEmptyModel {
+						if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].DisableSpec != nil {
 							return &NATPolicyEmptyModel{}
 						}
 						return nil
@@ -1838,6 +2110,12 @@ func (r *NATPolicyResource) Read(ctx context.Context, req resource.ReadRequest, 
 					NetworkInterface: func() *NATPolicyRulesNetworkInterfaceModel {
 						if _, ok := itemMap["network_interface"].(map[string]interface{}); ok {
 							return &NATPolicyRulesNetworkInterfaceModel{}
+						}
+						return nil
+					}(),
+					NodeInterface: func() *NATPolicyRulesNodeInterfaceModel {
+						if _, ok := itemMap["node_interface"].(map[string]interface{}); ok {
+							return &NATPolicyRulesNodeInterfaceModel{}
 						}
 						return nil
 					}(),
@@ -2044,6 +2322,12 @@ func (r *NATPolicyResource) Update(ctx context.Context, req resource.UpdateReque
 						segmentDeepMap := make(map[string]interface{})
 						criteriaNestedMap["segment"] = segmentDeepMap
 					}
+					if item.Criteria.SiteLocalInsideNetwork != nil {
+						criteriaNestedMap["site_local_inside_network"] = map[string]interface{}{}
+					}
+					if item.Criteria.SiteLocalNetwork != nil {
+						criteriaNestedMap["site_local_network"] = map[string]interface{}{}
+					}
 					if !item.Criteria.SourceCIDR.IsNull() && !item.Criteria.SourceCIDR.IsUnknown() {
 						var SourceCIDRItems []string
 						diags := item.Criteria.SourceCIDR.ElementsAs(ctx, &SourceCIDRItems, false)
@@ -2078,7 +2362,7 @@ func (r *NATPolicyResource) Update(ctx context.Context, req resource.UpdateReque
 					}
 					itemMap["criteria"] = criteriaNestedMap
 				}
-				if item.Disable != nil {
+				if item.DisableSpec != nil {
 					itemMap["disable"] = map[string]interface{}{}
 				}
 				if item.Enable != nil {
@@ -2113,6 +2397,21 @@ func (r *NATPolicyResource) Update(ctx context.Context, req resource.UpdateReque
 						network_interfaceNestedMap["refs"] = refsDeepList
 					}
 					itemMap["network_interface"] = network_interfaceNestedMap
+				}
+				if item.NodeInterface != nil {
+					node_interfaceNestedMap := make(map[string]interface{})
+					if len(item.NodeInterface.List) > 0 {
+						var listDeepList []map[string]interface{}
+						for _, deepListItem := range item.NodeInterface.List {
+							deepListItemMap := make(map[string]interface{})
+							if !deepListItem.Node.IsNull() && !deepListItem.Node.IsUnknown() {
+								deepListItemMap["node"] = deepListItem.Node.ValueString()
+							}
+							listDeepList = append(listDeepList, deepListItemMap)
+						}
+						node_interfaceNestedMap["list"] = listDeepList
+					}
+					itemMap["node_interface"] = node_interfaceNestedMap
 				}
 				if item.Segment != nil {
 					segmentNestedMap := make(map[string]interface{})
@@ -2287,6 +2586,18 @@ func (r *NATPolicyResource) Update(ctx context.Context, req resource.UpdateReque
 									}
 									return types.StringNull()
 								}(),
+								SiteLocalInsideNetwork: func() *NATPolicyEmptyModel {
+									if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].Criteria != nil && existingRulesItems[listIdx].Criteria.SiteLocalInsideNetwork != nil {
+										return &NATPolicyEmptyModel{}
+									}
+									return nil
+								}(),
+								SiteLocalNetwork: func() *NATPolicyEmptyModel {
+									if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].Criteria != nil && existingRulesItems[listIdx].Criteria.SiteLocalNetwork != nil {
+										return &NATPolicyEmptyModel{}
+									}
+									return nil
+								}(),
 								SourceCIDR: func() types.List {
 									if v, ok := nestedMap["source_cidr"].([]interface{}); ok && len(v) > 0 {
 										var items []string
@@ -2304,8 +2615,8 @@ func (r *NATPolicyResource) Update(ctx context.Context, req resource.UpdateReque
 						}
 						return nil
 					}(),
-					Disable: func() *NATPolicyEmptyModel {
-						if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].Disable != nil {
+					DisableSpec: func() *NATPolicyEmptyModel {
+						if !isImport && len(existingRulesItems) > listIdx && existingRulesItems[listIdx].DisableSpec != nil {
 							return &NATPolicyEmptyModel{}
 						}
 						return nil
@@ -2325,6 +2636,12 @@ func (r *NATPolicyResource) Update(ctx context.Context, req resource.UpdateReque
 					NetworkInterface: func() *NATPolicyRulesNetworkInterfaceModel {
 						if _, ok := itemMap["network_interface"].(map[string]interface{}); ok {
 							return &NATPolicyRulesNetworkInterfaceModel{}
+						}
+						return nil
+					}(),
+					NodeInterface: func() *NATPolicyRulesNodeInterfaceModel {
+						if _, ok := itemMap["node_interface"].(map[string]interface{}); ok {
+							return &NATPolicyRulesNodeInterfaceModel{}
 						}
 						return nil
 					}(),

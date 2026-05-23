@@ -9,10 +9,13 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -88,12 +91,12 @@ type APIDefinitionResourceModel struct {
 	Description               types.String             `tfsdk:"description"`
 	Disable                   types.Bool               `tfsdk:"disable"`
 	Labels                    types.Map                `tfsdk:"labels"`
-	SwaggerSpecs              types.List               `tfsdk:"swagger_specs"`
 	ID                        types.String             `tfsdk:"id"`
+	SwaggerSpecs              types.List               `tfsdk:"swagger_specs"`
 	Timeouts                  timeouts.Value           `tfsdk:"timeouts"`
+	MixedSchemaOrigin         *APIDefinitionEmptyModel `tfsdk:"mixed_schema_origin"`
 	APIInventoryExclusionList types.List               `tfsdk:"api_inventory_exclusion_list"`
 	APIInventoryInclusionList types.List               `tfsdk:"api_inventory_inclusion_list"`
-	MixedSchemaOrigin         *APIDefinitionEmptyModel `tfsdk:"mixed_schema_origin"`
 	NonAPIEndpoints           types.List               `tfsdk:"non_api_endpoints"`
 	StrictSchemaOrigin        *APIDefinitionEmptyModel `tfsdk:"strict_schema_origin"`
 }
@@ -144,16 +147,23 @@ func (r *APIDefinitionResource) Schema(ctx context.Context, req resource.SchemaR
 				Optional:            true,
 				ElementType:         types.StringType,
 			},
-			"swagger_specs": schema.ListAttribute{
-				MarkdownDescription: "Define your application API by single or multiple OpenAPI files. 1. Upload your OpenAPI files via Web App & API Protection-> Files-> Swagger Files. 2. Select from the list of uploaded files. Defaults to `[]`. Server applies default when omitted.",
-				Optional:            true,
-				ElementType:         types.StringType,
-			},
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique identifier for the resource.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
+			"swagger_specs": schema.ListAttribute{
+				MarkdownDescription: "Define your application API by single or multiple OpenAPI files. 1. Upload your OpenAPI files via Web App & API Protection-> Files-> Swagger Files. 2. Select from the list of uploaded files. Defaults to `[]`. Server applies default when omitted.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(20),
 				},
 			},
 		},
@@ -164,56 +174,74 @@ func (r *APIDefinitionResource) Schema(ctx context.Context, req resource.SchemaR
 				Update: true,
 				Delete: true,
 			}),
+			"mixed_schema_origin": schema.SingleNestedBlock{
+				MarkdownDescription: "[OneOf: mixed_schema_origin, strict_schema_origin] Configuration parameter for mixed schema origin.",
+			},
 			"api_inventory_exclusion_list": schema.ListNestedBlock{
-				MarkdownDescription: "List of API Endpoints excluded from the API Inventory.",
+				MarkdownDescription: "List of API Endpoints excluded from the API Inventory. Defaults to `[]`. Server applies default when omitted.",
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"method": schema.StringAttribute{
 							MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] Specifies the HTTP method used to access a resource. Any HTTP Method. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf("ANY", "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH", "COPY"),
+							},
 						},
 						"path": schema.StringAttribute{
 							MarkdownDescription: "Endpoint path, as specified in OpenAPI, including parameters. The path should comply with RFC 3986 and may have parameters according to OpenAPI specification .",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+							},
 						},
 					},
 				},
 			},
 			"api_inventory_inclusion_list": schema.ListNestedBlock{
-				MarkdownDescription: "List of API Endpoints included in the API Inventory. Typically, discovered API endpoints are added to the API Inventory using this list.",
+				MarkdownDescription: "List of API Endpoints included in the API Inventory. Typically, discovered API endpoints are added to the API Inventory using this list. Defaults to `[]`. Server applies default when omitted.",
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"method": schema.StringAttribute{
 							MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] Specifies the HTTP method used to access a resource. Any HTTP Method. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf("ANY", "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH", "COPY"),
+							},
 						},
 						"path": schema.StringAttribute{
 							MarkdownDescription: "Endpoint path, as specified in OpenAPI, including parameters. The path should comply with RFC 3986 and may have parameters according to OpenAPI specification .",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+							},
 						},
 					},
 				},
 			},
-			"mixed_schema_origin": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: mixed_schema_origin, strict_schema_origin] Enable this option",
-			},
 			"non_api_endpoints": schema.ListNestedBlock{
-				MarkdownDescription: "API Discovery Exclusion List. List of Non-API Endpoints.",
+				MarkdownDescription: "API Discovery Exclusion List. List of Non-API Endpoints. Defaults to `[]`. Server applies default when omitted.",
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"method": schema.StringAttribute{
 							MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] Specifies the HTTP method used to access a resource. Any HTTP Method. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf("ANY", "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH", "COPY"),
+							},
 						},
 						"path": schema.StringAttribute{
 							MarkdownDescription: "Endpoint path, as specified in OpenAPI, including parameters. The path should comply with RFC 3986 and may have parameters according to OpenAPI specification .",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+							},
 						},
 					},
 				},
 			},
 			"strict_schema_origin": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for strict schema origin. Defaults to `map[]`. Server applies default when omitted.",
 			},
 		},
 	}
@@ -321,6 +349,10 @@ func (r *APIDefinitionResource) Create(ctx context.Context, req resource.CreateR
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if data.MixedSchemaOrigin != nil {
+		mixed_schema_originMap := make(map[string]interface{})
+		createReq.Spec["mixed_schema_origin"] = mixed_schema_originMap
+	}
 	if !data.APIInventoryExclusionList.IsNull() && !data.APIInventoryExclusionList.IsUnknown() {
 		var api_inventory_exclusion_listItems []APIDefinitionAPIInventoryExclusionListModel
 		diags := data.APIInventoryExclusionList.ElementsAs(ctx, &api_inventory_exclusion_listItems, false)
@@ -358,10 +390,6 @@ func (r *APIDefinitionResource) Create(ctx context.Context, req resource.CreateR
 			}
 			createReq.Spec["api_inventory_inclusion_list"] = api_inventory_inclusion_listList
 		}
-	}
-	if data.MixedSchemaOrigin != nil {
-		mixed_schema_originMap := make(map[string]interface{})
-		createReq.Spec["mixed_schema_origin"] = mixed_schema_originMap
 	}
 	if !data.NonAPIEndpoints.IsNull() && !data.NonAPIEndpoints.IsUnknown() {
 		var non_api_endpointsItems []APIDefinitionNonAPIEndpointsModel
@@ -406,6 +434,11 @@ func (r *APIDefinitionResource) Create(ctx context.Context, req resource.CreateR
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["mixed_schema_origin"].(map[string]interface{}); ok && isImport && data.MixedSchemaOrigin == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.MixedSchemaOrigin = &APIDefinitionEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["api_inventory_exclusion_list"].([]interface{}); ok && len(listData) > 0 {
 		var api_inventory_exclusion_listList []APIDefinitionAPIInventoryExclusionListModel
 		var existingAPIInventoryExclusionListItems []APIDefinitionAPIInventoryExclusionListModel
@@ -474,11 +507,6 @@ func (r *APIDefinitionResource) Create(ctx context.Context, req resource.CreateR
 		// No data from API - set to null list
 		data.APIInventoryInclusionList = types.ListNull(types.ObjectType{AttrTypes: APIDefinitionAPIInventoryInclusionListModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["mixed_schema_origin"].(map[string]interface{}); ok && isImport && data.MixedSchemaOrigin == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.MixedSchemaOrigin = &APIDefinitionEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["non_api_endpoints"].([]interface{}); ok && len(listData) > 0 {
 		var non_api_endpointsList []APIDefinitionNonAPIEndpointsModel
 		var existingNonAPIEndpointsItems []APIDefinitionNonAPIEndpointsModel
@@ -613,6 +641,11 @@ func (r *APIDefinitionResource) Read(ctx context.Context, req resource.ReadReque
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["mixed_schema_origin"].(map[string]interface{}); ok && isImport && data.MixedSchemaOrigin == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.MixedSchemaOrigin = &APIDefinitionEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["api_inventory_exclusion_list"].([]interface{}); ok && len(listData) > 0 {
 		var api_inventory_exclusion_listList []APIDefinitionAPIInventoryExclusionListModel
 		var existingAPIInventoryExclusionListItems []APIDefinitionAPIInventoryExclusionListModel
@@ -681,11 +714,6 @@ func (r *APIDefinitionResource) Read(ctx context.Context, req resource.ReadReque
 		// No data from API - set to null list
 		data.APIInventoryInclusionList = types.ListNull(types.ObjectType{AttrTypes: APIDefinitionAPIInventoryInclusionListModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["mixed_schema_origin"].(map[string]interface{}); ok && isImport && data.MixedSchemaOrigin == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.MixedSchemaOrigin = &APIDefinitionEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["non_api_endpoints"].([]interface{}); ok && len(listData) > 0 {
 		var non_api_endpointsList []APIDefinitionNonAPIEndpointsModel
 		var existingNonAPIEndpointsItems []APIDefinitionNonAPIEndpointsModel
@@ -791,6 +819,10 @@ func (r *APIDefinitionResource) Update(ctx context.Context, req resource.UpdateR
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if data.MixedSchemaOrigin != nil {
+		mixed_schema_originMap := make(map[string]interface{})
+		apiResource.Spec["mixed_schema_origin"] = mixed_schema_originMap
+	}
 	if !data.APIInventoryExclusionList.IsNull() && !data.APIInventoryExclusionList.IsUnknown() {
 		var api_inventory_exclusion_listItems []APIDefinitionAPIInventoryExclusionListModel
 		diags := data.APIInventoryExclusionList.ElementsAs(ctx, &api_inventory_exclusion_listItems, false)
@@ -828,10 +860,6 @@ func (r *APIDefinitionResource) Update(ctx context.Context, req resource.UpdateR
 			}
 			apiResource.Spec["api_inventory_inclusion_list"] = api_inventory_inclusion_listList
 		}
-	}
-	if data.MixedSchemaOrigin != nil {
-		mixed_schema_originMap := make(map[string]interface{})
-		apiResource.Spec["mixed_schema_origin"] = mixed_schema_originMap
 	}
 	if !data.NonAPIEndpoints.IsNull() && !data.NonAPIEndpoints.IsUnknown() {
 		var non_api_endpointsItems []APIDefinitionNonAPIEndpointsModel
@@ -887,6 +915,11 @@ func (r *APIDefinitionResource) Update(ctx context.Context, req resource.UpdateR
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["mixed_schema_origin"].(map[string]interface{}); ok && isImport && data.MixedSchemaOrigin == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.MixedSchemaOrigin = &APIDefinitionEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["api_inventory_exclusion_list"].([]interface{}); ok && len(listData) > 0 {
 		var api_inventory_exclusion_listList []APIDefinitionAPIInventoryExclusionListModel
 		var existingAPIInventoryExclusionListItems []APIDefinitionAPIInventoryExclusionListModel
@@ -955,11 +988,6 @@ func (r *APIDefinitionResource) Update(ctx context.Context, req resource.UpdateR
 		// No data from API - set to null list
 		data.APIInventoryInclusionList = types.ListNull(types.ObjectType{AttrTypes: APIDefinitionAPIInventoryInclusionListModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["mixed_schema_origin"].(map[string]interface{}); ok && isImport && data.MixedSchemaOrigin == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.MixedSchemaOrigin = &APIDefinitionEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["non_api_endpoints"].([]interface{}); ok && len(listData) > 0 {
 		var non_api_endpointsList []APIDefinitionNonAPIEndpointsModel
 		var existingNonAPIEndpointsItems []APIDefinitionNonAPIEndpointsModel

@@ -29,3 +29,6 @@ resource "f5xc_global_log_receiver" "example" {
     # Configure aws_cred settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - ns_current

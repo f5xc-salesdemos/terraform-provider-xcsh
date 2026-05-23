@@ -20,12 +20,12 @@ resource "f5xc_external_connector" "example" {
   ce_site_reference {
     # Configure ce_site_reference settings
   }
-  # IPsec. External Connector with IPsec tunnel.
-  ipsec {
-    # Configure ipsec settings
+  # GRE. External Connector with GRE tunnel.
+  gre {
+    # Configure gre settings
   }
-  # IKE configuration parameters required for IPsec Connectio...
-  ike_parameters {
-    # Configure ike_parameters settings
+  # X-displayName: 'GRE Tunnel Parameters' GRE configuration ...
+  gre_parameters {
+    # Configure gre_parameters settings
   }
 }

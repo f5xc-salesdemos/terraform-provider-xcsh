@@ -20,7 +20,7 @@ resource "f5xc_api_crawler" "example" {
   domains {
     # Configure domains settings
   }
-  # Simple Login.
+  # Configuration parameter for simple login.
   simple_login {
     # Configure simple_login settings
   }

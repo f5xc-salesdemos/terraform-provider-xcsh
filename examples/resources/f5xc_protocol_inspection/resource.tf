@@ -20,7 +20,7 @@ resource "f5xc_protocol_inspection" "example" {
   enable_disable_compliance_checks {
     # Configure enable_disable_compliance_checks settings
   }
-  # Enable this option
+  # Configuration parameter for disable compliance checks.
   disable_compliance_checks {
     # Configure disable_compliance_checks settings
   }
@@ -29,3 +29,6 @@ resource "f5xc_protocol_inspection" "example" {
     # Configure enable_compliance_checks settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - action

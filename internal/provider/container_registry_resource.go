@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -86,14 +87,14 @@ var ContainerRegistryPasswordClearSecretInfoModelAttrTypes = map[string]attr.Typ
 type ContainerRegistryResourceModel struct {
 	Name        types.String                    `tfsdk:"name"`
 	Namespace   types.String                    `tfsdk:"namespace"`
+	Registry    types.String                    `tfsdk:"registry"`
+	UserName    types.String                    `tfsdk:"user_name"`
 	Annotations types.Map                       `tfsdk:"annotations"`
 	Description types.String                    `tfsdk:"description"`
 	Disable     types.Bool                      `tfsdk:"disable"`
 	Labels      types.Map                       `tfsdk:"labels"`
 	ID          types.String                    `tfsdk:"id"`
 	Email       types.String                    `tfsdk:"email"`
-	Registry    types.String                    `tfsdk:"registry"`
-	UserName    types.String                    `tfsdk:"user_name"`
 	Timeouts    timeouts.Value                  `tfsdk:"timeouts"`
 	Password    *ContainerRegistryPasswordModel `tfsdk:"password"`
 }
@@ -126,6 +127,20 @@ func (r *ContainerRegistryResource) Schema(ctx context.Context, req resource.Sch
 					validators.NamespaceValidator(),
 				},
 			},
+			"registry": schema.StringAttribute{
+				MarkdownDescription: "Fully qualified name of the registry login server .",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(1024),
+				},
+			},
+			"user_name": schema.StringAttribute{
+				MarkdownDescription: "Username used to access the registry .",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(128),
+				},
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -153,26 +168,9 @@ func (r *ContainerRegistryResource) Schema(ctx context.Context, req resource.Sch
 			},
 			"email": schema.StringAttribute{
 				MarkdownDescription: "Email. Email used for the registry.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"registry": schema.StringAttribute{
-				MarkdownDescription: "Fully qualified name of the registry login server .",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"user_name": schema.StringAttribute{
-				MarkdownDescription: "Username used to access the registry .",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(3, 1024),
 				},
 			},
 		},
@@ -197,6 +195,9 @@ func (r *ContainerRegistryResource) Schema(ctx context.Context, req resource.Sch
 							"location": schema.StringAttribute{
 								MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(1024),
+								},
 							},
 							"store_provider": schema.StringAttribute{
 								MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -214,6 +215,9 @@ func (r *ContainerRegistryResource) Schema(ctx context.Context, req resource.Sch
 							"url": schema.StringAttribute{
 								MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 131072),
+								},
 							},
 						},
 					},
@@ -325,6 +329,12 @@ func (r *ContainerRegistryResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Registry.IsNull() && !data.Registry.IsUnknown() {
+		createReq.Spec["registry"] = data.Registry.ValueString()
+	}
+	if !data.UserName.IsNull() && !data.UserName.IsUnknown() {
+		createReq.Spec["user_name"] = data.UserName.ValueString()
+	}
 	if data.Password != nil {
 		passwordMap := make(map[string]interface{})
 		if data.Password.BlindfoldSecretInfo != nil {
@@ -355,12 +365,6 @@ func (r *ContainerRegistryResource) Create(ctx context.Context, req resource.Cre
 	if !data.Email.IsNull() && !data.Email.IsUnknown() {
 		createReq.Spec["email"] = data.Email.ValueString()
 	}
-	if !data.Registry.IsNull() && !data.Registry.IsUnknown() {
-		createReq.Spec["registry"] = data.Registry.ValueString()
-	}
-	if !data.UserName.IsNull() && !data.UserName.IsUnknown() {
-		createReq.Spec["user_name"] = data.UserName.ValueString()
-	}
 
 	apiResource, err := r.client.CreateContainerRegistry(ctx, createReq)
 	if err != nil {
@@ -374,16 +378,6 @@ func (r *ContainerRegistryResource) Create(ctx context.Context, req resource.Cre
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["password"].(map[string]interface{}); ok && isImport && data.Password == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.Password = &ContainerRegistryPasswordModel{}
-	}
-	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["email"].(string); ok && v != "" {
-		data.Email = types.StringValue(v)
-	} else {
-		data.Email = types.StringNull()
-	}
 	if v, ok := apiResource.Spec["registry"].(string); ok && v != "" {
 		data.Registry = types.StringValue(v)
 	} else {
@@ -393,6 +387,16 @@ func (r *ContainerRegistryResource) Create(ctx context.Context, req resource.Cre
 		data.UserName = types.StringValue(v)
 	} else {
 		data.UserName = types.StringNull()
+	}
+	if _, ok := apiResource.Spec["password"].(map[string]interface{}); ok && isImport && data.Password == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.Password = &ContainerRegistryPasswordModel{}
+	}
+	// Normal Read: preserve existing state value
+	if v, ok := apiResource.Spec["email"].(string); ok && v != "" {
+		data.Email = types.StringValue(v)
+	} else {
+		data.Email = types.StringNull()
 	}
 
 	tflog.Trace(ctx, "created ContainerRegistry resource")
@@ -474,16 +478,6 @@ func (r *ContainerRegistryResource) Read(ctx context.Context, req resource.ReadR
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["password"].(map[string]interface{}); ok && isImport && data.Password == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.Password = &ContainerRegistryPasswordModel{}
-	}
-	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["email"].(string); ok && v != "" {
-		data.Email = types.StringValue(v)
-	} else {
-		data.Email = types.StringNull()
-	}
 	if v, ok := apiResource.Spec["registry"].(string); ok && v != "" {
 		data.Registry = types.StringValue(v)
 	} else {
@@ -493,6 +487,16 @@ func (r *ContainerRegistryResource) Read(ctx context.Context, req resource.ReadR
 		data.UserName = types.StringValue(v)
 	} else {
 		data.UserName = types.StringNull()
+	}
+	if _, ok := apiResource.Spec["password"].(map[string]interface{}); ok && isImport && data.Password == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.Password = &ContainerRegistryPasswordModel{}
+	}
+	// Normal Read: preserve existing state value
+	if v, ok := apiResource.Spec["email"].(string); ok && v != "" {
+		data.Email = types.StringValue(v)
+	} else {
+		data.Email = types.StringNull()
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -545,6 +549,12 @@ func (r *ContainerRegistryResource) Update(ctx context.Context, req resource.Upd
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Registry.IsNull() && !data.Registry.IsUnknown() {
+		apiResource.Spec["registry"] = data.Registry.ValueString()
+	}
+	if !data.UserName.IsNull() && !data.UserName.IsUnknown() {
+		apiResource.Spec["user_name"] = data.UserName.ValueString()
+	}
 	if data.Password != nil {
 		passwordMap := make(map[string]interface{})
 		if data.Password.BlindfoldSecretInfo != nil {
@@ -575,12 +585,6 @@ func (r *ContainerRegistryResource) Update(ctx context.Context, req resource.Upd
 	if !data.Email.IsNull() && !data.Email.IsUnknown() {
 		apiResource.Spec["email"] = data.Email.ValueString()
 	}
-	if !data.Registry.IsNull() && !data.Registry.IsUnknown() {
-		apiResource.Spec["registry"] = data.Registry.ValueString()
-	}
-	if !data.UserName.IsNull() && !data.UserName.IsUnknown() {
-		apiResource.Spec["user_name"] = data.UserName.ValueString()
-	}
 
 	_, err := r.client.UpdateContainerRegistry(ctx, apiResource)
 	if err != nil {
@@ -600,42 +604,11 @@ func (r *ContainerRegistryResource) Update(ctx context.Context, req resource.Upd
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["email"].(string); ok && v != "" {
-		data.Email = types.StringValue(v)
-	} else if data.Email.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Email = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["registry"].(string); ok && v != "" {
-		data.Registry = types.StringValue(v)
-	} else if data.Registry.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Registry = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["user_name"].(string); ok && v != "" {
-		data.UserName = types.StringValue(v)
-	} else if data.UserName.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.UserName = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["password"].(map[string]interface{}); ok && isImport && data.Password == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.Password = &ContainerRegistryPasswordModel{}
-	}
-	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["email"].(string); ok && v != "" {
-		data.Email = types.StringValue(v)
-	} else {
-		data.Email = types.StringNull()
-	}
 	if v, ok := apiResource.Spec["registry"].(string); ok && v != "" {
 		data.Registry = types.StringValue(v)
 	} else {
@@ -645,6 +618,16 @@ func (r *ContainerRegistryResource) Update(ctx context.Context, req resource.Upd
 		data.UserName = types.StringValue(v)
 	} else {
 		data.UserName = types.StringNull()
+	}
+	if _, ok := apiResource.Spec["password"].(map[string]interface{}); ok && isImport && data.Password == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.Password = &ContainerRegistryPasswordModel{}
+	}
+	// Normal Read: preserve existing state value
+	if v, ok := apiResource.Spec["email"].(string); ok && v != "" {
+		data.Email = types.StringValue(v)
+	} else {
+		data.Email = types.StringNull()
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

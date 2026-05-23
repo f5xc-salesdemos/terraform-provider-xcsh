@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -356,8 +357,11 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 				MarkdownDescription: "[OneOf: aws_assume_role, aws_secret_key, azure_client_secret, azure_pfx_certificate, gcp_cred_file] AWS Assume Role to Handle Delegated Access.",
 				Attributes: map[string]schema.Attribute{
 					"custom_external_id": schema.StringAttribute{
-						MarkdownDescription: "External ID is Custom ID.",
+						MarkdownDescription: "Exclusive with [external_id_is_optional external_id_is_tenant_id] External ID is Custom ID.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(2, 64),
+						},
 					},
 					"duration_seconds": schema.Int64Attribute{
 						MarkdownDescription: "The duration, in seconds of the role session.",
@@ -366,15 +370,21 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 					"role_arn": schema.StringAttribute{
 						MarkdownDescription: "IAM Role ARN to assume the role .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(20, 2048),
+						},
 					},
 					"session_name": schema.StringAttribute{
 						MarkdownDescription: "Use the role session name to uniquely identify a session, which will be used for deploy, monitor from F5XC console .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(2, 64),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
 					"external_id_is_optional": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for external id is optional.",
 					},
 					"external_id_is_tenant_id": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
@@ -390,6 +400,9 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 					"access_key": schema.StringAttribute{
 						MarkdownDescription: "Access key ID for your AWS account .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(128),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -407,6 +420,9 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -424,6 +440,9 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -437,14 +456,23 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 					"client_id": schema.StringAttribute{
 						MarkdownDescription: "Client ID for your Azure service principal .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 					"subscription_id": schema.StringAttribute{
 						MarkdownDescription: "Subscription ID for your Azure service principal .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 					"tenant_id": schema.StringAttribute{
 						MarkdownDescription: "Tenant ID for your Azure service principal .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -462,6 +490,9 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -479,6 +510,9 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -492,18 +526,30 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 					"certificate_url": schema.StringAttribute{
 						MarkdownDescription: "URL for Client Certificate in '.pfx' or '.p12' whose certificate is linked to service principal object Certificate URL can contain client certificate in string:///<Base64 of certificate> format. Here <Base64 of certificate> is base64 of '.pfx' or '.p12' binary file .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(8192),
+						},
 					},
 					"client_id": schema.StringAttribute{
 						MarkdownDescription: "Client ID for your Azure service principal .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 					"subscription_id": schema.StringAttribute{
 						MarkdownDescription: "Subscription ID for your Azure service principal .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 					"tenant_id": schema.StringAttribute{
 						MarkdownDescription: "Tenant ID for your Azure service principal .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -521,6 +567,9 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -538,6 +587,9 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -546,7 +598,7 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 				},
 			},
 			"gcp_cred_file": schema.SingleNestedBlock{
-				MarkdownDescription: "GCP Credentials. GCP Credentials type.",
+				MarkdownDescription: "Configuration parameter for gcp cred file.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"credential_file": schema.SingleNestedBlock{
@@ -563,6 +615,9 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -580,6 +635,9 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},

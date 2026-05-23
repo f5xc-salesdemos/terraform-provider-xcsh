@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -557,6 +560,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 					"email": schema.StringAttribute{
 						MarkdownDescription: "Email. Email ID of the user.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(3, 1024),
+						},
 					},
 				},
 			},
@@ -566,6 +572,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 					"url": schema.StringAttribute{
 						MarkdownDescription: "URL to send API requests to .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 1024),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -583,6 +592,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -600,6 +612,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -613,6 +628,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 					"url": schema.StringAttribute{
 						MarkdownDescription: "URL to send API requests to .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 1024),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -630,6 +648,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -647,6 +668,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -660,6 +684,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 					"channel": schema.StringAttribute{
 						MarkdownDescription: "Channel or user to send notifications to .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(1024),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -677,6 +704,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -694,6 +724,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -745,6 +778,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -762,6 +798,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -775,6 +814,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 									"user_name": schema.StringAttribute{
 										MarkdownDescription: "HTTP Basic Auth User Name .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -792,6 +834,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -809,6 +854,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -835,6 +883,10 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+														stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -842,6 +894,10 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+														stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 													},
 												},
 												"tenant": schema.StringAttribute{
@@ -866,7 +922,7 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 								},
 							},
 							"no_authorization": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for no authorization.",
 							},
 							"no_tls": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -877,26 +933,35 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 									"max_version": schema.StringAttribute{
 										MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+										},
 									},
 									"min_version": schema.StringAttribute{
 										MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+										},
 									},
 									"sni": schema.StringAttribute{
-										MarkdownDescription: "SNI value to be used.",
+										MarkdownDescription: "Exclusive with [disable_sni] SNI value to be used.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(256),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
 									"disable_sni": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for disable sni.",
 									},
 									"use_server_verification": schema.SingleNestedBlock{
-										MarkdownDescription: "TLS Validation Context for Servers. Upstream TLS Validation Context.",
+										MarkdownDescription: "Configuration parameter for use server verification.",
 										Attributes:          map[string]schema.Attribute{},
 										Blocks: map[string]schema.Block{
 											"ca_cert_obj": schema.SingleNestedBlock{
-												MarkdownDescription: "CA Certificate Object. Configuration for CA certificate.",
+												MarkdownDescription: "Configuration parameter for ca cert obj.",
 												Attributes:          map[string]schema.Attribute{},
 												Blocks: map[string]schema.Block{
 													"trusted_ca": schema.ListNestedBlock{
@@ -914,6 +979,10 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 																"name": schema.StringAttribute{
 																	MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 1024),
+																		stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																	},
 																},
 																"namespace": schema.StringAttribute{
 																	MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -921,6 +990,10 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 																	Computed:            true,
 																	PlanModifiers: []planmodifier.String{
 																		stringplanmodifier.UseStateForUnknown(),
+																	},
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 1024),
+																		stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																	},
 																},
 																"tenant": schema.StringAttribute{
@@ -947,7 +1020,7 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 										},
 									},
 									"volterra_trusted_ca": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for volterra trusted ca.",
 									},
 								},
 							},
@@ -967,6 +1040,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -984,6 +1060,9 @@ func (r *AlertReceiverResource) Schema(ctx context.Context, req resource.SchemaR
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},

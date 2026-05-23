@@ -25,3 +25,8 @@ resource "f5xc_sensitive_data_policy" "example" {
     # Configure custom_data_type_ref settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - compliances
+# - disabled_predefined_data_types
+# - custom_data_types

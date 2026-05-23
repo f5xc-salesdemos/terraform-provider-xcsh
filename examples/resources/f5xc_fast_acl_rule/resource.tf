@@ -16,16 +16,16 @@ resource "f5xc_fast_acl_rule" "example" {
   }
 
   # Resource-specific configuration
-  # FastAclRuleAction specifies possible action to be applied...
-  action {
-    # Configure action settings
+  # Source Ports. L4 port numbers to match .
+  port {
+    # Configure port settings
   }
-  # Policer Reference. Reference to policer object.
-  policer_action {
-    # Configure policer_action settings
+  # Enable this option
+  all {
+    # Configure all settings
   }
-  # Reference. A policer direct reference.
-  ref {
-    # Configure ref settings
+  # Enable this option
+  dns {
+    # Configure dns settings
   }
 }

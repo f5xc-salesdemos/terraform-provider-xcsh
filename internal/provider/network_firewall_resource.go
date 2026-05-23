@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -231,6 +232,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -238,6 +242,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -247,6 +254,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
+									},
 								},
 							},
 						},
@@ -254,7 +264,7 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"active_fast_acls": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: active_fast_acls, disable_fast_acl; Default: disable_fast_acl] Active Fast ACL(s). List of Fast ACL(s).",
+				MarkdownDescription: "[OneOf: active_fast_acls, disable_fast_acl; Default: disable_fast_acl] Configuration parameter for active fast acls.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"fast_acls": schema.ListNestedBlock{
@@ -264,6 +274,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -272,6 +285,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 								"tenant": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -279,6 +295,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
 									},
 								},
 							},
@@ -297,6 +316,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -304,6 +326,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -313,6 +338,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
+									},
 								},
 							},
 						},
@@ -320,7 +348,7 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"active_network_policies": schema.SingleNestedBlock{
-				MarkdownDescription: "Active Firewall Policies Type. List of firewall policy views.",
+				MarkdownDescription: "Configuration parameter for active network policies.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"network_policies": schema.ListNestedBlock{
@@ -330,6 +358,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -337,6 +368,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -346,6 +380,9 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
+									},
 								},
 							},
 						},
@@ -353,13 +390,13 @@ func (r *NetworkFirewallResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"disable_fast_acl": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for disable fast acl. Defaults to `map[]`. Server applies default when omitted.",
 			},
 			"disable_forward_proxy_policy": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Policy configuration for this feature. Defaults to `map[]`. Server applies default when omitted.",
 			},
 			"disable_network_policy": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Policy configuration for this feature. Defaults to `map[]`. Server applies default when omitted.",
 			},
 		},
 	}

@@ -1,5 +1,5 @@
 # Site Resource Example
-# Manages a Site resource in F5 Distributed Cloud for app stack site specification. configuration.
+# Manages virtual site object in given namespace. in F5 Distributed Cloud.
 
 # Basic Site configuration
 resource "f5xc_site" "example" {
@@ -16,16 +16,8 @@ resource "f5xc_site" "example" {
   }
 
   # Resource-specific configuration
-  # [OneOf: allow_all_usb, deny_all_usb, usb_policy] Enable t...
-  allow_all_usb {
-    # Configure allow_all_usb settings
-  }
-  # [OneOf: blocked_services, default_blocked_services; Defau...
-  blocked_services {
-    # Configure blocked_services settings
-  }
-  # Disable Node Local Services. Blocking or denial configura...
-  blocked_sevice {
-    # Configure blocked_sevice settings
+  # Type can be used to establish a 'selector reference' from...
+  site_selector {
+    # Configure site_selector settings
   }
 }

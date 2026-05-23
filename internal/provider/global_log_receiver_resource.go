@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -1379,7 +1383,6 @@ type GlobalLogReceiverResourceModel struct {
 	KafkaReceiver          *GlobalLogReceiverKafkaReceiverModel          `tfsdk:"kafka_receiver"`
 	NewRelicReceiver       *GlobalLogReceiverNewRelicReceiverModel       `tfsdk:"new_relic_receiver"`
 	NsAll                  *GlobalLogReceiverEmptyModel                  `tfsdk:"ns_all"`
-	NsCurrent              *GlobalLogReceiverEmptyModel                  `tfsdk:"ns_current"`
 	NsList                 *GlobalLogReceiverNsListModel                 `tfsdk:"ns_list"`
 	QradarReceiver         *GlobalLogReceiverQradarReceiverModel         `tfsdk:"qradar_receiver"`
 	RequestLogs            *GlobalLogReceiverEmptyModel                  `tfsdk:"request_logs"`
@@ -1387,6 +1390,7 @@ type GlobalLogReceiverResourceModel struct {
 	SecurityEvents         *GlobalLogReceiverEmptyModel                  `tfsdk:"security_events"`
 	SplunkReceiver         *GlobalLogReceiverSplunkReceiverModel         `tfsdk:"splunk_receiver"`
 	SumoLogicReceiver      *GlobalLogReceiverSumoLogicReceiverModel      `tfsdk:"sumo_logic_receiver"`
+	NsCurrent              *GlobalLogReceiverEmptyModel                  `tfsdk:"ns_current"`
 }
 
 func (r *GlobalLogReceiverResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -1463,10 +1467,16 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 					"group_name": schema.StringAttribute{
 						MarkdownDescription: "The group name of the target Cloudwatch Logs stream .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(3, 512),
+						},
 					},
 					"stream_name": schema.StringAttribute{
 						MarkdownDescription: "The stream name of the target Cloudwatch Logs stream. Note that there can only be one writer to a log stream at a time .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(3, 512),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -1476,6 +1486,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1483,6 +1496,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
 								},
 							},
 							"tenant": schema.StringAttribute{
@@ -1492,6 +1508,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 						},
 					},
@@ -1499,15 +1518,15 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Batch OPTIONS allow tuning for how batches of logs are sent to an endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"max_bytes": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after the batch is equal to or larger than this many bytes.",
+								MarkdownDescription: "Exclusive with [max_bytes_disabled] Send batch to endpoint after the batch is equal to or larger than this many bytes.",
 								Optional:            true,
 							},
 							"max_events": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after this many log messages are in the batch.",
+								MarkdownDescription: "Exclusive with [max_events_disabled] Send batch to endpoint after this many log messages are in the batch.",
 								Optional:            true,
 							},
 							"timeout_seconds": schema.StringAttribute{
-								MarkdownDescription: "Send batch to the endpoint after this many seconds.",
+								MarkdownDescription: "Exclusive with [timeout_seconds_default] Send batch to the endpoint after this many seconds.",
 								Optional:            true,
 							},
 						},
@@ -1524,17 +1543,17 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						},
 					},
 					"compression": schema.SingleNestedBlock{
-						MarkdownDescription: "Compression Type. Compression Type.",
+						MarkdownDescription: "Configuration parameter for compression.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"compression_default": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression default.",
 							},
 							"compression_gzip": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"compression_none": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression none.",
 							},
 						},
 					},
@@ -1546,6 +1565,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 					"instance": schema.StringAttribute{
 						MarkdownDescription: "Event Hubs Instance name into which logs should be stored .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(3, 63),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "Event Hubs Namespace is namespace with instance into which logs should be stored .",
@@ -1553,6 +1575,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(3, 63),
 						},
 					},
 				},
@@ -1571,6 +1596,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1588,6 +1616,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -1601,6 +1632,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 					"container_name": schema.StringAttribute{
 						MarkdownDescription: "Container Name is the name of the container into which logs should be stored .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(3, 63),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -1608,15 +1642,15 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Batch OPTIONS allow tuning for how batches of logs are sent to an endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"max_bytes": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after the batch is equal to or larger than this many bytes.",
+								MarkdownDescription: "Exclusive with [max_bytes_disabled] Send batch to endpoint after the batch is equal to or larger than this many bytes.",
 								Optional:            true,
 							},
 							"max_events": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after this many log messages are in the batch.",
+								MarkdownDescription: "Exclusive with [max_events_disabled] Send batch to endpoint after this many log messages are in the batch.",
 								Optional:            true,
 							},
 							"timeout_seconds": schema.StringAttribute{
-								MarkdownDescription: "Send batch to the endpoint after this many seconds.",
+								MarkdownDescription: "Exclusive with [timeout_seconds_default] Send batch to the endpoint after this many seconds.",
 								Optional:            true,
 							},
 						},
@@ -1633,17 +1667,17 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						},
 					},
 					"compression": schema.SingleNestedBlock{
-						MarkdownDescription: "Compression Type. Compression Type.",
+						MarkdownDescription: "Configuration parameter for compression.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"compression_default": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression default.",
 							},
 							"compression_gzip": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"compression_none": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression none.",
 							},
 						},
 					},
@@ -1661,6 +1695,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1678,6 +1715,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -1687,13 +1727,16 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Filename OPTIONS allow customization of filename and folder paths used by a destination endpoint bucket or file.",
 						Attributes: map[string]schema.Attribute{
 							"custom_folder": schema.StringAttribute{
-								MarkdownDescription: "Use your own folder name as the name of the folder in the endpoint bucket or file The folder name must match.",
+								MarkdownDescription: "Exclusive with [log_type_folder no_folder] Use your own folder name as the name of the folder in the endpoint bucket or file The folder name must match.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(1024),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
 							"log_type_folder": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for log type folder.",
 							},
 							"no_folder": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -1706,11 +1749,15 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 				MarkdownDescription: "Datadog Configuration. Configuration for Datadog endpoint.",
 				Attributes: map[string]schema.Attribute{
 					"endpoint": schema.StringAttribute{
-						MarkdownDescription: "Datadog Endpoint,.",
+						MarkdownDescription: "Exclusive with [site] Datadog Endpoint,.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 1024),
+							stringvalidator.RegexMatches(regexp.MustCompile(`^https?://[^\s/$.?#].[^\s]*$`), ""),
+						},
 					},
 					"site": schema.StringAttribute{
-						MarkdownDescription: "Datadog Site,.",
+						MarkdownDescription: "Exclusive with [endpoint] Datadog Site,.",
 						Optional:            true,
 					},
 				},
@@ -1719,15 +1766,15 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Batch OPTIONS allow tuning for how batches of logs are sent to an endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"max_bytes": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after the batch is equal to or larger than this many bytes.",
+								MarkdownDescription: "Exclusive with [max_bytes_disabled] Send batch to endpoint after the batch is equal to or larger than this many bytes.",
 								Optional:            true,
 							},
 							"max_events": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after this many log messages are in the batch.",
+								MarkdownDescription: "Exclusive with [max_events_disabled] Send batch to endpoint after this many log messages are in the batch.",
 								Optional:            true,
 							},
 							"timeout_seconds": schema.StringAttribute{
-								MarkdownDescription: "Send batch to the endpoint after this many seconds.",
+								MarkdownDescription: "Exclusive with [timeout_seconds_default] Send batch to the endpoint after this many seconds.",
 								Optional:            true,
 							},
 						},
@@ -1744,17 +1791,17 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						},
 					},
 					"compression": schema.SingleNestedBlock{
-						MarkdownDescription: "Compression Type. Compression Type.",
+						MarkdownDescription: "Configuration parameter for compression.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"compression_default": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression default.",
 							},
 							"compression_gzip": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"compression_none": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression none.",
 							},
 						},
 					},
@@ -1772,6 +1819,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1789,6 +1839,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -1801,19 +1854,22 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "TLS Parameters for client connection to the endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"trusted_ca_url": schema.StringAttribute{
-								MarkdownDescription: "The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
+								MarkdownDescription: "Exclusive with [no_ca] The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(131072),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
 							"disable_verify_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable verify certificate.",
 							},
 							"disable_verify_hostname": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"enable_verify_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for enable verify certificate.",
 							},
 							"enable_verify_hostname": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -1827,6 +1883,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"certificate": schema.StringAttribute{
 										MarkdownDescription: "Client certificate is PEM-encoded certificate or certificate-chain.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(100, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -1844,6 +1903,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1861,6 +1923,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -1884,6 +1949,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 					"bucket": schema.StringAttribute{
 						MarkdownDescription: "GCP Bucket Name. GCP Bucket Name .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(3, 128),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -1891,15 +1959,15 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Batch OPTIONS allow tuning for how batches of logs are sent to an endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"max_bytes": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after the batch is equal to or larger than this many bytes.",
+								MarkdownDescription: "Exclusive with [max_bytes_disabled] Send batch to endpoint after the batch is equal to or larger than this many bytes.",
 								Optional:            true,
 							},
 							"max_events": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after this many log messages are in the batch.",
+								MarkdownDescription: "Exclusive with [max_events_disabled] Send batch to endpoint after this many log messages are in the batch.",
 								Optional:            true,
 							},
 							"timeout_seconds": schema.StringAttribute{
-								MarkdownDescription: "Send batch to the endpoint after this many seconds.",
+								MarkdownDescription: "Exclusive with [timeout_seconds_default] Send batch to the endpoint after this many seconds.",
 								Optional:            true,
 							},
 						},
@@ -1916,17 +1984,17 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						},
 					},
 					"compression": schema.SingleNestedBlock{
-						MarkdownDescription: "Compression Type. Compression Type.",
+						MarkdownDescription: "Configuration parameter for compression.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"compression_default": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression default.",
 							},
 							"compression_gzip": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"compression_none": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression none.",
 							},
 						},
 					},
@@ -1934,13 +2002,16 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Filename OPTIONS allow customization of filename and folder paths used by a destination endpoint bucket or file.",
 						Attributes: map[string]schema.Attribute{
 							"custom_folder": schema.StringAttribute{
-								MarkdownDescription: "Use your own folder name as the name of the folder in the endpoint bucket or file The folder name must match.",
+								MarkdownDescription: "Exclusive with [log_type_folder no_folder] Use your own folder name as the name of the folder in the endpoint bucket or file The folder name must match.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(1024),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
 							"log_type_folder": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for log type folder.",
 							},
 							"no_folder": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -1953,6 +2024,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1960,6 +2034,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
 								},
 							},
 							"tenant": schema.StringAttribute{
@@ -1969,17 +2046,23 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 						},
 					},
 				},
 			},
 			"http_receiver": schema.SingleNestedBlock{
-				MarkdownDescription: "HTTP Configuration. Configuration for HTTP endpoint.",
+				MarkdownDescription: "Configuration parameter for http receiver.",
 				Attributes: map[string]schema.Attribute{
 					"uri": schema.StringAttribute{
 						MarkdownDescription: "HTTP URI is the URI of the HTTP endpoint to send logs to, .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(1024),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -1989,6 +2072,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 							"user_name": schema.StringAttribute{
 								MarkdownDescription: "User Name. HTTP Basic Auth User Name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -2006,6 +2092,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2023,6 +2112,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -2051,6 +2143,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2068,6 +2163,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -2079,15 +2177,15 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Batch OPTIONS allow tuning for how batches of logs are sent to an endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"max_bytes": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after the batch is equal to or larger than this many bytes.",
+								MarkdownDescription: "Exclusive with [max_bytes_disabled] Send batch to endpoint after the batch is equal to or larger than this many bytes.",
 								Optional:            true,
 							},
 							"max_events": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after this many log messages are in the batch.",
+								MarkdownDescription: "Exclusive with [max_events_disabled] Send batch to endpoint after this many log messages are in the batch.",
 								Optional:            true,
 							},
 							"timeout_seconds": schema.StringAttribute{
-								MarkdownDescription: "Send batch to the endpoint after this many seconds.",
+								MarkdownDescription: "Exclusive with [timeout_seconds_default] Send batch to the endpoint after this many seconds.",
 								Optional:            true,
 							},
 						},
@@ -2104,17 +2202,17 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						},
 					},
 					"compression": schema.SingleNestedBlock{
-						MarkdownDescription: "Compression Type. Compression Type.",
+						MarkdownDescription: "Configuration parameter for compression.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"compression_default": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression default.",
 							},
 							"compression_gzip": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"compression_none": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression none.",
 							},
 						},
 					},
@@ -2125,19 +2223,22 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "TLS Parameters for client connection to the endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"trusted_ca_url": schema.StringAttribute{
-								MarkdownDescription: "The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
+								MarkdownDescription: "Exclusive with [no_ca] The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(131072),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
 							"disable_verify_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable verify certificate.",
 							},
 							"disable_verify_hostname": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"enable_verify_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for enable verify certificate.",
 							},
 							"enable_verify_hostname": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -2151,6 +2252,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"certificate": schema.StringAttribute{
 										MarkdownDescription: "Client certificate is PEM-encoded certificate or certificate-chain.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(100, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -2168,6 +2272,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2185,6 +2292,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -2206,10 +2316,16 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "List of host:port pairs of the Kafka brokers .",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeBetween(1, 8),
+						},
 					},
 					"kafka_topic": schema.StringAttribute{
 						MarkdownDescription: "The Kafka topic name to write events to .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(3, 255),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -2217,15 +2333,15 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Batch OPTIONS allow tuning for how batches of logs are sent to an endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"max_bytes": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after the batch is equal to or larger than this many bytes.",
+								MarkdownDescription: "Exclusive with [max_bytes_disabled] Send batch to endpoint after the batch is equal to or larger than this many bytes.",
 								Optional:            true,
 							},
 							"max_events": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after this many log messages are in the batch.",
+								MarkdownDescription: "Exclusive with [max_events_disabled] Send batch to endpoint after this many log messages are in the batch.",
 								Optional:            true,
 							},
 							"timeout_seconds": schema.StringAttribute{
-								MarkdownDescription: "Send batch to the endpoint after this many seconds.",
+								MarkdownDescription: "Exclusive with [timeout_seconds_default] Send batch to the endpoint after this many seconds.",
 								Optional:            true,
 							},
 						},
@@ -2242,17 +2358,17 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						},
 					},
 					"compression": schema.SingleNestedBlock{
-						MarkdownDescription: "Compression Type. Compression Type.",
+						MarkdownDescription: "Configuration parameter for compression.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"compression_default": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression default.",
 							},
 							"compression_gzip": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"compression_none": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression none.",
 							},
 						},
 					},
@@ -2263,19 +2379,22 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "TLS Parameters for client connection to the endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"trusted_ca_url": schema.StringAttribute{
-								MarkdownDescription: "The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
+								MarkdownDescription: "Exclusive with [no_ca] The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(131072),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
 							"disable_verify_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable verify certificate.",
 							},
 							"disable_verify_hostname": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"enable_verify_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for enable verify certificate.",
 							},
 							"enable_verify_hostname": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -2289,6 +2408,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"certificate": schema.StringAttribute{
 										MarkdownDescription: "Client certificate is PEM-encoded certificate or certificate-chain.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(100, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -2306,6 +2428,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2323,6 +2448,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -2338,7 +2466,7 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 				},
 			},
 			"new_relic_receiver": schema.SingleNestedBlock{
-				MarkdownDescription: "NewRelic Configuration. Configuration for NewRelic endpoint.",
+				MarkdownDescription: "Configuration parameter for new relic receiver.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"api_key": schema.SingleNestedBlock{
@@ -2355,6 +2483,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2372,6 +2503,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -2388,9 +2522,6 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 			"ns_all": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: ns_all, ns_current, ns_list] Enable this option",
 			},
-			"ns_current": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
-			},
 			"ns_list": schema.SingleNestedBlock{
 				MarkdownDescription: "Namespace List. Namespace List.",
 				Attributes: map[string]schema.Attribute{
@@ -2398,15 +2529,21 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "List of namespaces to stream logs for .",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 				},
 			},
 			"qradar_receiver": schema.SingleNestedBlock{
-				MarkdownDescription: "IBM QRadar Configuration. Configuration for IBM QRadar endpoint.",
+				MarkdownDescription: "Configuration parameter for qradar receiver.",
 				Attributes: map[string]schema.Attribute{
 					"uri": schema.StringAttribute{
 						MarkdownDescription: "Log Source Collector URL is the URL of the IBM QRadar Log Source Collector to send logs to, .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(1024),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -2414,15 +2551,15 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Batch OPTIONS allow tuning for how batches of logs are sent to an endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"max_bytes": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after the batch is equal to or larger than this many bytes.",
+								MarkdownDescription: "Exclusive with [max_bytes_disabled] Send batch to endpoint after the batch is equal to or larger than this many bytes.",
 								Optional:            true,
 							},
 							"max_events": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after this many log messages are in the batch.",
+								MarkdownDescription: "Exclusive with [max_events_disabled] Send batch to endpoint after this many log messages are in the batch.",
 								Optional:            true,
 							},
 							"timeout_seconds": schema.StringAttribute{
-								MarkdownDescription: "Send batch to the endpoint after this many seconds.",
+								MarkdownDescription: "Exclusive with [timeout_seconds_default] Send batch to the endpoint after this many seconds.",
 								Optional:            true,
 							},
 						},
@@ -2439,17 +2576,17 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						},
 					},
 					"compression": schema.SingleNestedBlock{
-						MarkdownDescription: "Compression Type. Compression Type.",
+						MarkdownDescription: "Configuration parameter for compression.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"compression_default": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression default.",
 							},
 							"compression_gzip": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"compression_none": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression none.",
 							},
 						},
 					},
@@ -2460,19 +2597,22 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "TLS Parameters for client connection to the endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"trusted_ca_url": schema.StringAttribute{
-								MarkdownDescription: "The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
+								MarkdownDescription: "Exclusive with [no_ca] The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(131072),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
 							"disable_verify_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable verify certificate.",
 							},
 							"disable_verify_hostname": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"enable_verify_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for enable verify certificate.",
 							},
 							"enable_verify_hostname": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -2486,6 +2626,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"certificate": schema.StringAttribute{
 										MarkdownDescription: "Client certificate is PEM-encoded certificate or certificate-chain.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(100, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -2503,6 +2646,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2520,6 +2666,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -2535,7 +2684,7 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 				},
 			},
 			"request_logs": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for request logs.",
 			},
 			"s3_receiver": schema.SingleNestedBlock{
 				MarkdownDescription: "S3 Configuration for Global Log Receiver.",
@@ -2547,6 +2696,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 					"bucket": schema.StringAttribute{
 						MarkdownDescription: "S3 Bucket Name. S3 Bucket Name .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(3, 128),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -2556,6 +2708,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2563,6 +2718,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
 								},
 							},
 							"tenant": schema.StringAttribute{
@@ -2572,6 +2730,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 						},
 					},
@@ -2579,15 +2740,15 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Batch OPTIONS allow tuning for how batches of logs are sent to an endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"max_bytes": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after the batch is equal to or larger than this many bytes.",
+								MarkdownDescription: "Exclusive with [max_bytes_disabled] Send batch to endpoint after the batch is equal to or larger than this many bytes.",
 								Optional:            true,
 							},
 							"max_events": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after this many log messages are in the batch.",
+								MarkdownDescription: "Exclusive with [max_events_disabled] Send batch to endpoint after this many log messages are in the batch.",
 								Optional:            true,
 							},
 							"timeout_seconds": schema.StringAttribute{
-								MarkdownDescription: "Send batch to the endpoint after this many seconds.",
+								MarkdownDescription: "Exclusive with [timeout_seconds_default] Send batch to the endpoint after this many seconds.",
 								Optional:            true,
 							},
 						},
@@ -2604,17 +2765,17 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						},
 					},
 					"compression": schema.SingleNestedBlock{
-						MarkdownDescription: "Compression Type. Compression Type.",
+						MarkdownDescription: "Configuration parameter for compression.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"compression_default": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression default.",
 							},
 							"compression_gzip": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"compression_none": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression none.",
 							},
 						},
 					},
@@ -2622,13 +2783,16 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Filename OPTIONS allow customization of filename and folder paths used by a destination endpoint bucket or file.",
 						Attributes: map[string]schema.Attribute{
 							"custom_folder": schema.StringAttribute{
-								MarkdownDescription: "Use your own folder name as the name of the folder in the endpoint bucket or file The folder name must match.",
+								MarkdownDescription: "Exclusive with [log_type_folder no_folder] Use your own folder name as the name of the folder in the endpoint bucket or file The folder name must match.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(1024),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
 							"log_type_folder": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for log type folder.",
 							},
 							"no_folder": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -2646,6 +2810,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 					"endpoint": schema.StringAttribute{
 						MarkdownDescription: "Splunk HEC Logs Endpoint. Splunk HEC Logs Endpoint, (Note: must not contain `/services/collector`) .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 1024),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -2653,15 +2820,15 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Batch OPTIONS allow tuning for how batches of logs are sent to an endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"max_bytes": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after the batch is equal to or larger than this many bytes.",
+								MarkdownDescription: "Exclusive with [max_bytes_disabled] Send batch to endpoint after the batch is equal to or larger than this many bytes.",
 								Optional:            true,
 							},
 							"max_events": schema.Int64Attribute{
-								MarkdownDescription: "Send batch to endpoint after this many log messages are in the batch.",
+								MarkdownDescription: "Exclusive with [max_events_disabled] Send batch to endpoint after this many log messages are in the batch.",
 								Optional:            true,
 							},
 							"timeout_seconds": schema.StringAttribute{
-								MarkdownDescription: "Send batch to the endpoint after this many seconds.",
+								MarkdownDescription: "Exclusive with [timeout_seconds_default] Send batch to the endpoint after this many seconds.",
 								Optional:            true,
 							},
 						},
@@ -2678,17 +2845,17 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						},
 					},
 					"compression": schema.SingleNestedBlock{
-						MarkdownDescription: "Compression Type. Compression Type.",
+						MarkdownDescription: "Configuration parameter for compression.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"compression_default": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression default.",
 							},
 							"compression_gzip": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"compression_none": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for compression none.",
 							},
 						},
 					},
@@ -2709,6 +2876,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2726,6 +2896,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
@@ -2735,19 +2908,22 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "TLS Parameters for client connection to the endpoint.",
 						Attributes: map[string]schema.Attribute{
 							"trusted_ca_url": schema.StringAttribute{
-								MarkdownDescription: "The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
+								MarkdownDescription: "Exclusive with [no_ca] The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(131072),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
 							"disable_verify_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable verify certificate.",
 							},
 							"disable_verify_hostname": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
 							},
 							"enable_verify_certificate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for enable verify certificate.",
 							},
 							"enable_verify_hostname": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -2761,6 +2937,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"certificate": schema.StringAttribute{
 										MarkdownDescription: "Client certificate is PEM-encoded certificate or certificate-chain.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(100, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -2778,6 +2957,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2795,6 +2977,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -2810,7 +2995,7 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 				},
 			},
 			"sumo_logic_receiver": schema.SingleNestedBlock{
-				MarkdownDescription: "SumoLogic Configuration. Configuration for SumoLogic endpoint.",
+				MarkdownDescription: "Configuration parameter for sumo logic receiver.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"url": schema.SingleNestedBlock{
@@ -2827,6 +3012,9 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2844,12 +3032,18 @@ func (r *GlobalLogReceiverResource) Schema(ctx context.Context, req resource.Sch
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
 						},
 					},
 				},
+			},
+			"ns_current": schema.SingleNestedBlock{
+				MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
 			},
 		},
 	}
@@ -3249,10 +3443,6 @@ func (r *GlobalLogReceiverResource) Create(ctx context.Context, req resource.Cre
 		ns_allMap := make(map[string]interface{})
 		createReq.Spec["ns_all"] = ns_allMap
 	}
-	if data.NsCurrent != nil {
-		ns_currentMap := make(map[string]interface{})
-		createReq.Spec["ns_current"] = ns_currentMap
-	}
 	if data.NsList != nil {
 		ns_listMap := make(map[string]interface{})
 		if !data.NsList.Namespaces.IsNull() && !data.NsList.Namespaces.IsUnknown() {
@@ -3398,6 +3588,10 @@ func (r *GlobalLogReceiverResource) Create(ctx context.Context, req resource.Cre
 			sumo_logic_receiverMap["url"] = urlNestedMap
 		}
 		createReq.Spec["sumo_logic_receiver"] = sumo_logic_receiverMap
+	}
+	if data.NsCurrent != nil {
+		ns_currentMap := make(map[string]interface{})
+		createReq.Spec["ns_current"] = ns_currentMap
 	}
 
 	apiResource, err := r.client.CreateGlobalLogReceiver(ctx, createReq)
@@ -4045,11 +4239,6 @@ func (r *GlobalLogReceiverResource) Create(ctx context.Context, req resource.Cre
 		data.NsAll = &GlobalLogReceiverEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["ns_current"].(map[string]interface{}); ok && isImport && data.NsCurrent == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.NsCurrent = &GlobalLogReceiverEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["ns_list"].(map[string]interface{}); ok && (isImport || data.NsList != nil) {
 		data.NsList = &GlobalLogReceiverNsListModel{
 			Namespaces: func() types.List {
@@ -4358,6 +4547,11 @@ func (r *GlobalLogReceiverResource) Create(ctx context.Context, req resource.Cre
 	if _, ok := apiResource.Spec["sumo_logic_receiver"].(map[string]interface{}); ok && isImport && data.SumoLogicReceiver == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.SumoLogicReceiver = &GlobalLogReceiverSumoLogicReceiverModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["ns_current"].(map[string]interface{}); ok && isImport && data.NsCurrent == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NsCurrent = &GlobalLogReceiverEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 
@@ -5073,11 +5267,6 @@ func (r *GlobalLogReceiverResource) Read(ctx context.Context, req resource.ReadR
 		data.NsAll = &GlobalLogReceiverEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["ns_current"].(map[string]interface{}); ok && isImport && data.NsCurrent == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.NsCurrent = &GlobalLogReceiverEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["ns_list"].(map[string]interface{}); ok && (isImport || data.NsList != nil) {
 		data.NsList = &GlobalLogReceiverNsListModel{
 			Namespaces: func() types.List {
@@ -5386,6 +5575,11 @@ func (r *GlobalLogReceiverResource) Read(ctx context.Context, req resource.ReadR
 	if _, ok := apiResource.Spec["sumo_logic_receiver"].(map[string]interface{}); ok && isImport && data.SumoLogicReceiver == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.SumoLogicReceiver = &GlobalLogReceiverSumoLogicReceiverModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["ns_current"].(map[string]interface{}); ok && isImport && data.NsCurrent == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NsCurrent = &GlobalLogReceiverEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 
@@ -5731,10 +5925,6 @@ func (r *GlobalLogReceiverResource) Update(ctx context.Context, req resource.Upd
 		ns_allMap := make(map[string]interface{})
 		apiResource.Spec["ns_all"] = ns_allMap
 	}
-	if data.NsCurrent != nil {
-		ns_currentMap := make(map[string]interface{})
-		apiResource.Spec["ns_current"] = ns_currentMap
-	}
 	if data.NsList != nil {
 		ns_listMap := make(map[string]interface{})
 		if !data.NsList.Namespaces.IsNull() && !data.NsList.Namespaces.IsUnknown() {
@@ -5880,6 +6070,10 @@ func (r *GlobalLogReceiverResource) Update(ctx context.Context, req resource.Upd
 			sumo_logic_receiverMap["url"] = urlNestedMap
 		}
 		apiResource.Spec["sumo_logic_receiver"] = sumo_logic_receiverMap
+	}
+	if data.NsCurrent != nil {
+		ns_currentMap := make(map[string]interface{})
+		apiResource.Spec["ns_current"] = ns_currentMap
 	}
 
 	_, err := r.client.UpdateGlobalLogReceiver(ctx, apiResource)
@@ -6538,11 +6732,6 @@ func (r *GlobalLogReceiverResource) Update(ctx context.Context, req resource.Upd
 		data.NsAll = &GlobalLogReceiverEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["ns_current"].(map[string]interface{}); ok && isImport && data.NsCurrent == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.NsCurrent = &GlobalLogReceiverEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["ns_list"].(map[string]interface{}); ok && (isImport || data.NsList != nil) {
 		data.NsList = &GlobalLogReceiverNsListModel{
 			Namespaces: func() types.List {
@@ -6851,6 +7040,11 @@ func (r *GlobalLogReceiverResource) Update(ctx context.Context, req resource.Upd
 	if _, ok := apiResource.Spec["sumo_logic_receiver"].(map[string]interface{}); ok && isImport && data.SumoLogicReceiver == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.SumoLogicReceiver = &GlobalLogReceiverSumoLogicReceiverModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["ns_current"].(map[string]interface{}); ok && isImport && data.NsCurrent == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NsCurrent = &GlobalLogReceiverEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 
