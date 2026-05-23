@@ -298,11 +298,11 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.AUTO_MERGE_TOKEN }}
 
       - name: Download specs if not present
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
           ENRICHED_REPO: f5xc-salesdemos/api-specs-enriched
         run: |
           SPEC_DIR="docs/specifications/api"
@@ -405,7 +405,7 @@ jobs:
       - name: Close stale auto-regenerate PRs
         if: steps.check.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
         run: |
           # Find and close any open auto-regenerate PRs (they're superseded by this new regeneration)
           echo "Checking for stale auto-regenerate PRs..."
@@ -427,7 +427,7 @@ jobs:
         id: create-pr
         if: steps.check.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
         run: |
           # Create a unique branch name
           BRANCH_NAME="auto-regenerate/${{ github.sha }}"
