@@ -448,7 +448,8 @@ jobs:
 
           Co-Authored-By: Claude <noreply@anthropic.com>"
 
-          # Push the branch (use token-authenticated URL so push triggers CI)
+          # Push the branch (clear checkout extraheader and use PAT so push triggers CI)
+          git config --unset-all http.https://github.com/.extraheader || true
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
           git push origin "$BRANCH_NAME"
 
