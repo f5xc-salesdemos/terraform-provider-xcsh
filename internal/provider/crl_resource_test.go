@@ -52,6 +52,25 @@ func TestAccCRLResource_basic(t *testing.T) {
 	})
 }
 
+func TestAccCRLResource_emptyPlan(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-crl")
+	nsName := acctest.RandomName("tf-acc-test-ns")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_crl"),
+		Steps: []resource.TestStep{
+			{Config: testAccCRLConfig_basic(nsName, rName)},
+			{Config: testAccCRLConfig_basic(nsName, rName), PlanOnly: true, ExpectNonEmptyPlan: false},
+		},
+	})
+}
+
 func testAccCRLImportStateIdFunc(resourceName string) resource.ImportStateIdFunc {
 	return func(s *terraform.State) (string, error) {
 		rs, ok := s.RootModule().Resources[resourceName]

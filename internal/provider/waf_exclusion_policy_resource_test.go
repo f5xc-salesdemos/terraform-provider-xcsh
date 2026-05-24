@@ -4,9 +4,11 @@ package provider_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
@@ -331,6 +333,130 @@ func testAccWAFExclusionPolicyResourceImportStateIdFunc(resourceName string) res
 		}
 		return fmt.Sprintf("%s/%s", rs.Primary.Attributes["namespace"], rs.Primary.Attributes["name"]), nil
 	}
+}
+
+// =============================================================================
+// TEST: Empty plan after apply (no drift)
+// =============================================================================
+func TestAccWAFExclusionPolicyResource_emptyPlan(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-test-waf-exc")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_waf_exclusion_policy"),
+		Steps: []resource.TestStep{
+			{Config: testAccWAFExclusionPolicyResourceConfig_basic("", rName)},
+			{Config: testAccWAFExclusionPolicyResourceConfig_basic("", rName), PlanOnly: true, ExpectNonEmptyPlan: false},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Plan checks (create, update, noop)
+// =============================================================================
+func TestAccWAFExclusionPolicyResource_planChecks(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_waf_exclusion_policy.test"
+	rName := acctest.RandomName("tf-test-waf-exc")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_waf_exclusion_policy"),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccWAFExclusionPolicyResourceConfig_basic("", rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionCreate)},
+				},
+			},
+			{
+				Config: testAccWAFExclusionPolicyResourceConfig_withLabels("", rName, "test", "terraform"),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate)},
+				},
+			},
+			{
+				Config: testAccWAFExclusionPolicyResourceConfig_withLabels("", rName, "test", "terraform"),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionNoop)},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Invalid name validation
+// =============================================================================
+func TestAccWAFExclusionPolicyResource_invalidName(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		Steps: []resource.TestStep{
+			{Config: testAccWAFExclusionPolicyResourceConfig_basic("", "Invalid-NAME"), ExpectError: regexp.MustCompile(`(?i)(invalid|name|must)`)},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Full lifecycle
+// =============================================================================
+func TestAccWAFExclusionPolicyResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_waf_exclusion_policy.test"
+	rName := acctest.RandomName("tf-test-waf-exc")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_waf_exclusion_policy"),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccWAFExclusionPolicyResourceConfig_allAttributes("", rName, "Full lifecycle test"),
+				Check:  acctest.CheckResourceExists(resourceName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "disable", "description"},
+				ImportStateIdFunc:       testAccWAFExclusionPolicyResourceImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccWAFExclusionPolicyResourceConfig_withExclusionRules("", rName),
+				Check:  acctest.CheckResourceExists(resourceName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate)},
+				},
+			},
+			{
+				Config: testAccWAFExclusionPolicyResourceConfig_withExclusionRules("", rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+			},
+			{
+				Config: testAccWAFExclusionPolicyResourceConfig_basic("", rName),
+				Check:  acctest.CheckResourceExists(resourceName),
+			},
+		},
+	})
 }
 
 // =============================================================================
