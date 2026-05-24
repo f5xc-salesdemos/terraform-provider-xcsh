@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
@@ -41,6 +42,21 @@ func TestAccHealthcheckResource_httpFullOptions(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "jitter_percent", "30"),
 				),
 			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccMatrixHealthcheckImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccHealthcheckConfig_httpFullOptions(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
 		},
 	})
 }
@@ -65,10 +81,24 @@ func TestAccHealthcheckResource_tcpWithPayload(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					acctest.CheckHealthcheckExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", rName),
-					// Values are hex-encoded as per F5 XC API requirements
 					resource.TestCheckResourceAttr(resourceName, "tcp_health_check.send_payload", "48454c4c4f"),
 					resource.TestCheckResourceAttr(resourceName, "tcp_health_check.expected_response", "4f4b"),
 				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccMatrixHealthcheckImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccHealthcheckConfig_tcpWithPayload(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
 			},
 		},
 	})
@@ -133,6 +163,16 @@ func TestAccOriginPoolResource_customPort(t *testing.T) {
 			},
 		},
 	})
+}
+
+func testAccMatrixHealthcheckImportStateIdFunc(resourceName string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[resourceName]
+		if !ok {
+			return "", fmt.Errorf("resource not found: %s", resourceName)
+		}
+		return fmt.Sprintf("%s/%s", rs.Primary.Attributes["namespace"], rs.Primary.Attributes["name"]), nil
+	}
 }
 
 // =============================================================================

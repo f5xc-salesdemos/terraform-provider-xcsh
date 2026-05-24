@@ -502,6 +502,538 @@ func TestAccHealthcheckResource_httpHealthCheck(t *testing.T) {
 }
 
 // =============================================================================
+// GROUP 1: Health Check Type Coverage
+// =============================================================================
+
+// TestAccHealthcheckResource_tcpHealthCheck_withPayload — covered in healthcheck_origin_pool_matrix_test.go
+// TestAccHealthcheckResource_httpHealthCheck_allFields — covered in healthcheck_origin_pool_matrix_test.go (httpFullOptions)
+
+func TestAccHealthcheckResource_httpHealthCheck_originServerName(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_httpOriginServerName(rName, "/health"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.path", "/health"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccHealthcheckImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccHealthcheckResource_httpHealthCheck_statusCodes(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_httpStatusCodes(rName, "/health"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.expected_status_codes.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.expected_status_codes.0", "200"),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.expected_status_codes.1", "201"),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.expected_status_codes.2", "204"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccHealthcheckImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccHealthcheckResource_httpHealthCheck_headersRemove(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_httpHeadersRemove(rName, "/health"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.request_headers_to_remove.#", "2"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccHealthcheckImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccHealthcheckResource_httpHealthCheck_http2(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_httpHttp2(rName, "/health"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.use_http2", "true"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "http_health_check.use_http2"},
+				ImportStateIdFunc:       testAccHealthcheckImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccHealthcheckResource_udpIcmpHealthCheck(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_udpIcmp(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccHealthcheckImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// GROUP 2: Spec Attribute Coverage
+// =============================================================================
+
+func TestAccHealthcheckResource_description(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_withDescription(rName, "initial description"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "description", "initial description"),
+				),
+			},
+			{
+				Config: testAccHealthcheckConfig_withDescription(rName, "updated description"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "description", "updated description"),
+				),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "disable", "description"},
+				ImportStateIdFunc:       testAccHealthcheckImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccHealthcheckResource_jitterPercent(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_withJitter(rName, 30),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "jitter_percent", "30"),
+				),
+			},
+			{
+				Config: testAccHealthcheckConfig_withJitter(rName, 50),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "jitter_percent", "50"),
+				),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccHealthcheckImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccHealthcheckResource_thresholds_update(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_thresholds(rName, 1, 2, 3, 5),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "healthy_threshold", "1"),
+					resource.TestCheckResourceAttr(resourceName, "unhealthy_threshold", "2"),
+					resource.TestCheckResourceAttr(resourceName, "timeout", "3"),
+					resource.TestCheckResourceAttr(resourceName, "interval", "5"),
+				),
+			},
+			{
+				Config: testAccHealthcheckConfig_thresholds(rName, 5, 3, 10, 30),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "healthy_threshold", "5"),
+					resource.TestCheckResourceAttr(resourceName, "unhealthy_threshold", "3"),
+					resource.TestCheckResourceAttr(resourceName, "timeout", "10"),
+					resource.TestCheckResourceAttr(resourceName, "interval", "30"),
+				),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccHealthcheckConfig_thresholds(rName, 5, 3, 10, 30),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+		},
+	})
+}
+
+func TestAccHealthcheckResource_thresholds_boundary(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_thresholds(rName, 1, 1, 1, 1),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "healthy_threshold", "1"),
+					resource.TestCheckResourceAttr(resourceName, "unhealthy_threshold", "1"),
+					resource.TestCheckResourceAttr(resourceName, "timeout", "1"),
+					resource.TestCheckResourceAttr(resourceName, "interval", "1"),
+				),
+			},
+			{
+				Config: testAccHealthcheckConfig_thresholds(rName, 16, 16, 600, 600),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "healthy_threshold", "16"),
+					resource.TestCheckResourceAttr(resourceName, "unhealthy_threshold", "16"),
+					resource.TestCheckResourceAttr(resourceName, "timeout", "600"),
+					resource.TestCheckResourceAttr(resourceName, "interval", "600"),
+				),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// GROUP 3: Type Switching and Update Tests
+// =============================================================================
+
+func TestAccHealthcheckResource_switchType_tcpToHttp(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_basicSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+				),
+			},
+			{
+				Config: testAccHealthcheckConfig_httpHealthCheckSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.path", "/health"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccHealthcheckResource_switchType_httpToUdp(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_httpHealthCheckSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+				),
+			},
+			{
+				Config: testAccHealthcheckConfig_udpIcmp(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+				),
+			},
+		},
+	})
+}
+
+func TestAccHealthcheckResource_httpHealthCheck_updatePath(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_httpWithPath(rName, "/health"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.path", "/health"),
+				),
+			},
+			{
+				Config: testAccHealthcheckConfig_httpWithPath(rName, "/healthz"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.path", "/healthz"),
+				),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "http_health_check.use_http2"},
+				ImportStateIdFunc:       testAccHealthcheckImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccHealthcheckResource_httpHealthCheck_switchHostToOrigin(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHealthcheckConfig_httpHealthCheckSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.host_header", "example.com"),
+				),
+			},
+			{
+				Config: testAccHealthcheckConfig_httpOriginServerName(rName, "/health"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+				),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// GROUP 4: Full Lifecycle Validation
+// =============================================================================
+
+func TestAccHealthcheckResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+	resourceName := "f5xc_healthcheck.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckHealthcheckDestroyed,
+		Steps: []resource.TestStep{
+			// Step 1: Create with all optional fields (reuses matrix file's httpFullOptions config)
+			{
+				Config: testAccHealthcheckConfig_httpHealthCheckSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "http_health_check.path", "/health"),
+				),
+			},
+			// Step 2: Import verification
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "http_health_check.use_http2"},
+				ImportStateIdFunc:       testAccHealthcheckImportStateIdFunc(resourceName),
+			},
+			// Step 3: Update thresholds and timing
+			{
+				Config: testAccHealthcheckConfig_thresholds(rName, 5, 3, 10, 30),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "healthy_threshold", "5"),
+					resource.TestCheckResourceAttr(resourceName, "interval", "30"),
+				),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			// Step 4: Verify no drift
+			{
+				Config: testAccHealthcheckConfig_thresholds(rName, 5, 3, 10, 30),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+			// Step 5: Strip down to minimal config
+			{
+				Config: testAccHealthcheckConfig_basicSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckHealthcheckExists(resourceName),
+				),
+			},
+		},
+	})
+}
+
+// =============================================================================
 // CONFIG HELPERS - Use "system" namespace
 // =============================================================================
 
@@ -606,4 +1138,168 @@ resource "f5xc_healthcheck" "test" {
   }
 }
 `, name)
+}
+
+func testAccHealthcheckConfig_httpOriginServerName(name, path string) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = 1
+  unhealthy_threshold = 2
+  timeout             = 3
+  interval            = 5
+
+  http_health_check {
+    path = %[2]q
+    use_origin_server_name {}
+  }
+}
+`, name, path)
+}
+
+func testAccHealthcheckConfig_httpStatusCodes(name, path string) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = 1
+  unhealthy_threshold = 2
+  timeout             = 3
+  interval            = 5
+
+  http_health_check {
+    path                  = %[2]q
+    host_header           = "example.com"
+    expected_status_codes = ["200", "201", "204"]
+  }
+}
+`, name, path)
+}
+
+func testAccHealthcheckConfig_httpHeadersRemove(name, path string) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = 1
+  unhealthy_threshold = 2
+  timeout             = 3
+  interval            = 5
+
+  http_health_check {
+    path                       = %[2]q
+    host_header                = "example.com"
+    request_headers_to_remove  = ["X-Custom-Header", "X-Debug"]
+  }
+}
+`, name, path)
+}
+
+func testAccHealthcheckConfig_httpHttp2(name, path string) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = 1
+  unhealthy_threshold = 2
+  timeout             = 3
+  interval            = 5
+
+  http_health_check {
+    path        = %[2]q
+    host_header = "example.com"
+    use_http2   = true
+  }
+}
+`, name, path)
+}
+
+func testAccHealthcheckConfig_udpIcmp(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = 1
+  unhealthy_threshold = 2
+  timeout             = 3
+  interval            = 5
+
+  udp_icmp_health_check {}
+}
+`, name)
+}
+
+func testAccHealthcheckConfig_withDescription(name, description string) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name        = %[1]q
+  namespace   = "system"
+  description = %[2]q
+
+  healthy_threshold   = 1
+  unhealthy_threshold = 2
+  timeout             = 3
+  interval            = 5
+
+  tcp_health_check {}
+}
+`, name, description)
+}
+
+func testAccHealthcheckConfig_withJitter(name string, jitter int) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = 1
+  unhealthy_threshold = 2
+  timeout             = 3
+  interval            = 5
+  jitter_percent      = %[2]d
+
+  tcp_health_check {}
+}
+`, name, jitter)
+}
+
+func testAccHealthcheckConfig_thresholds(name string, healthy, unhealthy, timeout, interval int) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = %[2]d
+  unhealthy_threshold = %[3]d
+  timeout             = %[4]d
+  interval            = %[5]d
+
+  tcp_health_check {}
+}
+`, name, healthy, unhealthy, timeout, interval)
+}
+
+func testAccHealthcheckConfig_httpWithPath(name, path string) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = 1
+  unhealthy_threshold = 2
+  timeout             = 3
+  interval            = 5
+
+  http_health_check {
+    path        = %[2]q
+    host_header = "example.com"
+  }
+}
+`, name, path)
 }
