@@ -86,7 +86,7 @@ export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/robinmordasiewicz/terraform-provider-f5xc.git
+git clone https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc.git
 cd terraform-provider-f5xc/examples/guides/blindfold
 ```
 
@@ -246,8 +246,8 @@ resource "f5xc_cloud_credentials" "aws" {
 Secure Azure service principal client secrets:
 
 ```hcl
-resource "f5xc_cloud_credentials" "azure" {
-  name      = "azure-credentials"
+resource "f5xc_cloud_credentials" "Azure" {
+  name      = "Azure-credentials"
   namespace = "system"
 
   azure_client_secret {
@@ -297,10 +297,10 @@ Protect container registry passwords for private image pulls:
 
 ```hcl
 resource "f5xc_container_registry" "example" {
-  name      = "docker-registry"
+  name      = "Docker-registry"
   namespace = "shared"
 
-  registry  = "docker.io"
+  registry  = "Docker.io"
   user_name = var.registry_username
 
   password {
@@ -516,4 +516,4 @@ Now that you understand blindfold encryption, explore related resources:
 - **Provider Documentation:** [F5XC Provider](../index.md)
 - **F5 Documentation:** [F5 Distributed Cloud Docs](https://docs.cloud.f5.com/)
 - **Secret Management:** [F5XC Secret Management](https://docs.cloud.f5.com/docs/how-to/secrets-management)
-- **Issues:** [GitHub Issues](https://github.com/robinmordasiewicz/terraform-provider-f5xc/issues)
+- **Issues:** [GitHub Issues](https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc/issues)

@@ -2,6 +2,18 @@
 # Manages k8s_pod_security_policy will create the object in the storage backend for namespace metadata.namespace in F5 Distributed Cloud.
 
 # Basic K8S Pod Security Policy configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_k8s_pod_security_policy" "example" {
   name      = "example-k8s-pod-security-policy"
   namespace = "staging"

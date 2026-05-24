@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -151,11 +152,14 @@ func (r *ProtocolInspectionResource) Schema(ctx context.Context, req resource.Sc
 				},
 			},
 			"action": schema.StringAttribute{
-				MarkdownDescription: "[Enum: ALLOW|DENY|DROP] Action after inspection - ALLOW: Allow Allow traffic - DENY: Deny Throw RST error for TCP and ICMP error for UDP - DROP: DROP Silently drop traffic. Possible values are `ALLOW`, `DENY`, `DROP`. Defaults to `ALLOW`.",
+				MarkdownDescription: "[Enum: ALLOW|DENY|DROP] Action after inspection - ALLOW: Allow Allow traffic - DENY: Deny Throw RST error for TCP and ICMP error for UDP - DROP: DROP Silently drop traffic. Possible values are `ALLOW`, `DENY`, `DROP`. Defaults to `ALLOW`. Server applies default when omitted.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.String{
+					stringvalidator.OneOf("ALLOW", "DENY", "DROP"),
 				},
 			},
 		},
@@ -171,7 +175,7 @@ func (r *ProtocolInspectionResource) Schema(ctx context.Context, req resource.Sc
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"disable_compliance_checks": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable compliance checks.",
 					},
 					"enable_compliance_checks": schema.SingleNestedBlock{
 						MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
@@ -179,6 +183,9 @@ func (r *ProtocolInspectionResource) Schema(ctx context.Context, req resource.Sc
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -186,6 +193,9 @@ func (r *ProtocolInspectionResource) Schema(ctx context.Context, req resource.Sc
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
 								},
 							},
 							"tenant": schema.StringAttribute{
@@ -195,20 +205,23 @@ func (r *ProtocolInspectionResource) Schema(ctx context.Context, req resource.Sc
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 						},
 					},
 				},
 			},
 			"enable_disable_signatures": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable/Disable Signatures Choice. Enable Disable Signature Choice.",
+				MarkdownDescription: "Configuration parameter for enable disable signatures.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"disable_signature": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable signature.",
 					},
 					"enable_signature": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for enable signature.",
 					},
 				},
 			},

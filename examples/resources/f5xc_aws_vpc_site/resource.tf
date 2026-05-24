@@ -1,6 +1,17 @@
 # AWS VPC Site Resource Example
 # Manages a AWS VPC Site resource in F5 Distributed Cloud for deploying F5 sites within AWS VPC environments.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic AWS VPC Site configuration
 resource "f5xc_aws_vpc_site" "example" {
   name      = "example-aws-vpc-site"

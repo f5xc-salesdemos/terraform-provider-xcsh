@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -445,6 +449,9 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 						"action": schema.StringAttribute{
 							MarkdownDescription: "[Enum: DENY|ALLOW] Network policy rule action configures the action to be taken on rule match Apply deny action on rule match Apply allow action on rule match. Possible values are `DENY`, `ALLOW`. Defaults to `DENY`.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf("DENY", "ALLOW"),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -454,23 +461,26 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 								"action": schema.StringAttribute{
 									MarkdownDescription: "[Enum: NOLOG|LOG] Choice to choose logging or no logging This works together with option selected via NetworkPolicyRuleAction or any other action specified x-. Possible values are `NOLOG`, `LOG`. Defaults to `NOLOG`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("NOLOG", "LOG"),
+									},
 								},
 							},
 						},
 						"all_tcp_traffic": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for all tcp traffic.",
 						},
 						"all_traffic": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for all traffic.",
 						},
 						"all_udp_traffic": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for all udp traffic.",
 						},
 						"any": schema.SingleNestedBlock{
 							MarkdownDescription: "Enable this option",
 						},
 						"applications": schema.SingleNestedBlock{
-							MarkdownDescription: "Applications. Application protocols like HTTP, SNMP.",
+							MarkdownDescription: "Configuration parameter for applications.",
 							Attributes: map[string]schema.Attribute{
 								"applications": schema.ListAttribute{
 									MarkdownDescription: "[Enum: APPLICATION_HTTP|APPLICATION_HTTPS|APPLICATION_SNMP|APPLICATION_DNS] Application Protocols. Application protocols like HTTP, SNMP. Possible values are `APPLICATION_HTTP`, `APPLICATION_HTTPS`, `APPLICATION_SNMP`, `APPLICATION_DNS`. Defaults to `APPLICATION_HTTP`.",
@@ -501,6 +511,10 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -508,6 +522,10 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 												},
 											},
 											"tenant": schema.StringAttribute{
@@ -538,16 +556,22 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "The list of label key names that have to match.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(16),
+									},
 								},
 							},
 						},
 						"label_selector": schema.SingleNestedBlock{
-							MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+							MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 							Attributes: map[string]schema.Attribute{
 								"expressions": schema.ListAttribute{
 									MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(1),
+									},
 								},
 							},
 						},
@@ -557,10 +581,16 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 								"description_spec": schema.StringAttribute{
 									MarkdownDescription: "Description. Human readable description.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+									},
 								},
 							},
 						},
@@ -574,6 +604,9 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(128),
+									},
 								},
 							},
 						},
@@ -584,6 +617,9 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "List of port ranges. Each range is a single port or a pair of start and end ports e.g. 8080-8192.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(128),
+									},
 								},
 								"protocol": schema.StringAttribute{
 									MarkdownDescription: "Protocol in IP packet to be used as match criteria Values are TCP, UDP, and icmp.",
@@ -605,12 +641,15 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Enable this option",
 					},
 					"label_selector": schema.SingleNestedBlock{
-						MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+						MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 						Attributes: map[string]schema.Attribute{
 							"expressions": schema.ListAttribute{
 								MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(1),
+								},
 							},
 						},
 					},
@@ -624,6 +663,9 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 								MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(128),
+								},
 							},
 						},
 					},
@@ -636,6 +678,9 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 						"action": schema.StringAttribute{
 							MarkdownDescription: "[Enum: DENY|ALLOW] Network policy rule action configures the action to be taken on rule match Apply deny action on rule match Apply allow action on rule match. Possible values are `DENY`, `ALLOW`. Defaults to `DENY`.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf("DENY", "ALLOW"),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -645,23 +690,26 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 								"action": schema.StringAttribute{
 									MarkdownDescription: "[Enum: NOLOG|LOG] Choice to choose logging or no logging This works together with option selected via NetworkPolicyRuleAction or any other action specified x-. Possible values are `NOLOG`, `LOG`. Defaults to `NOLOG`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("NOLOG", "LOG"),
+									},
 								},
 							},
 						},
 						"all_tcp_traffic": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for all tcp traffic.",
 						},
 						"all_traffic": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for all traffic.",
 						},
 						"all_udp_traffic": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for all udp traffic.",
 						},
 						"any": schema.SingleNestedBlock{
 							MarkdownDescription: "Enable this option",
 						},
 						"applications": schema.SingleNestedBlock{
-							MarkdownDescription: "Applications. Application protocols like HTTP, SNMP.",
+							MarkdownDescription: "Configuration parameter for applications.",
 							Attributes: map[string]schema.Attribute{
 								"applications": schema.ListAttribute{
 									MarkdownDescription: "[Enum: APPLICATION_HTTP|APPLICATION_HTTPS|APPLICATION_SNMP|APPLICATION_DNS] Application Protocols. Application protocols like HTTP, SNMP. Possible values are `APPLICATION_HTTP`, `APPLICATION_HTTPS`, `APPLICATION_SNMP`, `APPLICATION_DNS`. Defaults to `APPLICATION_HTTP`.",
@@ -692,6 +740,10 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -699,6 +751,10 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+													stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 												},
 											},
 											"tenant": schema.StringAttribute{
@@ -729,16 +785,22 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "The list of label key names that have to match.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(16),
+									},
 								},
 							},
 						},
 						"label_selector": schema.SingleNestedBlock{
-							MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+							MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 							Attributes: map[string]schema.Attribute{
 								"expressions": schema.ListAttribute{
 									MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(1),
+									},
 								},
 							},
 						},
@@ -748,10 +810,16 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 								"description_spec": schema.StringAttribute{
 									MarkdownDescription: "Description. Human readable description.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+									},
 								},
 							},
 						},
@@ -765,6 +833,9 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(128),
+									},
 								},
 							},
 						},
@@ -775,6 +846,9 @@ func (r *NetworkPolicyViewResource) Schema(ctx context.Context, req resource.Sch
 									MarkdownDescription: "List of port ranges. Each range is a single port or a pair of start and end ports e.g. 8080-8192.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(128),
+									},
 								},
 								"protocol": schema.StringAttribute{
 									MarkdownDescription: "Protocol in IP packet to be used as match criteria Values are TCP, UDP, and icmp.",

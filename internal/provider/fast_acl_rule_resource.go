@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -43,6 +47,20 @@ type FastACLRuleResource struct {
 
 // FastACLRuleEmptyModel represents empty nested blocks
 type FastACLRuleEmptyModel struct {
+}
+
+// FastACLRulePortModel represents port block
+type FastACLRulePortModel struct {
+	UserDefined types.Int64            `tfsdk:"user_defined"`
+	All         *FastACLRuleEmptyModel `tfsdk:"all"`
+	DNS         *FastACLRuleEmptyModel `tfsdk:"dns"`
+}
+
+// FastACLRulePortModelAttrTypes defines the attribute types for FastACLRulePortModel
+var FastACLRulePortModelAttrTypes = map[string]attr.Type{
+	"user_defined": types.Int64Type,
+	"all":          types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"dns":          types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // FastACLRuleActionModel represents action block
@@ -143,20 +161,6 @@ var FastACLRuleIPPrefixSetRefModelAttrTypes = map[string]attr.Type{
 	"uid":       types.StringType,
 }
 
-// FastACLRulePortModel represents port block
-type FastACLRulePortModel struct {
-	UserDefined types.Int64            `tfsdk:"user_defined"`
-	All         *FastACLRuleEmptyModel `tfsdk:"all"`
-	DNS         *FastACLRuleEmptyModel `tfsdk:"dns"`
-}
-
-// FastACLRulePortModelAttrTypes defines the attribute types for FastACLRulePortModel
-var FastACLRulePortModelAttrTypes = map[string]attr.Type{
-	"user_defined": types.Int64Type,
-	"all":          types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"dns":          types.ObjectType{AttrTypes: map[string]attr.Type{}},
-}
-
 // FastACLRulePrefixModel represents prefix block
 type FastACLRulePrefixModel struct {
 	Prefix types.List `tfsdk:"prefix"`
@@ -176,9 +180,9 @@ type FastACLRuleResourceModel struct {
 	Labels      types.Map                    `tfsdk:"labels"`
 	ID          types.String                 `tfsdk:"id"`
 	Timeouts    timeouts.Value               `tfsdk:"timeouts"`
+	Port        types.List                   `tfsdk:"port"`
 	Action      *FastACLRuleActionModel      `tfsdk:"action"`
 	IPPrefixSet *FastACLRuleIPPrefixSetModel `tfsdk:"ip_prefix_set"`
-	Port        types.List                   `tfsdk:"port"`
 	Prefix      *FastACLRulePrefixModel      `tfsdk:"prefix"`
 }
 
@@ -243,12 +247,34 @@ func (r *FastACLRuleResource) Schema(ctx context.Context, req resource.SchemaReq
 				Update: true,
 				Delete: true,
 			}),
+			"port": schema.ListNestedBlock{
+				MarkdownDescription: "Source Ports. L4 port numbers to match .",
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"user_defined": schema.Int64Attribute{
+							MarkdownDescription: "Exclusive with [all DNS] Matches the user defined port.",
+							Optional:            true,
+						},
+					},
+					Blocks: map[string]schema.Block{
+						"all": schema.SingleNestedBlock{
+							MarkdownDescription: "Enable this option",
+						},
+						"dns": schema.SingleNestedBlock{
+							MarkdownDescription: "Enable this option",
+						},
+					},
+				},
+			},
 			"action": schema.SingleNestedBlock{
 				MarkdownDescription: "FastAclRuleAction specifies possible action to be applied on traffic, possible action include dropping, forwarding or ratelimiting the traffic.",
 				Attributes: map[string]schema.Attribute{
 					"simple_action": schema.StringAttribute{
 						MarkdownDescription: "[Enum: DENY|ALLOW] FastAclRuleSimpleAction specifies simple action like PASS or DENY Drop the traffic Forward the traffic. Possible values are `DENY`, `ALLOW`. Defaults to `DENY`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("DENY", "ALLOW"),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -271,6 +297,10 @@ func (r *FastACLRuleResource) Schema(ctx context.Context, req resource.SchemaReq
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -278,6 +308,10 @@ func (r *FastACLRuleResource) Schema(ctx context.Context, req resource.SchemaReq
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -320,6 +354,10 @@ func (r *FastACLRuleResource) Schema(ctx context.Context, req resource.SchemaReq
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -327,6 +365,10 @@ func (r *FastACLRuleResource) Schema(ctx context.Context, req resource.SchemaReq
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -371,6 +413,10 @@ func (r *FastACLRuleResource) Schema(ctx context.Context, req resource.SchemaReq
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -378,6 +424,10 @@ func (r *FastACLRuleResource) Schema(ctx context.Context, req resource.SchemaReq
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -401,25 +451,6 @@ func (r *FastACLRuleResource) Schema(ctx context.Context, req resource.SchemaReq
 					},
 				},
 			},
-			"port": schema.ListNestedBlock{
-				MarkdownDescription: "Source Ports. L4 port numbers to match .",
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"user_defined": schema.Int64Attribute{
-							MarkdownDescription: "Matches the user defined port.",
-							Optional:            true,
-						},
-					},
-					Blocks: map[string]schema.Block{
-						"all": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
-						},
-						"dns": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
-						},
-					},
-				},
-			},
 			"prefix": schema.SingleNestedBlock{
 				MarkdownDescription: "List of IP Address prefixes. Prefix must contain both prefix and prefix-length The list can contain mix of both IPv4 and IPv6 prefixes.",
 				Attributes: map[string]schema.Attribute{
@@ -427,6 +458,9 @@ func (r *FastACLRuleResource) Schema(ctx context.Context, req resource.SchemaReq
 						MarkdownDescription: "IP Address prefix in string format. String must contain both prefix and prefix-length.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(256),
+						},
 					},
 				},
 			},
@@ -536,6 +570,28 @@ func (r *FastACLRuleResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Port.IsNull() && !data.Port.IsUnknown() {
+		var portItems []FastACLRulePortModel
+		diags := data.Port.ElementsAs(ctx, &portItems, false)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() && len(portItems) > 0 {
+			var portList []map[string]interface{}
+			for _, item := range portItems {
+				itemMap := make(map[string]interface{})
+				if item.All != nil {
+					itemMap["all"] = map[string]interface{}{}
+				}
+				if item.DNS != nil {
+					itemMap["dns"] = map[string]interface{}{}
+				}
+				if !item.UserDefined.IsNull() && !item.UserDefined.IsUnknown() {
+					itemMap["user_defined"] = item.UserDefined.ValueInt64()
+				}
+				portList = append(portList, itemMap)
+			}
+			createReq.Spec["port"] = portList
+		}
+	}
 	if data.Action != nil {
 		actionMap := make(map[string]interface{})
 		if data.Action.PolicerAction != nil {
@@ -578,28 +634,6 @@ func (r *FastACLRuleResource) Create(ctx context.Context, req resource.CreateReq
 		}
 		createReq.Spec["ip_prefix_set"] = ip_prefix_setMap
 	}
-	if !data.Port.IsNull() && !data.Port.IsUnknown() {
-		var portItems []FastACLRulePortModel
-		diags := data.Port.ElementsAs(ctx, &portItems, false)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() && len(portItems) > 0 {
-			var portList []map[string]interface{}
-			for _, item := range portItems {
-				itemMap := make(map[string]interface{})
-				if item.All != nil {
-					itemMap["all"] = map[string]interface{}{}
-				}
-				if item.DNS != nil {
-					itemMap["dns"] = map[string]interface{}{}
-				}
-				if !item.UserDefined.IsNull() && !item.UserDefined.IsUnknown() {
-					itemMap["user_defined"] = item.UserDefined.ValueInt64()
-				}
-				portList = append(portList, itemMap)
-			}
-			createReq.Spec["port"] = portList
-		}
-	}
 	if data.Prefix != nil {
 		prefixMap := make(map[string]interface{})
 		if !data.Prefix.Prefix.IsNull() && !data.Prefix.Prefix.IsUnknown() {
@@ -624,6 +658,46 @@ func (r *FastACLRuleResource) Create(ctx context.Context, req resource.CreateReq
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if listData, ok := apiResource.Spec["port"].([]interface{}); ok && len(listData) > 0 {
+		var portList []FastACLRulePortModel
+		var existingPortItems []FastACLRulePortModel
+		if !data.Port.IsNull() && !data.Port.IsUnknown() {
+			data.Port.ElementsAs(ctx, &existingPortItems, false)
+		}
+		for listIdx, item := range listData {
+			_ = listIdx // May be unused if no empty marker blocks in list item
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				portList = append(portList, FastACLRulePortModel{
+					All: func() *FastACLRuleEmptyModel {
+						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].All != nil {
+							return &FastACLRuleEmptyModel{}
+						}
+						return nil
+					}(),
+					DNS: func() *FastACLRuleEmptyModel {
+						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].DNS != nil {
+							return &FastACLRuleEmptyModel{}
+						}
+						return nil
+					}(),
+					UserDefined: func() types.Int64 {
+						if v, ok := itemMap["user_defined"].(float64); ok && v != 0 {
+							return types.Int64Value(int64(v))
+						}
+						return types.Int64Null()
+					}(),
+				})
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes}, portList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Port = listVal
+		}
+	} else {
+		// No data from API - set to null list
+		data.Port = types.ListNull(types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes})
+	}
 	if blockData, ok := apiResource.Spec["action"].(map[string]interface{}); ok && (isImport || data.Action != nil) {
 		data.Action = &FastACLRuleActionModel{
 			PolicerAction: func() *FastACLRuleActionPolicerActionModel {
@@ -702,46 +776,6 @@ func (r *FastACLRuleResource) Create(ctx context.Context, req resource.CreateReq
 				return nil
 			}(),
 		}
-	}
-	if listData, ok := apiResource.Spec["port"].([]interface{}); ok && len(listData) > 0 {
-		var portList []FastACLRulePortModel
-		var existingPortItems []FastACLRulePortModel
-		if !data.Port.IsNull() && !data.Port.IsUnknown() {
-			data.Port.ElementsAs(ctx, &existingPortItems, false)
-		}
-		for listIdx, item := range listData {
-			_ = listIdx // May be unused if no empty marker blocks in list item
-			if itemMap, ok := item.(map[string]interface{}); ok {
-				portList = append(portList, FastACLRulePortModel{
-					All: func() *FastACLRuleEmptyModel {
-						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].All != nil {
-							return &FastACLRuleEmptyModel{}
-						}
-						return nil
-					}(),
-					DNS: func() *FastACLRuleEmptyModel {
-						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].DNS != nil {
-							return &FastACLRuleEmptyModel{}
-						}
-						return nil
-					}(),
-					UserDefined: func() types.Int64 {
-						if v, ok := itemMap["user_defined"].(float64); ok && v != 0 {
-							return types.Int64Value(int64(v))
-						}
-						return types.Int64Null()
-					}(),
-				})
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes}, portList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Port = listVal
-		}
-	} else {
-		// No data from API - set to null list
-		data.Port = types.ListNull(types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes})
 	}
 	if blockData, ok := apiResource.Spec["prefix"].(map[string]interface{}); ok && (isImport || data.Prefix != nil) {
 		data.Prefix = &FastACLRulePrefixModel{
@@ -840,6 +874,46 @@ func (r *FastACLRuleResource) Read(ctx context.Context, req resource.ReadRequest
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if listData, ok := apiResource.Spec["port"].([]interface{}); ok && len(listData) > 0 {
+		var portList []FastACLRulePortModel
+		var existingPortItems []FastACLRulePortModel
+		if !data.Port.IsNull() && !data.Port.IsUnknown() {
+			data.Port.ElementsAs(ctx, &existingPortItems, false)
+		}
+		for listIdx, item := range listData {
+			_ = listIdx // May be unused if no empty marker blocks in list item
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				portList = append(portList, FastACLRulePortModel{
+					All: func() *FastACLRuleEmptyModel {
+						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].All != nil {
+							return &FastACLRuleEmptyModel{}
+						}
+						return nil
+					}(),
+					DNS: func() *FastACLRuleEmptyModel {
+						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].DNS != nil {
+							return &FastACLRuleEmptyModel{}
+						}
+						return nil
+					}(),
+					UserDefined: func() types.Int64 {
+						if v, ok := itemMap["user_defined"].(float64); ok && v != 0 {
+							return types.Int64Value(int64(v))
+						}
+						return types.Int64Null()
+					}(),
+				})
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes}, portList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Port = listVal
+		}
+	} else {
+		// No data from API - set to null list
+		data.Port = types.ListNull(types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes})
+	}
 	if blockData, ok := apiResource.Spec["action"].(map[string]interface{}); ok && (isImport || data.Action != nil) {
 		data.Action = &FastACLRuleActionModel{
 			PolicerAction: func() *FastACLRuleActionPolicerActionModel {
@@ -918,46 +992,6 @@ func (r *FastACLRuleResource) Read(ctx context.Context, req resource.ReadRequest
 				return nil
 			}(),
 		}
-	}
-	if listData, ok := apiResource.Spec["port"].([]interface{}); ok && len(listData) > 0 {
-		var portList []FastACLRulePortModel
-		var existingPortItems []FastACLRulePortModel
-		if !data.Port.IsNull() && !data.Port.IsUnknown() {
-			data.Port.ElementsAs(ctx, &existingPortItems, false)
-		}
-		for listIdx, item := range listData {
-			_ = listIdx // May be unused if no empty marker blocks in list item
-			if itemMap, ok := item.(map[string]interface{}); ok {
-				portList = append(portList, FastACLRulePortModel{
-					All: func() *FastACLRuleEmptyModel {
-						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].All != nil {
-							return &FastACLRuleEmptyModel{}
-						}
-						return nil
-					}(),
-					DNS: func() *FastACLRuleEmptyModel {
-						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].DNS != nil {
-							return &FastACLRuleEmptyModel{}
-						}
-						return nil
-					}(),
-					UserDefined: func() types.Int64 {
-						if v, ok := itemMap["user_defined"].(float64); ok && v != 0 {
-							return types.Int64Value(int64(v))
-						}
-						return types.Int64Null()
-					}(),
-				})
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes}, portList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Port = listVal
-		}
-	} else {
-		// No data from API - set to null list
-		data.Port = types.ListNull(types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes})
 	}
 	if blockData, ok := apiResource.Spec["prefix"].(map[string]interface{}); ok && (isImport || data.Prefix != nil) {
 		data.Prefix = &FastACLRulePrefixModel{
@@ -1027,6 +1061,28 @@ func (r *FastACLRuleResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Port.IsNull() && !data.Port.IsUnknown() {
+		var portItems []FastACLRulePortModel
+		diags := data.Port.ElementsAs(ctx, &portItems, false)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() && len(portItems) > 0 {
+			var portList []map[string]interface{}
+			for _, item := range portItems {
+				itemMap := make(map[string]interface{})
+				if item.All != nil {
+					itemMap["all"] = map[string]interface{}{}
+				}
+				if item.DNS != nil {
+					itemMap["dns"] = map[string]interface{}{}
+				}
+				if !item.UserDefined.IsNull() && !item.UserDefined.IsUnknown() {
+					itemMap["user_defined"] = item.UserDefined.ValueInt64()
+				}
+				portList = append(portList, itemMap)
+			}
+			apiResource.Spec["port"] = portList
+		}
+	}
 	if data.Action != nil {
 		actionMap := make(map[string]interface{})
 		if data.Action.PolicerAction != nil {
@@ -1069,28 +1125,6 @@ func (r *FastACLRuleResource) Update(ctx context.Context, req resource.UpdateReq
 		}
 		apiResource.Spec["ip_prefix_set"] = ip_prefix_setMap
 	}
-	if !data.Port.IsNull() && !data.Port.IsUnknown() {
-		var portItems []FastACLRulePortModel
-		diags := data.Port.ElementsAs(ctx, &portItems, false)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() && len(portItems) > 0 {
-			var portList []map[string]interface{}
-			for _, item := range portItems {
-				itemMap := make(map[string]interface{})
-				if item.All != nil {
-					itemMap["all"] = map[string]interface{}{}
-				}
-				if item.DNS != nil {
-					itemMap["dns"] = map[string]interface{}{}
-				}
-				if !item.UserDefined.IsNull() && !item.UserDefined.IsUnknown() {
-					itemMap["user_defined"] = item.UserDefined.ValueInt64()
-				}
-				portList = append(portList, itemMap)
-			}
-			apiResource.Spec["port"] = portList
-		}
-	}
 	if data.Prefix != nil {
 		prefixMap := make(map[string]interface{})
 		if !data.Prefix.Prefix.IsNull() && !data.Prefix.Prefix.IsUnknown() {
@@ -1126,6 +1160,46 @@ func (r *FastACLRuleResource) Update(ctx context.Context, req resource.UpdateReq
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if listData, ok := apiResource.Spec["port"].([]interface{}); ok && len(listData) > 0 {
+		var portList []FastACLRulePortModel
+		var existingPortItems []FastACLRulePortModel
+		if !data.Port.IsNull() && !data.Port.IsUnknown() {
+			data.Port.ElementsAs(ctx, &existingPortItems, false)
+		}
+		for listIdx, item := range listData {
+			_ = listIdx // May be unused if no empty marker blocks in list item
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				portList = append(portList, FastACLRulePortModel{
+					All: func() *FastACLRuleEmptyModel {
+						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].All != nil {
+							return &FastACLRuleEmptyModel{}
+						}
+						return nil
+					}(),
+					DNS: func() *FastACLRuleEmptyModel {
+						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].DNS != nil {
+							return &FastACLRuleEmptyModel{}
+						}
+						return nil
+					}(),
+					UserDefined: func() types.Int64 {
+						if v, ok := itemMap["user_defined"].(float64); ok && v != 0 {
+							return types.Int64Value(int64(v))
+						}
+						return types.Int64Null()
+					}(),
+				})
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes}, portList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Port = listVal
+		}
+	} else {
+		// No data from API - set to null list
+		data.Port = types.ListNull(types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes})
+	}
 	if blockData, ok := apiResource.Spec["action"].(map[string]interface{}); ok && (isImport || data.Action != nil) {
 		data.Action = &FastACLRuleActionModel{
 			PolicerAction: func() *FastACLRuleActionPolicerActionModel {
@@ -1204,46 +1278,6 @@ func (r *FastACLRuleResource) Update(ctx context.Context, req resource.UpdateReq
 				return nil
 			}(),
 		}
-	}
-	if listData, ok := apiResource.Spec["port"].([]interface{}); ok && len(listData) > 0 {
-		var portList []FastACLRulePortModel
-		var existingPortItems []FastACLRulePortModel
-		if !data.Port.IsNull() && !data.Port.IsUnknown() {
-			data.Port.ElementsAs(ctx, &existingPortItems, false)
-		}
-		for listIdx, item := range listData {
-			_ = listIdx // May be unused if no empty marker blocks in list item
-			if itemMap, ok := item.(map[string]interface{}); ok {
-				portList = append(portList, FastACLRulePortModel{
-					All: func() *FastACLRuleEmptyModel {
-						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].All != nil {
-							return &FastACLRuleEmptyModel{}
-						}
-						return nil
-					}(),
-					DNS: func() *FastACLRuleEmptyModel {
-						if !isImport && len(existingPortItems) > listIdx && existingPortItems[listIdx].DNS != nil {
-							return &FastACLRuleEmptyModel{}
-						}
-						return nil
-					}(),
-					UserDefined: func() types.Int64 {
-						if v, ok := itemMap["user_defined"].(float64); ok && v != 0 {
-							return types.Int64Value(int64(v))
-						}
-						return types.Int64Null()
-					}(),
-				})
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes}, portList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Port = listVal
-		}
-	} else {
-		// No data from API - set to null list
-		data.Port = types.ListNull(types.ObjectType{AttrTypes: FastACLRulePortModelAttrTypes})
 	}
 	if blockData, ok := apiResource.Spec["prefix"].(map[string]interface{}); ok && (isImport || data.Prefix != nil) {
 		data.Prefix = &FastACLRulePrefixModel{

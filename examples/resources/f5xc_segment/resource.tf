@@ -1,6 +1,17 @@
 # Segment Resource Example
 # Manages a Segment resource in F5 Distributed Cloud for segment. configuration.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Segment configuration
 resource "f5xc_segment" "example" {
   name      = "example-segment"
@@ -17,8 +28,8 @@ resource "f5xc_segment" "example" {
 
   # Resource-specific configuration
   # [OneOf: disable, enable] Enable this option
-  disable {
-    # Configure disable settings
+  disable_spec {
+    # Configure disable_spec settings
   }
   # Enable this option
   enable {

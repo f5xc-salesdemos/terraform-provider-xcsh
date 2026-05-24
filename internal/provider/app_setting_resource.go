@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -81,14 +84,14 @@ var AppSettingAppTypeSettingsAppTypeRefModelAttrTypes = map[string]attr.Type{
 
 // AppSettingAppTypeSettingsBusinessLogicMarkupSettingModel represents business_logic_markup_setting block
 type AppSettingAppTypeSettingsBusinessLogicMarkupSettingModel struct {
-	Disable *AppSettingEmptyModel `tfsdk:"disable"`
-	Enable  *AppSettingEmptyModel `tfsdk:"enable"`
+	DisableSpec *AppSettingEmptyModel `tfsdk:"disable_spec"`
+	Enable      *AppSettingEmptyModel `tfsdk:"enable"`
 }
 
 // AppSettingAppTypeSettingsBusinessLogicMarkupSettingModelAttrTypes defines the attribute types for AppSettingAppTypeSettingsBusinessLogicMarkupSettingModel
 var AppSettingAppTypeSettingsBusinessLogicMarkupSettingModelAttrTypes = map[string]attr.Type{
-	"disable": types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"enable":  types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"disable_spec": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"enable":       types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // AppSettingAppTypeSettingsTimeseriesAnalysesSettingModel represents timeseries_analyses_setting block
@@ -310,6 +313,10 @@ func (r *AppSettingResource) Schema(ctx context.Context, req resource.SchemaRequ
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 1024),
+											stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -317,6 +324,10 @@ func (r *AppSettingResource) Schema(ctx context.Context, req resource.SchemaRequ
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 1024),
+											stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 										},
 									},
 									"tenant": schema.StringAttribute{
@@ -342,7 +353,7 @@ func (r *AppSettingResource) Schema(ctx context.Context, req resource.SchemaRequ
 							MarkdownDescription: "Settings specifying how API Discovery will be performed.",
 							Attributes:          map[string]schema.Attribute{},
 							Blocks: map[string]schema.Block{
-								"disable": schema.SingleNestedBlock{
+								"disable_spec": schema.SingleNestedBlock{
 									MarkdownDescription: "Enable this option",
 								},
 								"enable": schema.SingleNestedBlock{
@@ -351,7 +362,7 @@ func (r *AppSettingResource) Schema(ctx context.Context, req resource.SchemaRequ
 							},
 						},
 						"timeseries_analyses_setting": schema.SingleNestedBlock{
-							MarkdownDescription: "DDoS Settings. Configuration for DDoS Detection.",
+							MarkdownDescription: "Configuration parameter for timeseries analyses setting.",
 							Attributes:          map[string]schema.Attribute{},
 							Blocks: map[string]schema.Block{
 								"metric_selectors": schema.ListNestedBlock{
@@ -366,6 +377,9 @@ func (r *AppSettingResource) Schema(ctx context.Context, req resource.SchemaRequ
 											"metrics_source": schema.StringAttribute{
 												MarkdownDescription: "[Enum: NONE|NODES|EDGES|VIRTUAL_HOSTS] Supported sources from which Metrics can be analyzed All edges in the service mesh graph. Metrics are analyzed separately between all source and destination service combinations. Possible values are `NONE`, `NODES`, `EDGES`, `VIRTUAL_HOSTS`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("NONE", "NODES", "EDGES", "VIRTUAL_HOSTS"),
+												},
 											},
 										},
 									},
@@ -377,34 +391,34 @@ func (r *AppSettingResource) Schema(ctx context.Context, req resource.SchemaRequ
 							Attributes:          map[string]schema.Attribute{},
 							Blocks: map[string]schema.Block{
 								"disable_detection": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for disable detection.",
 								},
 								"disable_learning": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for disable learning.",
 								},
 								"enable_detection": schema.SingleNestedBlock{
 									MarkdownDescription: "Various factors about user activity are monitored and analysed to determine malicious users. These settings allow tuning those factors used by the system to detect malicious users.",
 									Attributes: map[string]schema.Attribute{
 										"cooling_off_period": schema.Int64Attribute{
-											MarkdownDescription: "Malicious user detection assigns a threat level to each user based on their activity. Once a threat level is assigned, the system continues tracking activity from this user and if no further malicious activity is seen, it gradually reduces the threat assesment to lower levels..",
+											MarkdownDescription: "Exclusive with [] Malicious user detection assigns a threat level to each user based on their activity. Once a threat level is assigned, the system continues tracking activity from this user and if no further malicious activity is seen, it gradually reduces the threat assessment to lower levels..",
 											Optional:            true,
 										},
 									},
 									Blocks: map[string]schema.Block{
 										"bola_detection_automatic": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for bola detection automatic.",
 										},
 										"exclude_bola_detection": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for exclude bola detection.",
 										},
 										"exclude_bot_defense_activity": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for exclude bot defense activity.",
 										},
 										"exclude_failed_login_activity": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for exclude failed login activity.",
 										},
 										"exclude_forbidden_activity": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for exclude forbidden activity.",
 										},
 										"exclude_ip_reputation": schema.SingleNestedBlock{
 											MarkdownDescription: "Enable this option",
@@ -413,13 +427,13 @@ func (r *AppSettingResource) Schema(ctx context.Context, req resource.SchemaRequ
 											MarkdownDescription: "Enable this option",
 										},
 										"exclude_rate_limit": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for exclude rate limit.",
 										},
 										"exclude_waf_activity": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for exclude waf activity.",
 										},
 										"include_bot_defense_activity": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for include bot defense activity.",
 										},
 										"include_failed_login_activity": schema.SingleNestedBlock{
 											MarkdownDescription: "When enabled, the system monitors persistent failed login attempts from a user. A failed login is detected if a request results in a response code of 401. These settings specify how to use failed login activity to determine suspicious behavior.",
@@ -467,15 +481,15 @@ func (r *AppSettingResource) Schema(ctx context.Context, req resource.SchemaRequ
 											},
 										},
 										"include_rate_limit": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for include rate limit.",
 										},
 										"include_waf_activity": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for include waf activity.",
 										},
 									},
 								},
 								"enable_learning": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for enable learning.",
 								},
 							},
 						},
@@ -621,7 +635,7 @@ func (r *AppSettingResource) Create(ctx context.Context, req resource.CreateRequ
 				}
 				if item.BusinessLogicMarkupSetting != nil {
 					business_logic_markup_settingNestedMap := make(map[string]interface{})
-					if item.BusinessLogicMarkupSetting.Disable != nil {
+					if item.BusinessLogicMarkupSetting.DisableSpec != nil {
 						business_logic_markup_settingNestedMap["disable"] = map[string]interface{}{}
 					}
 					if item.BusinessLogicMarkupSetting.Enable != nil {
@@ -777,8 +791,8 @@ func (r *AppSettingResource) Create(ctx context.Context, req resource.CreateRequ
 					BusinessLogicMarkupSetting: func() *AppSettingAppTypeSettingsBusinessLogicMarkupSettingModel {
 						if _, ok := itemMap["business_logic_markup_setting"].(map[string]interface{}); ok {
 							return &AppSettingAppTypeSettingsBusinessLogicMarkupSettingModel{
-								Disable: func() *AppSettingEmptyModel {
-									if !isImport && len(existingAppTypeSettingsItems) > listIdx && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting != nil && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting.Disable != nil {
+								DisableSpec: func() *AppSettingEmptyModel {
+									if !isImport && len(existingAppTypeSettingsItems) > listIdx && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting != nil && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting.DisableSpec != nil {
 										return &AppSettingEmptyModel{}
 									}
 									return nil
@@ -972,8 +986,8 @@ func (r *AppSettingResource) Read(ctx context.Context, req resource.ReadRequest,
 					BusinessLogicMarkupSetting: func() *AppSettingAppTypeSettingsBusinessLogicMarkupSettingModel {
 						if _, ok := itemMap["business_logic_markup_setting"].(map[string]interface{}); ok {
 							return &AppSettingAppTypeSettingsBusinessLogicMarkupSettingModel{
-								Disable: func() *AppSettingEmptyModel {
-									if !isImport && len(existingAppTypeSettingsItems) > listIdx && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting != nil && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting.Disable != nil {
+								DisableSpec: func() *AppSettingEmptyModel {
+									if !isImport && len(existingAppTypeSettingsItems) > listIdx && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting != nil && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting.DisableSpec != nil {
 										return &AppSettingEmptyModel{}
 									}
 									return nil
@@ -1115,7 +1129,7 @@ func (r *AppSettingResource) Update(ctx context.Context, req resource.UpdateRequ
 				}
 				if item.BusinessLogicMarkupSetting != nil {
 					business_logic_markup_settingNestedMap := make(map[string]interface{})
-					if item.BusinessLogicMarkupSetting.Disable != nil {
+					if item.BusinessLogicMarkupSetting.DisableSpec != nil {
 						business_logic_markup_settingNestedMap["disable"] = map[string]interface{}{}
 					}
 					if item.BusinessLogicMarkupSetting.Enable != nil {
@@ -1282,8 +1296,8 @@ func (r *AppSettingResource) Update(ctx context.Context, req resource.UpdateRequ
 					BusinessLogicMarkupSetting: func() *AppSettingAppTypeSettingsBusinessLogicMarkupSettingModel {
 						if _, ok := itemMap["business_logic_markup_setting"].(map[string]interface{}); ok {
 							return &AppSettingAppTypeSettingsBusinessLogicMarkupSettingModel{
-								Disable: func() *AppSettingEmptyModel {
-									if !isImport && len(existingAppTypeSettingsItems) > listIdx && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting != nil && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting.Disable != nil {
+								DisableSpec: func() *AppSettingEmptyModel {
+									if !isImport && len(existingAppTypeSettingsItems) > listIdx && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting != nil && existingAppTypeSettingsItems[listIdx].BusinessLogicMarkupSetting.DisableSpec != nil {
 										return &AppSettingEmptyModel{}
 									}
 									return nil

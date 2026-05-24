@@ -1,6 +1,17 @@
 # Protocol Inspection Resource Example
 # Manages Protocol Inspection Specification in a given namespace. If one already exists it will give an error. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Protocol Inspection configuration
 resource "f5xc_protocol_inspection" "example" {
   name      = "example-protocol-inspection"
@@ -20,7 +31,7 @@ resource "f5xc_protocol_inspection" "example" {
   enable_disable_compliance_checks {
     # Configure enable_disable_compliance_checks settings
   }
-  # Enable this option
+  # Configuration parameter for disable compliance checks.
   disable_compliance_checks {
     # Configure disable_compliance_checks settings
   }
@@ -29,3 +40,6 @@ resource "f5xc_protocol_inspection" "example" {
     # Configure enable_compliance_checks settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - action

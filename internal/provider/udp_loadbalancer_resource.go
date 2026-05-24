@@ -9,12 +9,12 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -45,6 +45,30 @@ type UDPLoadBalancerResource struct {
 
 // UDPLoadBalancerEmptyModel represents empty nested blocks
 type UDPLoadBalancerEmptyModel struct {
+}
+
+// UDPLoadBalancerActiveServicePoliciesModel represents active_service_policies block
+type UDPLoadBalancerActiveServicePoliciesModel struct {
+	Policies []UDPLoadBalancerActiveServicePoliciesPoliciesModel `tfsdk:"policies"`
+}
+
+// UDPLoadBalancerActiveServicePoliciesModelAttrTypes defines the attribute types for UDPLoadBalancerActiveServicePoliciesModel
+var UDPLoadBalancerActiveServicePoliciesModelAttrTypes = map[string]attr.Type{
+	"policies": types.ListType{ElemType: types.ObjectType{AttrTypes: UDPLoadBalancerActiveServicePoliciesPoliciesModelAttrTypes}},
+}
+
+// UDPLoadBalancerActiveServicePoliciesPoliciesModel represents policies block
+type UDPLoadBalancerActiveServicePoliciesPoliciesModel struct {
+	Name      types.String `tfsdk:"name"`
+	Namespace types.String `tfsdk:"namespace"`
+	Tenant    types.String `tfsdk:"tenant"`
+}
+
+// UDPLoadBalancerActiveServicePoliciesPoliciesModelAttrTypes defines the attribute types for UDPLoadBalancerActiveServicePoliciesPoliciesModel
+var UDPLoadBalancerActiveServicePoliciesPoliciesModelAttrTypes = map[string]attr.Type{
+	"name":      types.StringType,
+	"namespace": types.StringType,
+	"tenant":    types.StringType,
 }
 
 // UDPLoadBalancerAdvertiseCustomModel represents advertise_custom block
@@ -332,29 +356,32 @@ var UDPLoadBalancerOriginPoolsWeightsPoolModelAttrTypes = map[string]attr.Type{
 }
 
 type UDPLoadBalancerResourceModel struct {
-	Name                               types.String                           `tfsdk:"name"`
-	Namespace                          types.String                           `tfsdk:"namespace"`
-	Annotations                        types.Map                              `tfsdk:"annotations"`
-	Description                        types.String                           `tfsdk:"description"`
-	Disable                            types.Bool                             `tfsdk:"disable"`
-	Domains                            types.List                             `tfsdk:"domains"`
-	Labels                             types.Map                              `tfsdk:"labels"`
-	ID                                 types.String                           `tfsdk:"id"`
-	DNSVolterraManaged                 types.Bool                             `tfsdk:"dns_volterra_managed"`
-	EnablePerPacketLoadBalancing       types.Bool                             `tfsdk:"enable_per_packet_load_balancing"`
-	IdleTimeout                        types.Int64                            `tfsdk:"idle_timeout"`
-	ListenPort                         types.Int64                            `tfsdk:"listen_port"`
-	PortRanges                         types.String                           `tfsdk:"port_ranges"`
-	Timeouts                           timeouts.Value                         `tfsdk:"timeouts"`
-	AdvertiseCustom                    *UDPLoadBalancerAdvertiseCustomModel   `tfsdk:"advertise_custom"`
-	AdvertiseOnPublic                  *UDPLoadBalancerAdvertiseOnPublicModel `tfsdk:"advertise_on_public"`
-	AdvertiseOnPublicDefaultVIP        *UDPLoadBalancerEmptyModel             `tfsdk:"advertise_on_public_default_vip"`
-	DoNotAdvertise                     *UDPLoadBalancerEmptyModel             `tfsdk:"do_not_advertise"`
-	HashPolicyChoiceRandom             *UDPLoadBalancerEmptyModel             `tfsdk:"hash_policy_choice_random"`
-	HashPolicyChoiceRoundRobin         *UDPLoadBalancerEmptyModel             `tfsdk:"hash_policy_choice_round_robin"`
-	HashPolicyChoiceSourceIPStickiness *UDPLoadBalancerEmptyModel             `tfsdk:"hash_policy_choice_source_ip_stickiness"`
-	OriginPoolsWeights                 types.List                             `tfsdk:"origin_pools_weights"`
-	UDP                                *UDPLoadBalancerEmptyModel             `tfsdk:"udp"`
+	Name                               types.String                               `tfsdk:"name"`
+	Namespace                          types.String                               `tfsdk:"namespace"`
+	Annotations                        types.Map                                  `tfsdk:"annotations"`
+	Description                        types.String                               `tfsdk:"description"`
+	Disable                            types.Bool                                 `tfsdk:"disable"`
+	Domains                            types.List                                 `tfsdk:"domains"`
+	Labels                             types.Map                                  `tfsdk:"labels"`
+	ID                                 types.String                               `tfsdk:"id"`
+	DNSVolterraManaged                 types.Bool                                 `tfsdk:"dns_volterra_managed"`
+	EnablePerPacketLoadBalancing       types.Bool                                 `tfsdk:"enable_per_packet_load_balancing"`
+	IdleTimeout                        types.Int64                                `tfsdk:"idle_timeout"`
+	ListenPort                         types.Int64                                `tfsdk:"listen_port"`
+	PortRanges                         types.String                               `tfsdk:"port_ranges"`
+	Timeouts                           timeouts.Value                             `tfsdk:"timeouts"`
+	ActiveServicePolicies              *UDPLoadBalancerActiveServicePoliciesModel `tfsdk:"active_service_policies"`
+	AdvertiseCustom                    *UDPLoadBalancerAdvertiseCustomModel       `tfsdk:"advertise_custom"`
+	AdvertiseOnPublic                  *UDPLoadBalancerAdvertiseOnPublicModel     `tfsdk:"advertise_on_public"`
+	AdvertiseOnPublicDefaultVIP        *UDPLoadBalancerEmptyModel                 `tfsdk:"advertise_on_public_default_vip"`
+	DoNotAdvertise                     *UDPLoadBalancerEmptyModel                 `tfsdk:"do_not_advertise"`
+	HashPolicyChoiceRandom             *UDPLoadBalancerEmptyModel                 `tfsdk:"hash_policy_choice_random"`
+	HashPolicyChoiceRoundRobin         *UDPLoadBalancerEmptyModel                 `tfsdk:"hash_policy_choice_round_robin"`
+	HashPolicyChoiceSourceIPStickiness *UDPLoadBalancerEmptyModel                 `tfsdk:"hash_policy_choice_source_ip_stickiness"`
+	NoServicePolicies                  *UDPLoadBalancerEmptyModel                 `tfsdk:"no_service_policies"`
+	OriginPoolsWeights                 types.List                                 `tfsdk:"origin_pools_weights"`
+	ServicePoliciesFromNamespace       *UDPLoadBalancerEmptyModel                 `tfsdk:"service_policies_from_namespace"`
+	UDP                                *UDPLoadBalancerEmptyModel                 `tfsdk:"udp"`
 }
 
 func (r *UDPLoadBalancerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -400,8 +427,11 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 			},
 			"domains": schema.ListAttribute{
 				MarkdownDescription: "List of domains (host/authority header) that will be matched to this load balancer.",
-				Optional:            true,
+				Required:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeBetween(1, 32),
+				},
 			},
 			"labels": schema.MapAttribute{
 				MarkdownDescription: "Labels is a user defined key value map that can be attached to resources for organization and filtering.",
@@ -417,42 +447,25 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 			},
 			"dns_volterra_managed": schema.BoolAttribute{
 				MarkdownDescription: "DNS records for domains will be managed automatically by F5 Distributed Cloud. As a prerequisite, the domain to be delegated to F5 Distributed Cloud using the Delegated Domain feature or a DNS CNAME record must be created in your DNS provider's portal.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"enable_per_packet_load_balancing": schema.BoolAttribute{
-				MarkdownDescription: "Per packet load balancing: If disabled (default): First packet identified by source IP/port and local IP/port is sent to an upstream server as the load balancing algorithm dictates, and subsequent packets with the same identity are forwarded to the same upstream server without rechecking the..",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
-				},
+				MarkdownDescription: "Per packet load balancing: If disabled (default): First packet identified by source IP/port and local IP/port is sent to an upstream server as the load balancing algorithm dictates, and subsequent packets with the same identity are forwarded to the same upstream server without recheckingg the..",
+				Required:            true,
 			},
 			"idle_timeout": schema.Int64Attribute{
 				MarkdownDescription: "The amount of time that a session can exist without upstream or downstream activity, in milliseconds.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"listen_port": schema.Int64Attribute{
-				MarkdownDescription: "[OneOf: listen_port, port_ranges] Listen Port for this load balancer.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
+				MarkdownDescription: "[OneOf: listen_port, port_ranges] Exclusive with [port_ranges] Listen Port for this load balancer.",
+				Required:            true,
 			},
 			"port_ranges": schema.StringAttribute{
-				MarkdownDescription: "A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				MarkdownDescription: "Exclusive with [listen_port] A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(1, 512),
 				},
 			},
 		},
@@ -463,6 +476,48 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				Update: true,
 				Delete: true,
 			}),
+			"active_service_policies": schema.SingleNestedBlock{
+				MarkdownDescription: "[OneOf: active_service_policies, no_service_policies, service_policies_from_namespace; Default: no_service_policies] Configuration parameter for active service policies.",
+				Attributes:          map[string]schema.Attribute{},
+				Blocks: map[string]schema.Block{
+					"policies": schema.ListNestedBlock{
+						MarkdownDescription: "Service Policies is a sequential engine where policies (and rules within the policy) are evaluated one after the other. It's important to define the correct order (policies evaluated from top to bottom in the list) for service policies, to GET the intended result. For each request, its..",
+						NestedObject: schema.NestedBlockObject{
+							Attributes: map[string]schema.Attribute{
+								"name": schema.StringAttribute{
+									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
+								},
+								"namespace": schema.StringAttribute{
+									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+									Optional:            true,
+									Computed:            true,
+									PlanModifiers: []planmodifier.String{
+										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
+								},
+								"tenant": schema.StringAttribute{
+									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+									Optional:            true,
+									Computed:            true,
+									PlanModifiers: []planmodifier.String{
+										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"advertise_custom": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: advertise_custom, advertise_on_public, advertise_on_public_default_vip, do_not_advertise; Default: advertise_on_public_default_vip] Defines a way to advertise a VIP on specific sites.",
 				Attributes:          map[string]schema.Attribute{},
@@ -472,12 +527,15 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"port": schema.Int64Attribute{
-									MarkdownDescription: "Port to Listen.",
+									MarkdownDescription: "Exclusive with [port_ranges use_default_port] Port to Listen.",
 									Optional:            true,
 								},
 								"port_ranges": schema.StringAttribute{
-									MarkdownDescription: "A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
+									MarkdownDescription: "Exclusive with [port use_default_port] A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 512),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -491,6 +549,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -499,6 +560,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -506,6 +570,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -518,10 +585,16 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"ip": schema.StringAttribute{
 											MarkdownDescription: "Use given IP address as VIP on the site.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"network": schema.StringAttribute{
 											MarkdownDescription: "[Enum: SITE_NETWORK_INSIDE_AND_OUTSIDE|SITE_NETWORK_INSIDE|SITE_NETWORK_OUTSIDE|SITE_NETWORK_SERVICE|SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP|SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP|SITE_NETWORK_IP_FABRIC] Defines network types to be used on site All inside and outside networks. All inside and outside networks with internet VIP support. All inside networks. Possible values are `SITE_NETWORK_INSIDE_AND_OUTSIDE`, `SITE_NETWORK_INSIDE`, `SITE_NETWORK_OUTSIDE`, `SITE_NETWORK_SERVICE`, `SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP`, `SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP`, `SITE_NETWORK_IP_FABRIC`. Defaults to `SITE_NETWORK_INSIDE_AND_OUTSIDE`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("SITE_NETWORK_INSIDE_AND_OUTSIDE", "SITE_NETWORK_INSIDE", "SITE_NETWORK_OUTSIDE", "SITE_NETWORK_SERVICE", "SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP", "SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP", "SITE_NETWORK_IP_FABRIC"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -531,6 +604,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -539,6 +615,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -546,6 +625,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -559,12 +641,18 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									MarkdownDescription: "Parameters to advertise on a given virtual network.",
 									Attributes: map[string]schema.Attribute{
 										"specific_v6_vip": schema.StringAttribute{
-											MarkdownDescription: "Use given IPv6 address as VIP on virtual Network.",
+											MarkdownDescription: "Exclusive with [default_v6_vip] Use given IPv6 address as VIP on virtual Network.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"specific_vip": schema.StringAttribute{
-											MarkdownDescription: "Use given IPv4 address as VIP on virtual Network.",
+											MarkdownDescription: "Exclusive with [default_vip] Use given IPv4 address as VIP on virtual Network.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -580,6 +668,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -588,6 +679,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -595,6 +689,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -607,6 +704,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"network": schema.StringAttribute{
 											MarkdownDescription: "[Enum: SITE_NETWORK_INSIDE_AND_OUTSIDE|SITE_NETWORK_INSIDE|SITE_NETWORK_OUTSIDE|SITE_NETWORK_SERVICE|SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP|SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP|SITE_NETWORK_IP_FABRIC] Defines network types to be used on site All inside and outside networks. All inside and outside networks with internet VIP support. All inside networks. Possible values are `SITE_NETWORK_INSIDE_AND_OUTSIDE`, `SITE_NETWORK_INSIDE`, `SITE_NETWORK_OUTSIDE`, `SITE_NETWORK_SERVICE`, `SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP`, `SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP`, `SITE_NETWORK_IP_FABRIC`. Defaults to `SITE_NETWORK_INSIDE_AND_OUTSIDE`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("SITE_NETWORK_INSIDE_AND_OUTSIDE", "SITE_NETWORK_INSIDE", "SITE_NETWORK_OUTSIDE", "SITE_NETWORK_SERVICE", "SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP", "SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP", "SITE_NETWORK_IP_FABRIC"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -616,6 +716,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -624,6 +727,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -631,6 +737,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -643,10 +752,16 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"ip": schema.StringAttribute{
 											MarkdownDescription: "Use given IP address as VIP on the site.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"network": schema.StringAttribute{
 											MarkdownDescription: "[Enum: SITE_NETWORK_SPECIFIED_VIP_OUTSIDE|SITE_NETWORK_SPECIFIED_VIP_INSIDE] Defines network types to be used on virtual-site with specified VIP All outside networks. All inside networks. Possible values are `SITE_NETWORK_SPECIFIED_VIP_OUTSIDE`, `SITE_NETWORK_SPECIFIED_VIP_INSIDE`. Defaults to `SITE_NETWORK_SPECIFIED_VIP_OUTSIDE`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("SITE_NETWORK_SPECIFIED_VIP_OUTSIDE", "SITE_NETWORK_SPECIFIED_VIP_INSIDE"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -656,6 +771,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -664,6 +782,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -671,6 +792,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -687,6 +811,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -695,6 +822,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -702,6 +832,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -712,6 +845,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -720,6 +856,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -727,6 +866,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -748,6 +890,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -756,6 +901,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -763,6 +911,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -773,16 +924,19 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				MarkdownDescription: "Enable this option",
 			},
 			"do_not_advertise": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for do not advertise.",
 			},
 			"hash_policy_choice_random": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: hash_policy_choice_random, hash_policy_choice_round_robin, hash_policy_choice_source_ip_stickiness] Enable this option",
+				MarkdownDescription: "[OneOf: hash_policy_choice_random, hash_policy_choice_round_robin, hash_policy_choice_source_ip_stickiness] Configuration parameter for hash policy choice random.",
 			},
 			"hash_policy_choice_round_robin": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for hash policy choice round robin.",
 			},
 			"hash_policy_choice_source_ip_stickiness": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
+			},
+			"no_service_policies": schema.SingleNestedBlock{
+				MarkdownDescription: "Configuration parameter for no service policies.",
 			},
 			"origin_pools_weights": schema.ListNestedBlock{
 				MarkdownDescription: "Origin pools with weights and priorities used for this load balancer.",
@@ -804,6 +958,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -812,6 +969,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 								"tenant": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -819,6 +979,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
 									},
 								},
 							},
@@ -832,6 +995,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -839,6 +1005,9 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -848,11 +1017,17 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
+									},
 								},
 							},
 						},
 					},
 				},
+			},
+			"service_policies_from_namespace": schema.SingleNestedBlock{
+				MarkdownDescription: "Enable this option",
 			},
 			"udp": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
@@ -883,6 +1058,14 @@ func (r *UDPLoadBalancerResource) ValidateConfig(ctx context.Context, req resour
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	if !data.ListenPort.IsNull() && !data.PortRanges.IsNull() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("listen_port"),
+			"Conflicting Configuration",
+			"listen_port and port_ranges are mutually exclusive.",
+		)
+	}
+
 }
 
 // ModifyPlan implements resource.ResourceWithModifyPlan
@@ -963,6 +1146,27 @@ func (r *UDPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if data.ActiveServicePolicies != nil {
+		active_service_policiesMap := make(map[string]interface{})
+		if len(data.ActiveServicePolicies.Policies) > 0 {
+			var policiesList []map[string]interface{}
+			for _, listItem := range data.ActiveServicePolicies.Policies {
+				listItemMap := make(map[string]interface{})
+				if !listItem.Name.IsNull() && !listItem.Name.IsUnknown() {
+					listItemMap["name"] = listItem.Name.ValueString()
+				}
+				if !listItem.Namespace.IsNull() && !listItem.Namespace.IsUnknown() {
+					listItemMap["namespace"] = listItem.Namespace.ValueString()
+				}
+				if !listItem.Tenant.IsNull() && !listItem.Tenant.IsUnknown() {
+					listItemMap["tenant"] = listItem.Tenant.ValueString()
+				}
+				policiesList = append(policiesList, listItemMap)
+			}
+			active_service_policiesMap["policies"] = policiesList
+		}
+		createReq.Spec["active_service_policies"] = active_service_policiesMap
+	}
 	if data.AdvertiseCustom != nil {
 		advertise_customMap := make(map[string]interface{})
 		if len(data.AdvertiseCustom.AdvertiseWhere) > 0 {
@@ -1079,6 +1283,10 @@ func (r *UDPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 		hash_policy_choice_source_ip_stickinessMap := make(map[string]interface{})
 		createReq.Spec["hash_policy_choice_source_ip_stickiness"] = hash_policy_choice_source_ip_stickinessMap
 	}
+	if data.NoServicePolicies != nil {
+		no_service_policiesMap := make(map[string]interface{})
+		createReq.Spec["no_service_policies"] = no_service_policiesMap
+	}
 	if !data.OriginPoolsWeights.IsNull() && !data.OriginPoolsWeights.IsUnknown() {
 		var origin_pools_weightsItems []UDPLoadBalancerOriginPoolsWeightsModel
 		diags := data.OriginPoolsWeights.ElementsAs(ctx, &origin_pools_weightsItems, false)
@@ -1127,6 +1335,10 @@ func (r *UDPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 			createReq.Spec["origin_pools_weights"] = origin_pools_weightsList
 		}
 	}
+	if data.ServicePoliciesFromNamespace != nil {
+		service_policies_from_namespaceMap := make(map[string]interface{})
+		createReq.Spec["service_policies_from_namespace"] = service_policies_from_namespaceMap
+	}
 	if data.UDP != nil {
 		udpMap := make(map[string]interface{})
 		createReq.Spec["udp"] = udpMap
@@ -1159,6 +1371,41 @@ func (r *UDPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if blockData, ok := apiResource.Spec["active_service_policies"].(map[string]interface{}); ok && (isImport || data.ActiveServicePolicies != nil) {
+		data.ActiveServicePolicies = &UDPLoadBalancerActiveServicePoliciesModel{
+			Policies: func() []UDPLoadBalancerActiveServicePoliciesPoliciesModel {
+				if listData, ok := blockData["policies"].([]interface{}); ok && len(listData) > 0 {
+					var result []UDPLoadBalancerActiveServicePoliciesPoliciesModel
+					for _, item := range listData {
+						if itemMap, ok := item.(map[string]interface{}); ok {
+							result = append(result, UDPLoadBalancerActiveServicePoliciesPoliciesModel{
+								Name: func() types.String {
+									if v, ok := itemMap["name"].(string); ok && v != "" {
+										return types.StringValue(v)
+									}
+									return types.StringNull()
+								}(),
+								Namespace: func() types.String {
+									if v, ok := itemMap["namespace"].(string); ok && v != "" {
+										return types.StringValue(v)
+									}
+									return types.StringNull()
+								}(),
+								Tenant: func() types.String {
+									if v, ok := itemMap["tenant"].(string); ok && v != "" {
+										return types.StringValue(v)
+									}
+									return types.StringNull()
+								}(),
+							})
+						}
+					}
+					return result
+				}
+				return nil
+			}(),
+		}
+	}
 	if blockData, ok := apiResource.Spec["advertise_custom"].(map[string]interface{}); ok && (isImport || data.AdvertiseCustom != nil) {
 		data.AdvertiseCustom = &UDPLoadBalancerAdvertiseCustomModel{
 			AdvertiseWhere: func() []UDPLoadBalancerAdvertiseCustomAdvertiseWhereModel {
@@ -1333,6 +1580,11 @@ func (r *UDPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 		data.HashPolicyChoiceSourceIPStickiness = &UDPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["no_service_policies"].(map[string]interface{}); ok && isImport && data.NoServicePolicies == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoServicePolicies = &UDPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["origin_pools_weights"].([]interface{}); ok && len(listData) > 0 {
 		var origin_pools_weightsList []UDPLoadBalancerOriginPoolsWeightsModel
 		var existingOriginPoolsWeightsItems []UDPLoadBalancerOriginPoolsWeightsModel
@@ -1423,32 +1675,25 @@ func (r *UDPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 		// No data from API - set to null list
 		data.OriginPoolsWeights = types.ListNull(types.ObjectType{AttrTypes: UDPLoadBalancerOriginPoolsWeightsModelAttrTypes})
 	}
+	if _, ok := apiResource.Spec["service_policies_from_namespace"].(map[string]interface{}); ok && isImport && data.ServicePoliciesFromNamespace == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ServicePoliciesFromNamespace = &UDPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["udp"].(map[string]interface{}); ok && isImport && data.UDP == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.UDP = &UDPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.DNSVolterraManaged.IsNull() && !data.DNSVolterraManaged.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["dns_volterra_managed"].(bool); ok {
+		data.DNSVolterraManaged = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["dns_volterra_managed"].(bool); ok {
-			data.DNSVolterraManaged = types.BoolValue(v)
-		} else {
-			data.DNSVolterraManaged = types.BoolNull()
-		}
+		data.DNSVolterraManaged = types.BoolNull()
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.EnablePerPacketLoadBalancing.IsNull() && !data.EnablePerPacketLoadBalancing.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["enable_per_packet_load_balancing"].(bool); ok {
+		data.EnablePerPacketLoadBalancing = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["enable_per_packet_load_balancing"].(bool); ok {
-			data.EnablePerPacketLoadBalancing = types.BoolValue(v)
-		} else {
-			data.EnablePerPacketLoadBalancing = types.BoolNull()
-		}
+		data.EnablePerPacketLoadBalancing = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["idle_timeout"].(float64); ok {
 		data.IdleTimeout = types.Int64Value(int64(v))
@@ -1545,6 +1790,41 @@ func (r *UDPLoadBalancerResource) Read(ctx context.Context, req resource.ReadReq
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if blockData, ok := apiResource.Spec["active_service_policies"].(map[string]interface{}); ok && (isImport || data.ActiveServicePolicies != nil) {
+		data.ActiveServicePolicies = &UDPLoadBalancerActiveServicePoliciesModel{
+			Policies: func() []UDPLoadBalancerActiveServicePoliciesPoliciesModel {
+				if listData, ok := blockData["policies"].([]interface{}); ok && len(listData) > 0 {
+					var result []UDPLoadBalancerActiveServicePoliciesPoliciesModel
+					for _, item := range listData {
+						if itemMap, ok := item.(map[string]interface{}); ok {
+							result = append(result, UDPLoadBalancerActiveServicePoliciesPoliciesModel{
+								Name: func() types.String {
+									if v, ok := itemMap["name"].(string); ok && v != "" {
+										return types.StringValue(v)
+									}
+									return types.StringNull()
+								}(),
+								Namespace: func() types.String {
+									if v, ok := itemMap["namespace"].(string); ok && v != "" {
+										return types.StringValue(v)
+									}
+									return types.StringNull()
+								}(),
+								Tenant: func() types.String {
+									if v, ok := itemMap["tenant"].(string); ok && v != "" {
+										return types.StringValue(v)
+									}
+									return types.StringNull()
+								}(),
+							})
+						}
+					}
+					return result
+				}
+				return nil
+			}(),
+		}
+	}
 	if blockData, ok := apiResource.Spec["advertise_custom"].(map[string]interface{}); ok && (isImport || data.AdvertiseCustom != nil) {
 		data.AdvertiseCustom = &UDPLoadBalancerAdvertiseCustomModel{
 			AdvertiseWhere: func() []UDPLoadBalancerAdvertiseCustomAdvertiseWhereModel {
@@ -1719,6 +1999,11 @@ func (r *UDPLoadBalancerResource) Read(ctx context.Context, req resource.ReadReq
 		data.HashPolicyChoiceSourceIPStickiness = &UDPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["no_service_policies"].(map[string]interface{}); ok && isImport && data.NoServicePolicies == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoServicePolicies = &UDPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["origin_pools_weights"].([]interface{}); ok && len(listData) > 0 {
 		var origin_pools_weightsList []UDPLoadBalancerOriginPoolsWeightsModel
 		var existingOriginPoolsWeightsItems []UDPLoadBalancerOriginPoolsWeightsModel
@@ -1809,32 +2094,25 @@ func (r *UDPLoadBalancerResource) Read(ctx context.Context, req resource.ReadReq
 		// No data from API - set to null list
 		data.OriginPoolsWeights = types.ListNull(types.ObjectType{AttrTypes: UDPLoadBalancerOriginPoolsWeightsModelAttrTypes})
 	}
+	if _, ok := apiResource.Spec["service_policies_from_namespace"].(map[string]interface{}); ok && isImport && data.ServicePoliciesFromNamespace == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ServicePoliciesFromNamespace = &UDPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["udp"].(map[string]interface{}); ok && isImport && data.UDP == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.UDP = &UDPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.DNSVolterraManaged.IsNull() && !data.DNSVolterraManaged.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["dns_volterra_managed"].(bool); ok {
+		data.DNSVolterraManaged = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["dns_volterra_managed"].(bool); ok {
-			data.DNSVolterraManaged = types.BoolValue(v)
-		} else {
-			data.DNSVolterraManaged = types.BoolNull()
-		}
+		data.DNSVolterraManaged = types.BoolNull()
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.EnablePerPacketLoadBalancing.IsNull() && !data.EnablePerPacketLoadBalancing.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["enable_per_packet_load_balancing"].(bool); ok {
+		data.EnablePerPacketLoadBalancing = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["enable_per_packet_load_balancing"].(bool); ok {
-			data.EnablePerPacketLoadBalancing = types.BoolValue(v)
-		} else {
-			data.EnablePerPacketLoadBalancing = types.BoolNull()
-		}
+		data.EnablePerPacketLoadBalancing = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["idle_timeout"].(float64); ok {
 		data.IdleTimeout = types.Int64Value(int64(v))
@@ -1902,6 +2180,27 @@ func (r *UDPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if data.ActiveServicePolicies != nil {
+		active_service_policiesMap := make(map[string]interface{})
+		if len(data.ActiveServicePolicies.Policies) > 0 {
+			var policiesList []map[string]interface{}
+			for _, listItem := range data.ActiveServicePolicies.Policies {
+				listItemMap := make(map[string]interface{})
+				if !listItem.Name.IsNull() && !listItem.Name.IsUnknown() {
+					listItemMap["name"] = listItem.Name.ValueString()
+				}
+				if !listItem.Namespace.IsNull() && !listItem.Namespace.IsUnknown() {
+					listItemMap["namespace"] = listItem.Namespace.ValueString()
+				}
+				if !listItem.Tenant.IsNull() && !listItem.Tenant.IsUnknown() {
+					listItemMap["tenant"] = listItem.Tenant.ValueString()
+				}
+				policiesList = append(policiesList, listItemMap)
+			}
+			active_service_policiesMap["policies"] = policiesList
+		}
+		apiResource.Spec["active_service_policies"] = active_service_policiesMap
+	}
 	if data.AdvertiseCustom != nil {
 		advertise_customMap := make(map[string]interface{})
 		if len(data.AdvertiseCustom.AdvertiseWhere) > 0 {
@@ -2018,6 +2317,10 @@ func (r *UDPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 		hash_policy_choice_source_ip_stickinessMap := make(map[string]interface{})
 		apiResource.Spec["hash_policy_choice_source_ip_stickiness"] = hash_policy_choice_source_ip_stickinessMap
 	}
+	if data.NoServicePolicies != nil {
+		no_service_policiesMap := make(map[string]interface{})
+		apiResource.Spec["no_service_policies"] = no_service_policiesMap
+	}
 	if !data.OriginPoolsWeights.IsNull() && !data.OriginPoolsWeights.IsUnknown() {
 		var origin_pools_weightsItems []UDPLoadBalancerOriginPoolsWeightsModel
 		diags := data.OriginPoolsWeights.ElementsAs(ctx, &origin_pools_weightsItems, false)
@@ -2066,6 +2369,10 @@ func (r *UDPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 			apiResource.Spec["origin_pools_weights"] = origin_pools_weightsList
 		}
 	}
+	if data.ServicePoliciesFromNamespace != nil {
+		service_policies_from_namespaceMap := make(map[string]interface{})
+		apiResource.Spec["service_policies_from_namespace"] = service_policies_from_namespaceMap
+	}
 	if data.UDP != nil {
 		udpMap := make(map[string]interface{})
 		apiResource.Spec["udp"] = udpMap
@@ -2104,46 +2411,46 @@ func (r *UDPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["dns_volterra_managed"].(bool); ok {
-		data.DNSVolterraManaged = types.BoolValue(v)
-	} else if data.DNSVolterraManaged.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.DNSVolterraManaged = types.BoolNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["enable_per_packet_load_balancing"].(bool); ok {
-		data.EnablePerPacketLoadBalancing = types.BoolValue(v)
-	} else if data.EnablePerPacketLoadBalancing.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.EnablePerPacketLoadBalancing = types.BoolNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["idle_timeout"].(float64); ok {
-		data.IdleTimeout = types.Int64Value(int64(v))
-	} else if data.IdleTimeout.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.IdleTimeout = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["listen_port"].(float64); ok {
-		data.ListenPort = types.Int64Value(int64(v))
-	} else if data.ListenPort.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.ListenPort = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["port_ranges"].(string); ok && v != "" {
-		data.PortRanges = types.StringValue(v)
-	} else if data.PortRanges.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.PortRanges = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if blockData, ok := apiResource.Spec["active_service_policies"].(map[string]interface{}); ok && (isImport || data.ActiveServicePolicies != nil) {
+		data.ActiveServicePolicies = &UDPLoadBalancerActiveServicePoliciesModel{
+			Policies: func() []UDPLoadBalancerActiveServicePoliciesPoliciesModel {
+				if listData, ok := blockData["policies"].([]interface{}); ok && len(listData) > 0 {
+					var result []UDPLoadBalancerActiveServicePoliciesPoliciesModel
+					for _, item := range listData {
+						if itemMap, ok := item.(map[string]interface{}); ok {
+							result = append(result, UDPLoadBalancerActiveServicePoliciesPoliciesModel{
+								Name: func() types.String {
+									if v, ok := itemMap["name"].(string); ok && v != "" {
+										return types.StringValue(v)
+									}
+									return types.StringNull()
+								}(),
+								Namespace: func() types.String {
+									if v, ok := itemMap["namespace"].(string); ok && v != "" {
+										return types.StringValue(v)
+									}
+									return types.StringNull()
+								}(),
+								Tenant: func() types.String {
+									if v, ok := itemMap["tenant"].(string); ok && v != "" {
+										return types.StringValue(v)
+									}
+									return types.StringNull()
+								}(),
+							})
+						}
+					}
+					return result
+				}
+				return nil
+			}(),
+		}
+	}
 	if blockData, ok := apiResource.Spec["advertise_custom"].(map[string]interface{}); ok && (isImport || data.AdvertiseCustom != nil) {
 		data.AdvertiseCustom = &UDPLoadBalancerAdvertiseCustomModel{
 			AdvertiseWhere: func() []UDPLoadBalancerAdvertiseCustomAdvertiseWhereModel {
@@ -2318,6 +2625,11 @@ func (r *UDPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 		data.HashPolicyChoiceSourceIPStickiness = &UDPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["no_service_policies"].(map[string]interface{}); ok && isImport && data.NoServicePolicies == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoServicePolicies = &UDPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["origin_pools_weights"].([]interface{}); ok && len(listData) > 0 {
 		var origin_pools_weightsList []UDPLoadBalancerOriginPoolsWeightsModel
 		var existingOriginPoolsWeightsItems []UDPLoadBalancerOriginPoolsWeightsModel
@@ -2408,32 +2720,25 @@ func (r *UDPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 		// No data from API - set to null list
 		data.OriginPoolsWeights = types.ListNull(types.ObjectType{AttrTypes: UDPLoadBalancerOriginPoolsWeightsModelAttrTypes})
 	}
+	if _, ok := apiResource.Spec["service_policies_from_namespace"].(map[string]interface{}); ok && isImport && data.ServicePoliciesFromNamespace == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ServicePoliciesFromNamespace = &UDPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["udp"].(map[string]interface{}); ok && isImport && data.UDP == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.UDP = &UDPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.DNSVolterraManaged.IsNull() && !data.DNSVolterraManaged.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["dns_volterra_managed"].(bool); ok {
+		data.DNSVolterraManaged = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["dns_volterra_managed"].(bool); ok {
-			data.DNSVolterraManaged = types.BoolValue(v)
-		} else {
-			data.DNSVolterraManaged = types.BoolNull()
-		}
+		data.DNSVolterraManaged = types.BoolNull()
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.EnablePerPacketLoadBalancing.IsNull() && !data.EnablePerPacketLoadBalancing.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["enable_per_packet_load_balancing"].(bool); ok {
+		data.EnablePerPacketLoadBalancing = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["enable_per_packet_load_balancing"].(bool); ok {
-			data.EnablePerPacketLoadBalancing = types.BoolValue(v)
-		} else {
-			data.EnablePerPacketLoadBalancing = types.BoolNull()
-		}
+		data.EnablePerPacketLoadBalancing = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["idle_timeout"].(float64); ok {
 		data.IdleTimeout = types.Int64Value(int64(v))

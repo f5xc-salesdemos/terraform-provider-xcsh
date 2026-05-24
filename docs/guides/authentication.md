@@ -214,7 +214,7 @@ on:
 
 jobs:
   terraform:
-    runs-on: ubuntu-latest
+    runs-on: Ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -232,7 +232,7 @@ jobs:
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: GitHub.ref == 'refs/heads/main' && GitHub.event_name == 'push'
         env:
           F5XC_API_URL: ${{ secrets.F5XC_API_URL }}
           F5XC_API_TOKEN: ${{ secrets.F5XC_API_TOKEN }}
@@ -259,7 +259,7 @@ on:
 
 jobs:
   terraform:
-    runs-on: ubuntu-latest
+    runs-on: Ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -385,4 +385,4 @@ F5XC_API_TOKEN="token"         # Won't work
 - [Provider Documentation](../index.md)
 - [F5 Distributed Cloud Docs](https://docs.cloud.f5.com/)
 - [F5 Credentials Guide](https://docs.cloud.f5.com/docs-v2/administration/how-tos/user-mgmt/Credentials)
-- [GitHub Issues](https://github.com/robinmordasiewicz/terraform-provider-f5xc/issues)
+- [GitHub Issues](https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc/issues)

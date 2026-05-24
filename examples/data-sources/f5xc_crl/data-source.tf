@@ -1,13 +1,23 @@
-# Crl Data Source Example
-# Retrieves information about an existing Crl
+# CRL Data Source Example
+# Retrieves information about an existing CRL
 
-# Look up an existing Crl by name
-data "f5xc_crl" "example" {
-  name      = "example-crl"
-  namespace = "system"
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
 }
 
-# Example: Use the data source in another resource
-# output "crl_id" {
-#   value = data.f5xc_crl.example.id
-# }
+# Look up an existing CRL by name
+data "f5xc_crl" "example" {
+  name      = "example-crl"
+  namespace = "shared"
+}
+
+output "crl_id" {
+  value = data.f5xc_crl.example.id
+}

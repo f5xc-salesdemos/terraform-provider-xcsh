@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -1292,10 +1294,16 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 							"admin_username": schema.StringAttribute{
 								MarkdownDescription: "Admin Username for BIG-IP .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(256),
+								},
 							},
 							"ssh_key": schema.StringAttribute{
 								MarkdownDescription: "Public SSH key for accessing the BIG-IP nodes.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 8192),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -1313,6 +1321,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1330,6 +1341,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -1345,6 +1359,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1353,6 +1370,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1360,6 +1380,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -1370,8 +1393,11 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 								MarkdownDescription: "Endpoint Service is a type of service where the packets are destined to BIG-IP APM device and service modifies the destination with a new destination address.",
 								Attributes: map[string]schema.Attribute{
 									"configured_vip": schema.StringAttribute{
-										MarkdownDescription: "Enter IP address for the default VIP.",
+										MarkdownDescription: "Exclusive with [automatic_vip] Enter IP address for the default VIP.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -1391,6 +1417,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												MarkdownDescription: "List of port ranges. Each range is a single port or a pair of start and end ports e.g. 8080-8192 .",
 												Optional:            true,
 												ElementType:         types.StringType,
+												Validators: []validator.List{
+													listvalidator.SizeAtMost(128),
+												},
 											},
 										},
 									},
@@ -1401,6 +1430,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												MarkdownDescription: "List of port ranges. Each range is a single port or a pair of start and end ports e.g. 8080-8192 .",
 												Optional:            true,
 												ElementType:         types.StringType,
+												Validators: []validator.List{
+													listvalidator.SizeAtMost(128),
+												},
 											},
 										},
 									},
@@ -1431,26 +1463,35 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										"aws_az_name": schema.StringAttribute{
 											MarkdownDescription: "The AWS Availability Zone must be consistent with the AWS Region chosen. Please select an AZ in the same Region as your TGW Site .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"node_name": schema.StringAttribute{
 											MarkdownDescription: "Node Name will be used to assign as hostname to the service .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 256),
+											},
 										},
 										"tunnel_prefix": schema.StringAttribute{
-											MarkdownDescription: "Enter IP prefix for the tunnel, it has to be /30.",
+											MarkdownDescription: "Exclusive with [automatic_prefix] Enter IP prefix for the tunnel, it has to be /30.",
 											Optional:            true,
 										},
 									},
 									Blocks: map[string]schema.Block{
 										"automatic_prefix": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for automatic prefix.",
 										},
 										"mgmt_subnet": schema.SingleNestedBlock{
-											MarkdownDescription: "AWS Subnet. Parameters for AWS subnet.",
+											MarkdownDescription: "Configuration parameter for mgmt subnet.",
 											Attributes: map[string]schema.Attribute{
 												"existing_subnet_id": schema.StringAttribute{
-													MarkdownDescription: "Information about existing subnet ID.",
+													MarkdownDescription: "Exclusive with [subnet_param] Information about existing subnet ID.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
@@ -1466,7 +1507,7 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											},
 										},
 										"reserved_mgmt_subnet": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for reserved mgmt subnet.",
 										},
 									},
 								},
@@ -1481,10 +1522,10 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"best_plus_pay_g200_mbps": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for BestPlusPayG200Mbps.",
 							},
 							"best_plus_payg_1gbps": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for best plus payg 1gbps.",
 							},
 						},
 					},
@@ -1500,14 +1541,23 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 							"admin_username": schema.StringAttribute{
 								MarkdownDescription: "Admin Username for BIG-IP .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(256),
+								},
 							},
 							"public_download_url": schema.StringAttribute{
 								MarkdownDescription: "Public URL where BIG-IP VE image (qcow2) is hosted .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(1024),
+								},
 							},
 							"ssh_key": schema.StringAttribute{
 								MarkdownDescription: "Public SSH key for accessing the BIG-IP nodes.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 8192),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -1525,6 +1575,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1542,6 +1595,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -1553,6 +1609,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1561,6 +1620,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
 										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
+										},
 									},
 									"tenant": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1568,6 +1630,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
 										},
 									},
 								},
@@ -1578,18 +1643,30 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 									"license_pool_name": schema.StringAttribute{
 										MarkdownDescription: "Name of Utility Pool on BIG-IQ .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 256),
+										},
 									},
 									"license_server_ip": schema.StringAttribute{
 										MarkdownDescription: "IP Address from the TCP Load Balancer which is configured to communicate with License Server .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"sku_name": schema.StringAttribute{
 										MarkdownDescription: "License offering name aka SKU name .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 256),
+										},
 									},
 									"username": schema.StringAttribute{
 										MarkdownDescription: "User Name used to access BIG-IQ to activate the license .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 256),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -1607,6 +1684,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1624,6 +1704,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -1638,23 +1721,35 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										"bm_node_memory_size": schema.StringAttribute{
 											MarkdownDescription: "[Enum: BM_8_GB_MEMORY|BM_16_GB_MEMORY|BM_32_GB_MEMORY] Enum to define amount of memory to be assigned to the node - BM_8_GB_MEMORY: 8 GB - BM_16_GB_MEMORY: 16 GB - BM_32_GB_MEMORY: 32 GB. Possible values are `BM_8_GB_MEMORY`, `BM_16_GB_MEMORY`, `BM_32_GB_MEMORY`. Defaults to `BM_8_GB_MEMORY`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("BM_8_GB_MEMORY", "BM_16_GB_MEMORY", "BM_32_GB_MEMORY"),
+											},
 										},
 										"bm_virtual_cpu_count": schema.StringAttribute{
 											MarkdownDescription: "[Enum: BM_4_VCPU|BM_8_VCPU] Enum to define number of virtual CPU's to be assigned to the node - BM_4_VCPU: 4 virtual CPUs - BM_8_VCPU: 8 virtual CPUs. Possible values are `BM_4_VCPU`, `BM_8_VCPU`. Defaults to `BM_4_VCPU`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("BM_4_VCPU", "BM_8_VCPU"),
+											},
 										},
 										"node_name": schema.StringAttribute{
 											MarkdownDescription: "Node Name will be used to assign as hostname to the service .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 256),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
 										"external_interface": schema.SingleNestedBlock{
-											MarkdownDescription: "Interface. BIG-IP interface details.",
+											MarkdownDescription: "Configuration parameter for external interface.",
 											Attributes: map[string]schema.Attribute{
 												"network_gateway": schema.StringAttribute{
 													MarkdownDescription: "Configuration parameter for network gateway.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(1024),
+													},
 												},
 												"network_self_ip": schema.StringAttribute{
 													MarkdownDescription: "Self IP. Self IP CIDR .",
@@ -1668,6 +1763,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 														"name": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 128),
+															},
 														},
 														"namespace": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1676,6 +1774,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 															PlanModifiers: []planmodifier.String{
 																stringplanmodifier.UseStateForUnknown(),
 															},
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 64),
+															},
 														},
 														"tenant": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1683,6 +1784,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 															Computed:            true,
 															PlanModifiers: []planmodifier.String{
 																stringplanmodifier.UseStateForUnknown(),
+															},
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(64),
 															},
 														},
 													},
@@ -1690,11 +1794,14 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											},
 										},
 										"internal_interface": schema.SingleNestedBlock{
-											MarkdownDescription: "Interface. BIG-IP interface details.",
+											MarkdownDescription: "Configuration parameter for internal interface.",
 											Attributes: map[string]schema.Attribute{
 												"network_gateway": schema.StringAttribute{
 													MarkdownDescription: "Configuration parameter for network gateway.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(1024),
+													},
 												},
 												"network_self_ip": schema.StringAttribute{
 													MarkdownDescription: "Self IP. Self IP CIDR .",
@@ -1708,6 +1815,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 														"name": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 128),
+															},
 														},
 														"namespace": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1716,6 +1826,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 															PlanModifiers: []planmodifier.String{
 																stringplanmodifier.UseStateForUnknown(),
 															},
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 64),
+															},
 														},
 														"tenant": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1723,6 +1836,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 															Computed:            true,
 															PlanModifiers: []planmodifier.String{
 																stringplanmodifier.UseStateForUnknown(),
+															},
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(64),
 															},
 														},
 													},
@@ -1737,14 +1853,17 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 				},
 			},
 			"https_management": schema.SingleNestedBlock{
-				MarkdownDescription: "HTTPS based management. HTTPS based configuration.",
+				MarkdownDescription: "Configuration parameter for https management.",
 				Attributes: map[string]schema.Attribute{
 					"domain_suffix": schema.StringAttribute{
 						MarkdownDescription: "Domain suffix will be used along with node name to form URL to access node management .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(1024),
+						},
 					},
 					"https_port": schema.Int64Attribute{
-						MarkdownDescription: "Enter TCP port number.",
+						MarkdownDescription: "Exclusive with [default_https_port] Enter TCP port number.",
 						Optional:            true,
 					},
 				},
@@ -1759,6 +1878,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1767,6 +1889,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
 										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
+										},
 									},
 									"tenant": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1774,6 +1899,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
 										},
 									},
 								},
@@ -1797,6 +1925,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										"certificate_url": schema.StringAttribute{
 											MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Description for the certificate.",
@@ -1811,11 +1942,14 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 													MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeBetween(1, 4),
+													},
 												},
 											},
 										},
 										"disable_ocsp_stapling": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 										},
 										"private_key": schema.SingleNestedBlock{
 											MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -1831,6 +1965,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1848,13 +1985,16 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
 											},
 										},
 										"use_system_defaults": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for use system defaults.",
 										},
 									},
 								},
@@ -1874,10 +2014,16 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"max_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 											"min_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 										},
 									},
@@ -1900,8 +2046,11 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										Optional:            true,
 									},
 									"trusted_ca_url": schema.StringAttribute{
-										MarkdownDescription: "Upload a Root CA Certificate specifically for this Load Balancer.",
+										MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Load Balancer.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -1911,6 +2060,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1919,6 +2071,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1926,6 +2081,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -1939,6 +2097,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1947,6 +2108,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1954,6 +2118,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -1989,6 +2156,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										"certificate_url": schema.StringAttribute{
 											MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Description for the certificate.",
@@ -2003,11 +2173,14 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 													MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeBetween(1, 4),
+													},
 												},
 											},
 										},
 										"disable_ocsp_stapling": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 										},
 										"private_key": schema.SingleNestedBlock{
 											MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -2023,6 +2196,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2040,13 +2216,16 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
 											},
 										},
 										"use_system_defaults": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for use system defaults.",
 										},
 									},
 								},
@@ -2066,10 +2245,16 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"max_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 											"min_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 										},
 									},
@@ -2092,8 +2277,11 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										Optional:            true,
 									},
 									"trusted_ca_url": schema.StringAttribute{
-										MarkdownDescription: "Upload a Root CA Certificate specifically for this Load Balancer.",
+										MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Load Balancer.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -2103,6 +2291,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2111,6 +2302,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2118,6 +2312,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -2131,6 +2328,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2139,6 +2339,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2146,6 +2349,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -2168,7 +2374,7 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 						},
 					},
 					"advertise_on_slo_sli": schema.SingleNestedBlock{
-						MarkdownDescription: "Inline TLS Parameters. Inline TLS parameters.",
+						MarkdownDescription: "Configuration parameter for advertise on slo sli.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"no_mtls": schema.SingleNestedBlock{
@@ -2181,6 +2387,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										"certificate_url": schema.StringAttribute{
 											MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Description for the certificate.",
@@ -2195,11 +2404,14 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 													MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeBetween(1, 4),
+													},
 												},
 											},
 										},
 										"disable_ocsp_stapling": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 										},
 										"private_key": schema.SingleNestedBlock{
 											MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -2215,6 +2427,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2232,13 +2447,16 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
 											},
 										},
 										"use_system_defaults": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for use system defaults.",
 										},
 									},
 								},
@@ -2258,10 +2476,16 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"max_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 											"min_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 										},
 									},
@@ -2284,8 +2508,11 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										Optional:            true,
 									},
 									"trusted_ca_url": schema.StringAttribute{
-										MarkdownDescription: "Upload a Root CA Certificate specifically for this Load Balancer.",
+										MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Load Balancer.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -2295,6 +2522,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2303,6 +2533,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2310,6 +2543,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -2323,6 +2559,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2331,6 +2570,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2338,6 +2580,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -2373,6 +2618,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										"certificate_url": schema.StringAttribute{
 											MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Description for the certificate.",
@@ -2387,11 +2635,14 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 													MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeBetween(1, 4),
+													},
 												},
 											},
 										},
 										"disable_ocsp_stapling": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 										},
 										"private_key": schema.SingleNestedBlock{
 											MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -2407,6 +2658,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2424,13 +2678,16 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
 											},
 										},
 										"use_system_defaults": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for use system defaults.",
 										},
 									},
 								},
@@ -2450,10 +2707,16 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"max_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 											"min_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 										},
 									},
@@ -2476,8 +2739,11 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 										Optional:            true,
 									},
 									"trusted_ca_url": schema.StringAttribute{
-										MarkdownDescription: "Upload a Root CA Certificate specifically for this Load Balancer.",
+										MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Load Balancer.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -2487,6 +2753,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2495,6 +2764,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2502,6 +2774,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -2515,6 +2790,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2523,6 +2801,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2530,6 +2811,9 @@ func (r *APMResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},

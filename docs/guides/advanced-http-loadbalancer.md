@@ -565,5 +565,5 @@ rate_limit {
 
 ## Support
 
-- **Provider Issues:** [GitHub Issues](https://github.com/robinmordasiewicz/terraform-provider-f5xc/issues)
+- **Provider Issues:** [GitHub Issues](https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc/issues)
 - **F5 Support:** [F5 Distributed Cloud Support](https://docs.cloud.f5.com/docs/support)

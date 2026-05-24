@@ -1,6 +1,17 @@
 # API Crawler Resource Example
 # Manages a API Crawler resource in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic API Crawler configuration
 resource "f5xc_api_crawler" "example" {
   name      = "example-api-crawler"
@@ -20,7 +31,7 @@ resource "f5xc_api_crawler" "example" {
   domains {
     # Configure domains settings
   }
-  # Simple Login.
+  # Configuration parameter for simple login.
   simple_login {
     # Configure simple_login settings
   }

@@ -1,6 +1,18 @@
 # Example: Query addon service details
 # This data source retrieves information about an F5 Distributed Cloud addon service
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 data "f5xc_addon_service" "bot_defense" {
   name = "bot_defense"
 }

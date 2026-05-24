@@ -2,6 +2,18 @@
 # Retrieves information about an existing Srv6 Network Slice
 
 # Look up an existing Srv6 Network Slice by name
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 data "f5xc_srv6_network_slice" "example" {
   name      = "example-srv6-network-slice"
   namespace = "system"

@@ -2,6 +2,18 @@
 # Retrieves information about an existing API Credential
 
 # Look up an existing API Credential by name
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 data "f5xc_api_credential" "example" {
   name      = "example-api-credential"
   namespace = "system"

@@ -2,6 +2,18 @@
 # Manages tenant_profile config instance. Name of the object is the name of the tenant profile to be created. in F5 Distributed Cloud.
 
 # Basic Tenant Profile configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_tenant_profile" "example" {
   name      = "example-tenant-profile"
   namespace = "system"

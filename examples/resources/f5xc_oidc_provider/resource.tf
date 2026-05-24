@@ -2,6 +2,18 @@
 # Manages a OIDC Provider resource in F5 Distributed Cloud for customcreatespectype is the spec to create oidc provider configuration.
 
 # Basic OIDC Provider configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_oidc_provider" "example" {
   name      = "example-oidc-provider"
   namespace = "staging"

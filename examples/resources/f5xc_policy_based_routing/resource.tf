@@ -1,6 +1,17 @@
 # Policy Based Routing Resource Example
 # Manages a Policy Based Routing resource in F5 Distributed Cloud for network policy based routing create specification. configuration.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Policy Based Routing configuration
 resource "f5xc_policy_based_routing" "example" {
   name      = "example-policy-based-routing"
@@ -16,16 +27,16 @@ resource "f5xc_policy_based_routing" "example" {
   }
 
   # Resource-specific configuration
-  # [OneOf: forward_proxy_pbr, network_pbr] L3/L4 routing rul...
+  # Ordered list of forwarding Class to be used if source app...
+  forwarding_class_list {
+    # Configure forwarding_class_list settings
+  }
+  # [OneOf: forward_proxy_pbr, network_pbr] Configuration par...
   forward_proxy_pbr {
     # Configure forward_proxy_pbr settings
   }
   # L3/L4 routing rules. Network(L3/L4) routing policy rules.
   forward_proxy_pbr_rules {
     # Configure forward_proxy_pbr_rules settings
-  }
-  # Enable this option
-  all_destinations {
-    # Configure all_destinations settings
   }
 }

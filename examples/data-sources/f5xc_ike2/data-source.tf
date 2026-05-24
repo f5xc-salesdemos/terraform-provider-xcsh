@@ -2,6 +2,18 @@
 # Retrieves information about an existing Ike2
 
 # Look up an existing Ike2 by name
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 data "f5xc_ike2" "example" {
   name      = "example-ike2"
   namespace = "system"

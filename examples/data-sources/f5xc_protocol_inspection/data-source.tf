@@ -1,13 +1,23 @@
 # Protocol Inspection Data Source Example
 # Retrieves information about an existing Protocol Inspection
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Look up an existing Protocol Inspection by name
 data "f5xc_protocol_inspection" "example" {
   name      = "example-protocol-inspection"
-  namespace = "system"
+  namespace = "shared"
 }
 
-# Example: Use the data source in another resource
-# output "protocol_inspection_id" {
-#   value = data.f5xc_protocol_inspection.example.id
-# }
+output "protocol_inspection_id" {
+  value = data.f5xc_protocol_inspection.example.id
+}

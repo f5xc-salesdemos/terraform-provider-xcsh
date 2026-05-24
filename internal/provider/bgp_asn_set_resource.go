@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -43,8 +44,8 @@ type BGPAsnSetResource struct {
 type BGPAsnSetResourceModel struct {
 	Name        types.String   `tfsdk:"name"`
 	Namespace   types.String   `tfsdk:"namespace"`
-	Annotations types.Map      `tfsdk:"annotations"`
 	AsNumbers   types.List     `tfsdk:"as_numbers"`
+	Annotations types.Map      `tfsdk:"annotations"`
 	Description types.String   `tfsdk:"description"`
 	Disable     types.Bool     `tfsdk:"disable"`
 	Labels      types.Map      `tfsdk:"labels"`
@@ -80,15 +81,18 @@ func (r *BGPAsnSetResource) Schema(ctx context.Context, req resource.SchemaReque
 					validators.NamespaceValidator(),
 				},
 			},
+			"as_numbers": schema.ListAttribute{
+				MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create whitelists or blacklists for use in network policy or service policy.",
+				Required:            true,
+				ElementType:         types.Int64Type,
+				Validators: []validator.List{
+					listvalidator.SizeBetween(1, 256),
+				},
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
 				ElementType:         types.StringType,
-			},
-			"as_numbers": schema.ListAttribute{
-				MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create whitelists or blacklists for use in network policy or service policy.",
-				Optional:            true,
-				ElementType:         types.Int64Type,
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Human readable description for the object.",

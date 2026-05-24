@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -788,17 +790,17 @@ type TCPLoadBalancerResourceModel struct {
 	DoNotRetractCluster                *TCPLoadBalancerEmptyModel                 `tfsdk:"do_not_retract_cluster"`
 	HashPolicyChoiceLeastActive        *TCPLoadBalancerEmptyModel                 `tfsdk:"hash_policy_choice_least_active"`
 	HashPolicyChoiceRandom             *TCPLoadBalancerEmptyModel                 `tfsdk:"hash_policy_choice_random"`
-	HashPolicyChoiceRoundRobin         *TCPLoadBalancerEmptyModel                 `tfsdk:"hash_policy_choice_round_robin"`
 	HashPolicyChoiceSourceIPStickiness *TCPLoadBalancerEmptyModel                 `tfsdk:"hash_policy_choice_source_ip_stickiness"`
 	NoServicePolicies                  *TCPLoadBalancerEmptyModel                 `tfsdk:"no_service_policies"`
-	NoSni                              *TCPLoadBalancerEmptyModel                 `tfsdk:"no_sni"`
 	OriginPoolsWeights                 types.List                                 `tfsdk:"origin_pools_weights"`
-	RetractCluster                     *TCPLoadBalancerEmptyModel                 `tfsdk:"retract_cluster"`
-	ServicePoliciesFromNamespace       *TCPLoadBalancerEmptyModel                 `tfsdk:"service_policies_from_namespace"`
 	Sni                                *TCPLoadBalancerEmptyModel                 `tfsdk:"sni"`
-	TCP                                *TCPLoadBalancerEmptyModel                 `tfsdk:"tcp"`
 	TLSTCP                             *TCPLoadBalancerTLSTCPModel                `tfsdk:"tls_tcp"`
 	TLSTCPAutoCert                     *TCPLoadBalancerTLSTCPAutoCertModel        `tfsdk:"tls_tcp_auto_cert"`
+	HashPolicyChoiceRoundRobin         *TCPLoadBalancerEmptyModel                 `tfsdk:"hash_policy_choice_round_robin"`
+	NoSni                              *TCPLoadBalancerEmptyModel                 `tfsdk:"no_sni"`
+	RetractCluster                     *TCPLoadBalancerEmptyModel                 `tfsdk:"retract_cluster"`
+	ServicePoliciesFromNamespace       *TCPLoadBalancerEmptyModel                 `tfsdk:"service_policies_from_namespace"`
+	TCP                                *TCPLoadBalancerEmptyModel                 `tfsdk:"tcp"`
 }
 
 func (r *TCPLoadBalancerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -846,6 +848,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				MarkdownDescription: "List of Domains (host/authority header) that will be matched to this Load Balancer. Supported Domains and search order: 1. Exact Domain names: www.example.com. 2.",
 				Optional:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeBetween(1, 32),
+				},
 			},
 			"labels": schema.MapAttribute{
 				MarkdownDescription: "Labels is a user defined key value map that can be attached to resources for organization and filtering.",
@@ -860,7 +865,7 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"dns_volterra_managed": schema.BoolAttribute{
-				MarkdownDescription: "DNS records for domains will be managed automatically by F5 Distributed Cloud. This requires the domain to be delegated to F5XC using the Delegated Domain feature.",
+				MarkdownDescription: "DNS records for domains will be managed automatically by F5 Distributed Cloud. This requires the domain to be delegated to F5XC using the Delegated Domain feature. Defaults to `false`. Server applies default when omitted.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
@@ -868,7 +873,7 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"idle_timeout": schema.Int64Attribute{
-				MarkdownDescription: "The amount of time that a stream can exist without upstream or downstream activity, in milliseconds.",
+				MarkdownDescription: "The amount of time that a stream can exist without upstream or downstream activity, in milliseconds. Server applies default when omitted.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.Int64{
@@ -876,19 +881,18 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"listen_port": schema.Int64Attribute{
-				MarkdownDescription: "[OneOf: listen_port, port_ranges] Listen Port for this load balancer.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
+				MarkdownDescription: "[OneOf: listen_port, port_ranges] Exclusive with [port_ranges] Listen Port for this load balancer.",
+				Required:            true,
 			},
 			"port_ranges": schema.StringAttribute{
-				MarkdownDescription: "A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
+				MarkdownDescription: "Exclusive with [listen_port] A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(1, 512),
 				},
 			},
 		},
@@ -900,7 +904,7 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				Delete: true,
 			}),
 			"active_service_policies": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: active_service_policies, no_service_policies, service_policies_from_namespace; Default: no_service_policies] Service Policy List. List of service policies.",
+				MarkdownDescription: "[OneOf: active_service_policies, no_service_policies, service_policies_from_namespace; Default: no_service_policies] Configuration parameter for active service policies.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"policies": schema.ListNestedBlock{
@@ -910,6 +914,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -918,6 +925,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 								"tenant": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -925,6 +935,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
 									},
 								},
 							},
@@ -941,12 +954,15 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"port": schema.Int64Attribute{
-									MarkdownDescription: "Port to Listen.",
+									MarkdownDescription: "Exclusive with [port_ranges use_default_port] Port to Listen.",
 									Optional:            true,
 								},
 								"port_ranges": schema.StringAttribute{
-									MarkdownDescription: "A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
+									MarkdownDescription: "Exclusive with [port use_default_port] A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 512),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -960,6 +976,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -968,6 +987,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -975,6 +997,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -987,10 +1012,16 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"ip": schema.StringAttribute{
 											MarkdownDescription: "Use given IP address as VIP on the site.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"network": schema.StringAttribute{
 											MarkdownDescription: "[Enum: SITE_NETWORK_INSIDE_AND_OUTSIDE|SITE_NETWORK_INSIDE|SITE_NETWORK_OUTSIDE|SITE_NETWORK_SERVICE|SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP|SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP|SITE_NETWORK_IP_FABRIC] Defines network types to be used on site All inside and outside networks. All inside and outside networks with internet VIP support. All inside networks. Possible values are `SITE_NETWORK_INSIDE_AND_OUTSIDE`, `SITE_NETWORK_INSIDE`, `SITE_NETWORK_OUTSIDE`, `SITE_NETWORK_SERVICE`, `SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP`, `SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP`, `SITE_NETWORK_IP_FABRIC`. Defaults to `SITE_NETWORK_INSIDE_AND_OUTSIDE`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("SITE_NETWORK_INSIDE_AND_OUTSIDE", "SITE_NETWORK_INSIDE", "SITE_NETWORK_OUTSIDE", "SITE_NETWORK_SERVICE", "SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP", "SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP", "SITE_NETWORK_IP_FABRIC"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -1000,6 +1031,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1008,6 +1042,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1015,6 +1052,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -1028,12 +1068,18 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									MarkdownDescription: "Parameters to advertise on a given virtual network.",
 									Attributes: map[string]schema.Attribute{
 										"specific_v6_vip": schema.StringAttribute{
-											MarkdownDescription: "Use given IPv6 address as VIP on virtual Network.",
+											MarkdownDescription: "Exclusive with [default_v6_vip] Use given IPv6 address as VIP on virtual Network.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"specific_vip": schema.StringAttribute{
-											MarkdownDescription: "Use given IPv4 address as VIP on virtual Network.",
+											MarkdownDescription: "Exclusive with [default_vip] Use given IPv4 address as VIP on virtual Network.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -1049,6 +1095,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1057,6 +1106,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1064,6 +1116,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -1076,6 +1131,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"network": schema.StringAttribute{
 											MarkdownDescription: "[Enum: SITE_NETWORK_INSIDE_AND_OUTSIDE|SITE_NETWORK_INSIDE|SITE_NETWORK_OUTSIDE|SITE_NETWORK_SERVICE|SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP|SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP|SITE_NETWORK_IP_FABRIC] Defines network types to be used on site All inside and outside networks. All inside and outside networks with internet VIP support. All inside networks. Possible values are `SITE_NETWORK_INSIDE_AND_OUTSIDE`, `SITE_NETWORK_INSIDE`, `SITE_NETWORK_OUTSIDE`, `SITE_NETWORK_SERVICE`, `SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP`, `SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP`, `SITE_NETWORK_IP_FABRIC`. Defaults to `SITE_NETWORK_INSIDE_AND_OUTSIDE`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("SITE_NETWORK_INSIDE_AND_OUTSIDE", "SITE_NETWORK_INSIDE", "SITE_NETWORK_OUTSIDE", "SITE_NETWORK_SERVICE", "SITE_NETWORK_OUTSIDE_WITH_INTERNET_VIP", "SITE_NETWORK_INSIDE_AND_OUTSIDE_WITH_INTERNET_VIP", "SITE_NETWORK_IP_FABRIC"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -1085,6 +1143,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1093,6 +1154,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1100,6 +1164,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -1112,10 +1179,16 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"ip": schema.StringAttribute{
 											MarkdownDescription: "Use given IP address as VIP on the site.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"network": schema.StringAttribute{
 											MarkdownDescription: "[Enum: SITE_NETWORK_SPECIFIED_VIP_OUTSIDE|SITE_NETWORK_SPECIFIED_VIP_INSIDE] Defines network types to be used on virtual-site with specified VIP All outside networks. All inside networks. Possible values are `SITE_NETWORK_SPECIFIED_VIP_OUTSIDE`, `SITE_NETWORK_SPECIFIED_VIP_INSIDE`. Defaults to `SITE_NETWORK_SPECIFIED_VIP_OUTSIDE`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("SITE_NETWORK_SPECIFIED_VIP_OUTSIDE", "SITE_NETWORK_SPECIFIED_VIP_INSIDE"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -1125,6 +1198,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1133,6 +1209,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1140,6 +1219,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -1156,6 +1238,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1164,6 +1249,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1171,6 +1259,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -1181,6 +1272,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1189,6 +1283,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1196,6 +1293,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -1217,6 +1317,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1225,6 +1328,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1232,6 +1338,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -1242,10 +1351,10 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				MarkdownDescription: "Enable this option",
 			},
 			"default_lb_with_sni": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: default_lb_with_sni, no_sni, sni; Default: default_lb_with_sni] Enable this option",
+				MarkdownDescription: "[OneOf: default_lb_with_sni, no_sni, sni; Default: default_lb_with_sni] Configuration parameter for default lb with sni.",
 			},
 			"do_not_advertise": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for do not advertise.",
 			},
 			"do_not_retract_cluster": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: do_not_retract_cluster, retract_cluster] Enable this option",
@@ -1254,19 +1363,13 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				MarkdownDescription: "[OneOf: hash_policy_choice_least_active, hash_policy_choice_random, hash_policy_choice_round_robin, hash_policy_choice_source_ip_stickiness] Enable this option",
 			},
 			"hash_policy_choice_random": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
-			},
-			"hash_policy_choice_round_robin": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for hash policy choice random.",
 			},
 			"hash_policy_choice_source_ip_stickiness": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
 			},
 			"no_service_policies": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
-			},
-			"no_sni": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for no service policies.",
 			},
 			"origin_pools_weights": schema.ListNestedBlock{
 				MarkdownDescription: "Origin pools and weights used for this load balancer.",
@@ -1288,6 +1391,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1296,6 +1402,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 								"tenant": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1303,6 +1412,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
 									},
 								},
 							},
@@ -1316,6 +1428,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1323,6 +1438,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -1332,30 +1450,24 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
+									},
 								},
 							},
 						},
 					},
 				},
 			},
-			"retract_cluster": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
-			},
-			"service_policies_from_namespace": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
-			},
 			"sni": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
-			},
-			"tcp": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: tcp, tls_tcp, tls_tcp_auto_cert] Enable this option",
 			},
 			"tls_tcp": schema.SingleNestedBlock{
 				MarkdownDescription: "Choice for selecting TLS over TCP proxy with bring your own certificates.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"tls_cert_params": schema.SingleNestedBlock{
-						MarkdownDescription: "TLS Parameters. Select TLS Parameters and Certificates.",
+						MarkdownDescription: "Configuration parameter for tls cert params.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"certificates": schema.ListNestedBlock{
@@ -1365,6 +1477,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1373,6 +1488,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1380,6 +1498,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -1403,10 +1524,16 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											"max_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 											"min_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 										},
 									},
@@ -1429,8 +1556,11 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										Optional:            true,
 									},
 									"trusted_ca_url": schema.StringAttribute{
-										MarkdownDescription: "Upload a Root CA Certificate specifically for this Load Balancer.",
+										MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Load Balancer.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -1440,6 +1570,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1448,6 +1581,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1455,6 +1591,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -1468,6 +1607,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1476,6 +1618,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1483,6 +1628,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -1505,7 +1653,7 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						},
 					},
 					"tls_parameters": schema.SingleNestedBlock{
-						MarkdownDescription: "Inline TLS Parameters. Inline TLS parameters.",
+						MarkdownDescription: "Configuration parameter for tls parameters.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"no_mtls": schema.SingleNestedBlock{
@@ -1518,6 +1666,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"certificate_url": schema.StringAttribute{
 											MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Description for the certificate.",
@@ -1532,11 +1683,14 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeBetween(1, 4),
+													},
 												},
 											},
 										},
 										"disable_ocsp_stapling": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 										},
 										"private_key": schema.SingleNestedBlock{
 											MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -1552,6 +1706,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1569,13 +1726,16 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
 											},
 										},
 										"use_system_defaults": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for use system defaults.",
 										},
 									},
 								},
@@ -1595,10 +1755,16 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											"max_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 											"min_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 										},
 									},
@@ -1621,8 +1787,11 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										Optional:            true,
 									},
 									"trusted_ca_url": schema.StringAttribute{
-										MarkdownDescription: "Upload a Root CA Certificate specifically for this Load Balancer.",
+										MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Load Balancer.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -1632,6 +1801,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1640,6 +1812,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1647,6 +1822,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -1660,6 +1838,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1668,6 +1849,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 											"tenant": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1675,6 +1859,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
 												},
 											},
 										},
@@ -1720,10 +1907,16 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									"max_version": schema.StringAttribute{
 										MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+										},
 									},
 									"min_version": schema.StringAttribute{
 										MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+										},
 									},
 								},
 							},
@@ -1746,8 +1939,11 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								Optional:            true,
 							},
 							"trusted_ca_url": schema.StringAttribute{
-								MarkdownDescription: "Upload a Root CA Certificate specifically for this Load Balancer.",
+								MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Load Balancer.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 131072),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -1757,6 +1953,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1765,6 +1964,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
 										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
+										},
 									},
 									"tenant": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1772,6 +1974,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
 										},
 									},
 								},
@@ -1785,6 +1990,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1793,6 +2001,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
 										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
+										},
 									},
 									"tenant": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1800,6 +2011,9 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
 										},
 									},
 								},
@@ -1820,6 +2034,21 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						},
 					},
 				},
+			},
+			"hash_policy_choice_round_robin": schema.SingleNestedBlock{
+				MarkdownDescription: "Configuration parameter for hash policy choice round robin. Defaults to `map[]`. Server applies default when omitted.",
+			},
+			"no_sni": schema.SingleNestedBlock{
+				MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+			},
+			"retract_cluster": schema.SingleNestedBlock{
+				MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+			},
+			"service_policies_from_namespace": schema.SingleNestedBlock{
+				MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+			},
+			"tcp": schema.SingleNestedBlock{
+				MarkdownDescription: "[OneOf: tcp, tls_tcp, tls_tcp_auto_cert] Enable this option. Defaults to `map[]`. Server applies default when omitted.",
 			},
 		},
 	}
@@ -1847,6 +2076,14 @@ func (r *TCPLoadBalancerResource) ValidateConfig(ctx context.Context, req resour
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	if !data.ListenPort.IsNull() && !data.PortRanges.IsNull() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("listen_port"),
+			"Conflicting Configuration",
+			"listen_port and port_ranges are mutually exclusive.",
+		)
+	}
+
 }
 
 // ModifyPlan implements resource.ResourceWithModifyPlan
@@ -2068,10 +2305,6 @@ func (r *TCPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 		hash_policy_choice_randomMap := make(map[string]interface{})
 		createReq.Spec["hash_policy_choice_random"] = hash_policy_choice_randomMap
 	}
-	if data.HashPolicyChoiceRoundRobin != nil {
-		hash_policy_choice_round_robinMap := make(map[string]interface{})
-		createReq.Spec["hash_policy_choice_round_robin"] = hash_policy_choice_round_robinMap
-	}
 	if data.HashPolicyChoiceSourceIPStickiness != nil {
 		hash_policy_choice_source_ip_stickinessMap := make(map[string]interface{})
 		createReq.Spec["hash_policy_choice_source_ip_stickiness"] = hash_policy_choice_source_ip_stickinessMap
@@ -2079,10 +2312,6 @@ func (r *TCPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 	if data.NoServicePolicies != nil {
 		no_service_policiesMap := make(map[string]interface{})
 		createReq.Spec["no_service_policies"] = no_service_policiesMap
-	}
-	if data.NoSni != nil {
-		no_sniMap := make(map[string]interface{})
-		createReq.Spec["no_sni"] = no_sniMap
 	}
 	if !data.OriginPoolsWeights.IsNull() && !data.OriginPoolsWeights.IsUnknown() {
 		var origin_pools_weightsItems []TCPLoadBalancerOriginPoolsWeightsModel
@@ -2132,21 +2361,9 @@ func (r *TCPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 			createReq.Spec["origin_pools_weights"] = origin_pools_weightsList
 		}
 	}
-	if data.RetractCluster != nil {
-		retract_clusterMap := make(map[string]interface{})
-		createReq.Spec["retract_cluster"] = retract_clusterMap
-	}
-	if data.ServicePoliciesFromNamespace != nil {
-		service_policies_from_namespaceMap := make(map[string]interface{})
-		createReq.Spec["service_policies_from_namespace"] = service_policies_from_namespaceMap
-	}
 	if data.Sni != nil {
 		sniMap := make(map[string]interface{})
 		createReq.Spec["sni"] = sniMap
-	}
-	if data.TCP != nil {
-		tcpMap := make(map[string]interface{})
-		createReq.Spec["tcp"] = tcpMap
 	}
 	if data.TLSTCP != nil {
 		tls_tcpMap := make(map[string]interface{})
@@ -2184,14 +2401,34 @@ func (r *TCPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 	if !data.DNSVolterraManaged.IsNull() && !data.DNSVolterraManaged.IsUnknown() {
 		createReq.Spec["dns_volterra_managed"] = data.DNSVolterraManaged.ValueBool()
 	}
+	if data.HashPolicyChoiceRoundRobin != nil {
+		hash_policy_choice_round_robinMap := make(map[string]interface{})
+		createReq.Spec["hash_policy_choice_round_robin"] = hash_policy_choice_round_robinMap
+	}
 	if !data.IdleTimeout.IsNull() && !data.IdleTimeout.IsUnknown() {
 		createReq.Spec["idle_timeout"] = data.IdleTimeout.ValueInt64()
 	}
 	if !data.ListenPort.IsNull() && !data.ListenPort.IsUnknown() {
 		createReq.Spec["listen_port"] = data.ListenPort.ValueInt64()
 	}
+	if data.NoSni != nil {
+		no_sniMap := make(map[string]interface{})
+		createReq.Spec["no_sni"] = no_sniMap
+	}
 	if !data.PortRanges.IsNull() && !data.PortRanges.IsUnknown() {
 		createReq.Spec["port_ranges"] = data.PortRanges.ValueString()
+	}
+	if data.RetractCluster != nil {
+		retract_clusterMap := make(map[string]interface{})
+		createReq.Spec["retract_cluster"] = retract_clusterMap
+	}
+	if data.ServicePoliciesFromNamespace != nil {
+		service_policies_from_namespaceMap := make(map[string]interface{})
+		createReq.Spec["service_policies_from_namespace"] = service_policies_from_namespaceMap
+	}
+	if data.TCP != nil {
+		tcpMap := make(map[string]interface{})
+		createReq.Spec["tcp"] = tcpMap
 	}
 
 	apiResource, err := r.client.CreateTCPLoadBalancer(ctx, createReq)
@@ -2420,11 +2657,6 @@ func (r *TCPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 		data.HashPolicyChoiceRandom = &TCPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["hash_policy_choice_round_robin"].(map[string]interface{}); ok && isImport && data.HashPolicyChoiceRoundRobin == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.HashPolicyChoiceRoundRobin = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["hash_policy_choice_source_ip_stickiness"].(map[string]interface{}); ok && isImport && data.HashPolicyChoiceSourceIPStickiness == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.HashPolicyChoiceSourceIPStickiness = &TCPLoadBalancerEmptyModel{}
@@ -2433,11 +2665,6 @@ func (r *TCPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 	if _, ok := apiResource.Spec["no_service_policies"].(map[string]interface{}); ok && isImport && data.NoServicePolicies == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.NoServicePolicies = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["no_sni"].(map[string]interface{}); ok && isImport && data.NoSni == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.NoSni = &TCPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["origin_pools_weights"].([]interface{}); ok && len(listData) > 0 {
@@ -2530,24 +2757,9 @@ func (r *TCPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 		// No data from API - set to null list
 		data.OriginPoolsWeights = types.ListNull(types.ObjectType{AttrTypes: TCPLoadBalancerOriginPoolsWeightsModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["retract_cluster"].(map[string]interface{}); ok && isImport && data.RetractCluster == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.RetractCluster = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["service_policies_from_namespace"].(map[string]interface{}); ok && isImport && data.ServicePoliciesFromNamespace == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.ServicePoliciesFromNamespace = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["sni"].(map[string]interface{}); ok && isImport && data.Sni == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.Sni = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["tcp"].(map[string]interface{}); ok && isImport && data.TCP == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.TCP = &TCPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["tls_tcp"].(map[string]interface{}); ok && isImport && data.TLSTCP == nil {
@@ -2571,6 +2783,11 @@ func (r *TCPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 			data.DNSVolterraManaged = types.BoolNull()
 		}
 	}
+	if _, ok := apiResource.Spec["hash_policy_choice_round_robin"].(map[string]interface{}); ok && isImport && data.HashPolicyChoiceRoundRobin == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.HashPolicyChoiceRoundRobin = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if v, ok := apiResource.Spec["idle_timeout"].(float64); ok {
 		data.IdleTimeout = types.Int64Value(int64(v))
 	} else {
@@ -2581,11 +2798,31 @@ func (r *TCPLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 	} else {
 		data.ListenPort = types.Int64Null()
 	}
+	if _, ok := apiResource.Spec["no_sni"].(map[string]interface{}); ok && isImport && data.NoSni == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoSni = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if v, ok := apiResource.Spec["port_ranges"].(string); ok && v != "" {
 		data.PortRanges = types.StringValue(v)
 	} else {
 		data.PortRanges = types.StringNull()
 	}
+	if _, ok := apiResource.Spec["retract_cluster"].(map[string]interface{}); ok && isImport && data.RetractCluster == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.RetractCluster = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["service_policies_from_namespace"].(map[string]interface{}); ok && isImport && data.ServicePoliciesFromNamespace == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ServicePoliciesFromNamespace = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["tcp"].(map[string]interface{}); ok && isImport && data.TCP == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.TCP = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	tflog.Trace(ctx, "created TCPLoadBalancer resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -2880,11 +3117,6 @@ func (r *TCPLoadBalancerResource) Read(ctx context.Context, req resource.ReadReq
 		data.HashPolicyChoiceRandom = &TCPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["hash_policy_choice_round_robin"].(map[string]interface{}); ok && isImport && data.HashPolicyChoiceRoundRobin == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.HashPolicyChoiceRoundRobin = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["hash_policy_choice_source_ip_stickiness"].(map[string]interface{}); ok && isImport && data.HashPolicyChoiceSourceIPStickiness == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.HashPolicyChoiceSourceIPStickiness = &TCPLoadBalancerEmptyModel{}
@@ -2893,11 +3125,6 @@ func (r *TCPLoadBalancerResource) Read(ctx context.Context, req resource.ReadReq
 	if _, ok := apiResource.Spec["no_service_policies"].(map[string]interface{}); ok && isImport && data.NoServicePolicies == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.NoServicePolicies = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["no_sni"].(map[string]interface{}); ok && isImport && data.NoSni == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.NoSni = &TCPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["origin_pools_weights"].([]interface{}); ok && len(listData) > 0 {
@@ -2990,24 +3217,9 @@ func (r *TCPLoadBalancerResource) Read(ctx context.Context, req resource.ReadReq
 		// No data from API - set to null list
 		data.OriginPoolsWeights = types.ListNull(types.ObjectType{AttrTypes: TCPLoadBalancerOriginPoolsWeightsModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["retract_cluster"].(map[string]interface{}); ok && isImport && data.RetractCluster == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.RetractCluster = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["service_policies_from_namespace"].(map[string]interface{}); ok && isImport && data.ServicePoliciesFromNamespace == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.ServicePoliciesFromNamespace = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["sni"].(map[string]interface{}); ok && isImport && data.Sni == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.Sni = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["tcp"].(map[string]interface{}); ok && isImport && data.TCP == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.TCP = &TCPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["tls_tcp"].(map[string]interface{}); ok && isImport && data.TLSTCP == nil {
@@ -3031,6 +3243,11 @@ func (r *TCPLoadBalancerResource) Read(ctx context.Context, req resource.ReadReq
 			data.DNSVolterraManaged = types.BoolNull()
 		}
 	}
+	if _, ok := apiResource.Spec["hash_policy_choice_round_robin"].(map[string]interface{}); ok && isImport && data.HashPolicyChoiceRoundRobin == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.HashPolicyChoiceRoundRobin = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if v, ok := apiResource.Spec["idle_timeout"].(float64); ok {
 		data.IdleTimeout = types.Int64Value(int64(v))
 	} else {
@@ -3041,11 +3258,31 @@ func (r *TCPLoadBalancerResource) Read(ctx context.Context, req resource.ReadReq
 	} else {
 		data.ListenPort = types.Int64Null()
 	}
+	if _, ok := apiResource.Spec["no_sni"].(map[string]interface{}); ok && isImport && data.NoSni == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoSni = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if v, ok := apiResource.Spec["port_ranges"].(string); ok && v != "" {
 		data.PortRanges = types.StringValue(v)
 	} else {
 		data.PortRanges = types.StringNull()
 	}
+	if _, ok := apiResource.Spec["retract_cluster"].(map[string]interface{}); ok && isImport && data.RetractCluster == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.RetractCluster = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["service_policies_from_namespace"].(map[string]interface{}); ok && isImport && data.ServicePoliciesFromNamespace == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ServicePoliciesFromNamespace = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["tcp"].(map[string]interface{}); ok && isImport && data.TCP == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.TCP = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -3238,10 +3475,6 @@ func (r *TCPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 		hash_policy_choice_randomMap := make(map[string]interface{})
 		apiResource.Spec["hash_policy_choice_random"] = hash_policy_choice_randomMap
 	}
-	if data.HashPolicyChoiceRoundRobin != nil {
-		hash_policy_choice_round_robinMap := make(map[string]interface{})
-		apiResource.Spec["hash_policy_choice_round_robin"] = hash_policy_choice_round_robinMap
-	}
 	if data.HashPolicyChoiceSourceIPStickiness != nil {
 		hash_policy_choice_source_ip_stickinessMap := make(map[string]interface{})
 		apiResource.Spec["hash_policy_choice_source_ip_stickiness"] = hash_policy_choice_source_ip_stickinessMap
@@ -3249,10 +3482,6 @@ func (r *TCPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 	if data.NoServicePolicies != nil {
 		no_service_policiesMap := make(map[string]interface{})
 		apiResource.Spec["no_service_policies"] = no_service_policiesMap
-	}
-	if data.NoSni != nil {
-		no_sniMap := make(map[string]interface{})
-		apiResource.Spec["no_sni"] = no_sniMap
 	}
 	if !data.OriginPoolsWeights.IsNull() && !data.OriginPoolsWeights.IsUnknown() {
 		var origin_pools_weightsItems []TCPLoadBalancerOriginPoolsWeightsModel
@@ -3302,21 +3531,9 @@ func (r *TCPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 			apiResource.Spec["origin_pools_weights"] = origin_pools_weightsList
 		}
 	}
-	if data.RetractCluster != nil {
-		retract_clusterMap := make(map[string]interface{})
-		apiResource.Spec["retract_cluster"] = retract_clusterMap
-	}
-	if data.ServicePoliciesFromNamespace != nil {
-		service_policies_from_namespaceMap := make(map[string]interface{})
-		apiResource.Spec["service_policies_from_namespace"] = service_policies_from_namespaceMap
-	}
 	if data.Sni != nil {
 		sniMap := make(map[string]interface{})
 		apiResource.Spec["sni"] = sniMap
-	}
-	if data.TCP != nil {
-		tcpMap := make(map[string]interface{})
-		apiResource.Spec["tcp"] = tcpMap
 	}
 	if data.TLSTCP != nil {
 		tls_tcpMap := make(map[string]interface{})
@@ -3354,14 +3571,34 @@ func (r *TCPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 	if !data.DNSVolterraManaged.IsNull() && !data.DNSVolterraManaged.IsUnknown() {
 		apiResource.Spec["dns_volterra_managed"] = data.DNSVolterraManaged.ValueBool()
 	}
+	if data.HashPolicyChoiceRoundRobin != nil {
+		hash_policy_choice_round_robinMap := make(map[string]interface{})
+		apiResource.Spec["hash_policy_choice_round_robin"] = hash_policy_choice_round_robinMap
+	}
 	if !data.IdleTimeout.IsNull() && !data.IdleTimeout.IsUnknown() {
 		apiResource.Spec["idle_timeout"] = data.IdleTimeout.ValueInt64()
 	}
 	if !data.ListenPort.IsNull() && !data.ListenPort.IsUnknown() {
 		apiResource.Spec["listen_port"] = data.ListenPort.ValueInt64()
 	}
+	if data.NoSni != nil {
+		no_sniMap := make(map[string]interface{})
+		apiResource.Spec["no_sni"] = no_sniMap
+	}
 	if !data.PortRanges.IsNull() && !data.PortRanges.IsUnknown() {
 		apiResource.Spec["port_ranges"] = data.PortRanges.ValueString()
+	}
+	if data.RetractCluster != nil {
+		retract_clusterMap := make(map[string]interface{})
+		apiResource.Spec["retract_cluster"] = retract_clusterMap
+	}
+	if data.ServicePoliciesFromNamespace != nil {
+		service_policies_from_namespaceMap := make(map[string]interface{})
+		apiResource.Spec["service_policies_from_namespace"] = service_policies_from_namespaceMap
+	}
+	if data.TCP != nil {
+		tcpMap := make(map[string]interface{})
+		apiResource.Spec["tcp"] = tcpMap
 	}
 
 	_, err := r.client.UpdateTCPLoadBalancer(ctx, apiResource)
@@ -3394,13 +3631,6 @@ func (r *TCPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 	} else if data.IdleTimeout.IsUnknown() {
 		// API didn't return value and plan was unknown - set to null
 		data.IdleTimeout = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["listen_port"].(float64); ok {
-		data.ListenPort = types.Int64Value(int64(v))
-	} else if data.ListenPort.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.ListenPort = types.Int64Null()
 	}
 	// If plan had a value, preserve it
 	if v, ok := fetched.Spec["port_ranges"].(string); ok && v != "" {
@@ -3629,11 +3859,6 @@ func (r *TCPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 		data.HashPolicyChoiceRandom = &TCPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["hash_policy_choice_round_robin"].(map[string]interface{}); ok && isImport && data.HashPolicyChoiceRoundRobin == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.HashPolicyChoiceRoundRobin = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["hash_policy_choice_source_ip_stickiness"].(map[string]interface{}); ok && isImport && data.HashPolicyChoiceSourceIPStickiness == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.HashPolicyChoiceSourceIPStickiness = &TCPLoadBalancerEmptyModel{}
@@ -3642,11 +3867,6 @@ func (r *TCPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 	if _, ok := apiResource.Spec["no_service_policies"].(map[string]interface{}); ok && isImport && data.NoServicePolicies == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.NoServicePolicies = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["no_sni"].(map[string]interface{}); ok && isImport && data.NoSni == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.NoSni = &TCPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["origin_pools_weights"].([]interface{}); ok && len(listData) > 0 {
@@ -3739,24 +3959,9 @@ func (r *TCPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 		// No data from API - set to null list
 		data.OriginPoolsWeights = types.ListNull(types.ObjectType{AttrTypes: TCPLoadBalancerOriginPoolsWeightsModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["retract_cluster"].(map[string]interface{}); ok && isImport && data.RetractCluster == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.RetractCluster = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["service_policies_from_namespace"].(map[string]interface{}); ok && isImport && data.ServicePoliciesFromNamespace == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.ServicePoliciesFromNamespace = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["sni"].(map[string]interface{}); ok && isImport && data.Sni == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.Sni = &TCPLoadBalancerEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["tcp"].(map[string]interface{}); ok && isImport && data.TCP == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.TCP = &TCPLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["tls_tcp"].(map[string]interface{}); ok && isImport && data.TLSTCP == nil {
@@ -3780,6 +3985,11 @@ func (r *TCPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 			data.DNSVolterraManaged = types.BoolNull()
 		}
 	}
+	if _, ok := apiResource.Spec["hash_policy_choice_round_robin"].(map[string]interface{}); ok && isImport && data.HashPolicyChoiceRoundRobin == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.HashPolicyChoiceRoundRobin = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if v, ok := apiResource.Spec["idle_timeout"].(float64); ok {
 		data.IdleTimeout = types.Int64Value(int64(v))
 	} else {
@@ -3790,11 +4000,31 @@ func (r *TCPLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 	} else {
 		data.ListenPort = types.Int64Null()
 	}
+	if _, ok := apiResource.Spec["no_sni"].(map[string]interface{}); ok && isImport && data.NoSni == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoSni = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if v, ok := apiResource.Spec["port_ranges"].(string); ok && v != "" {
 		data.PortRanges = types.StringValue(v)
 	} else {
 		data.PortRanges = types.StringNull()
 	}
+	if _, ok := apiResource.Spec["retract_cluster"].(map[string]interface{}); ok && isImport && data.RetractCluster == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.RetractCluster = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["service_policies_from_namespace"].(map[string]interface{}); ok && isImport && data.ServicePoliciesFromNamespace == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.ServicePoliciesFromNamespace = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["tcp"].(map[string]interface{}); ok && isImport && data.TCP == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.TCP = &TCPLoadBalancerEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

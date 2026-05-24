@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -331,7 +332,7 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "[OneOf: aws, gcp] Amazon Web Services(AWS) CloudLink Provider. CloudLink for AWS Cloud Provider.",
 				Attributes: map[string]schema.Attribute{
 					"custom_asn": schema.Int64Attribute{
-						MarkdownDescription: "F5XC will use custom ASN to create a Direct Connect Gateway.",
+						MarkdownDescription: "Exclusive with [] F5XC will use custom ASN to create a Direct Connect Gateway.",
 						Optional:            true,
 					},
 				},
@@ -342,6 +343,9 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -350,6 +354,9 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -357,6 +364,9 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -376,18 +386,27 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 										"connection_id": schema.StringAttribute{
 											MarkdownDescription: "ID of the existing AWS Direct Connect Connection .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 										"region": schema.StringAttribute{
 											MarkdownDescription: "Region where the connection is setup .",
 											Optional:            true,
 										},
 										"user_assigned_name": schema.StringAttribute{
-											MarkdownDescription: "User is managing the AWS resource name.",
+											MarkdownDescription: "Exclusive with [system_generated_name] User is managing the AWS resource name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"virtual_interface_type": schema.StringAttribute{
 											MarkdownDescription: "[Enum: PRIVATE] Defines the type of virtual interface that needs to be configured on AWS - PRIVATE: Private A private virtual interface should be used to access an Amazon VPC using private IP addresses. - TRANSIT: Transit A transit virtual interface is a VLAN that transports traffic from a Direct Connect.. The only possible value is `PRIVATE`. Defaults to `PRIVATE`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("PRIVATE"),
+											},
 										},
 										"vlan": schema.Int64Attribute{
 											MarkdownDescription: "Virtual Local Area Network number for the new virtual interface to be configured on the AWS. This tag is required for any traffic traversing the AWS Direct Connect connection .",
@@ -409,6 +428,9 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -426,6 +448,9 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
@@ -450,10 +475,16 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 												"description_spec": schema.StringAttribute{
 													MarkdownDescription: "Description. Human readable description.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"name": schema.StringAttribute{
 													MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+													},
 												},
 											},
 										},
@@ -474,11 +505,14 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "[OneOf: disabled, enabled] Enable this option",
 			},
 			"enabled": schema.SingleNestedBlock{
-				MarkdownDescription: "CloudLink ADN Network Config.",
+				MarkdownDescription: "CloudLink AND Network Config.",
 				Attributes: map[string]schema.Attribute{
 					"cloudlink_network_name": schema.StringAttribute{
-						MarkdownDescription: "Establish private connectivity with the F5 Distributed Cloud Global Network using a Private ADN network. To provision a Private ADN network, please contact F5 Distributed Cloud support.",
+						MarkdownDescription: "Establish private connectivity with the F5 Distributed Cloud Global Network using a Private AND network. To provision a Private AND network, please contact F5 Distributed Cloud support.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 				},
 			},
@@ -497,10 +531,16 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 										"interconnect_attachment_name": schema.StringAttribute{
 											MarkdownDescription: "Name of already-existing GCP Cloud Interconnect Attachment .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 63),
+											},
 										},
 										"project": schema.StringAttribute{
-											MarkdownDescription: "Specify a GCP Project for the interconnect attachment.",
+											MarkdownDescription: "Exclusive with [same_as_credential] Specify a GCP Project for the interconnect attachment.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(4, 30),
+											},
 										},
 										"region": schema.StringAttribute{
 											MarkdownDescription: "GCP Region in which the GCP Cloud Interconnect attachment is configured .",
@@ -514,15 +554,21 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 												"description_spec": schema.StringAttribute{
 													MarkdownDescription: "Description. Human readable description.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"name": schema.StringAttribute{
 													MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+													},
 												},
 											},
 										},
 										"same_as_credential": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for same as credential.",
 										},
 									},
 								},
@@ -535,6 +581,9 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -543,6 +592,9 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -550,6 +602,9 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},

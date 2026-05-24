@@ -1,6 +1,17 @@
 # NAT Policy Resource Example
 # Manages a NAT Policy resource in F5 Distributed Cloud for nat policy create specification configures nat policy with multiple rules,. configuration.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic NAT Policy configuration
 resource "f5xc_nat_policy" "example" {
   name      = "example-nat-policy"

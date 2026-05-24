@@ -1,0 +1,23 @@
+# Addon Service Data Source Example
+# Retrieves information about an existing Addon Service
+
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+# Look up an existing Addon Service by name
+data "f5xc_addon_service" "example" {
+  name      = "example-addon-service"
+  namespace = "staging"
+}
+
+output "addon_service_id" {
+  value = data.f5xc_addon_service.example.id
+}

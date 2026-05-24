@@ -1,6 +1,17 @@
 # Namespace Resource Example
 # Manages new namespace. Name of the object is name of the name space. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Namespace configuration
 resource "f5xc_namespace" "example" {
   name      = "example-namespace"

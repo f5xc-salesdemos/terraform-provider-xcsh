@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -327,10 +330,9 @@ func (r *TunnelResource) Schema(ctx context.Context, req resource.SchemaRequest,
 			},
 			"tunnel_type": schema.StringAttribute{
 				MarkdownDescription: "[Enum: IPSEC_PSK|GRE] Supported tunnel types are IPsec IPsec tunnel type with PSK GRE tunnel type. Possible values are `IPSEC_PSK`, `GRE`. Defaults to `IPSEC_PSK`.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("IPSEC_PSK", "GRE"),
 				},
 			},
 		},
@@ -364,6 +366,10 @@ func (r *TunnelResource) Schema(ctx context.Context, req resource.SchemaRequest,
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -371,6 +377,10 @@ func (r *TunnelResource) Schema(ctx context.Context, req resource.SchemaRequest,
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -406,11 +416,14 @@ func (r *TunnelResource) Schema(ctx context.Context, req resource.SchemaRequest,
 								Attributes:          map[string]schema.Attribute{},
 								Blocks: map[string]schema.Block{
 									"ipv4": schema.SingleNestedBlock{
-										MarkdownDescription: "IPv4 Address. IPv4 Address in dot-decimal notation.",
+										MarkdownDescription: "IPv4 address in dotted decimal notation (e.g., 192.0.2.1).",
 										Attributes: map[string]schema.Attribute{
 											"addr": schema.StringAttribute{
 												MarkdownDescription: "IPv4 Address in string form with dot-decimal notation.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 										},
 									},
@@ -420,6 +433,9 @@ func (r *TunnelResource) Schema(ctx context.Context, req resource.SchemaRequest,
 											"addr": schema.StringAttribute{
 												MarkdownDescription: "IPv6 Address in form of string. IPv6 address must be specified as hexadecimal numbers separated by ':' The address can be compacted by suppressing zeros e.g. '2001:db8:0:0:0:0:2:1' becomes '2001:db8::2:1' or '2001:db8:0:0:0:2:0:0' becomes '2001:db8::2::'.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 										},
 									},
@@ -466,6 +482,9 @@ func (r *TunnelResource) Schema(ctx context.Context, req resource.SchemaRequest,
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -483,6 +502,9 @@ func (r *TunnelResource) Schema(ctx context.Context, req resource.SchemaRequest,
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -510,11 +532,14 @@ func (r *TunnelResource) Schema(ctx context.Context, req resource.SchemaRequest,
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"ipv4": schema.SingleNestedBlock{
-								MarkdownDescription: "IPv4 Address. IPv4 Address in dot-decimal notation.",
+								MarkdownDescription: "IPv4 address in dotted decimal notation (e.g., 192.0.2.1).",
 								Attributes: map[string]schema.Attribute{
 									"addr": schema.StringAttribute{
 										MarkdownDescription: "IPv4 Address in string form with dot-decimal notation.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 								},
 							},
@@ -524,6 +549,9 @@ func (r *TunnelResource) Schema(ctx context.Context, req resource.SchemaRequest,
 									"addr": schema.StringAttribute{
 										MarkdownDescription: "IPv6 Address in form of string. IPv6 address must be specified as hexadecimal numbers separated by ':' The address can be compacted by suppressing zeros e.g. '2001:db8:0:0:0:0:2:1' becomes '2001:db8::2:1' or '2001:db8:0:0:0:2:0:0' becomes '2001:db8::2::'.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 								},
 							},
@@ -910,13 +938,6 @@ func (r *TunnelResource) Update(ctx context.Context, req resource.UpdateRequest,
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["tunnel_type"].(string); ok && v != "" {
-		data.TunnelType = types.StringValue(v)
-	} else if data.TunnelType.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.TunnelType = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields

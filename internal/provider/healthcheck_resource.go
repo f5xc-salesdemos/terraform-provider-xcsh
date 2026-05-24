@@ -9,6 +9,9 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -48,6 +51,7 @@ type HealthcheckEmptyModel struct {
 
 // HealthcheckHTTPHealthCheckModel represents http_health_check block
 type HealthcheckHTTPHealthCheckModel struct {
+	ExpectedResponse       types.String           `tfsdk:"expected_response"`
 	ExpectedStatusCodes    types.List             `tfsdk:"expected_status_codes"`
 	HostHeader             types.String           `tfsdk:"host_header"`
 	Path                   types.String           `tfsdk:"path"`
@@ -59,6 +63,7 @@ type HealthcheckHTTPHealthCheckModel struct {
 
 // HealthcheckHTTPHealthCheckModelAttrTypes defines the attribute types for HealthcheckHTTPHealthCheckModel
 var HealthcheckHTTPHealthCheckModelAttrTypes = map[string]attr.Type{
+	"expected_response":         types.StringType,
 	"expected_status_codes":     types.ListType{ElemType: types.StringType},
 	"host_header":               types.StringType,
 	"path":                      types.StringType,
@@ -83,16 +88,16 @@ var HealthcheckTCPHealthCheckModelAttrTypes = map[string]attr.Type{
 type HealthcheckResourceModel struct {
 	Name               types.String                     `tfsdk:"name"`
 	Namespace          types.String                     `tfsdk:"namespace"`
+	HealthyThreshold   types.Int64                      `tfsdk:"healthy_threshold"`
+	Interval           types.Int64                      `tfsdk:"interval"`
+	Timeout            types.Int64                      `tfsdk:"timeout"`
+	UnhealthyThreshold types.Int64                      `tfsdk:"unhealthy_threshold"`
 	Annotations        types.Map                        `tfsdk:"annotations"`
 	Description        types.String                     `tfsdk:"description"`
 	Disable            types.Bool                       `tfsdk:"disable"`
 	Labels             types.Map                        `tfsdk:"labels"`
 	ID                 types.String                     `tfsdk:"id"`
-	HealthyThreshold   types.Int64                      `tfsdk:"healthy_threshold"`
-	Interval           types.Int64                      `tfsdk:"interval"`
 	JitterPercent      types.Int64                      `tfsdk:"jitter_percent"`
-	Timeout            types.Int64                      `tfsdk:"timeout"`
-	UnhealthyThreshold types.Int64                      `tfsdk:"unhealthy_threshold"`
 	Timeouts           timeouts.Value                   `tfsdk:"timeouts"`
 	HTTPHealthCheck    *HealthcheckHTTPHealthCheckModel `tfsdk:"http_health_check"`
 	TCPHealthCheck     *HealthcheckTCPHealthCheckModel  `tfsdk:"tcp_health_check"`
@@ -127,6 +132,34 @@ func (r *HealthcheckResource) Schema(ctx context.Context, req resource.SchemaReq
 					validators.NamespaceValidator(),
 				},
 			},
+			"healthy_threshold": schema.Int64Attribute{
+				MarkdownDescription: "Number of successful responses before declaring healthy. In other words, this is the number of healthy health checks required before a host is marked healthy. Note that during startup, only a single successful health check is required to mark a host healthy. Recommended: `3`.",
+				Required:            true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 16),
+				},
+			},
+			"interval": schema.Int64Attribute{
+				MarkdownDescription: "Time interval in seconds between two healthcheck requests. Recommended: `15`.",
+				Required:            true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 600),
+				},
+			},
+			"timeout": schema.Int64Attribute{
+				MarkdownDescription: "Timeout in seconds to wait for successful response. In other words, it is the time to wait for a health check response. If the timeout is reached the health check attempt will be considered a failure. Recommended: `3`.",
+				Required:            true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 600),
+				},
+			},
+			"unhealthy_threshold": schema.Int64Attribute{
+				MarkdownDescription: "Number of failed responses before declaring unhealthy. In other words, this is the number of unhealthy health checks required before a host is marked unhealthy. Note that for HTTP health checkingg if a host responds with 503 this threshold is ignored and the host is considered unhealthy immediately. Recommended: `1`.",
+				Required:            true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 16),
+				},
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -152,40 +185,8 @@ func (r *HealthcheckResource) Schema(ctx context.Context, req resource.SchemaReq
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"healthy_threshold": schema.Int64Attribute{
-				MarkdownDescription: "Number of successful responses before declaring healthy. In other words, this is the number of healthy health checks required before a host is marked healthy. Note that during startup, only a single successful health check is required to mark a host healthy.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
-			"interval": schema.Int64Attribute{
-				MarkdownDescription: "Time interval in seconds between two healthcheck requests.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
 			"jitter_percent": schema.Int64Attribute{
-				MarkdownDescription: "Add a random amount of time as a percent value to the interval between successive healthcheck requests. Server applies default when omitted.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
-			"timeout": schema.Int64Attribute{
-				MarkdownDescription: "Timeout in seconds to wait for successful response. In other words, it is the time to wait for a health check response. If the timeout is reached the health check attempt will be considered a failure.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
-			"unhealthy_threshold": schema.Int64Attribute{
-				MarkdownDescription: "Number of failed responses before declaring unhealthy. In other words, this is the number of unhealthy health checks required before a host is marked unhealthy. Note that for HTTP health checking if a host responds with 503 this threshold is ignored and the host is considered unhealthy immediately.",
+				MarkdownDescription: "Add a random amount of time as a percent value to the interval between successive healthcheck requests. Server applies default when omitted. Recommended: `30`.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.Int64{
@@ -203,35 +204,54 @@ func (r *HealthcheckResource) Schema(ctx context.Context, req resource.SchemaReq
 			"http_health_check": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: http_health_check, tcp_health_check, udp_icmp_health_check] Healthy if 'GET' method on URL 'HTTP(s)://<host>/<path>' with optional '<header>' returns success. 'host' is not used for DNS resolution. It is used as HTTP Header in the request.",
 				Attributes: map[string]schema.Attribute{
+					"expected_response": schema.StringAttribute{
+						MarkdownDescription: "Raw bytes expected in the response of HTTP health check. Input is to be given in Hex encoded format. If left empty, then response body is not considered for evaluating health check status.",
+						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(2048),
+						},
+					},
 					"expected_status_codes": schema.ListAttribute{
-						MarkdownDescription: "Specifies a list of HTTP response status codes considered healthy. To treat default HTTP expected status code 200 as healthy, user has to configure it explicitly. This is a list of strings, each of which is single HTTP status code or a range with start and end values separated by '-'. Defaults to `[]`. Server applies default when omitted.",
+						MarkdownDescription: "Specifies a list of HTTP response status codes considered healthy. To treat default HTTP expected status code 200 as healthy, user has to configure it explicitly. This is a list of strings, each of which is single HTTP status code or a range with start and end values separated by '-'.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"host_header": schema.StringAttribute{
-						MarkdownDescription: "The value of the host header.",
+						MarkdownDescription: "Exclusive with [use_origin_server_name] The value of the host header.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(262),
+						},
 					},
 					"path": schema.StringAttribute{
-						MarkdownDescription: "Specifies the HTTP path that will be requested during health checking.",
+						MarkdownDescription: "Specifies the HTTP path that will be requested during health checkingg.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 2048),
+						},
 					},
 					"request_headers_to_remove": schema.ListAttribute{
-						MarkdownDescription: "Specifies a list of HTTP headers that should be removed from each request that is sent to the health checked cluster. This is a list of keys of headers. Defaults to `[]`. Server applies default when omitted.",
+						MarkdownDescription: "Specifies a list of HTTP headers that should be removed from each request that is sent to the health checked cluster. This is a list of keys of headers.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"use_http2": schema.BoolAttribute{
-						MarkdownDescription: "If set, health checks will be made using HTTP/2. Defaults to `false`. Server applies default when omitted.",
+						MarkdownDescription: "If set, health checks will be made using HTTP/2.",
 						Optional:            true,
 					},
 				},
 				Blocks: map[string]schema.Block{
 					"headers": schema.SingleNestedBlock{
-						MarkdownDescription: "Specifies a list of HTTP headers that should be added to each request that is sent to the health checked cluster. This is a list of key-value pairs. Defaults to `map[]`. Server applies default when omitted.",
+						MarkdownDescription: "Specifies a list of HTTP headers that should be added to each request that is sent to the health checked cluster. This is a list of key-value pairs.",
 					},
 					"use_origin_server_name": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+						MarkdownDescription: "Enable this option",
 					},
 				},
 			},
@@ -241,15 +261,21 @@ func (r *HealthcheckResource) Schema(ctx context.Context, req resource.SchemaReq
 					"expected_response": schema.StringAttribute{
 						MarkdownDescription: "Raw bytes expected in the request. Describes the encoding of the payload bytes in the payload. Hex encoded payload.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(2048),
+						},
 					},
 					"send_payload": schema.StringAttribute{
 						MarkdownDescription: "Raw bytes sent in the request. Empty payloads imply a connect-only health check. Describes the encoding of the payload bytes in the payload. Hex encoded payload.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(2048),
+						},
 					},
 				},
 			},
 			"udp_icmp_health_check": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for udp icmp health check.",
 			},
 		},
 	}
@@ -357,8 +383,23 @@ func (r *HealthcheckResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.HealthyThreshold.IsNull() && !data.HealthyThreshold.IsUnknown() {
+		createReq.Spec["healthy_threshold"] = data.HealthyThreshold.ValueInt64()
+	}
+	if !data.Interval.IsNull() && !data.Interval.IsUnknown() {
+		createReq.Spec["interval"] = data.Interval.ValueInt64()
+	}
+	if !data.Timeout.IsNull() && !data.Timeout.IsUnknown() {
+		createReq.Spec["timeout"] = data.Timeout.ValueInt64()
+	}
+	if !data.UnhealthyThreshold.IsNull() && !data.UnhealthyThreshold.IsUnknown() {
+		createReq.Spec["unhealthy_threshold"] = data.UnhealthyThreshold.ValueInt64()
+	}
 	if data.HTTPHealthCheck != nil {
 		http_health_checkMap := make(map[string]interface{})
+		if !data.HTTPHealthCheck.ExpectedResponse.IsNull() && !data.HTTPHealthCheck.ExpectedResponse.IsUnknown() {
+			http_health_checkMap["expected_response"] = data.HTTPHealthCheck.ExpectedResponse.ValueString()
+		}
 		if !data.HTTPHealthCheck.ExpectedStatusCodes.IsNull() && !data.HTTPHealthCheck.ExpectedStatusCodes.IsUnknown() {
 			var expected_status_codesItems []string
 			diags := data.HTTPHealthCheck.ExpectedStatusCodes.ElementsAs(ctx, &expected_status_codesItems, false)
@@ -404,20 +445,8 @@ func (r *HealthcheckResource) Create(ctx context.Context, req resource.CreateReq
 		udp_icmp_health_checkMap := make(map[string]interface{})
 		createReq.Spec["udp_icmp_health_check"] = udp_icmp_health_checkMap
 	}
-	if !data.HealthyThreshold.IsNull() && !data.HealthyThreshold.IsUnknown() {
-		createReq.Spec["healthy_threshold"] = data.HealthyThreshold.ValueInt64()
-	}
-	if !data.Interval.IsNull() && !data.Interval.IsUnknown() {
-		createReq.Spec["interval"] = data.Interval.ValueInt64()
-	}
 	if !data.JitterPercent.IsNull() && !data.JitterPercent.IsUnknown() {
 		createReq.Spec["jitter_percent"] = data.JitterPercent.ValueInt64()
-	}
-	if !data.Timeout.IsNull() && !data.Timeout.IsUnknown() {
-		createReq.Spec["timeout"] = data.Timeout.ValueInt64()
-	}
-	if !data.UnhealthyThreshold.IsNull() && !data.UnhealthyThreshold.IsUnknown() {
-		createReq.Spec["unhealthy_threshold"] = data.UnhealthyThreshold.ValueInt64()
 	}
 
 	apiResource, err := r.client.CreateHealthcheck(ctx, createReq)
@@ -432,8 +461,34 @@ func (r *HealthcheckResource) Create(ctx context.Context, req resource.CreateReq
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["healthy_threshold"].(float64); ok {
+		data.HealthyThreshold = types.Int64Value(int64(v))
+	} else {
+		data.HealthyThreshold = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["interval"].(float64); ok {
+		data.Interval = types.Int64Value(int64(v))
+	} else {
+		data.Interval = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["timeout"].(float64); ok {
+		data.Timeout = types.Int64Value(int64(v))
+	} else {
+		data.Timeout = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["unhealthy_threshold"].(float64); ok {
+		data.UnhealthyThreshold = types.Int64Value(int64(v))
+	} else {
+		data.UnhealthyThreshold = types.Int64Null()
+	}
 	if blockData, ok := apiResource.Spec["http_health_check"].(map[string]interface{}); ok && (isImport || data.HTTPHealthCheck != nil) {
 		data.HTTPHealthCheck = &HealthcheckHTTPHealthCheckModel{
+			ExpectedResponse: func() types.String {
+				if v, ok := blockData["expected_response"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
 			ExpectedStatusCodes: func() types.List {
 				if v, ok := blockData["expected_status_codes"].([]interface{}); ok && len(v) > 0 {
 					var items []string
@@ -535,30 +590,10 @@ func (r *HealthcheckResource) Create(ctx context.Context, req resource.CreateReq
 		data.UDPICMPHealthCheck = &HealthcheckEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["healthy_threshold"].(float64); ok {
-		data.HealthyThreshold = types.Int64Value(int64(v))
-	} else {
-		data.HealthyThreshold = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["interval"].(float64); ok {
-		data.Interval = types.Int64Value(int64(v))
-	} else {
-		data.Interval = types.Int64Null()
-	}
 	if v, ok := apiResource.Spec["jitter_percent"].(float64); ok {
 		data.JitterPercent = types.Int64Value(int64(v))
 	} else {
 		data.JitterPercent = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["timeout"].(float64); ok {
-		data.Timeout = types.Int64Value(int64(v))
-	} else {
-		data.Timeout = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["unhealthy_threshold"].(float64); ok {
-		data.UnhealthyThreshold = types.Int64Value(int64(v))
-	} else {
-		data.UnhealthyThreshold = types.Int64Null()
 	}
 
 	tflog.Trace(ctx, "created Healthcheck resource")
@@ -640,8 +675,34 @@ func (r *HealthcheckResource) Read(ctx context.Context, req resource.ReadRequest
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["healthy_threshold"].(float64); ok {
+		data.HealthyThreshold = types.Int64Value(int64(v))
+	} else {
+		data.HealthyThreshold = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["interval"].(float64); ok {
+		data.Interval = types.Int64Value(int64(v))
+	} else {
+		data.Interval = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["timeout"].(float64); ok {
+		data.Timeout = types.Int64Value(int64(v))
+	} else {
+		data.Timeout = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["unhealthy_threshold"].(float64); ok {
+		data.UnhealthyThreshold = types.Int64Value(int64(v))
+	} else {
+		data.UnhealthyThreshold = types.Int64Null()
+	}
 	if blockData, ok := apiResource.Spec["http_health_check"].(map[string]interface{}); ok && (isImport || data.HTTPHealthCheck != nil) {
 		data.HTTPHealthCheck = &HealthcheckHTTPHealthCheckModel{
+			ExpectedResponse: func() types.String {
+				if v, ok := blockData["expected_response"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
 			ExpectedStatusCodes: func() types.List {
 				if v, ok := blockData["expected_status_codes"].([]interface{}); ok && len(v) > 0 {
 					var items []string
@@ -743,30 +804,10 @@ func (r *HealthcheckResource) Read(ctx context.Context, req resource.ReadRequest
 		data.UDPICMPHealthCheck = &HealthcheckEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["healthy_threshold"].(float64); ok {
-		data.HealthyThreshold = types.Int64Value(int64(v))
-	} else {
-		data.HealthyThreshold = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["interval"].(float64); ok {
-		data.Interval = types.Int64Value(int64(v))
-	} else {
-		data.Interval = types.Int64Null()
-	}
 	if v, ok := apiResource.Spec["jitter_percent"].(float64); ok {
 		data.JitterPercent = types.Int64Value(int64(v))
 	} else {
 		data.JitterPercent = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["timeout"].(float64); ok {
-		data.Timeout = types.Int64Value(int64(v))
-	} else {
-		data.Timeout = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["unhealthy_threshold"].(float64); ok {
-		data.UnhealthyThreshold = types.Int64Value(int64(v))
-	} else {
-		data.UnhealthyThreshold = types.Int64Null()
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -819,8 +860,23 @@ func (r *HealthcheckResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.HealthyThreshold.IsNull() && !data.HealthyThreshold.IsUnknown() {
+		apiResource.Spec["healthy_threshold"] = data.HealthyThreshold.ValueInt64()
+	}
+	if !data.Interval.IsNull() && !data.Interval.IsUnknown() {
+		apiResource.Spec["interval"] = data.Interval.ValueInt64()
+	}
+	if !data.Timeout.IsNull() && !data.Timeout.IsUnknown() {
+		apiResource.Spec["timeout"] = data.Timeout.ValueInt64()
+	}
+	if !data.UnhealthyThreshold.IsNull() && !data.UnhealthyThreshold.IsUnknown() {
+		apiResource.Spec["unhealthy_threshold"] = data.UnhealthyThreshold.ValueInt64()
+	}
 	if data.HTTPHealthCheck != nil {
 		http_health_checkMap := make(map[string]interface{})
+		if !data.HTTPHealthCheck.ExpectedResponse.IsNull() && !data.HTTPHealthCheck.ExpectedResponse.IsUnknown() {
+			http_health_checkMap["expected_response"] = data.HTTPHealthCheck.ExpectedResponse.ValueString()
+		}
 		if !data.HTTPHealthCheck.ExpectedStatusCodes.IsNull() && !data.HTTPHealthCheck.ExpectedStatusCodes.IsUnknown() {
 			var expected_status_codesItems []string
 			diags := data.HTTPHealthCheck.ExpectedStatusCodes.ElementsAs(ctx, &expected_status_codesItems, false)
@@ -866,20 +922,8 @@ func (r *HealthcheckResource) Update(ctx context.Context, req resource.UpdateReq
 		udp_icmp_health_checkMap := make(map[string]interface{})
 		apiResource.Spec["udp_icmp_health_check"] = udp_icmp_health_checkMap
 	}
-	if !data.HealthyThreshold.IsNull() && !data.HealthyThreshold.IsUnknown() {
-		apiResource.Spec["healthy_threshold"] = data.HealthyThreshold.ValueInt64()
-	}
-	if !data.Interval.IsNull() && !data.Interval.IsUnknown() {
-		apiResource.Spec["interval"] = data.Interval.ValueInt64()
-	}
 	if !data.JitterPercent.IsNull() && !data.JitterPercent.IsUnknown() {
 		apiResource.Spec["jitter_percent"] = data.JitterPercent.ValueInt64()
-	}
-	if !data.Timeout.IsNull() && !data.Timeout.IsUnknown() {
-		apiResource.Spec["timeout"] = data.Timeout.ValueInt64()
-	}
-	if !data.UnhealthyThreshold.IsNull() && !data.UnhealthyThreshold.IsUnknown() {
-		apiResource.Spec["unhealthy_threshold"] = data.UnhealthyThreshold.ValueInt64()
 	}
 
 	_, err := r.client.UpdateHealthcheck(ctx, apiResource)
@@ -900,20 +944,6 @@ func (r *HealthcheckResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["healthy_threshold"].(float64); ok {
-		data.HealthyThreshold = types.Int64Value(int64(v))
-	} else if data.HealthyThreshold.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.HealthyThreshold = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["interval"].(float64); ok {
-		data.Interval = types.Int64Value(int64(v))
-	} else if data.Interval.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Interval = types.Int64Null()
-	}
-	// If plan had a value, preserve it
 	if v, ok := fetched.Spec["jitter_percent"].(float64); ok {
 		data.JitterPercent = types.Int64Value(int64(v))
 	} else if data.JitterPercent.IsUnknown() {
@@ -921,27 +951,39 @@ func (r *HealthcheckResource) Update(ctx context.Context, req resource.UpdateReq
 		data.JitterPercent = types.Int64Null()
 	}
 	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["timeout"].(float64); ok {
-		data.Timeout = types.Int64Value(int64(v))
-	} else if data.Timeout.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Timeout = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["unhealthy_threshold"].(float64); ok {
-		data.UnhealthyThreshold = types.Int64Value(int64(v))
-	} else if data.UnhealthyThreshold.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.UnhealthyThreshold = types.Int64Null()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["healthy_threshold"].(float64); ok {
+		data.HealthyThreshold = types.Int64Value(int64(v))
+	} else {
+		data.HealthyThreshold = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["interval"].(float64); ok {
+		data.Interval = types.Int64Value(int64(v))
+	} else {
+		data.Interval = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["timeout"].(float64); ok {
+		data.Timeout = types.Int64Value(int64(v))
+	} else {
+		data.Timeout = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["unhealthy_threshold"].(float64); ok {
+		data.UnhealthyThreshold = types.Int64Value(int64(v))
+	} else {
+		data.UnhealthyThreshold = types.Int64Null()
+	}
 	if blockData, ok := apiResource.Spec["http_health_check"].(map[string]interface{}); ok && (isImport || data.HTTPHealthCheck != nil) {
 		data.HTTPHealthCheck = &HealthcheckHTTPHealthCheckModel{
+			ExpectedResponse: func() types.String {
+				if v, ok := blockData["expected_response"].(string); ok && v != "" {
+					return types.StringValue(v)
+				}
+				return types.StringNull()
+			}(),
 			ExpectedStatusCodes: func() types.List {
 				if v, ok := blockData["expected_status_codes"].([]interface{}); ok && len(v) > 0 {
 					var items []string
@@ -1043,30 +1085,10 @@ func (r *HealthcheckResource) Update(ctx context.Context, req resource.UpdateReq
 		data.UDPICMPHealthCheck = &HealthcheckEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["healthy_threshold"].(float64); ok {
-		data.HealthyThreshold = types.Int64Value(int64(v))
-	} else {
-		data.HealthyThreshold = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["interval"].(float64); ok {
-		data.Interval = types.Int64Value(int64(v))
-	} else {
-		data.Interval = types.Int64Null()
-	}
 	if v, ok := apiResource.Spec["jitter_percent"].(float64); ok {
 		data.JitterPercent = types.Int64Value(int64(v))
 	} else {
 		data.JitterPercent = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["timeout"].(float64); ok {
-		data.Timeout = types.Int64Value(int64(v))
-	} else {
-		data.Timeout = types.Int64Null()
-	}
-	if v, ok := apiResource.Spec["unhealthy_threshold"].(float64); ok {
-		data.UnhealthyThreshold = types.Int64Value(int64(v))
-	} else {
-		data.UnhealthyThreshold = types.Int64Null()
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

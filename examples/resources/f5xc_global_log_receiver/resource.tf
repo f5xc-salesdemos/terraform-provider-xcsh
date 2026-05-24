@@ -1,6 +1,17 @@
 # Global Log Receiver Resource Example
 # Manages new Global Log Receiver object. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Global Log Receiver configuration
 resource "f5xc_global_log_receiver" "example" {
   name      = "example-global-log-receiver"
@@ -29,3 +40,6 @@ resource "f5xc_global_log_receiver" "example" {
     # Configure aws_cred settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - ns_current

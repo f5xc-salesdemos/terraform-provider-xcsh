@@ -2,6 +2,18 @@
 # Retrieves information about an existing Infraprotect Firewall Rule Group
 
 # Look up an existing Infraprotect Firewall Rule Group by name
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 data "f5xc_infraprotect_firewall_rule_group" "example" {
   name      = "example-infraprotect-firewall-rule-group"
   namespace = "system"

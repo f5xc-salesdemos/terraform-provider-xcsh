@@ -9,11 +9,11 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -146,27 +146,21 @@ func (r *ForwardingClassResource) Schema(ctx context.Context, req resource.Schem
 			},
 			"interface_group": schema.StringAttribute{
 				MarkdownDescription: "[Enum: ANY_AVAILABLE_INTERFACE|INTERFACE_GROUP1|INTERFACE_GROUP2|INTERFACE_GROUP3] Interface group, group membership by adding group label to interface Choose any of the available interfaces Choose all interfaces with label group1 Choose all interfaces with label group2 Choose all interfaces with label group3. Possible values are `ANY_AVAILABLE_INTERFACE`, `INTERFACE_GROUP1`, `INTERFACE_GROUP2`, `INTERFACE_GROUP3`. Defaults to `ANY_AVAILABLE_INTERFACE`.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("ANY_AVAILABLE_INTERFACE", "INTERFACE_GROUP1", "INTERFACE_GROUP2", "INTERFACE_GROUP3"),
 				},
 			},
 			"queue_id_to_use": schema.StringAttribute{
 				MarkdownDescription: "[Enum: DSCP_BEST_EFFORT|DSCP_CLASS1|DSCP_CLASS2|DSCP_CLASS3|DSCP_CLASS4|DSCP_EXPRESS_FORWARDING|DSCP_CONTROL_L3|DSCP_CONTROL_L2] DSCP Precedence Level Values Best Effort service will GET any available bandwidth DSCP Class 1 service DSCP Class 2 service DSCP Class 3 service DSCP Class 4 service Express Forwarding is used for low latency traffic Control is used for routing traffic, not recommended Link Layer traffic like.. Possible values are `DSCP_BEST_EFFORT`, `DSCP_CLASS1`, `DSCP_CLASS2`, `DSCP_CLASS3`, `DSCP_CLASS4`, `DSCP_EXPRESS_FORWARDING`, `DSCP_CONTROL_L3`, `DSCP_CONTROL_L2`. Defaults to `DSCP_BEST_EFFORT`.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("DSCP_BEST_EFFORT", "DSCP_CLASS1", "DSCP_CLASS2", "DSCP_CLASS3", "DSCP_CLASS4", "DSCP_EXPRESS_FORWARDING", "DSCP_CONTROL_L3", "DSCP_CONTROL_L2"),
 				},
 			},
 			"tos_value": schema.Int64Attribute{
-				MarkdownDescription: "Decimal value of raw 8 bit TOS. In above example DSCP 10 = Precedence Class 1 and drop precedence low.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
+				MarkdownDescription: "Exclusive with [dscp no_marking] Decimal value of raw 8 bit TOS. In above example DSCP 10 = Precedence Class 1 and drop precedence low.",
+				Required:            true,
 			},
 		},
 		Blocks: map[string]schema.Block{
@@ -180,17 +174,23 @@ func (r *ForwardingClassResource) Schema(ctx context.Context, req resource.Schem
 				MarkdownDescription: "[OneOf: dscp, no_marking, tos_value; Default: no_marking] DSCP Marking setting. DSCP marking setting as per RFC 2475.",
 				Attributes: map[string]schema.Attribute{
 					"drop_precedence": schema.StringAttribute{
-						MarkdownDescription: "[Enum: DSCP_AF_LOW|DSCP_AF_MEDIUM|DSCP_AF_HIGH|DSCP_AF_POLICER] DSCP Assured forwarding drop precedence DSCP Low drop precedence DSCP Low drop precedence DSCP Low drop precedence DSCP drop precedence value is taken from output of policer. Possible values are `DSCP_AF_LOW`, `DSCP_AF_MEDIUM`, `DSCP_AF_HIGH`, `DSCP_AF_POLICER`. Defaults to `DSCP_AF_FAKE`.",
+						MarkdownDescription: "[Enum: DSCP_AF_LOW|DSCP_AF_MEDIUM|DSCP_AF_HIGH|DSCP_AF_POLICER] DSCP Assured forwarding drop precedence DSCP Low drop precedence DSCP Low drop precedence DSCP Low drop precedence DSCP drop precedence value is taken from output of policer. Possible values are `DSCP_AF_LOW`, `DSCP_AF_MEDIUM`, `DSCP_AF_HIGH`, `DSCP_AF_POLICER`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("DSCP_AF_LOW", "DSCP_AF_MEDIUM", "DSCP_AF_HIGH", "DSCP_AF_POLICER"),
+						},
 					},
 					"dscp_class": schema.StringAttribute{
 						MarkdownDescription: "[Enum: DSCP_BEST_EFFORT|DSCP_CLASS1|DSCP_CLASS2|DSCP_CLASS3|DSCP_CLASS4|DSCP_EXPRESS_FORWARDING|DSCP_CONTROL_L3|DSCP_CONTROL_L2] DSCP Precedence Level Values Best Effort service will GET any available bandwidth DSCP Class 1 service DSCP Class 2 service DSCP Class 3 service DSCP Class 4 service Express Forwarding is used for low latency traffic Control is used for routing traffic, not recommended Link Layer traffic like.. Possible values are `DSCP_BEST_EFFORT`, `DSCP_CLASS1`, `DSCP_CLASS2`, `DSCP_CLASS3`, `DSCP_CLASS4`, `DSCP_EXPRESS_FORWARDING`, `DSCP_CONTROL_L3`, `DSCP_CONTROL_L2`. Defaults to `DSCP_BEST_EFFORT`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("DSCP_BEST_EFFORT", "DSCP_CLASS1", "DSCP_CLASS2", "DSCP_CLASS3", "DSCP_CLASS4", "DSCP_EXPRESS_FORWARDING", "DSCP_CONTROL_L3", "DSCP_CONTROL_L2"),
+						},
 					},
 				},
 			},
 			"dscp_based_queue": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: dscp_based_queue, queue_id_to_use] Enable this option",
+				MarkdownDescription: "[OneOf: dscp_based_queue, queue_id_to_use] Configuration parameter for dscp based queue.",
 			},
 			"no_marking": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
@@ -204,6 +204,9 @@ func (r *ForwardingClassResource) Schema(ctx context.Context, req resource.Schem
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -212,6 +215,9 @@ func (r *ForwardingClassResource) Schema(ctx context.Context, req resource.Schem
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"tenant": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -219,6 +225,9 @@ func (r *ForwardingClassResource) Schema(ctx context.Context, req resource.Schem
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
 						},
 					},
 				},
@@ -716,27 +725,6 @@ func (r *ForwardingClassResource) Update(ctx context.Context, req resource.Updat
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["interface_group"].(string); ok && v != "" {
-		data.InterfaceGroup = types.StringValue(v)
-	} else if data.InterfaceGroup.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.InterfaceGroup = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["queue_id_to_use"].(string); ok && v != "" {
-		data.QueueIDToUse = types.StringValue(v)
-	} else if data.QueueIDToUse.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.QueueIDToUse = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["tos_value"].(float64); ok {
-		data.TosValue = types.Int64Value(int64(v))
-	} else if data.TosValue.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.TosValue = types.Int64Null()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields

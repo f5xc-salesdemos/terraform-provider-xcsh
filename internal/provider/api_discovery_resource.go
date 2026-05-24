@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -131,16 +132,22 @@ func (r *APIDiscoveryResource) Schema(ctx context.Context, req resource.SchemaRe
 				Delete: true,
 			}),
 			"custom_auth_types": schema.ListNestedBlock{
-				MarkdownDescription: "Select your custom authentication types to be detected in the API discovery.",
+				MarkdownDescription: "Select your custom authentication types to be detected in the API discovery. Defaults to `[]`. Server applies default when omitted.",
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"parameter_name": schema.StringAttribute{
 							MarkdownDescription: "The authentication parameter name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(256),
+							},
 						},
 						"parameter_type": schema.StringAttribute{
 							MarkdownDescription: "[Enum: QUERY_PARAMETER|HEADER|COOKIE] Enumeration for authentication parameter types. Possible values are `QUERY_PARAMETER`, `HEADER`, `COOKIE`. Defaults to `QUERY_PARAMETER`.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf("QUERY_PARAMETER", "HEADER", "COOKIE"),
+							},
 						},
 					},
 				},

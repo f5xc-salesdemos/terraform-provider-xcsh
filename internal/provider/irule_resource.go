@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -43,13 +44,13 @@ type IruleResource struct {
 type IruleResourceModel struct {
 	Name            types.String   `tfsdk:"name"`
 	Namespace       types.String   `tfsdk:"namespace"`
+	DescriptionSpec types.String   `tfsdk:"description_spec"`
+	Irule           types.String   `tfsdk:"irule"`
 	Annotations     types.Map      `tfsdk:"annotations"`
 	Description     types.String   `tfsdk:"description"`
 	Disable         types.Bool     `tfsdk:"disable"`
 	Labels          types.Map      `tfsdk:"labels"`
 	ID              types.String   `tfsdk:"id"`
-	DescriptionSpec types.String   `tfsdk:"description_spec"`
-	Irule           types.String   `tfsdk:"irule"`
 	Timeouts        timeouts.Value `tfsdk:"timeouts"`
 }
 
@@ -81,6 +82,20 @@ func (r *IruleResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					validators.NamespaceValidator(),
 				},
 			},
+			"description_spec": schema.StringAttribute{
+				MarkdownDescription: "Specify Description for iRule .",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(256),
+				},
+			},
+			"irule": schema.StringAttribute{
+				MarkdownDescription: "Www.internal.example.f5.com')} DNS::drop} irule content .",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(24576),
+				},
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -88,7 +103,7 @@ func (r *IruleResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Human readable description for the object.",
-				Optional:            true,
+				Required:            true,
 			},
 			"disable": schema.BoolAttribute{
 				MarkdownDescription: "A value of true will administratively disable the object.",
@@ -101,22 +116,6 @@ func (r *IruleResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			},
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique identifier for the resource.",
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"description_spec": schema.StringAttribute{
-				MarkdownDescription: "Specify Description for iRule .",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"irule": schema.StringAttribute{
-				MarkdownDescription: "Www.internal.example.f5.com')} DNS::drop} irule content .",
-				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -431,20 +430,6 @@ func (r *IruleResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["description"].(string); ok && v != "" {
-		data.DescriptionSpec = types.StringValue(v)
-	} else if data.DescriptionSpec.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.DescriptionSpec = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["irule"].(string); ok && v != "" {
-		data.Irule = types.StringValue(v)
-	} else if data.Irule.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Irule = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields

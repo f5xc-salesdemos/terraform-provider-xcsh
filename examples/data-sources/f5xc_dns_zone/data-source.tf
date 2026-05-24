@@ -2,6 +2,18 @@
 # Retrieves information about an existing DNS Zone
 
 # Look up an existing DNS Zone by name
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 data "f5xc_dns_zone" "example" {
   name      = "example-dns-zone"
   namespace = "system"

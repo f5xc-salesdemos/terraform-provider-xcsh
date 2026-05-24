@@ -2,6 +2,18 @@
 # Manages secret_policy_rule creates a new object in storage backend for metadata.namespace. in F5 Distributed Cloud.
 
 # Basic Secret Policy Rule configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_secret_policy_rule" "example" {
   name      = "example-secret-policy-rule"
   namespace = "shared"

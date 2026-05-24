@@ -2,6 +2,18 @@
 # Manages managed_tenant config instance. Name of the object is name of the tenant that is allowed to manage. in F5 Distributed Cloud.
 
 # Basic Managed Tenant configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_managed_tenant" "example" {
   name      = "example-managed-tenant"
   namespace = "staging"
@@ -20,7 +32,7 @@ resource "f5xc_managed_tenant" "example" {
   groups {
     # Configure groups settings
   }
-  # Object reference. This type establishes a direct referenc...
+  # Object reference. This type establishes a direct reference...
   group {
     # Configure group settings
   }

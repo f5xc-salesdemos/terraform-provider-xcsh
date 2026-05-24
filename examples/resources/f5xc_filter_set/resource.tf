@@ -1,6 +1,17 @@
 # Filter Set Resource Example
 # Manages specification. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Filter Set configuration
 resource "f5xc_filter_set" "example" {
   name      = "example-filter-set"

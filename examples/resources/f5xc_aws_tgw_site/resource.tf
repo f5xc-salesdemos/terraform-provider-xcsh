@@ -1,6 +1,17 @@
 # AWS TGW Site Resource Example
 # Manages a AWS TGW Site resource in F5 Distributed Cloud for deploying F5 sites connected via AWS Transit Gateway.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic AWS TGW Site configuration
 resource "f5xc_aws_tgw_site" "example" {
   name      = "example-aws-tgw-site"

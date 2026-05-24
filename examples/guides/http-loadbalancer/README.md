@@ -115,4 +115,4 @@ For detailed documentation including architecture diagrams and troubleshooting, 
 
 - [F5XC Provider Documentation](https://registry.terraform.io/providers/robinmordasiewicz/f5xc/latest/docs)
 - [F5 Distributed Cloud Documentation](https://docs.cloud.f5.com/)
-- [GitHub Issues](https://github.com/robinmordasiewicz/terraform-provider-f5xc/issues)
+- [GitHub Issues](https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc/issues)

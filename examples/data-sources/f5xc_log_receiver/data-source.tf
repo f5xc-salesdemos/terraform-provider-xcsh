@@ -1,16 +1,26 @@
 # Log Receiver Data Source Example
 # Retrieves information about an existing Log Receiver
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Look up an existing Log Receiver by name
 data "f5xc_log_receiver" "example" {
   name      = "example-log-receiver"
-  namespace = "system"
+  namespace = "shared"
 }
 
-# Example: Use the data source in another resource
-# output "log_receiver_id" {
-#   value = data.f5xc_log_receiver.example.id
-# }
+output "log_receiver_id" {
+  value = data.f5xc_log_receiver.example.id
+}
 
 # Example: Reference log receiver in site configuration
 # resource "f5xc_securemesh_site_v2" "example" {

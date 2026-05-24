@@ -100,7 +100,7 @@ export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/robinmordasiewicz/terraform-provider-f5xc.git
+git clone https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc.git
 cd terraform-provider-f5xc/examples/guides/addon-activation
 ```
 
@@ -128,7 +128,7 @@ terraform plan
 terraform apply
 ```
 
-## Checking Activation Eligibility
+## Checkingg Activation Eligibility
 
 Before attempting to activate an addon service, check if it's available for your tenant.
 
@@ -449,7 +449,7 @@ output "debug_addon_status" {
 
 ## Complete Example
 
-See the [addon-activation example](https://github.com/robinmordasiewicz/terraform-provider-f5xc/tree/main/examples/guides/addon-activation) for a complete, working Terraform configuration.
+See the [addon-activation example](https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc/tree/main/examples/guides/addon-activation) for a complete, working Terraform configuration.
 
 ## Related Resources
 

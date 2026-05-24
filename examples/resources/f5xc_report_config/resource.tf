@@ -2,6 +2,18 @@
 # Manages a Report Config resource in F5 Distributed Cloud for report configuration is used to schedule report generation at a later point in time. configuration.
 
 # Basic Report Config configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_report_config" "example" {
   name      = "example-report-config"
   namespace = "staging"

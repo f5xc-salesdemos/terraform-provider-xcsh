@@ -8,7 +8,12 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -44,174 +49,6 @@ type OriginPoolResource struct {
 
 // OriginPoolEmptyModel represents empty nested blocks
 type OriginPoolEmptyModel struct {
-}
-
-// OriginPoolAdvancedOptionsModel represents advanced_options block
-type OriginPoolAdvancedOptionsModel struct {
-	ConnectionTimeout            types.Int64                                     `tfsdk:"connection_timeout"`
-	HTTPIdleTimeout              types.Int64                                     `tfsdk:"http_idle_timeout"`
-	PanicThreshold               types.Int64                                     `tfsdk:"panic_threshold"`
-	AutoHTTPConfig               *OriginPoolEmptyModel                           `tfsdk:"auto_http_config"`
-	CircuitBreaker               *OriginPoolAdvancedOptionsCircuitBreakerModel   `tfsdk:"circuit_breaker"`
-	DefaultCircuitBreaker        *OriginPoolEmptyModel                           `tfsdk:"default_circuit_breaker"`
-	DisableCircuitBreaker        *OriginPoolEmptyModel                           `tfsdk:"disable_circuit_breaker"`
-	DisableLBSourceIPPersistance *OriginPoolEmptyModel                           `tfsdk:"disable_lb_source_ip_persistance"`
-	DisableOutlierDetection      *OriginPoolEmptyModel                           `tfsdk:"disable_outlier_detection"`
-	DisableProxyProtocol         *OriginPoolEmptyModel                           `tfsdk:"disable_proxy_protocol"`
-	DisableSubsets               *OriginPoolEmptyModel                           `tfsdk:"disable_subsets"`
-	EnableLBSourceIPPersistance  *OriginPoolEmptyModel                           `tfsdk:"enable_lb_source_ip_persistance"`
-	EnableSubsets                *OriginPoolAdvancedOptionsEnableSubsetsModel    `tfsdk:"enable_subsets"`
-	Http1Config                  *OriginPoolAdvancedOptionsHttp1ConfigModel      `tfsdk:"http1_config"`
-	Http2Options                 *OriginPoolAdvancedOptionsHttp2OptionsModel     `tfsdk:"http2_options"`
-	NoPanicThreshold             *OriginPoolEmptyModel                           `tfsdk:"no_panic_threshold"`
-	OutlierDetection             *OriginPoolAdvancedOptionsOutlierDetectionModel `tfsdk:"outlier_detection"`
-	ProxyProtocolV1              *OriginPoolEmptyModel                           `tfsdk:"proxy_protocol_v1"`
-	ProxyProtocolV2              *OriginPoolEmptyModel                           `tfsdk:"proxy_protocol_v2"`
-}
-
-// OriginPoolAdvancedOptionsModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsModel
-var OriginPoolAdvancedOptionsModelAttrTypes = map[string]attr.Type{
-	"connection_timeout":               types.Int64Type,
-	"http_idle_timeout":                types.Int64Type,
-	"panic_threshold":                  types.Int64Type,
-	"auto_http_config":                 types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"circuit_breaker":                  types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsCircuitBreakerModelAttrTypes},
-	"default_circuit_breaker":          types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"disable_circuit_breaker":          types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"disable_lb_source_ip_persistance": types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"disable_outlier_detection":        types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"disable_proxy_protocol":           types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"disable_subsets":                  types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"enable_lb_source_ip_persistance":  types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"enable_subsets":                   types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsEnableSubsetsModelAttrTypes},
-	"http1_config":                     types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsHttp1ConfigModelAttrTypes},
-	"http2_options":                    types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsHttp2OptionsModelAttrTypes},
-	"no_panic_threshold":               types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"outlier_detection":                types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsOutlierDetectionModelAttrTypes},
-	"proxy_protocol_v1":                types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"proxy_protocol_v2":                types.ObjectType{AttrTypes: map[string]attr.Type{}},
-}
-
-// OriginPoolAdvancedOptionsCircuitBreakerModel represents circuit_breaker block
-type OriginPoolAdvancedOptionsCircuitBreakerModel struct {
-	ConnectionLimit types.Int64  `tfsdk:"connection_limit"`
-	MaxRequests     types.Int64  `tfsdk:"max_requests"`
-	PendingRequests types.Int64  `tfsdk:"pending_requests"`
-	Priority        types.String `tfsdk:"priority"`
-	Retries         types.Int64  `tfsdk:"retries"`
-}
-
-// OriginPoolAdvancedOptionsCircuitBreakerModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsCircuitBreakerModel
-var OriginPoolAdvancedOptionsCircuitBreakerModelAttrTypes = map[string]attr.Type{
-	"connection_limit": types.Int64Type,
-	"max_requests":     types.Int64Type,
-	"pending_requests": types.Int64Type,
-	"priority":         types.StringType,
-	"retries":          types.Int64Type,
-}
-
-// OriginPoolAdvancedOptionsEnableSubsetsModel represents enable_subsets block
-type OriginPoolAdvancedOptionsEnableSubsetsModel struct {
-	AnyEndpoint     *OriginPoolEmptyModel                                        `tfsdk:"any_endpoint"`
-	DefaultSubset   *OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModel    `tfsdk:"default_subset"`
-	EndpointSubsets []OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModel `tfsdk:"endpoint_subsets"`
-	FailRequest     *OriginPoolEmptyModel                                        `tfsdk:"fail_request"`
-}
-
-// OriginPoolAdvancedOptionsEnableSubsetsModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsEnableSubsetsModel
-var OriginPoolAdvancedOptionsEnableSubsetsModelAttrTypes = map[string]attr.Type{
-	"any_endpoint":     types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"default_subset":   types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModelAttrTypes},
-	"endpoint_subsets": types.ListType{ElemType: types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModelAttrTypes}},
-	"fail_request":     types.ObjectType{AttrTypes: map[string]attr.Type{}},
-}
-
-// OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModel represents default_subset block
-type OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModel struct {
-	DefaultSubset *OriginPoolEmptyModel `tfsdk:"default_subset"`
-}
-
-// OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModel
-var OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModelAttrTypes = map[string]attr.Type{
-	"default_subset": types.ObjectType{AttrTypes: map[string]attr.Type{}},
-}
-
-// OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModel represents endpoint_subsets block
-type OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModel struct {
-	Keys types.List `tfsdk:"keys"`
-}
-
-// OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModel
-var OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModelAttrTypes = map[string]attr.Type{
-	"keys": types.ListType{ElemType: types.StringType},
-}
-
-// OriginPoolAdvancedOptionsHttp1ConfigModel represents http1_config block
-type OriginPoolAdvancedOptionsHttp1ConfigModel struct {
-	HeaderTransformation *OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModel `tfsdk:"header_transformation"`
-}
-
-// OriginPoolAdvancedOptionsHttp1ConfigModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsHttp1ConfigModel
-var OriginPoolAdvancedOptionsHttp1ConfigModelAttrTypes = map[string]attr.Type{
-	"header_transformation": types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModelAttrTypes},
-}
-
-// OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModel represents header_transformation block
-type OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModel struct {
-	DefaultHeaderTransformation      *OriginPoolEmptyModel `tfsdk:"default_header_transformation"`
-	LegacyHeaderTransformation       *OriginPoolEmptyModel `tfsdk:"legacy_header_transformation"`
-	PreserveCaseHeaderTransformation *OriginPoolEmptyModel `tfsdk:"preserve_case_header_transformation"`
-	ProperCaseHeaderTransformation   *OriginPoolEmptyModel `tfsdk:"proper_case_header_transformation"`
-}
-
-// OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModel
-var OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModelAttrTypes = map[string]attr.Type{
-	"default_header_transformation":       types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"legacy_header_transformation":        types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"preserve_case_header_transformation": types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"proper_case_header_transformation":   types.ObjectType{AttrTypes: map[string]attr.Type{}},
-}
-
-// OriginPoolAdvancedOptionsHttp2OptionsModel represents http2_options block
-type OriginPoolAdvancedOptionsHttp2OptionsModel struct {
-	Enabled types.Bool `tfsdk:"enabled"`
-}
-
-// OriginPoolAdvancedOptionsHttp2OptionsModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsHttp2OptionsModel
-var OriginPoolAdvancedOptionsHttp2OptionsModelAttrTypes = map[string]attr.Type{
-	"enabled": types.BoolType,
-}
-
-// OriginPoolAdvancedOptionsOutlierDetectionModel represents outlier_detection block
-type OriginPoolAdvancedOptionsOutlierDetectionModel struct {
-	BaseEjectionTime          types.Int64 `tfsdk:"base_ejection_time"`
-	Consecutive5xx            types.Int64 `tfsdk:"consecutive_5xx"`
-	ConsecutiveGatewayFailure types.Int64 `tfsdk:"consecutive_gateway_failure"`
-	Interval                  types.Int64 `tfsdk:"interval"`
-	MaxEjectionPercent        types.Int64 `tfsdk:"max_ejection_percent"`
-}
-
-// OriginPoolAdvancedOptionsOutlierDetectionModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsOutlierDetectionModel
-var OriginPoolAdvancedOptionsOutlierDetectionModelAttrTypes = map[string]attr.Type{
-	"base_ejection_time":          types.Int64Type,
-	"consecutive_5xx":             types.Int64Type,
-	"consecutive_gateway_failure": types.Int64Type,
-	"interval":                    types.Int64Type,
-	"max_ejection_percent":        types.Int64Type,
-}
-
-// OriginPoolHealthcheckModel represents healthcheck block
-type OriginPoolHealthcheckModel struct {
-	Name      types.String `tfsdk:"name"`
-	Namespace types.String `tfsdk:"namespace"`
-	Tenant    types.String `tfsdk:"tenant"`
-}
-
-// OriginPoolHealthcheckModelAttrTypes defines the attribute types for OriginPoolHealthcheckModel
-var OriginPoolHealthcheckModelAttrTypes = map[string]attr.Type{
-	"name":      types.StringType,
-	"namespace": types.StringType,
-	"tenant":    types.StringType,
 }
 
 // OriginPoolOriginServersModel represents origin_servers block
@@ -710,6 +547,164 @@ var OriginPoolOriginServersVnPrivateNamePrivateNetworkModelAttrTypes = map[strin
 	"tenant":    types.StringType,
 }
 
+// OriginPoolAdvancedOptionsModel represents advanced_options block
+type OriginPoolAdvancedOptionsModel struct {
+	ConnectionTimeout            types.Int64                                     `tfsdk:"connection_timeout"`
+	HTTPIdleTimeout              types.Int64                                     `tfsdk:"http_idle_timeout"`
+	MaxRequestsPerConnection     types.Int64                                     `tfsdk:"max_requests_per_connection"`
+	PanicThreshold               types.Int64                                     `tfsdk:"panic_threshold"`
+	AutoHTTPConfig               *OriginPoolEmptyModel                           `tfsdk:"auto_http_config"`
+	CircuitBreaker               *OriginPoolAdvancedOptionsCircuitBreakerModel   `tfsdk:"circuit_breaker"`
+	DefaultCircuitBreaker        *OriginPoolEmptyModel                           `tfsdk:"default_circuit_breaker"`
+	DisableCircuitBreaker        *OriginPoolEmptyModel                           `tfsdk:"disable_circuit_breaker"`
+	DisableLBSourceIPPersistance *OriginPoolEmptyModel                           `tfsdk:"disable_lb_source_ip_persistance"`
+	DisableOutlierDetection      *OriginPoolEmptyModel                           `tfsdk:"disable_outlier_detection"`
+	DisableProxyProtocol         *OriginPoolEmptyModel                           `tfsdk:"disable_proxy_protocol"`
+	DisableSubsets               *OriginPoolEmptyModel                           `tfsdk:"disable_subsets"`
+	EnableLBSourceIPPersistance  *OriginPoolEmptyModel                           `tfsdk:"enable_lb_source_ip_persistance"`
+	EnableSubsets                *OriginPoolAdvancedOptionsEnableSubsetsModel    `tfsdk:"enable_subsets"`
+	Http1Config                  *OriginPoolAdvancedOptionsHttp1ConfigModel      `tfsdk:"http1_config"`
+	Http2Options                 *OriginPoolAdvancedOptionsHttp2OptionsModel     `tfsdk:"http2_options"`
+	NoPanicThreshold             *OriginPoolEmptyModel                           `tfsdk:"no_panic_threshold"`
+	NoRequestLimitPerConnection  *OriginPoolEmptyModel                           `tfsdk:"no_request_limit_per_connection"`
+	OutlierDetection             *OriginPoolAdvancedOptionsOutlierDetectionModel `tfsdk:"outlier_detection"`
+	ProxyProtocolV1              *OriginPoolEmptyModel                           `tfsdk:"proxy_protocol_v1"`
+	ProxyProtocolV2              *OriginPoolEmptyModel                           `tfsdk:"proxy_protocol_v2"`
+}
+
+// OriginPoolAdvancedOptionsModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsModel
+var OriginPoolAdvancedOptionsModelAttrTypes = map[string]attr.Type{
+	"connection_timeout":               types.Int64Type,
+	"http_idle_timeout":                types.Int64Type,
+	"max_requests_per_connection":      types.Int64Type,
+	"panic_threshold":                  types.Int64Type,
+	"auto_http_config":                 types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"circuit_breaker":                  types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsCircuitBreakerModelAttrTypes},
+	"default_circuit_breaker":          types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"disable_circuit_breaker":          types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"disable_lb_source_ip_persistance": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"disable_outlier_detection":        types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"disable_proxy_protocol":           types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"disable_subsets":                  types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"enable_lb_source_ip_persistance":  types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"enable_subsets":                   types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsEnableSubsetsModelAttrTypes},
+	"http1_config":                     types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsHttp1ConfigModelAttrTypes},
+	"http2_options":                    types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsHttp2OptionsModelAttrTypes},
+	"no_panic_threshold":               types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"no_request_limit_per_connection":  types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"outlier_detection":                types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsOutlierDetectionModelAttrTypes},
+	"proxy_protocol_v1":                types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"proxy_protocol_v2":                types.ObjectType{AttrTypes: map[string]attr.Type{}},
+}
+
+// OriginPoolAdvancedOptionsCircuitBreakerModel represents circuit_breaker block
+type OriginPoolAdvancedOptionsCircuitBreakerModel struct {
+	ConnectionLimit types.Int64  `tfsdk:"connection_limit"`
+	MaxRequests     types.Int64  `tfsdk:"max_requests"`
+	PendingRequests types.Int64  `tfsdk:"pending_requests"`
+	Priority        types.String `tfsdk:"priority"`
+	Retries         types.Int64  `tfsdk:"retries"`
+}
+
+// OriginPoolAdvancedOptionsCircuitBreakerModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsCircuitBreakerModel
+var OriginPoolAdvancedOptionsCircuitBreakerModelAttrTypes = map[string]attr.Type{
+	"connection_limit": types.Int64Type,
+	"max_requests":     types.Int64Type,
+	"pending_requests": types.Int64Type,
+	"priority":         types.StringType,
+	"retries":          types.Int64Type,
+}
+
+// OriginPoolAdvancedOptionsEnableSubsetsModel represents enable_subsets block
+type OriginPoolAdvancedOptionsEnableSubsetsModel struct {
+	AnyEndpoint     *OriginPoolEmptyModel                                        `tfsdk:"any_endpoint"`
+	DefaultSubset   *OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModel    `tfsdk:"default_subset"`
+	EndpointSubsets []OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModel `tfsdk:"endpoint_subsets"`
+	FailRequest     *OriginPoolEmptyModel                                        `tfsdk:"fail_request"`
+}
+
+// OriginPoolAdvancedOptionsEnableSubsetsModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsEnableSubsetsModel
+var OriginPoolAdvancedOptionsEnableSubsetsModelAttrTypes = map[string]attr.Type{
+	"any_endpoint":     types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"default_subset":   types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModelAttrTypes},
+	"endpoint_subsets": types.ListType{ElemType: types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModelAttrTypes}},
+	"fail_request":     types.ObjectType{AttrTypes: map[string]attr.Type{}},
+}
+
+// OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModel represents default_subset block
+type OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModel struct {
+	DefaultSubset *OriginPoolEmptyModel `tfsdk:"default_subset"`
+}
+
+// OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModel
+var OriginPoolAdvancedOptionsEnableSubsetsDefaultSubsetModelAttrTypes = map[string]attr.Type{
+	"default_subset": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+}
+
+// OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModel represents endpoint_subsets block
+type OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModel struct {
+	Keys types.List `tfsdk:"keys"`
+}
+
+// OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModel
+var OriginPoolAdvancedOptionsEnableSubsetsEndpointSubsetsModelAttrTypes = map[string]attr.Type{
+	"keys": types.ListType{ElemType: types.StringType},
+}
+
+// OriginPoolAdvancedOptionsHttp1ConfigModel represents http1_config block
+type OriginPoolAdvancedOptionsHttp1ConfigModel struct {
+	HeaderTransformation *OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModel `tfsdk:"header_transformation"`
+}
+
+// OriginPoolAdvancedOptionsHttp1ConfigModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsHttp1ConfigModel
+var OriginPoolAdvancedOptionsHttp1ConfigModelAttrTypes = map[string]attr.Type{
+	"header_transformation": types.ObjectType{AttrTypes: OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModelAttrTypes},
+}
+
+// OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModel represents header_transformation block
+type OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModel struct {
+	DefaultHeaderTransformation      *OriginPoolEmptyModel `tfsdk:"default_header_transformation"`
+	LegacyHeaderTransformation       *OriginPoolEmptyModel `tfsdk:"legacy_header_transformation"`
+	PreserveCaseHeaderTransformation *OriginPoolEmptyModel `tfsdk:"preserve_case_header_transformation"`
+	ProperCaseHeaderTransformation   *OriginPoolEmptyModel `tfsdk:"proper_case_header_transformation"`
+}
+
+// OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModel
+var OriginPoolAdvancedOptionsHttp1ConfigHeaderTransformationModelAttrTypes = map[string]attr.Type{
+	"default_header_transformation":       types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"legacy_header_transformation":        types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"preserve_case_header_transformation": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"proper_case_header_transformation":   types.ObjectType{AttrTypes: map[string]attr.Type{}},
+}
+
+// OriginPoolAdvancedOptionsHttp2OptionsModel represents http2_options block
+type OriginPoolAdvancedOptionsHttp2OptionsModel struct {
+	Enabled types.Bool `tfsdk:"enabled"`
+}
+
+// OriginPoolAdvancedOptionsHttp2OptionsModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsHttp2OptionsModel
+var OriginPoolAdvancedOptionsHttp2OptionsModelAttrTypes = map[string]attr.Type{
+	"enabled": types.BoolType,
+}
+
+// OriginPoolAdvancedOptionsOutlierDetectionModel represents outlier_detection block
+type OriginPoolAdvancedOptionsOutlierDetectionModel struct {
+	BaseEjectionTime          types.Int64 `tfsdk:"base_ejection_time"`
+	Consecutive5xx            types.Int64 `tfsdk:"consecutive_5xx"`
+	ConsecutiveGatewayFailure types.Int64 `tfsdk:"consecutive_gateway_failure"`
+	Interval                  types.Int64 `tfsdk:"interval"`
+	MaxEjectionPercent        types.Int64 `tfsdk:"max_ejection_percent"`
+}
+
+// OriginPoolAdvancedOptionsOutlierDetectionModelAttrTypes defines the attribute types for OriginPoolAdvancedOptionsOutlierDetectionModel
+var OriginPoolAdvancedOptionsOutlierDetectionModelAttrTypes = map[string]attr.Type{
+	"base_ejection_time":          types.Int64Type,
+	"consecutive_5xx":             types.Int64Type,
+	"consecutive_gateway_failure": types.Int64Type,
+	"interval":                    types.Int64Type,
+	"max_ejection_percent":        types.Int64Type,
+}
+
 // OriginPoolUpstreamConnPoolReuseTypeModel represents upstream_conn_pool_reuse_type block
 type OriginPoolUpstreamConnPoolReuseTypeModel struct {
 	DisableConnPoolReuse *OriginPoolEmptyModel `tfsdk:"disable_conn_pool_reuse"`
@@ -904,6 +899,20 @@ var OriginPoolUseTLSUseServerVerificationTrustedCAModelAttrTypes = map[string]at
 	"tenant":    types.StringType,
 }
 
+// OriginPoolHealthcheckModel represents healthcheck block
+type OriginPoolHealthcheckModel struct {
+	Name      types.String `tfsdk:"name"`
+	Namespace types.String `tfsdk:"namespace"`
+	Tenant    types.String `tfsdk:"tenant"`
+}
+
+// OriginPoolHealthcheckModelAttrTypes defines the attribute types for OriginPoolHealthcheckModel
+var OriginPoolHealthcheckModelAttrTypes = map[string]attr.Type{
+	"name":      types.StringType,
+	"namespace": types.StringType,
+	"tenant":    types.StringType,
+}
+
 type OriginPoolResourceModel struct {
 	Name                      types.String                              `tfsdk:"name"`
 	Namespace                 types.String                              `tfsdk:"namespace"`
@@ -917,15 +926,15 @@ type OriginPoolResourceModel struct {
 	LoadBalancerAlgorithm     types.String                              `tfsdk:"loadbalancer_algorithm"`
 	Port                      types.Int64                               `tfsdk:"port"`
 	Timeouts                  timeouts.Value                            `tfsdk:"timeouts"`
+	OriginServers             types.List                                `tfsdk:"origin_servers"`
 	AdvancedOptions           *OriginPoolAdvancedOptionsModel           `tfsdk:"advanced_options"`
 	AutomaticPort             *OriginPoolEmptyModel                     `tfsdk:"automatic_port"`
-	Healthcheck               types.List                                `tfsdk:"healthcheck"`
 	LBPort                    *OriginPoolEmptyModel                     `tfsdk:"lb_port"`
-	NoTLS                     *OriginPoolEmptyModel                     `tfsdk:"no_tls"`
-	OriginServers             types.List                                `tfsdk:"origin_servers"`
-	SameAsEndpointPort        *OriginPoolEmptyModel                     `tfsdk:"same_as_endpoint_port"`
 	UpstreamConnPoolReuseType *OriginPoolUpstreamConnPoolReuseTypeModel `tfsdk:"upstream_conn_pool_reuse_type"`
 	UseTLS                    *OriginPoolUseTLSModel                    `tfsdk:"use_tls"`
+	Healthcheck               types.List                                `tfsdk:"healthcheck"`
+	NoTLS                     *OriginPoolEmptyModel                     `tfsdk:"no_tls"`
+	SameAsEndpointPort        *OriginPoolEmptyModel                     `tfsdk:"same_as_endpoint_port"`
 }
 
 func (r *OriginPoolResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -988,13 +997,19 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
+				Validators: []validator.String{
+					stringvalidator.OneOf("DISTRIBUTED", "LOCAL_ONLY", "LOCAL_PREFERRED"),
+				},
 			},
 			"health_check_port": schema.Int64Attribute{
-				MarkdownDescription: "[OneOf: health_check_port, same_as_endpoint_port] Port used for performing health check.",
+				MarkdownDescription: "[OneOf: health_check_port, same_as_endpoint_port] Exclusive with [same_as_endpoint_port] Port used for performing health check.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.Int64{
+					int64validator.AtMost(65535),
 				},
 			},
 			"loadbalancer_algorithm": schema.StringAttribute{
@@ -1004,13 +1019,15 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
+				Validators: []validator.String{
+					stringvalidator.OneOf("ROUND_ROBIN", "LEAST_REQUEST", "RING_HASH", "RANDOM", "LB_OVERRIDE"),
+				},
 			},
 			"port": schema.Int64Attribute{
-				MarkdownDescription: "Endpoint service is available on this port.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
+				MarkdownDescription: "Exclusive with [automatic_port lb_port] Endpoint service is available on this port. Recommended: `443`.",
+				Required:            true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 65535),
 				},
 			},
 		},
@@ -1021,6 +1038,732 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Update: true,
 				Delete: true,
 			}),
+			"origin_servers": schema.ListNestedBlock{
+				MarkdownDescription: "List of origin servers in this pool .",
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{},
+					Blocks: map[string]schema.Block{
+						"cbip_service": schema.SingleNestedBlock{
+							MarkdownDescription: "Specify origin server with Classic BIG-IP Service (Virtual Server).",
+							Attributes: map[string]schema.Attribute{
+								"service_name": schema.StringAttribute{
+									MarkdownDescription: "Name of the discovered Classic BIG-IP virtual server to be used as origin.",
+									Optional:            true,
+								},
+							},
+						},
+						"consul_service": schema.SingleNestedBlock{
+							MarkdownDescription: "Specify origin server with Hashi Corp Consul service name and site information.",
+							Attributes: map[string]schema.Attribute{
+								"service_name": schema.StringAttribute{
+									MarkdownDescription: "Consul service name of this origin server will be listed, including cluster-ID. The format is servicename:cluster-ID.",
+									Optional:            true,
+								},
+							},
+							Blocks: map[string]schema.Block{
+								"inside_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Configuration parameter for inside network.",
+								},
+								"outside_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Configuration parameter for outside network.",
+								},
+								"site_locator": schema.SingleNestedBlock{
+									MarkdownDescription: "Message defines a reference to a site or virtual site object.",
+									Attributes:          map[string]schema.Attribute{},
+									Blocks: map[string]schema.Block{
+										"site": schema.SingleNestedBlock{
+											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+											Attributes: map[string]schema.Attribute{
+												"name": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
+												},
+												"namespace": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
+												},
+												"tenant": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
+												},
+											},
+										},
+										"virtual_site": schema.SingleNestedBlock{
+											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+											Attributes: map[string]schema.Attribute{
+												"name": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
+												},
+												"namespace": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
+												},
+												"tenant": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
+												},
+											},
+										},
+									},
+								},
+								"snat_pool": schema.SingleNestedBlock{
+									MarkdownDescription: "SNAT Pool. SNAT Pool configuration.",
+									Attributes:          map[string]schema.Attribute{},
+									Blocks: map[string]schema.Block{
+										"no_snat_pool": schema.SingleNestedBlock{
+											MarkdownDescription: "Configuration parameter for no snat pool.",
+										},
+										"snat_pool": schema.SingleNestedBlock{
+											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
+											Attributes: map[string]schema.Attribute{
+												"prefixes": schema.ListAttribute{
+													MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
+													Optional:            true,
+													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(128),
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"custom_endpoint_object": schema.SingleNestedBlock{
+							MarkdownDescription: "Specify origin server with a reference to endpoint object.",
+							Attributes:          map[string]schema.Attribute{},
+							Blocks: map[string]schema.Block{
+								"endpoint": schema.SingleNestedBlock{
+									MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+									Attributes: map[string]schema.Attribute{
+										"name": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
+										},
+										"namespace": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
+										},
+										"tenant": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
+										},
+									},
+								},
+							},
+						},
+						"k8s_service": schema.SingleNestedBlock{
+							MarkdownDescription: "Specify origin server with K8s service name and site information.",
+							Attributes: map[string]schema.Attribute{
+								"protocol": schema.StringAttribute{
+									MarkdownDescription: "[Enum: PROTOCOL_TCP|PROTOCOL_UDP] Type of protocol - PROTOCOL_TCP: TCP - PROTOCOL_UDP: UDP. Possible values are `PROTOCOL_TCP`, `PROTOCOL_UDP`. Defaults to `PROTOCOL_TCP`.",
+									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("PROTOCOL_TCP", "PROTOCOL_UDP"),
+									},
+								},
+								"service_name": schema.StringAttribute{
+									MarkdownDescription: "Exclusive with [] K8s service name of the origin server will be listed, including the namespace and cluster-ID. For vK8s services, you need to enter a string with the format servicename.namespace:cluster-ID. If the servicename is 'frontend', namespace is 'speedtest' and cluster-ID is 'prod'..",
+									Optional:            true,
+								},
+							},
+							Blocks: map[string]schema.Block{
+								"inside_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Configuration parameter for inside network.",
+								},
+								"outside_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Configuration parameter for outside network.",
+								},
+								"site_locator": schema.SingleNestedBlock{
+									MarkdownDescription: "Message defines a reference to a site or virtual site object.",
+									Attributes:          map[string]schema.Attribute{},
+									Blocks: map[string]schema.Block{
+										"site": schema.SingleNestedBlock{
+											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+											Attributes: map[string]schema.Attribute{
+												"name": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
+												},
+												"namespace": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
+												},
+												"tenant": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
+												},
+											},
+										},
+										"virtual_site": schema.SingleNestedBlock{
+											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+											Attributes: map[string]schema.Attribute{
+												"name": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
+												},
+												"namespace": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
+												},
+												"tenant": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
+												},
+											},
+										},
+									},
+								},
+								"snat_pool": schema.SingleNestedBlock{
+									MarkdownDescription: "SNAT Pool. SNAT Pool configuration.",
+									Attributes:          map[string]schema.Attribute{},
+									Blocks: map[string]schema.Block{
+										"no_snat_pool": schema.SingleNestedBlock{
+											MarkdownDescription: "Configuration parameter for no snat pool.",
+										},
+										"snat_pool": schema.SingleNestedBlock{
+											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
+											Attributes: map[string]schema.Attribute{
+												"prefixes": schema.ListAttribute{
+													MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
+													Optional:            true,
+													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(128),
+													},
+												},
+											},
+										},
+									},
+								},
+								"vk8s_networks": schema.SingleNestedBlock{
+									MarkdownDescription: "Configuration parameter for vk8s networks.",
+								},
+							},
+						},
+						"labels": schema.SingleNestedBlock{
+							MarkdownDescription: "Add Labels for this origin server, these labels can be used to form subset.",
+						},
+						"private_ip": schema.SingleNestedBlock{
+							MarkdownDescription: "Specify origin server with private or public IP address and site information.",
+							Attributes: map[string]schema.Attribute{
+								"ip": schema.StringAttribute{
+									MarkdownDescription: "IP. Exclusive with [] Private IPv4 address.",
+									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
+								},
+							},
+							Blocks: map[string]schema.Block{
+								"inside_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Configuration parameter for inside network.",
+								},
+								"outside_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Configuration parameter for outside network.",
+								},
+								"segment": schema.SingleNestedBlock{
+									MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+									Attributes: map[string]schema.Attribute{
+										"name": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
+										},
+										"namespace": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
+										},
+										"tenant": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
+										},
+									},
+								},
+								"site_locator": schema.SingleNestedBlock{
+									MarkdownDescription: "Message defines a reference to a site or virtual site object.",
+									Attributes:          map[string]schema.Attribute{},
+									Blocks: map[string]schema.Block{
+										"site": schema.SingleNestedBlock{
+											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+											Attributes: map[string]schema.Attribute{
+												"name": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
+												},
+												"namespace": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
+												},
+												"tenant": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
+												},
+											},
+										},
+										"virtual_site": schema.SingleNestedBlock{
+											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+											Attributes: map[string]schema.Attribute{
+												"name": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
+												},
+												"namespace": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
+												},
+												"tenant": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
+												},
+											},
+										},
+									},
+								},
+								"snat_pool": schema.SingleNestedBlock{
+									MarkdownDescription: "SNAT Pool. SNAT Pool configuration.",
+									Attributes:          map[string]schema.Attribute{},
+									Blocks: map[string]schema.Block{
+										"no_snat_pool": schema.SingleNestedBlock{
+											MarkdownDescription: "Configuration parameter for no snat pool.",
+										},
+										"snat_pool": schema.SingleNestedBlock{
+											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
+											Attributes: map[string]schema.Attribute{
+												"prefixes": schema.ListAttribute{
+													MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
+													Optional:            true,
+													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(128),
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"private_name": schema.SingleNestedBlock{
+							MarkdownDescription: "Specify origin server with private or public DNS name and site information.",
+							Attributes: map[string]schema.Attribute{
+								"dns_name": schema.StringAttribute{
+									MarkdownDescription: "DNS Name. DNS Name .",
+									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`), ""),
+									},
+								},
+								"refresh_interval": schema.Int64Attribute{
+									MarkdownDescription: "Interval for DNS refresh in seconds. Max value is 7 days as per https://datatracker.ietf.org/doc/HTML/rfc8767.",
+									Optional:            true,
+								},
+							},
+							Blocks: map[string]schema.Block{
+								"inside_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Configuration parameter for inside network.",
+								},
+								"outside_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Configuration parameter for outside network.",
+								},
+								"segment": schema.SingleNestedBlock{
+									MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+									Attributes: map[string]schema.Attribute{
+										"name": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
+										},
+										"namespace": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
+										},
+										"tenant": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
+										},
+									},
+								},
+								"site_locator": schema.SingleNestedBlock{
+									MarkdownDescription: "Message defines a reference to a site or virtual site object.",
+									Attributes:          map[string]schema.Attribute{},
+									Blocks: map[string]schema.Block{
+										"site": schema.SingleNestedBlock{
+											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+											Attributes: map[string]schema.Attribute{
+												"name": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
+												},
+												"namespace": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
+												},
+												"tenant": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
+												},
+											},
+										},
+										"virtual_site": schema.SingleNestedBlock{
+											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+											Attributes: map[string]schema.Attribute{
+												"name": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
+												},
+												"namespace": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
+												},
+												"tenant": schema.StringAttribute{
+													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+													Optional:            true,
+													Computed:            true,
+													PlanModifiers: []planmodifier.String{
+														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
+												},
+											},
+										},
+									},
+								},
+								"snat_pool": schema.SingleNestedBlock{
+									MarkdownDescription: "SNAT Pool. SNAT Pool configuration.",
+									Attributes:          map[string]schema.Attribute{},
+									Blocks: map[string]schema.Block{
+										"no_snat_pool": schema.SingleNestedBlock{
+											MarkdownDescription: "Configuration parameter for no snat pool.",
+										},
+										"snat_pool": schema.SingleNestedBlock{
+											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
+											Attributes: map[string]schema.Attribute{
+												"prefixes": schema.ListAttribute{
+													MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
+													Optional:            true,
+													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(128),
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"public_ip": schema.SingleNestedBlock{
+							MarkdownDescription: "Specify origin server with public IP address.",
+							Attributes: map[string]schema.Attribute{
+								"ip": schema.StringAttribute{
+									MarkdownDescription: "Public IPv4. Exclusive with [] Public IPv4 address.",
+									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
+								},
+							},
+						},
+						"public_name": schema.SingleNestedBlock{
+							MarkdownDescription: "Specify origin server with public DNS name.",
+							Attributes: map[string]schema.Attribute{
+								"dns_name": schema.StringAttribute{
+									MarkdownDescription: "DNS Name. DNS Name .",
+									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
+								},
+								"refresh_interval": schema.Int64Attribute{
+									MarkdownDescription: "Interval for DNS refresh in seconds. Max value is 7 days as per https://datatracker.ietf.org/doc/HTML/rfc8767.",
+									Optional:            true,
+								},
+							},
+						},
+						"vn_private_ip": schema.SingleNestedBlock{
+							MarkdownDescription: "Specify origin server with IP on Virtual Network.",
+							Attributes: map[string]schema.Attribute{
+								"ip": schema.StringAttribute{
+									MarkdownDescription: "IPv4. Exclusive with [] IPv4 address.",
+									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
+								},
+							},
+							Blocks: map[string]schema.Block{
+								"virtual_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+									Attributes: map[string]schema.Attribute{
+										"name": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
+										},
+										"namespace": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
+										},
+										"tenant": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
+										},
+									},
+								},
+							},
+						},
+						"vn_private_name": schema.SingleNestedBlock{
+							MarkdownDescription: "Specify origin server with DNS name on Virtual Network.",
+							Attributes: map[string]schema.Attribute{
+								"dns_name": schema.StringAttribute{
+									MarkdownDescription: "DNS Name. DNS Name .",
+									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`), ""),
+									},
+								},
+							},
+							Blocks: map[string]schema.Block{
+								"private_network": schema.SingleNestedBlock{
+									MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+									Attributes: map[string]schema.Attribute{
+										"name": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
+										},
+										"namespace": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
+										},
+										"tenant": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"advanced_options": schema.SingleNestedBlock{
 				MarkdownDescription: "Configure Advanced OPTIONS for origin pool.",
 				Attributes: map[string]schema.Attribute{
@@ -1032,14 +1775,18 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 						MarkdownDescription: "The idle timeout for upstream connection pool connections. The idle timeout is defined as the period in which there are no active requests. When the idle timeout is reached the connection will be closed.",
 						Optional:            true,
 					},
+					"max_requests_per_connection": schema.Int64Attribute{
+						MarkdownDescription: "Exclusive with [no_request_limit_per_connection] Sets the maximum number of requests allowed per connection to the origin server. Enter a value >=1 to define the request limit per connection.",
+						Optional:            true,
+					},
 					"panic_threshold": schema.Int64Attribute{
-						MarkdownDescription: "Configure a threshold (percentage of unhealthy endpoints) below which all endpoints will be considered for load balancing ignoring its health status.",
+						MarkdownDescription: "Exclusive with [no_panic_threshold] Configure a threshold (percentage of unhealthy endpoints) below which all endpoints will be considered for load balancing ignoring its health status.",
 						Optional:            true,
 					},
 				},
 				Blocks: map[string]schema.Block{
 					"auto_http_config": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+						MarkdownDescription: "Enable this option",
 					},
 					"circuit_breaker": schema.SingleNestedBlock{
 						MarkdownDescription: "CircuitBreaker provides a mechanism for watching failures in upstream connections or requests and if the failures reach a certain threshold, automatically fail subsequent requests which allows to apply back pressure on downstream quickly.",
@@ -1059,6 +1806,9 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"priority": schema.StringAttribute{
 								MarkdownDescription: "[Enum: DEFAULT|HIGH] Priority routing for each request. Different connection pools are used based on the priority selected for the request. Also, circuit-breaker configuration at destination cluster is chosen based on selected priority. Possible values are `DEFAULT`, `HIGH`. Defaults to `DEFAULT`.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.OneOf("DEFAULT", "HIGH"),
+								},
 							},
 							"retries": schema.Int64Attribute{
 								MarkdownDescription: "The maximum number of retries that can be outstanding to all hosts in a cluster at any given time. Remove endpoint out of load balancing decision, if retries for request exceed this count.",
@@ -1067,22 +1817,22 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"default_circuit_breaker": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+						MarkdownDescription: "Configuration parameter for default circuit breaker.",
 					},
 					"disable_circuit_breaker": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable circuit breaker.",
 					},
 					"disable_lb_source_ip_persistance": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+						MarkdownDescription: "Enable this option",
 					},
 					"disable_outlier_detection": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+						MarkdownDescription: "Configuration parameter for disable outlier detection.",
 					},
 					"disable_proxy_protocol": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+						MarkdownDescription: "Configuration parameter for disable proxy protocol.",
 					},
 					"disable_subsets": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+						MarkdownDescription: "Configuration parameter for disable subsets.",
 					},
 					"enable_lb_source_ip_persistance": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
@@ -1095,7 +1845,7 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 								MarkdownDescription: "Enable this option",
 							},
 							"default_subset": schema.SingleNestedBlock{
-								MarkdownDescription: "Origin Pool Default Subset. Default Subset definition.",
+								MarkdownDescription: "Configuration parameter for default subset.",
 								Attributes:          map[string]schema.Attribute{},
 								Blocks: map[string]schema.Block{
 									"default_subset": schema.SingleNestedBlock{
@@ -1104,19 +1854,22 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 								},
 							},
 							"endpoint_subsets": schema.ListNestedBlock{
-								MarkdownDescription: "List of subset class. Subsets class is defined using list of keys. Every unique combination of values of these keys form a subset withing the class.",
+								MarkdownDescription: "List of subset class. Subsets class is defined using list of keys. Every unique combination of values of these keys form a subset within the class.",
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"keys": schema.ListAttribute{
 											MarkdownDescription: "List of keys that define a cluster subset class.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 									},
 								},
 							},
 							"fail_request": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for fail request.",
 							},
 						},
 					},
@@ -1154,10 +1907,13 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"no_panic_threshold": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+						MarkdownDescription: "Configuration parameter for no panic threshold.",
+					},
+					"no_request_limit_per_connection": schema.SingleNestedBlock{
+						MarkdownDescription: "Configuration parameter for no request limit per connection.",
 					},
 					"outlier_detection": schema.SingleNestedBlock{
-						MarkdownDescription: "Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checking. Algorithm 1.",
+						MarkdownDescription: "Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkingg. Algorithm 1.",
 						Attributes: map[string]schema.Attribute{
 							"base_ejection_time": schema.Int64Attribute{
 								MarkdownDescription: "The base time that a host is ejected for. The real time is equal to the base time multiplied by the number of times the host has been ejected. This causes hosts to GET ejected for longer periods if they continue to fail.",
@@ -1182,635 +1938,28 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"proxy_protocol_v1": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for proxy protocol v1.",
 					},
 					"proxy_protocol_v2": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for proxy protocol v2.",
 					},
 				},
 			},
 			"automatic_port": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: automatic_port, lb_port, port] Enable this option",
 			},
-			"healthcheck": schema.ListNestedBlock{
-				MarkdownDescription: "Reference to healthcheck configuration objects. Defaults to `[]`. Server applies default when omitted.",
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"name": schema.StringAttribute{
-							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-							Optional:            true,
-						},
-						"namespace": schema.StringAttribute{
-							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-							Optional:            true,
-							Computed:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.UseStateForUnknown(),
-							},
-						},
-						"tenant": schema.StringAttribute{
-							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-							Optional:            true,
-							Computed:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.UseStateForUnknown(),
-							},
-						},
-					},
-				},
-			},
 			"lb_port": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
-			},
-			"no_tls": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: no_tls, use_tls; Default: no_tls] Enable this option. Defaults to `map[]`. Server applies default when omitted.",
-			},
-			"origin_servers": schema.ListNestedBlock{
-				MarkdownDescription: "List of origin servers in this pool .",
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{},
-					Blocks: map[string]schema.Block{
-						"cbip_service": schema.SingleNestedBlock{
-							MarkdownDescription: "Specify origin server with Classic BIG-IP Service (Virtual Server).",
-							Attributes: map[string]schema.Attribute{
-								"service_name": schema.StringAttribute{
-									MarkdownDescription: "Name of the discovered Classic BIG-IP virtual server to be used as origin.",
-									Optional:            true,
-								},
-							},
-						},
-						"consul_service": schema.SingleNestedBlock{
-							MarkdownDescription: "Specify origin server with Hashi Corp Consul service name and site information.",
-							Attributes: map[string]schema.Attribute{
-								"service_name": schema.StringAttribute{
-									MarkdownDescription: "Consul service name of this origin server will be listed, including cluster-ID. The format is servicename:cluster-ID.",
-									Optional:            true,
-								},
-							},
-							Blocks: map[string]schema.Block{
-								"inside_network": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
-								},
-								"outside_network": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
-								},
-								"site_locator": schema.SingleNestedBlock{
-									MarkdownDescription: "Message defines a reference to a site or virtual site object.",
-									Attributes:          map[string]schema.Attribute{},
-									Blocks: map[string]schema.Block{
-										"site": schema.SingleNestedBlock{
-											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-											Attributes: map[string]schema.Attribute{
-												"name": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-													Optional:            true,
-												},
-												"namespace": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-												"tenant": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-											},
-										},
-										"virtual_site": schema.SingleNestedBlock{
-											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-											Attributes: map[string]schema.Attribute{
-												"name": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-													Optional:            true,
-												},
-												"namespace": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-												"tenant": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-											},
-										},
-									},
-								},
-								"snat_pool": schema.SingleNestedBlock{
-									MarkdownDescription: "SNAT Pool. SNAT Pool configuration.",
-									Attributes:          map[string]schema.Attribute{},
-									Blocks: map[string]schema.Block{
-										"no_snat_pool": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
-										},
-										"snat_pool": schema.SingleNestedBlock{
-											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
-											Attributes: map[string]schema.Attribute{
-												"prefixes": schema.ListAttribute{
-													MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
-													Optional:            true,
-													ElementType:         types.StringType,
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-						"custom_endpoint_object": schema.SingleNestedBlock{
-							MarkdownDescription: "Specify origin server with a reference to endpoint object.",
-							Attributes:          map[string]schema.Attribute{},
-							Blocks: map[string]schema.Block{
-								"endpoint": schema.SingleNestedBlock{
-									MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-									Attributes: map[string]schema.Attribute{
-										"name": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-											Optional:            true,
-										},
-										"namespace": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-											Optional:            true,
-											Computed:            true,
-											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
-											},
-										},
-										"tenant": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-											Optional:            true,
-											Computed:            true,
-											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
-											},
-										},
-									},
-								},
-							},
-						},
-						"k8s_service": schema.SingleNestedBlock{
-							MarkdownDescription: "Specify origin server with K8s service name and site information.",
-							Attributes: map[string]schema.Attribute{
-								"protocol": schema.StringAttribute{
-									MarkdownDescription: "[Enum: PROTOCOL_TCP|PROTOCOL_UDP] Type of protocol - PROTOCOL_TCP: TCP - PROTOCOL_UDP: UDP. Possible values are `PROTOCOL_TCP`, `PROTOCOL_UDP`. Defaults to `PROTOCOL_TCP`.",
-									Optional:            true,
-								},
-								"service_name": schema.StringAttribute{
-									MarkdownDescription: "K8s service name of the origin server will be listed, including the namespace and cluster-ID. For vK8s services, you need to enter a string with the format servicename.namespace:cluster-ID. If the servicename is 'frontend', namespace is 'speedtest' and cluster-ID is 'prod'..",
-									Optional:            true,
-								},
-							},
-							Blocks: map[string]schema.Block{
-								"inside_network": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
-								},
-								"outside_network": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
-								},
-								"site_locator": schema.SingleNestedBlock{
-									MarkdownDescription: "Message defines a reference to a site or virtual site object.",
-									Attributes:          map[string]schema.Attribute{},
-									Blocks: map[string]schema.Block{
-										"site": schema.SingleNestedBlock{
-											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-											Attributes: map[string]schema.Attribute{
-												"name": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-													Optional:            true,
-												},
-												"namespace": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-												"tenant": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-											},
-										},
-										"virtual_site": schema.SingleNestedBlock{
-											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-											Attributes: map[string]schema.Attribute{
-												"name": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-													Optional:            true,
-												},
-												"namespace": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-												"tenant": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-											},
-										},
-									},
-								},
-								"snat_pool": schema.SingleNestedBlock{
-									MarkdownDescription: "SNAT Pool. SNAT Pool configuration.",
-									Attributes:          map[string]schema.Attribute{},
-									Blocks: map[string]schema.Block{
-										"no_snat_pool": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
-										},
-										"snat_pool": schema.SingleNestedBlock{
-											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
-											Attributes: map[string]schema.Attribute{
-												"prefixes": schema.ListAttribute{
-													MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
-													Optional:            true,
-													ElementType:         types.StringType,
-												},
-											},
-										},
-									},
-								},
-								"vk8s_networks": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
-								},
-							},
-						},
-						"labels": schema.SingleNestedBlock{
-							MarkdownDescription: "Add Labels for this origin server, these labels can be used to form subset.",
-						},
-						"private_ip": schema.SingleNestedBlock{
-							MarkdownDescription: "Specify origin server with private or public IP address and site information.",
-							Attributes: map[string]schema.Attribute{
-								"ip": schema.StringAttribute{
-									MarkdownDescription: "IP. Private IPv4 address.",
-									Optional:            true,
-								},
-							},
-							Blocks: map[string]schema.Block{
-								"inside_network": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
-								},
-								"outside_network": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
-								},
-								"segment": schema.SingleNestedBlock{
-									MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-									Attributes: map[string]schema.Attribute{
-										"name": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-											Optional:            true,
-										},
-										"namespace": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-											Optional:            true,
-											Computed:            true,
-											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
-											},
-										},
-										"tenant": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-											Optional:            true,
-											Computed:            true,
-											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
-											},
-										},
-									},
-								},
-								"site_locator": schema.SingleNestedBlock{
-									MarkdownDescription: "Message defines a reference to a site or virtual site object.",
-									Attributes:          map[string]schema.Attribute{},
-									Blocks: map[string]schema.Block{
-										"site": schema.SingleNestedBlock{
-											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-											Attributes: map[string]schema.Attribute{
-												"name": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-													Optional:            true,
-												},
-												"namespace": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-												"tenant": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-											},
-										},
-										"virtual_site": schema.SingleNestedBlock{
-											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-											Attributes: map[string]schema.Attribute{
-												"name": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-													Optional:            true,
-												},
-												"namespace": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-												"tenant": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-											},
-										},
-									},
-								},
-								"snat_pool": schema.SingleNestedBlock{
-									MarkdownDescription: "SNAT Pool. SNAT Pool configuration.",
-									Attributes:          map[string]schema.Attribute{},
-									Blocks: map[string]schema.Block{
-										"no_snat_pool": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
-										},
-										"snat_pool": schema.SingleNestedBlock{
-											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
-											Attributes: map[string]schema.Attribute{
-												"prefixes": schema.ListAttribute{
-													MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
-													Optional:            true,
-													ElementType:         types.StringType,
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-						"private_name": schema.SingleNestedBlock{
-							MarkdownDescription: "Specify origin server with private or public DNS name and site information.",
-							Attributes: map[string]schema.Attribute{
-								"dns_name": schema.StringAttribute{
-									MarkdownDescription: "DNS Name. DNS Name .",
-									Optional:            true,
-								},
-								"refresh_interval": schema.Int64Attribute{
-									MarkdownDescription: "Interval for DNS refresh in seconds. Max value is 7 days as per https://datatracker.ietf.org/doc/HTML/rfc8767.",
-									Optional:            true,
-								},
-							},
-							Blocks: map[string]schema.Block{
-								"inside_network": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
-								},
-								"outside_network": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
-								},
-								"segment": schema.SingleNestedBlock{
-									MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-									Attributes: map[string]schema.Attribute{
-										"name": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-											Optional:            true,
-										},
-										"namespace": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-											Optional:            true,
-											Computed:            true,
-											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
-											},
-										},
-										"tenant": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-											Optional:            true,
-											Computed:            true,
-											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
-											},
-										},
-									},
-								},
-								"site_locator": schema.SingleNestedBlock{
-									MarkdownDescription: "Message defines a reference to a site or virtual site object.",
-									Attributes:          map[string]schema.Attribute{},
-									Blocks: map[string]schema.Block{
-										"site": schema.SingleNestedBlock{
-											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-											Attributes: map[string]schema.Attribute{
-												"name": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-													Optional:            true,
-												},
-												"namespace": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-												"tenant": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-											},
-										},
-										"virtual_site": schema.SingleNestedBlock{
-											MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-											Attributes: map[string]schema.Attribute{
-												"name": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-													Optional:            true,
-												},
-												"namespace": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-												"tenant": schema.StringAttribute{
-													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-													Optional:            true,
-													Computed:            true,
-													PlanModifiers: []planmodifier.String{
-														stringplanmodifier.UseStateForUnknown(),
-													},
-												},
-											},
-										},
-									},
-								},
-								"snat_pool": schema.SingleNestedBlock{
-									MarkdownDescription: "SNAT Pool. SNAT Pool configuration.",
-									Attributes:          map[string]schema.Attribute{},
-									Blocks: map[string]schema.Block{
-										"no_snat_pool": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
-										},
-										"snat_pool": schema.SingleNestedBlock{
-											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
-											Attributes: map[string]schema.Attribute{
-												"prefixes": schema.ListAttribute{
-													MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
-													Optional:            true,
-													ElementType:         types.StringType,
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-						"public_ip": schema.SingleNestedBlock{
-							MarkdownDescription: "Specify origin server with public IP address.",
-							Attributes: map[string]schema.Attribute{
-								"ip": schema.StringAttribute{
-									MarkdownDescription: "Public IPv4. Public IPv4 address.",
-									Optional:            true,
-								},
-							},
-						},
-						"public_name": schema.SingleNestedBlock{
-							MarkdownDescription: "Specify origin server with public DNS name.",
-							Attributes: map[string]schema.Attribute{
-								"dns_name": schema.StringAttribute{
-									MarkdownDescription: "DNS Name. DNS Name .",
-									Optional:            true,
-								},
-								"refresh_interval": schema.Int64Attribute{
-									MarkdownDescription: "Interval for DNS refresh in seconds. Max value is 7 days as per https://datatracker.ietf.org/doc/HTML/rfc8767.",
-									Optional:            true,
-								},
-							},
-						},
-						"vn_private_ip": schema.SingleNestedBlock{
-							MarkdownDescription: "Specify origin server with IP on Virtual Network.",
-							Attributes: map[string]schema.Attribute{
-								"ip": schema.StringAttribute{
-									MarkdownDescription: "IPv4. IPv4 address.",
-									Optional:            true,
-								},
-							},
-							Blocks: map[string]schema.Block{
-								"virtual_network": schema.SingleNestedBlock{
-									MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-									Attributes: map[string]schema.Attribute{
-										"name": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-											Optional:            true,
-										},
-										"namespace": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-											Optional:            true,
-											Computed:            true,
-											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
-											},
-										},
-										"tenant": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-											Optional:            true,
-											Computed:            true,
-											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
-											},
-										},
-									},
-								},
-							},
-						},
-						"vn_private_name": schema.SingleNestedBlock{
-							MarkdownDescription: "Specify origin server with DNS name on Virtual Network.",
-							Attributes: map[string]schema.Attribute{
-								"dns_name": schema.StringAttribute{
-									MarkdownDescription: "DNS Name. DNS Name .",
-									Optional:            true,
-								},
-							},
-							Blocks: map[string]schema.Block{
-								"private_network": schema.SingleNestedBlock{
-									MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
-									Attributes: map[string]schema.Attribute{
-										"name": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
-											Optional:            true,
-										},
-										"namespace": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
-											Optional:            true,
-											Computed:            true,
-											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
-											},
-										},
-										"tenant": schema.StringAttribute{
-											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
-											Optional:            true,
-											Computed:            true,
-											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			"same_as_endpoint_port": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
 			},
 			"upstream_conn_pool_reuse_type": schema.SingleNestedBlock{
 				MarkdownDescription: "Select upstream connection pool reuse state for every downstream connection. This configuration choice is for HTTP(S) LB only.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"disable_conn_pool_reuse": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable conn pool reuse.",
 					},
 					"enable_conn_pool_reuse": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for enable conn pool reuse.",
 					},
 				},
 			},
@@ -1818,23 +1967,26 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 				MarkdownDescription: "TLS Parameters for Origin Servers. Upstream TLS Parameters.",
 				Attributes: map[string]schema.Attribute{
 					"max_session_keys": schema.Int64Attribute{
-						MarkdownDescription: "Number of session keys that are cached.",
+						MarkdownDescription: "Exclusive with [default_session_key_caching disable_session_key_caching] Number of session keys that are cached.",
 						Optional:            true,
 					},
 					"sni": schema.StringAttribute{
-						MarkdownDescription: "SNI value to be used.",
+						MarkdownDescription: "Exclusive with [disable_sni use_host_header_as_sni] SNI value to be used.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(256),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
 					"default_session_key_caching": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for default session key caching.",
 					},
 					"disable_session_key_caching": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable session key caching.",
 					},
 					"disable_sni": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable sni.",
 					},
 					"no_mtls": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
@@ -1857,10 +2009,16 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 									"max_version": schema.StringAttribute{
 										MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+										},
 									},
 									"min_version": schema.StringAttribute{
 										MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+										},
 									},
 								},
 							},
@@ -1889,6 +2047,9 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 										"certificate_url": schema.StringAttribute{
 											MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Description for the certificate.",
@@ -1903,11 +2064,14 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 													MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeBetween(1, 4),
+													},
 												},
 											},
 										},
 										"disable_ocsp_stapling": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 										},
 										"private_key": schema.SingleNestedBlock{
 											MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -1923,6 +2087,9 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1940,13 +2107,16 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
 											},
 										},
 										"use_system_defaults": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for use system defaults.",
 										},
 									},
 								},
@@ -1959,6 +2129,9 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1966,6 +2139,9 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
 								},
 							},
 							"tenant": schema.StringAttribute{
@@ -1975,15 +2151,21 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 						},
 					},
 					"use_server_verification": schema.SingleNestedBlock{
-						MarkdownDescription: "TLS Validation Context for Origin Servers. Upstream TLS Validation Context.",
+						MarkdownDescription: "Configuration parameter for use server verification.",
 						Attributes: map[string]schema.Attribute{
 							"trusted_ca_url": schema.StringAttribute{
-								MarkdownDescription: "Upload a Root CA Certificate specifically for this Origin Pool for verification of server's certificate.",
+								MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Origin Pool for verification of server's certificate.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 131072),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -1993,6 +2175,9 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2000,6 +2185,9 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
 										},
 									},
 									"tenant": schema.StringAttribute{
@@ -2009,15 +2197,60 @@ func (r *OriginPoolResource) Schema(ctx context.Context, req resource.SchemaRequ
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
 										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
+										},
 									},
 								},
 							},
 						},
 					},
 					"volterra_trusted_ca": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for volterra trusted ca.",
 					},
 				},
+			},
+			"healthcheck": schema.ListNestedBlock{
+				MarkdownDescription: "Reference to healthcheck configuration objects. Defaults to `[]`. Server applies default when omitted.",
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 128),
+							},
+						},
+						"namespace": schema.StringAttribute{
+							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+							Optional:            true,
+							Computed:            true,
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 64),
+							},
+						},
+						"tenant": schema.StringAttribute{
+							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+							Optional:            true,
+							Computed:            true,
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(64),
+							},
+						},
+					},
+				},
+			},
+			"no_tls": schema.SingleNestedBlock{
+				MarkdownDescription: "[OneOf: no_tls, use_tls; Default: no_tls] Enable this option. Defaults to `map[]`. Server applies default when omitted.",
+			},
+			"same_as_endpoint_port": schema.SingleNestedBlock{
+				MarkdownDescription: "Enable this option. Defaults to `map[]`. Server applies default when omitted.",
 			},
 		},
 	}
@@ -2125,139 +2358,6 @@ func (r *OriginPoolResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.AdvancedOptions != nil {
-		advanced_optionsMap := make(map[string]interface{})
-		if data.AdvancedOptions.AutoHTTPConfig != nil {
-			advanced_optionsMap["auto_http_config"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.CircuitBreaker != nil {
-			circuit_breakerNestedMap := make(map[string]interface{})
-			if !data.AdvancedOptions.CircuitBreaker.ConnectionLimit.IsNull() && !data.AdvancedOptions.CircuitBreaker.ConnectionLimit.IsUnknown() {
-				circuit_breakerNestedMap["connection_limit"] = data.AdvancedOptions.CircuitBreaker.ConnectionLimit.ValueInt64()
-			}
-			if !data.AdvancedOptions.CircuitBreaker.MaxRequests.IsNull() && !data.AdvancedOptions.CircuitBreaker.MaxRequests.IsUnknown() {
-				circuit_breakerNestedMap["max_requests"] = data.AdvancedOptions.CircuitBreaker.MaxRequests.ValueInt64()
-			}
-			if !data.AdvancedOptions.CircuitBreaker.PendingRequests.IsNull() && !data.AdvancedOptions.CircuitBreaker.PendingRequests.IsUnknown() {
-				circuit_breakerNestedMap["pending_requests"] = data.AdvancedOptions.CircuitBreaker.PendingRequests.ValueInt64()
-			}
-			if !data.AdvancedOptions.CircuitBreaker.Priority.IsNull() && !data.AdvancedOptions.CircuitBreaker.Priority.IsUnknown() {
-				circuit_breakerNestedMap["priority"] = data.AdvancedOptions.CircuitBreaker.Priority.ValueString()
-			}
-			if !data.AdvancedOptions.CircuitBreaker.Retries.IsNull() && !data.AdvancedOptions.CircuitBreaker.Retries.IsUnknown() {
-				circuit_breakerNestedMap["retries"] = data.AdvancedOptions.CircuitBreaker.Retries.ValueInt64()
-			}
-			advanced_optionsMap["circuit_breaker"] = circuit_breakerNestedMap
-		}
-		if !data.AdvancedOptions.ConnectionTimeout.IsNull() && !data.AdvancedOptions.ConnectionTimeout.IsUnknown() {
-			advanced_optionsMap["connection_timeout"] = data.AdvancedOptions.ConnectionTimeout.ValueInt64()
-		}
-		if data.AdvancedOptions.DefaultCircuitBreaker != nil {
-			advanced_optionsMap["default_circuit_breaker"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.DisableCircuitBreaker != nil {
-			advanced_optionsMap["disable_circuit_breaker"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.DisableLBSourceIPPersistance != nil {
-			advanced_optionsMap["disable_lb_source_ip_persistance"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.DisableOutlierDetection != nil {
-			advanced_optionsMap["disable_outlier_detection"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.DisableProxyProtocol != nil {
-			advanced_optionsMap["disable_proxy_protocol"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.DisableSubsets != nil {
-			advanced_optionsMap["disable_subsets"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.EnableLBSourceIPPersistance != nil {
-			advanced_optionsMap["enable_lb_source_ip_persistance"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.EnableSubsets != nil {
-			enable_subsetsNestedMap := make(map[string]interface{})
-			advanced_optionsMap["enable_subsets"] = enable_subsetsNestedMap
-		}
-		if data.AdvancedOptions.Http1Config != nil {
-			http1_configNestedMap := make(map[string]interface{})
-			advanced_optionsMap["http1_config"] = http1_configNestedMap
-		}
-		if data.AdvancedOptions.Http2Options != nil {
-			http2_optionsNestedMap := make(map[string]interface{})
-			if !data.AdvancedOptions.Http2Options.Enabled.IsNull() && !data.AdvancedOptions.Http2Options.Enabled.IsUnknown() {
-				http2_optionsNestedMap["enabled"] = data.AdvancedOptions.Http2Options.Enabled.ValueBool()
-			}
-			advanced_optionsMap["http2_options"] = http2_optionsNestedMap
-		}
-		if !data.AdvancedOptions.HTTPIdleTimeout.IsNull() && !data.AdvancedOptions.HTTPIdleTimeout.IsUnknown() {
-			advanced_optionsMap["http_idle_timeout"] = data.AdvancedOptions.HTTPIdleTimeout.ValueInt64()
-		}
-		if data.AdvancedOptions.NoPanicThreshold != nil {
-			advanced_optionsMap["no_panic_threshold"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.OutlierDetection != nil {
-			outlier_detectionNestedMap := make(map[string]interface{})
-			if !data.AdvancedOptions.OutlierDetection.BaseEjectionTime.IsNull() && !data.AdvancedOptions.OutlierDetection.BaseEjectionTime.IsUnknown() {
-				outlier_detectionNestedMap["base_ejection_time"] = data.AdvancedOptions.OutlierDetection.BaseEjectionTime.ValueInt64()
-			}
-			if !data.AdvancedOptions.OutlierDetection.Consecutive5xx.IsNull() && !data.AdvancedOptions.OutlierDetection.Consecutive5xx.IsUnknown() {
-				outlier_detectionNestedMap["consecutive_5xx"] = data.AdvancedOptions.OutlierDetection.Consecutive5xx.ValueInt64()
-			}
-			if !data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.IsNull() && !data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.IsUnknown() {
-				outlier_detectionNestedMap["consecutive_gateway_failure"] = data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.ValueInt64()
-			}
-			if !data.AdvancedOptions.OutlierDetection.Interval.IsNull() && !data.AdvancedOptions.OutlierDetection.Interval.IsUnknown() {
-				outlier_detectionNestedMap["interval"] = data.AdvancedOptions.OutlierDetection.Interval.ValueInt64()
-			}
-			if !data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.IsNull() && !data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.IsUnknown() {
-				outlier_detectionNestedMap["max_ejection_percent"] = data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.ValueInt64()
-			}
-			advanced_optionsMap["outlier_detection"] = outlier_detectionNestedMap
-		}
-		if !data.AdvancedOptions.PanicThreshold.IsNull() && !data.AdvancedOptions.PanicThreshold.IsUnknown() {
-			advanced_optionsMap["panic_threshold"] = data.AdvancedOptions.PanicThreshold.ValueInt64()
-		}
-		if data.AdvancedOptions.ProxyProtocolV1 != nil {
-			advanced_optionsMap["proxy_protocol_v1"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.ProxyProtocolV2 != nil {
-			advanced_optionsMap["proxy_protocol_v2"] = map[string]interface{}{}
-		}
-		createReq.Spec["advanced_options"] = advanced_optionsMap
-	}
-	if data.AutomaticPort != nil {
-		automatic_portMap := make(map[string]interface{})
-		createReq.Spec["automatic_port"] = automatic_portMap
-	}
-	if !data.Healthcheck.IsNull() && !data.Healthcheck.IsUnknown() {
-		var healthcheckItems []OriginPoolHealthcheckModel
-		diags := data.Healthcheck.ElementsAs(ctx, &healthcheckItems, false)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() && len(healthcheckItems) > 0 {
-			var healthcheckList []map[string]interface{}
-			for _, item := range healthcheckItems {
-				itemMap := make(map[string]interface{})
-				if !item.Name.IsNull() && !item.Name.IsUnknown() {
-					itemMap["name"] = item.Name.ValueString()
-				}
-				if !item.Namespace.IsNull() && !item.Namespace.IsUnknown() {
-					itemMap["namespace"] = item.Namespace.ValueString()
-				}
-				if !item.Tenant.IsNull() && !item.Tenant.IsUnknown() {
-					itemMap["tenant"] = item.Tenant.ValueString()
-				}
-				healthcheckList = append(healthcheckList, itemMap)
-			}
-			createReq.Spec["healthcheck"] = healthcheckList
-		}
-	}
-	if data.LBPort != nil {
-		lb_portMap := make(map[string]interface{})
-		createReq.Spec["lb_port"] = lb_portMap
-	}
-	if data.NoTLS != nil {
-		no_tlsMap := make(map[string]interface{})
-		createReq.Spec["no_tls"] = no_tlsMap
-	}
 	if !data.OriginServers.IsNull() && !data.OriginServers.IsUnknown() {
 		var origin_serversItems []OriginPoolOriginServersModel
 		diags := data.OriginServers.ElementsAs(ctx, &origin_serversItems, false)
@@ -2486,9 +2586,118 @@ func (r *OriginPoolResource) Create(ctx context.Context, req resource.CreateRequ
 			createReq.Spec["origin_servers"] = origin_serversList
 		}
 	}
-	if data.SameAsEndpointPort != nil {
-		same_as_endpoint_portMap := make(map[string]interface{})
-		createReq.Spec["same_as_endpoint_port"] = same_as_endpoint_portMap
+	if data.AdvancedOptions != nil {
+		advanced_optionsMap := make(map[string]interface{})
+		if data.AdvancedOptions.AutoHTTPConfig != nil {
+			advanced_optionsMap["auto_http_config"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.CircuitBreaker != nil {
+			circuit_breakerNestedMap := make(map[string]interface{})
+			if !data.AdvancedOptions.CircuitBreaker.ConnectionLimit.IsNull() && !data.AdvancedOptions.CircuitBreaker.ConnectionLimit.IsUnknown() {
+				circuit_breakerNestedMap["connection_limit"] = data.AdvancedOptions.CircuitBreaker.ConnectionLimit.ValueInt64()
+			}
+			if !data.AdvancedOptions.CircuitBreaker.MaxRequests.IsNull() && !data.AdvancedOptions.CircuitBreaker.MaxRequests.IsUnknown() {
+				circuit_breakerNestedMap["max_requests"] = data.AdvancedOptions.CircuitBreaker.MaxRequests.ValueInt64()
+			}
+			if !data.AdvancedOptions.CircuitBreaker.PendingRequests.IsNull() && !data.AdvancedOptions.CircuitBreaker.PendingRequests.IsUnknown() {
+				circuit_breakerNestedMap["pending_requests"] = data.AdvancedOptions.CircuitBreaker.PendingRequests.ValueInt64()
+			}
+			if !data.AdvancedOptions.CircuitBreaker.Priority.IsNull() && !data.AdvancedOptions.CircuitBreaker.Priority.IsUnknown() {
+				circuit_breakerNestedMap["priority"] = data.AdvancedOptions.CircuitBreaker.Priority.ValueString()
+			}
+			if !data.AdvancedOptions.CircuitBreaker.Retries.IsNull() && !data.AdvancedOptions.CircuitBreaker.Retries.IsUnknown() {
+				circuit_breakerNestedMap["retries"] = data.AdvancedOptions.CircuitBreaker.Retries.ValueInt64()
+			}
+			advanced_optionsMap["circuit_breaker"] = circuit_breakerNestedMap
+		}
+		if !data.AdvancedOptions.ConnectionTimeout.IsNull() && !data.AdvancedOptions.ConnectionTimeout.IsUnknown() {
+			advanced_optionsMap["connection_timeout"] = data.AdvancedOptions.ConnectionTimeout.ValueInt64()
+		}
+		if data.AdvancedOptions.DefaultCircuitBreaker != nil {
+			advanced_optionsMap["default_circuit_breaker"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.DisableCircuitBreaker != nil {
+			advanced_optionsMap["disable_circuit_breaker"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.DisableLBSourceIPPersistance != nil {
+			advanced_optionsMap["disable_lb_source_ip_persistance"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.DisableOutlierDetection != nil {
+			advanced_optionsMap["disable_outlier_detection"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.DisableProxyProtocol != nil {
+			advanced_optionsMap["disable_proxy_protocol"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.DisableSubsets != nil {
+			advanced_optionsMap["disable_subsets"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.EnableLBSourceIPPersistance != nil {
+			advanced_optionsMap["enable_lb_source_ip_persistance"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.EnableSubsets != nil {
+			enable_subsetsNestedMap := make(map[string]interface{})
+			advanced_optionsMap["enable_subsets"] = enable_subsetsNestedMap
+		}
+		if data.AdvancedOptions.Http1Config != nil {
+			http1_configNestedMap := make(map[string]interface{})
+			advanced_optionsMap["http1_config"] = http1_configNestedMap
+		}
+		if data.AdvancedOptions.Http2Options != nil {
+			http2_optionsNestedMap := make(map[string]interface{})
+			if !data.AdvancedOptions.Http2Options.Enabled.IsNull() && !data.AdvancedOptions.Http2Options.Enabled.IsUnknown() {
+				http2_optionsNestedMap["enabled"] = data.AdvancedOptions.Http2Options.Enabled.ValueBool()
+			}
+			advanced_optionsMap["http2_options"] = http2_optionsNestedMap
+		}
+		if !data.AdvancedOptions.HTTPIdleTimeout.IsNull() && !data.AdvancedOptions.HTTPIdleTimeout.IsUnknown() {
+			advanced_optionsMap["http_idle_timeout"] = data.AdvancedOptions.HTTPIdleTimeout.ValueInt64()
+		}
+		if !data.AdvancedOptions.MaxRequestsPerConnection.IsNull() && !data.AdvancedOptions.MaxRequestsPerConnection.IsUnknown() {
+			advanced_optionsMap["max_requests_per_connection"] = data.AdvancedOptions.MaxRequestsPerConnection.ValueInt64()
+		}
+		if data.AdvancedOptions.NoPanicThreshold != nil {
+			advanced_optionsMap["no_panic_threshold"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.NoRequestLimitPerConnection != nil {
+			advanced_optionsMap["no_request_limit_per_connection"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.OutlierDetection != nil {
+			outlier_detectionNestedMap := make(map[string]interface{})
+			if !data.AdvancedOptions.OutlierDetection.BaseEjectionTime.IsNull() && !data.AdvancedOptions.OutlierDetection.BaseEjectionTime.IsUnknown() {
+				outlier_detectionNestedMap["base_ejection_time"] = data.AdvancedOptions.OutlierDetection.BaseEjectionTime.ValueInt64()
+			}
+			if !data.AdvancedOptions.OutlierDetection.Consecutive5xx.IsNull() && !data.AdvancedOptions.OutlierDetection.Consecutive5xx.IsUnknown() {
+				outlier_detectionNestedMap["consecutive_5xx"] = data.AdvancedOptions.OutlierDetection.Consecutive5xx.ValueInt64()
+			}
+			if !data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.IsNull() && !data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.IsUnknown() {
+				outlier_detectionNestedMap["consecutive_gateway_failure"] = data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.ValueInt64()
+			}
+			if !data.AdvancedOptions.OutlierDetection.Interval.IsNull() && !data.AdvancedOptions.OutlierDetection.Interval.IsUnknown() {
+				outlier_detectionNestedMap["interval"] = data.AdvancedOptions.OutlierDetection.Interval.ValueInt64()
+			}
+			if !data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.IsNull() && !data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.IsUnknown() {
+				outlier_detectionNestedMap["max_ejection_percent"] = data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.ValueInt64()
+			}
+			advanced_optionsMap["outlier_detection"] = outlier_detectionNestedMap
+		}
+		if !data.AdvancedOptions.PanicThreshold.IsNull() && !data.AdvancedOptions.PanicThreshold.IsUnknown() {
+			advanced_optionsMap["panic_threshold"] = data.AdvancedOptions.PanicThreshold.ValueInt64()
+		}
+		if data.AdvancedOptions.ProxyProtocolV1 != nil {
+			advanced_optionsMap["proxy_protocol_v1"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.ProxyProtocolV2 != nil {
+			advanced_optionsMap["proxy_protocol_v2"] = map[string]interface{}{}
+		}
+		createReq.Spec["advanced_options"] = advanced_optionsMap
+	}
+	if data.AutomaticPort != nil {
+		automatic_portMap := make(map[string]interface{})
+		createReq.Spec["automatic_port"] = automatic_portMap
+	}
+	if data.LBPort != nil {
+		lb_portMap := make(map[string]interface{})
+		createReq.Spec["lb_port"] = lb_portMap
 	}
 	if data.UpstreamConnPoolReuseType != nil {
 		upstream_conn_pool_reuse_typeMap := make(map[string]interface{})
@@ -2565,11 +2774,41 @@ func (r *OriginPoolResource) Create(ctx context.Context, req resource.CreateRequ
 	if !data.HealthCheckPort.IsNull() && !data.HealthCheckPort.IsUnknown() {
 		createReq.Spec["health_check_port"] = data.HealthCheckPort.ValueInt64()
 	}
+	if !data.Healthcheck.IsNull() && !data.Healthcheck.IsUnknown() {
+		var healthcheckItems []OriginPoolHealthcheckModel
+		diags := data.Healthcheck.ElementsAs(ctx, &healthcheckItems, false)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() && len(healthcheckItems) > 0 {
+			var healthcheckList []map[string]interface{}
+			for _, item := range healthcheckItems {
+				itemMap := make(map[string]interface{})
+				if !item.Name.IsNull() && !item.Name.IsUnknown() {
+					itemMap["name"] = item.Name.ValueString()
+				}
+				if !item.Namespace.IsNull() && !item.Namespace.IsUnknown() {
+					itemMap["namespace"] = item.Namespace.ValueString()
+				}
+				if !item.Tenant.IsNull() && !item.Tenant.IsUnknown() {
+					itemMap["tenant"] = item.Tenant.ValueString()
+				}
+				healthcheckList = append(healthcheckList, itemMap)
+			}
+			createReq.Spec["healthcheck"] = healthcheckList
+		}
+	}
 	if !data.LoadBalancerAlgorithm.IsNull() && !data.LoadBalancerAlgorithm.IsUnknown() {
 		createReq.Spec["loadbalancer_algorithm"] = data.LoadBalancerAlgorithm.ValueString()
 	}
+	if data.NoTLS != nil {
+		no_tlsMap := make(map[string]interface{})
+		createReq.Spec["no_tls"] = no_tlsMap
+	}
 	if !data.Port.IsNull() && !data.Port.IsUnknown() {
 		createReq.Spec["port"] = data.Port.ValueInt64()
+	}
+	if data.SameAsEndpointPort != nil {
+		same_as_endpoint_portMap := make(map[string]interface{})
+		createReq.Spec["same_as_endpoint_port"] = same_as_endpoint_portMap
 	}
 
 	apiResource, err := r.client.CreateOriginPool(ctx, createReq)
@@ -2584,369 +2823,6 @@ func (r *OriginPoolResource) Create(ctx context.Context, req resource.CreateRequ
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
-	if blockData, ok := apiResource.Spec["advanced_options"].(map[string]interface{}); ok && (isImport || data.AdvancedOptions != nil) {
-		data.AdvancedOptions = &OriginPoolAdvancedOptionsModel{
-			AutoHTTPConfig: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.AutoHTTPConfig
-				}
-				// Import case: read from API
-				if _, ok := blockData["auto_http_config"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			CircuitBreaker: func() *OriginPoolAdvancedOptionsCircuitBreakerModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.CircuitBreaker != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.CircuitBreaker
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["circuit_breaker"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsCircuitBreakerModel{
-						ConnectionLimit: func() types.Int64 {
-							if v, ok := nestedBlockData["connection_limit"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						MaxRequests: func() types.Int64 {
-							if v, ok := nestedBlockData["max_requests"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						PendingRequests: func() types.Int64 {
-							if v, ok := nestedBlockData["pending_requests"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						Priority: func() types.String {
-							if v, ok := nestedBlockData["priority"].(string); ok && v != "" {
-								return types.StringValue(v)
-							}
-							return types.StringNull()
-						}(),
-						Retries: func() types.Int64 {
-							if v, ok := nestedBlockData["retries"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-					}
-				}
-				return nil
-			}(),
-			ConnectionTimeout: func() types.Int64 {
-				if !isImport && data.AdvancedOptions != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults (like 0) from overwriting user intent
-					return data.AdvancedOptions.ConnectionTimeout
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.Int64Null()
-				}
-				// Import case: read from API
-				if v, ok := blockData["connection_timeout"].(float64); ok {
-					return types.Int64Value(int64(v))
-				}
-				return types.Int64Null()
-			}(),
-			DefaultCircuitBreaker: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DefaultCircuitBreaker
-				}
-				// Import case: read from API
-				if _, ok := blockData["default_circuit_breaker"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableCircuitBreaker: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableCircuitBreaker
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_circuit_breaker"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableLBSourceIPPersistance
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_lb_source_ip_persistance"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableOutlierDetection: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableOutlierDetection
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_outlier_detection"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableProxyProtocol: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableProxyProtocol
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_proxy_protocol"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableSubsets: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableSubsets
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_subsets"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			EnableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.EnableLBSourceIPPersistance
-				}
-				// Import case: read from API
-				if _, ok := blockData["enable_lb_source_ip_persistance"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			EnableSubsets: func() *OriginPoolAdvancedOptionsEnableSubsetsModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.EnableSubsets != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.EnableSubsets
-				}
-				// Import case: read from API
-				if _, ok := blockData["enable_subsets"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsEnableSubsetsModel{}
-				}
-				return nil
-			}(),
-			Http1Config: func() *OriginPoolAdvancedOptionsHttp1ConfigModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http1Config != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.Http1Config
-				}
-				// Import case: read from API
-				if _, ok := blockData["http1_config"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsHttp1ConfigModel{}
-				}
-				return nil
-			}(),
-			Http2Options: func() *OriginPoolAdvancedOptionsHttp2OptionsModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http2Options != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.Http2Options
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["http2_options"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsHttp2OptionsModel{
-						Enabled: func() types.Bool {
-							if v, ok := nestedBlockData["enabled"].(bool); ok {
-								return types.BoolValue(v)
-							}
-							return types.BoolNull()
-						}(),
-					}
-				}
-				return nil
-			}(),
-			HTTPIdleTimeout: func() types.Int64 {
-				if !isImport && data.AdvancedOptions != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults (like 0) from overwriting user intent
-					return data.AdvancedOptions.HTTPIdleTimeout
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.Int64Null()
-				}
-				// Import case: read from API
-				if v, ok := blockData["http_idle_timeout"].(float64); ok {
-					return types.Int64Value(int64(v))
-				}
-				return types.Int64Null()
-			}(),
-			NoPanicThreshold: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.NoPanicThreshold
-				}
-				// Import case: read from API
-				if _, ok := blockData["no_panic_threshold"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			OutlierDetection: func() *OriginPoolAdvancedOptionsOutlierDetectionModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.OutlierDetection != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.OutlierDetection
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["outlier_detection"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsOutlierDetectionModel{
-						BaseEjectionTime: func() types.Int64 {
-							if v, ok := nestedBlockData["base_ejection_time"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						Consecutive5xx: func() types.Int64 {
-							if v, ok := nestedBlockData["consecutive_5xx"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						ConsecutiveGatewayFailure: func() types.Int64 {
-							if v, ok := nestedBlockData["consecutive_gateway_failure"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						Interval: func() types.Int64 {
-							if v, ok := nestedBlockData["interval"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						MaxEjectionPercent: func() types.Int64 {
-							if v, ok := nestedBlockData["max_ejection_percent"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-					}
-				}
-				return nil
-			}(),
-			PanicThreshold: func() types.Int64 {
-				if !isImport && data.AdvancedOptions != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults (like 0) from overwriting user intent
-					return data.AdvancedOptions.PanicThreshold
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.Int64Null()
-				}
-				// Import case: read from API
-				if v, ok := blockData["panic_threshold"].(float64); ok {
-					return types.Int64Value(int64(v))
-				}
-				return types.Int64Null()
-			}(),
-			ProxyProtocolV1: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.ProxyProtocolV1
-				}
-				// Import case: read from API
-				if _, ok := blockData["proxy_protocol_v1"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			ProxyProtocolV2: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.ProxyProtocolV2
-				}
-				// Import case: read from API
-				if _, ok := blockData["proxy_protocol_v2"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-		}
-	}
-	if _, ok := apiResource.Spec["automatic_port"].(map[string]interface{}); ok && isImport && data.AutomaticPort == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.AutomaticPort = &OriginPoolEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if listData, ok := apiResource.Spec["healthcheck"].([]interface{}); ok && len(listData) > 0 {
-		var healthcheckList []OriginPoolHealthcheckModel
-		var existingHealthcheckItems []OriginPoolHealthcheckModel
-		if !data.Healthcheck.IsNull() && !data.Healthcheck.IsUnknown() {
-			data.Healthcheck.ElementsAs(ctx, &existingHealthcheckItems, false)
-		}
-		for listIdx, item := range listData {
-			_ = listIdx // May be unused if no empty marker blocks in list item
-			if itemMap, ok := item.(map[string]interface{}); ok {
-				healthcheckList = append(healthcheckList, OriginPoolHealthcheckModel{
-					Name: func() types.String {
-						if v, ok := itemMap["name"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Namespace: func() types.String {
-						if v, ok := itemMap["namespace"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Tenant: func() types.String {
-						if v, ok := itemMap["tenant"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-				})
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes}, healthcheckList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Healthcheck = listVal
-		}
-	} else {
-		// No data from API - set to null list
-		data.Healthcheck = types.ListNull(types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes})
-	}
-	if _, ok := apiResource.Spec["lb_port"].(map[string]interface{}); ok && isImport && data.LBPort == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.LBPort = &OriginPoolEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["no_tls"].(map[string]interface{}); ok && isImport && data.NoTLS == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.NoTLS = &OriginPoolEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["origin_servers"].([]interface{}); ok && len(listData) > 0 {
 		var origin_serversList []OriginPoolOriginServersModel
 		var existingOriginServersItems []OriginPoolOriginServersModel
@@ -3170,9 +3046,350 @@ func (r *OriginPoolResource) Create(ctx context.Context, req resource.CreateRequ
 		// No data from API - set to null list
 		data.OriginServers = types.ListNull(types.ObjectType{AttrTypes: OriginPoolOriginServersModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["same_as_endpoint_port"].(map[string]interface{}); ok && isImport && data.SameAsEndpointPort == nil {
+	if blockData, ok := apiResource.Spec["advanced_options"].(map[string]interface{}); ok && (isImport || data.AdvancedOptions != nil) {
+		data.AdvancedOptions = &OriginPoolAdvancedOptionsModel{
+			AutoHTTPConfig: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.AutoHTTPConfig
+				}
+				// Import case: read from API
+				if _, ok := blockData["auto_http_config"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			CircuitBreaker: func() *OriginPoolAdvancedOptionsCircuitBreakerModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.CircuitBreaker != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.CircuitBreaker
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["circuit_breaker"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsCircuitBreakerModel{
+						ConnectionLimit: func() types.Int64 {
+							if v, ok := nestedBlockData["connection_limit"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						MaxRequests: func() types.Int64 {
+							if v, ok := nestedBlockData["max_requests"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						PendingRequests: func() types.Int64 {
+							if v, ok := nestedBlockData["pending_requests"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						Priority: func() types.String {
+							if v, ok := nestedBlockData["priority"].(string); ok && v != "" {
+								return types.StringValue(v)
+							}
+							return types.StringNull()
+						}(),
+						Retries: func() types.Int64 {
+							if v, ok := nestedBlockData["retries"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+					}
+				}
+				return nil
+			}(),
+			ConnectionTimeout: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.ConnectionTimeout
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["connection_timeout"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			DefaultCircuitBreaker: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DefaultCircuitBreaker
+				}
+				// Import case: read from API
+				if _, ok := blockData["default_circuit_breaker"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableCircuitBreaker: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableCircuitBreaker
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_circuit_breaker"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableLBSourceIPPersistance
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_lb_source_ip_persistance"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableOutlierDetection: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableOutlierDetection
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_outlier_detection"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableProxyProtocol: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableProxyProtocol
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_proxy_protocol"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableSubsets: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableSubsets
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_subsets"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			EnableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.EnableLBSourceIPPersistance
+				}
+				// Import case: read from API
+				if _, ok := blockData["enable_lb_source_ip_persistance"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			EnableSubsets: func() *OriginPoolAdvancedOptionsEnableSubsetsModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.EnableSubsets != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.EnableSubsets
+				}
+				// Import case: read from API
+				if _, ok := blockData["enable_subsets"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsEnableSubsetsModel{}
+				}
+				return nil
+			}(),
+			Http1Config: func() *OriginPoolAdvancedOptionsHttp1ConfigModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http1Config != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.Http1Config
+				}
+				// Import case: read from API
+				if _, ok := blockData["http1_config"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsHttp1ConfigModel{}
+				}
+				return nil
+			}(),
+			Http2Options: func() *OriginPoolAdvancedOptionsHttp2OptionsModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http2Options != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.Http2Options
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["http2_options"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsHttp2OptionsModel{
+						Enabled: func() types.Bool {
+							if v, ok := nestedBlockData["enabled"].(bool); ok {
+								return types.BoolValue(v)
+							}
+							return types.BoolNull()
+						}(),
+					}
+				}
+				return nil
+			}(),
+			HTTPIdleTimeout: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.HTTPIdleTimeout
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["http_idle_timeout"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			MaxRequestsPerConnection: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.MaxRequestsPerConnection
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["max_requests_per_connection"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			NoPanicThreshold: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.NoPanicThreshold
+				}
+				// Import case: read from API
+				if _, ok := blockData["no_panic_threshold"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			NoRequestLimitPerConnection: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.NoRequestLimitPerConnection
+				}
+				// Import case: read from API
+				if _, ok := blockData["no_request_limit_per_connection"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			OutlierDetection: func() *OriginPoolAdvancedOptionsOutlierDetectionModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.OutlierDetection != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.OutlierDetection
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["outlier_detection"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsOutlierDetectionModel{
+						BaseEjectionTime: func() types.Int64 {
+							if v, ok := nestedBlockData["base_ejection_time"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						Consecutive5xx: func() types.Int64 {
+							if v, ok := nestedBlockData["consecutive_5xx"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						ConsecutiveGatewayFailure: func() types.Int64 {
+							if v, ok := nestedBlockData["consecutive_gateway_failure"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						Interval: func() types.Int64 {
+							if v, ok := nestedBlockData["interval"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						MaxEjectionPercent: func() types.Int64 {
+							if v, ok := nestedBlockData["max_ejection_percent"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+					}
+				}
+				return nil
+			}(),
+			PanicThreshold: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.PanicThreshold
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["panic_threshold"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			ProxyProtocolV1: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.ProxyProtocolV1
+				}
+				// Import case: read from API
+				if _, ok := blockData["proxy_protocol_v1"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			ProxyProtocolV2: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.ProxyProtocolV2
+				}
+				// Import case: read from API
+				if _, ok := blockData["proxy_protocol_v2"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+		}
+	}
+	if _, ok := apiResource.Spec["automatic_port"].(map[string]interface{}); ok && isImport && data.AutomaticPort == nil {
 		// Import case: populate from API since state is nil and psd is empty
-		data.SameAsEndpointPort = &OriginPoolEmptyModel{}
+		data.AutomaticPort = &OriginPoolEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["lb_port"].(map[string]interface{}); ok && isImport && data.LBPort == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.LBPort = &OriginPoolEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["upstream_conn_pool_reuse_type"].(map[string]interface{}); ok && isImport && data.UpstreamConnPoolReuseType == nil {
@@ -3370,16 +3587,66 @@ func (r *OriginPoolResource) Create(ctx context.Context, req resource.CreateRequ
 	} else {
 		data.HealthCheckPort = types.Int64Null()
 	}
+	if listData, ok := apiResource.Spec["healthcheck"].([]interface{}); ok && len(listData) > 0 {
+		var healthcheckList []OriginPoolHealthcheckModel
+		var existingHealthcheckItems []OriginPoolHealthcheckModel
+		if !data.Healthcheck.IsNull() && !data.Healthcheck.IsUnknown() {
+			data.Healthcheck.ElementsAs(ctx, &existingHealthcheckItems, false)
+		}
+		for listIdx, item := range listData {
+			_ = listIdx // May be unused if no empty marker blocks in list item
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				healthcheckList = append(healthcheckList, OriginPoolHealthcheckModel{
+					Name: func() types.String {
+						if v, ok := itemMap["name"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Namespace: func() types.String {
+						if v, ok := itemMap["namespace"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Tenant: func() types.String {
+						if v, ok := itemMap["tenant"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+				})
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes}, healthcheckList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Healthcheck = listVal
+		}
+	} else {
+		// No data from API - set to null list
+		data.Healthcheck = types.ListNull(types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes})
+	}
 	if v, ok := apiResource.Spec["loadbalancer_algorithm"].(string); ok && v != "" {
 		data.LoadBalancerAlgorithm = types.StringValue(v)
 	} else {
 		data.LoadBalancerAlgorithm = types.StringNull()
 	}
+	if _, ok := apiResource.Spec["no_tls"].(map[string]interface{}); ok && isImport && data.NoTLS == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoTLS = &OriginPoolEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if v, ok := apiResource.Spec["port"].(float64); ok {
 		data.Port = types.Int64Value(int64(v))
 	} else {
 		data.Port = types.Int64Null()
 	}
+	if _, ok := apiResource.Spec["same_as_endpoint_port"].(map[string]interface{}); ok && isImport && data.SameAsEndpointPort == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.SameAsEndpointPort = &OriginPoolEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	tflog.Trace(ctx, "created OriginPool resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -3460,369 +3727,6 @@ func (r *OriginPoolResource) Read(ctx context.Context, req resource.ReadRequest,
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
-	if blockData, ok := apiResource.Spec["advanced_options"].(map[string]interface{}); ok && (isImport || data.AdvancedOptions != nil) {
-		data.AdvancedOptions = &OriginPoolAdvancedOptionsModel{
-			AutoHTTPConfig: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.AutoHTTPConfig
-				}
-				// Import case: read from API
-				if _, ok := blockData["auto_http_config"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			CircuitBreaker: func() *OriginPoolAdvancedOptionsCircuitBreakerModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.CircuitBreaker != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.CircuitBreaker
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["circuit_breaker"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsCircuitBreakerModel{
-						ConnectionLimit: func() types.Int64 {
-							if v, ok := nestedBlockData["connection_limit"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						MaxRequests: func() types.Int64 {
-							if v, ok := nestedBlockData["max_requests"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						PendingRequests: func() types.Int64 {
-							if v, ok := nestedBlockData["pending_requests"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						Priority: func() types.String {
-							if v, ok := nestedBlockData["priority"].(string); ok && v != "" {
-								return types.StringValue(v)
-							}
-							return types.StringNull()
-						}(),
-						Retries: func() types.Int64 {
-							if v, ok := nestedBlockData["retries"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-					}
-				}
-				return nil
-			}(),
-			ConnectionTimeout: func() types.Int64 {
-				if !isImport && data.AdvancedOptions != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults (like 0) from overwriting user intent
-					return data.AdvancedOptions.ConnectionTimeout
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.Int64Null()
-				}
-				// Import case: read from API
-				if v, ok := blockData["connection_timeout"].(float64); ok {
-					return types.Int64Value(int64(v))
-				}
-				return types.Int64Null()
-			}(),
-			DefaultCircuitBreaker: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DefaultCircuitBreaker
-				}
-				// Import case: read from API
-				if _, ok := blockData["default_circuit_breaker"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableCircuitBreaker: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableCircuitBreaker
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_circuit_breaker"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableLBSourceIPPersistance
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_lb_source_ip_persistance"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableOutlierDetection: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableOutlierDetection
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_outlier_detection"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableProxyProtocol: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableProxyProtocol
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_proxy_protocol"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableSubsets: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableSubsets
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_subsets"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			EnableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.EnableLBSourceIPPersistance
-				}
-				// Import case: read from API
-				if _, ok := blockData["enable_lb_source_ip_persistance"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			EnableSubsets: func() *OriginPoolAdvancedOptionsEnableSubsetsModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.EnableSubsets != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.EnableSubsets
-				}
-				// Import case: read from API
-				if _, ok := blockData["enable_subsets"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsEnableSubsetsModel{}
-				}
-				return nil
-			}(),
-			Http1Config: func() *OriginPoolAdvancedOptionsHttp1ConfigModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http1Config != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.Http1Config
-				}
-				// Import case: read from API
-				if _, ok := blockData["http1_config"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsHttp1ConfigModel{}
-				}
-				return nil
-			}(),
-			Http2Options: func() *OriginPoolAdvancedOptionsHttp2OptionsModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http2Options != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.Http2Options
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["http2_options"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsHttp2OptionsModel{
-						Enabled: func() types.Bool {
-							if v, ok := nestedBlockData["enabled"].(bool); ok {
-								return types.BoolValue(v)
-							}
-							return types.BoolNull()
-						}(),
-					}
-				}
-				return nil
-			}(),
-			HTTPIdleTimeout: func() types.Int64 {
-				if !isImport && data.AdvancedOptions != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults (like 0) from overwriting user intent
-					return data.AdvancedOptions.HTTPIdleTimeout
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.Int64Null()
-				}
-				// Import case: read from API
-				if v, ok := blockData["http_idle_timeout"].(float64); ok {
-					return types.Int64Value(int64(v))
-				}
-				return types.Int64Null()
-			}(),
-			NoPanicThreshold: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.NoPanicThreshold
-				}
-				// Import case: read from API
-				if _, ok := blockData["no_panic_threshold"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			OutlierDetection: func() *OriginPoolAdvancedOptionsOutlierDetectionModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.OutlierDetection != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.OutlierDetection
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["outlier_detection"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsOutlierDetectionModel{
-						BaseEjectionTime: func() types.Int64 {
-							if v, ok := nestedBlockData["base_ejection_time"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						Consecutive5xx: func() types.Int64 {
-							if v, ok := nestedBlockData["consecutive_5xx"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						ConsecutiveGatewayFailure: func() types.Int64 {
-							if v, ok := nestedBlockData["consecutive_gateway_failure"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						Interval: func() types.Int64 {
-							if v, ok := nestedBlockData["interval"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						MaxEjectionPercent: func() types.Int64 {
-							if v, ok := nestedBlockData["max_ejection_percent"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-					}
-				}
-				return nil
-			}(),
-			PanicThreshold: func() types.Int64 {
-				if !isImport && data.AdvancedOptions != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults (like 0) from overwriting user intent
-					return data.AdvancedOptions.PanicThreshold
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.Int64Null()
-				}
-				// Import case: read from API
-				if v, ok := blockData["panic_threshold"].(float64); ok {
-					return types.Int64Value(int64(v))
-				}
-				return types.Int64Null()
-			}(),
-			ProxyProtocolV1: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.ProxyProtocolV1
-				}
-				// Import case: read from API
-				if _, ok := blockData["proxy_protocol_v1"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			ProxyProtocolV2: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.ProxyProtocolV2
-				}
-				// Import case: read from API
-				if _, ok := blockData["proxy_protocol_v2"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-		}
-	}
-	if _, ok := apiResource.Spec["automatic_port"].(map[string]interface{}); ok && isImport && data.AutomaticPort == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.AutomaticPort = &OriginPoolEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if listData, ok := apiResource.Spec["healthcheck"].([]interface{}); ok && len(listData) > 0 {
-		var healthcheckList []OriginPoolHealthcheckModel
-		var existingHealthcheckItems []OriginPoolHealthcheckModel
-		if !data.Healthcheck.IsNull() && !data.Healthcheck.IsUnknown() {
-			data.Healthcheck.ElementsAs(ctx, &existingHealthcheckItems, false)
-		}
-		for listIdx, item := range listData {
-			_ = listIdx // May be unused if no empty marker blocks in list item
-			if itemMap, ok := item.(map[string]interface{}); ok {
-				healthcheckList = append(healthcheckList, OriginPoolHealthcheckModel{
-					Name: func() types.String {
-						if v, ok := itemMap["name"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Namespace: func() types.String {
-						if v, ok := itemMap["namespace"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Tenant: func() types.String {
-						if v, ok := itemMap["tenant"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-				})
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes}, healthcheckList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Healthcheck = listVal
-		}
-	} else {
-		// No data from API - set to null list
-		data.Healthcheck = types.ListNull(types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes})
-	}
-	if _, ok := apiResource.Spec["lb_port"].(map[string]interface{}); ok && isImport && data.LBPort == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.LBPort = &OriginPoolEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["no_tls"].(map[string]interface{}); ok && isImport && data.NoTLS == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.NoTLS = &OriginPoolEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["origin_servers"].([]interface{}); ok && len(listData) > 0 {
 		var origin_serversList []OriginPoolOriginServersModel
 		var existingOriginServersItems []OriginPoolOriginServersModel
@@ -4046,9 +3950,350 @@ func (r *OriginPoolResource) Read(ctx context.Context, req resource.ReadRequest,
 		// No data from API - set to null list
 		data.OriginServers = types.ListNull(types.ObjectType{AttrTypes: OriginPoolOriginServersModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["same_as_endpoint_port"].(map[string]interface{}); ok && isImport && data.SameAsEndpointPort == nil {
+	if blockData, ok := apiResource.Spec["advanced_options"].(map[string]interface{}); ok && (isImport || data.AdvancedOptions != nil) {
+		data.AdvancedOptions = &OriginPoolAdvancedOptionsModel{
+			AutoHTTPConfig: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.AutoHTTPConfig
+				}
+				// Import case: read from API
+				if _, ok := blockData["auto_http_config"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			CircuitBreaker: func() *OriginPoolAdvancedOptionsCircuitBreakerModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.CircuitBreaker != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.CircuitBreaker
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["circuit_breaker"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsCircuitBreakerModel{
+						ConnectionLimit: func() types.Int64 {
+							if v, ok := nestedBlockData["connection_limit"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						MaxRequests: func() types.Int64 {
+							if v, ok := nestedBlockData["max_requests"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						PendingRequests: func() types.Int64 {
+							if v, ok := nestedBlockData["pending_requests"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						Priority: func() types.String {
+							if v, ok := nestedBlockData["priority"].(string); ok && v != "" {
+								return types.StringValue(v)
+							}
+							return types.StringNull()
+						}(),
+						Retries: func() types.Int64 {
+							if v, ok := nestedBlockData["retries"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+					}
+				}
+				return nil
+			}(),
+			ConnectionTimeout: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.ConnectionTimeout
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["connection_timeout"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			DefaultCircuitBreaker: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DefaultCircuitBreaker
+				}
+				// Import case: read from API
+				if _, ok := blockData["default_circuit_breaker"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableCircuitBreaker: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableCircuitBreaker
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_circuit_breaker"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableLBSourceIPPersistance
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_lb_source_ip_persistance"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableOutlierDetection: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableOutlierDetection
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_outlier_detection"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableProxyProtocol: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableProxyProtocol
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_proxy_protocol"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableSubsets: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableSubsets
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_subsets"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			EnableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.EnableLBSourceIPPersistance
+				}
+				// Import case: read from API
+				if _, ok := blockData["enable_lb_source_ip_persistance"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			EnableSubsets: func() *OriginPoolAdvancedOptionsEnableSubsetsModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.EnableSubsets != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.EnableSubsets
+				}
+				// Import case: read from API
+				if _, ok := blockData["enable_subsets"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsEnableSubsetsModel{}
+				}
+				return nil
+			}(),
+			Http1Config: func() *OriginPoolAdvancedOptionsHttp1ConfigModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http1Config != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.Http1Config
+				}
+				// Import case: read from API
+				if _, ok := blockData["http1_config"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsHttp1ConfigModel{}
+				}
+				return nil
+			}(),
+			Http2Options: func() *OriginPoolAdvancedOptionsHttp2OptionsModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http2Options != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.Http2Options
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["http2_options"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsHttp2OptionsModel{
+						Enabled: func() types.Bool {
+							if v, ok := nestedBlockData["enabled"].(bool); ok {
+								return types.BoolValue(v)
+							}
+							return types.BoolNull()
+						}(),
+					}
+				}
+				return nil
+			}(),
+			HTTPIdleTimeout: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.HTTPIdleTimeout
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["http_idle_timeout"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			MaxRequestsPerConnection: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.MaxRequestsPerConnection
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["max_requests_per_connection"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			NoPanicThreshold: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.NoPanicThreshold
+				}
+				// Import case: read from API
+				if _, ok := blockData["no_panic_threshold"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			NoRequestLimitPerConnection: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.NoRequestLimitPerConnection
+				}
+				// Import case: read from API
+				if _, ok := blockData["no_request_limit_per_connection"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			OutlierDetection: func() *OriginPoolAdvancedOptionsOutlierDetectionModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.OutlierDetection != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.OutlierDetection
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["outlier_detection"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsOutlierDetectionModel{
+						BaseEjectionTime: func() types.Int64 {
+							if v, ok := nestedBlockData["base_ejection_time"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						Consecutive5xx: func() types.Int64 {
+							if v, ok := nestedBlockData["consecutive_5xx"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						ConsecutiveGatewayFailure: func() types.Int64 {
+							if v, ok := nestedBlockData["consecutive_gateway_failure"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						Interval: func() types.Int64 {
+							if v, ok := nestedBlockData["interval"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						MaxEjectionPercent: func() types.Int64 {
+							if v, ok := nestedBlockData["max_ejection_percent"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+					}
+				}
+				return nil
+			}(),
+			PanicThreshold: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.PanicThreshold
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["panic_threshold"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			ProxyProtocolV1: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.ProxyProtocolV1
+				}
+				// Import case: read from API
+				if _, ok := blockData["proxy_protocol_v1"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			ProxyProtocolV2: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.ProxyProtocolV2
+				}
+				// Import case: read from API
+				if _, ok := blockData["proxy_protocol_v2"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+		}
+	}
+	if _, ok := apiResource.Spec["automatic_port"].(map[string]interface{}); ok && isImport && data.AutomaticPort == nil {
 		// Import case: populate from API since state is nil and psd is empty
-		data.SameAsEndpointPort = &OriginPoolEmptyModel{}
+		data.AutomaticPort = &OriginPoolEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["lb_port"].(map[string]interface{}); ok && isImport && data.LBPort == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.LBPort = &OriginPoolEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["upstream_conn_pool_reuse_type"].(map[string]interface{}); ok && isImport && data.UpstreamConnPoolReuseType == nil {
@@ -4246,16 +4491,66 @@ func (r *OriginPoolResource) Read(ctx context.Context, req resource.ReadRequest,
 	} else {
 		data.HealthCheckPort = types.Int64Null()
 	}
+	if listData, ok := apiResource.Spec["healthcheck"].([]interface{}); ok && len(listData) > 0 {
+		var healthcheckList []OriginPoolHealthcheckModel
+		var existingHealthcheckItems []OriginPoolHealthcheckModel
+		if !data.Healthcheck.IsNull() && !data.Healthcheck.IsUnknown() {
+			data.Healthcheck.ElementsAs(ctx, &existingHealthcheckItems, false)
+		}
+		for listIdx, item := range listData {
+			_ = listIdx // May be unused if no empty marker blocks in list item
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				healthcheckList = append(healthcheckList, OriginPoolHealthcheckModel{
+					Name: func() types.String {
+						if v, ok := itemMap["name"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Namespace: func() types.String {
+						if v, ok := itemMap["namespace"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Tenant: func() types.String {
+						if v, ok := itemMap["tenant"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+				})
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes}, healthcheckList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Healthcheck = listVal
+		}
+	} else {
+		// No data from API - set to null list
+		data.Healthcheck = types.ListNull(types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes})
+	}
 	if v, ok := apiResource.Spec["loadbalancer_algorithm"].(string); ok && v != "" {
 		data.LoadBalancerAlgorithm = types.StringValue(v)
 	} else {
 		data.LoadBalancerAlgorithm = types.StringNull()
 	}
+	if _, ok := apiResource.Spec["no_tls"].(map[string]interface{}); ok && isImport && data.NoTLS == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoTLS = &OriginPoolEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if v, ok := apiResource.Spec["port"].(float64); ok {
 		data.Port = types.Int64Value(int64(v))
 	} else {
 		data.Port = types.Int64Null()
 	}
+	if _, ok := apiResource.Spec["same_as_endpoint_port"].(map[string]interface{}); ok && isImport && data.SameAsEndpointPort == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.SameAsEndpointPort = &OriginPoolEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -4307,139 +4602,6 @@ func (r *OriginPoolResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.AdvancedOptions != nil {
-		advanced_optionsMap := make(map[string]interface{})
-		if data.AdvancedOptions.AutoHTTPConfig != nil {
-			advanced_optionsMap["auto_http_config"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.CircuitBreaker != nil {
-			circuit_breakerNestedMap := make(map[string]interface{})
-			if !data.AdvancedOptions.CircuitBreaker.ConnectionLimit.IsNull() && !data.AdvancedOptions.CircuitBreaker.ConnectionLimit.IsUnknown() {
-				circuit_breakerNestedMap["connection_limit"] = data.AdvancedOptions.CircuitBreaker.ConnectionLimit.ValueInt64()
-			}
-			if !data.AdvancedOptions.CircuitBreaker.MaxRequests.IsNull() && !data.AdvancedOptions.CircuitBreaker.MaxRequests.IsUnknown() {
-				circuit_breakerNestedMap["max_requests"] = data.AdvancedOptions.CircuitBreaker.MaxRequests.ValueInt64()
-			}
-			if !data.AdvancedOptions.CircuitBreaker.PendingRequests.IsNull() && !data.AdvancedOptions.CircuitBreaker.PendingRequests.IsUnknown() {
-				circuit_breakerNestedMap["pending_requests"] = data.AdvancedOptions.CircuitBreaker.PendingRequests.ValueInt64()
-			}
-			if !data.AdvancedOptions.CircuitBreaker.Priority.IsNull() && !data.AdvancedOptions.CircuitBreaker.Priority.IsUnknown() {
-				circuit_breakerNestedMap["priority"] = data.AdvancedOptions.CircuitBreaker.Priority.ValueString()
-			}
-			if !data.AdvancedOptions.CircuitBreaker.Retries.IsNull() && !data.AdvancedOptions.CircuitBreaker.Retries.IsUnknown() {
-				circuit_breakerNestedMap["retries"] = data.AdvancedOptions.CircuitBreaker.Retries.ValueInt64()
-			}
-			advanced_optionsMap["circuit_breaker"] = circuit_breakerNestedMap
-		}
-		if !data.AdvancedOptions.ConnectionTimeout.IsNull() && !data.AdvancedOptions.ConnectionTimeout.IsUnknown() {
-			advanced_optionsMap["connection_timeout"] = data.AdvancedOptions.ConnectionTimeout.ValueInt64()
-		}
-		if data.AdvancedOptions.DefaultCircuitBreaker != nil {
-			advanced_optionsMap["default_circuit_breaker"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.DisableCircuitBreaker != nil {
-			advanced_optionsMap["disable_circuit_breaker"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.DisableLBSourceIPPersistance != nil {
-			advanced_optionsMap["disable_lb_source_ip_persistance"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.DisableOutlierDetection != nil {
-			advanced_optionsMap["disable_outlier_detection"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.DisableProxyProtocol != nil {
-			advanced_optionsMap["disable_proxy_protocol"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.DisableSubsets != nil {
-			advanced_optionsMap["disable_subsets"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.EnableLBSourceIPPersistance != nil {
-			advanced_optionsMap["enable_lb_source_ip_persistance"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.EnableSubsets != nil {
-			enable_subsetsNestedMap := make(map[string]interface{})
-			advanced_optionsMap["enable_subsets"] = enable_subsetsNestedMap
-		}
-		if data.AdvancedOptions.Http1Config != nil {
-			http1_configNestedMap := make(map[string]interface{})
-			advanced_optionsMap["http1_config"] = http1_configNestedMap
-		}
-		if data.AdvancedOptions.Http2Options != nil {
-			http2_optionsNestedMap := make(map[string]interface{})
-			if !data.AdvancedOptions.Http2Options.Enabled.IsNull() && !data.AdvancedOptions.Http2Options.Enabled.IsUnknown() {
-				http2_optionsNestedMap["enabled"] = data.AdvancedOptions.Http2Options.Enabled.ValueBool()
-			}
-			advanced_optionsMap["http2_options"] = http2_optionsNestedMap
-		}
-		if !data.AdvancedOptions.HTTPIdleTimeout.IsNull() && !data.AdvancedOptions.HTTPIdleTimeout.IsUnknown() {
-			advanced_optionsMap["http_idle_timeout"] = data.AdvancedOptions.HTTPIdleTimeout.ValueInt64()
-		}
-		if data.AdvancedOptions.NoPanicThreshold != nil {
-			advanced_optionsMap["no_panic_threshold"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.OutlierDetection != nil {
-			outlier_detectionNestedMap := make(map[string]interface{})
-			if !data.AdvancedOptions.OutlierDetection.BaseEjectionTime.IsNull() && !data.AdvancedOptions.OutlierDetection.BaseEjectionTime.IsUnknown() {
-				outlier_detectionNestedMap["base_ejection_time"] = data.AdvancedOptions.OutlierDetection.BaseEjectionTime.ValueInt64()
-			}
-			if !data.AdvancedOptions.OutlierDetection.Consecutive5xx.IsNull() && !data.AdvancedOptions.OutlierDetection.Consecutive5xx.IsUnknown() {
-				outlier_detectionNestedMap["consecutive_5xx"] = data.AdvancedOptions.OutlierDetection.Consecutive5xx.ValueInt64()
-			}
-			if !data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.IsNull() && !data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.IsUnknown() {
-				outlier_detectionNestedMap["consecutive_gateway_failure"] = data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.ValueInt64()
-			}
-			if !data.AdvancedOptions.OutlierDetection.Interval.IsNull() && !data.AdvancedOptions.OutlierDetection.Interval.IsUnknown() {
-				outlier_detectionNestedMap["interval"] = data.AdvancedOptions.OutlierDetection.Interval.ValueInt64()
-			}
-			if !data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.IsNull() && !data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.IsUnknown() {
-				outlier_detectionNestedMap["max_ejection_percent"] = data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.ValueInt64()
-			}
-			advanced_optionsMap["outlier_detection"] = outlier_detectionNestedMap
-		}
-		if !data.AdvancedOptions.PanicThreshold.IsNull() && !data.AdvancedOptions.PanicThreshold.IsUnknown() {
-			advanced_optionsMap["panic_threshold"] = data.AdvancedOptions.PanicThreshold.ValueInt64()
-		}
-		if data.AdvancedOptions.ProxyProtocolV1 != nil {
-			advanced_optionsMap["proxy_protocol_v1"] = map[string]interface{}{}
-		}
-		if data.AdvancedOptions.ProxyProtocolV2 != nil {
-			advanced_optionsMap["proxy_protocol_v2"] = map[string]interface{}{}
-		}
-		apiResource.Spec["advanced_options"] = advanced_optionsMap
-	}
-	if data.AutomaticPort != nil {
-		automatic_portMap := make(map[string]interface{})
-		apiResource.Spec["automatic_port"] = automatic_portMap
-	}
-	if !data.Healthcheck.IsNull() && !data.Healthcheck.IsUnknown() {
-		var healthcheckItems []OriginPoolHealthcheckModel
-		diags := data.Healthcheck.ElementsAs(ctx, &healthcheckItems, false)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() && len(healthcheckItems) > 0 {
-			var healthcheckList []map[string]interface{}
-			for _, item := range healthcheckItems {
-				itemMap := make(map[string]interface{})
-				if !item.Name.IsNull() && !item.Name.IsUnknown() {
-					itemMap["name"] = item.Name.ValueString()
-				}
-				if !item.Namespace.IsNull() && !item.Namespace.IsUnknown() {
-					itemMap["namespace"] = item.Namespace.ValueString()
-				}
-				if !item.Tenant.IsNull() && !item.Tenant.IsUnknown() {
-					itemMap["tenant"] = item.Tenant.ValueString()
-				}
-				healthcheckList = append(healthcheckList, itemMap)
-			}
-			apiResource.Spec["healthcheck"] = healthcheckList
-		}
-	}
-	if data.LBPort != nil {
-		lb_portMap := make(map[string]interface{})
-		apiResource.Spec["lb_port"] = lb_portMap
-	}
-	if data.NoTLS != nil {
-		no_tlsMap := make(map[string]interface{})
-		apiResource.Spec["no_tls"] = no_tlsMap
-	}
 	if !data.OriginServers.IsNull() && !data.OriginServers.IsUnknown() {
 		var origin_serversItems []OriginPoolOriginServersModel
 		diags := data.OriginServers.ElementsAs(ctx, &origin_serversItems, false)
@@ -4668,9 +4830,118 @@ func (r *OriginPoolResource) Update(ctx context.Context, req resource.UpdateRequ
 			apiResource.Spec["origin_servers"] = origin_serversList
 		}
 	}
-	if data.SameAsEndpointPort != nil {
-		same_as_endpoint_portMap := make(map[string]interface{})
-		apiResource.Spec["same_as_endpoint_port"] = same_as_endpoint_portMap
+	if data.AdvancedOptions != nil {
+		advanced_optionsMap := make(map[string]interface{})
+		if data.AdvancedOptions.AutoHTTPConfig != nil {
+			advanced_optionsMap["auto_http_config"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.CircuitBreaker != nil {
+			circuit_breakerNestedMap := make(map[string]interface{})
+			if !data.AdvancedOptions.CircuitBreaker.ConnectionLimit.IsNull() && !data.AdvancedOptions.CircuitBreaker.ConnectionLimit.IsUnknown() {
+				circuit_breakerNestedMap["connection_limit"] = data.AdvancedOptions.CircuitBreaker.ConnectionLimit.ValueInt64()
+			}
+			if !data.AdvancedOptions.CircuitBreaker.MaxRequests.IsNull() && !data.AdvancedOptions.CircuitBreaker.MaxRequests.IsUnknown() {
+				circuit_breakerNestedMap["max_requests"] = data.AdvancedOptions.CircuitBreaker.MaxRequests.ValueInt64()
+			}
+			if !data.AdvancedOptions.CircuitBreaker.PendingRequests.IsNull() && !data.AdvancedOptions.CircuitBreaker.PendingRequests.IsUnknown() {
+				circuit_breakerNestedMap["pending_requests"] = data.AdvancedOptions.CircuitBreaker.PendingRequests.ValueInt64()
+			}
+			if !data.AdvancedOptions.CircuitBreaker.Priority.IsNull() && !data.AdvancedOptions.CircuitBreaker.Priority.IsUnknown() {
+				circuit_breakerNestedMap["priority"] = data.AdvancedOptions.CircuitBreaker.Priority.ValueString()
+			}
+			if !data.AdvancedOptions.CircuitBreaker.Retries.IsNull() && !data.AdvancedOptions.CircuitBreaker.Retries.IsUnknown() {
+				circuit_breakerNestedMap["retries"] = data.AdvancedOptions.CircuitBreaker.Retries.ValueInt64()
+			}
+			advanced_optionsMap["circuit_breaker"] = circuit_breakerNestedMap
+		}
+		if !data.AdvancedOptions.ConnectionTimeout.IsNull() && !data.AdvancedOptions.ConnectionTimeout.IsUnknown() {
+			advanced_optionsMap["connection_timeout"] = data.AdvancedOptions.ConnectionTimeout.ValueInt64()
+		}
+		if data.AdvancedOptions.DefaultCircuitBreaker != nil {
+			advanced_optionsMap["default_circuit_breaker"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.DisableCircuitBreaker != nil {
+			advanced_optionsMap["disable_circuit_breaker"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.DisableLBSourceIPPersistance != nil {
+			advanced_optionsMap["disable_lb_source_ip_persistance"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.DisableOutlierDetection != nil {
+			advanced_optionsMap["disable_outlier_detection"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.DisableProxyProtocol != nil {
+			advanced_optionsMap["disable_proxy_protocol"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.DisableSubsets != nil {
+			advanced_optionsMap["disable_subsets"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.EnableLBSourceIPPersistance != nil {
+			advanced_optionsMap["enable_lb_source_ip_persistance"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.EnableSubsets != nil {
+			enable_subsetsNestedMap := make(map[string]interface{})
+			advanced_optionsMap["enable_subsets"] = enable_subsetsNestedMap
+		}
+		if data.AdvancedOptions.Http1Config != nil {
+			http1_configNestedMap := make(map[string]interface{})
+			advanced_optionsMap["http1_config"] = http1_configNestedMap
+		}
+		if data.AdvancedOptions.Http2Options != nil {
+			http2_optionsNestedMap := make(map[string]interface{})
+			if !data.AdvancedOptions.Http2Options.Enabled.IsNull() && !data.AdvancedOptions.Http2Options.Enabled.IsUnknown() {
+				http2_optionsNestedMap["enabled"] = data.AdvancedOptions.Http2Options.Enabled.ValueBool()
+			}
+			advanced_optionsMap["http2_options"] = http2_optionsNestedMap
+		}
+		if !data.AdvancedOptions.HTTPIdleTimeout.IsNull() && !data.AdvancedOptions.HTTPIdleTimeout.IsUnknown() {
+			advanced_optionsMap["http_idle_timeout"] = data.AdvancedOptions.HTTPIdleTimeout.ValueInt64()
+		}
+		if !data.AdvancedOptions.MaxRequestsPerConnection.IsNull() && !data.AdvancedOptions.MaxRequestsPerConnection.IsUnknown() {
+			advanced_optionsMap["max_requests_per_connection"] = data.AdvancedOptions.MaxRequestsPerConnection.ValueInt64()
+		}
+		if data.AdvancedOptions.NoPanicThreshold != nil {
+			advanced_optionsMap["no_panic_threshold"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.NoRequestLimitPerConnection != nil {
+			advanced_optionsMap["no_request_limit_per_connection"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.OutlierDetection != nil {
+			outlier_detectionNestedMap := make(map[string]interface{})
+			if !data.AdvancedOptions.OutlierDetection.BaseEjectionTime.IsNull() && !data.AdvancedOptions.OutlierDetection.BaseEjectionTime.IsUnknown() {
+				outlier_detectionNestedMap["base_ejection_time"] = data.AdvancedOptions.OutlierDetection.BaseEjectionTime.ValueInt64()
+			}
+			if !data.AdvancedOptions.OutlierDetection.Consecutive5xx.IsNull() && !data.AdvancedOptions.OutlierDetection.Consecutive5xx.IsUnknown() {
+				outlier_detectionNestedMap["consecutive_5xx"] = data.AdvancedOptions.OutlierDetection.Consecutive5xx.ValueInt64()
+			}
+			if !data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.IsNull() && !data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.IsUnknown() {
+				outlier_detectionNestedMap["consecutive_gateway_failure"] = data.AdvancedOptions.OutlierDetection.ConsecutiveGatewayFailure.ValueInt64()
+			}
+			if !data.AdvancedOptions.OutlierDetection.Interval.IsNull() && !data.AdvancedOptions.OutlierDetection.Interval.IsUnknown() {
+				outlier_detectionNestedMap["interval"] = data.AdvancedOptions.OutlierDetection.Interval.ValueInt64()
+			}
+			if !data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.IsNull() && !data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.IsUnknown() {
+				outlier_detectionNestedMap["max_ejection_percent"] = data.AdvancedOptions.OutlierDetection.MaxEjectionPercent.ValueInt64()
+			}
+			advanced_optionsMap["outlier_detection"] = outlier_detectionNestedMap
+		}
+		if !data.AdvancedOptions.PanicThreshold.IsNull() && !data.AdvancedOptions.PanicThreshold.IsUnknown() {
+			advanced_optionsMap["panic_threshold"] = data.AdvancedOptions.PanicThreshold.ValueInt64()
+		}
+		if data.AdvancedOptions.ProxyProtocolV1 != nil {
+			advanced_optionsMap["proxy_protocol_v1"] = map[string]interface{}{}
+		}
+		if data.AdvancedOptions.ProxyProtocolV2 != nil {
+			advanced_optionsMap["proxy_protocol_v2"] = map[string]interface{}{}
+		}
+		apiResource.Spec["advanced_options"] = advanced_optionsMap
+	}
+	if data.AutomaticPort != nil {
+		automatic_portMap := make(map[string]interface{})
+		apiResource.Spec["automatic_port"] = automatic_portMap
+	}
+	if data.LBPort != nil {
+		lb_portMap := make(map[string]interface{})
+		apiResource.Spec["lb_port"] = lb_portMap
 	}
 	if data.UpstreamConnPoolReuseType != nil {
 		upstream_conn_pool_reuse_typeMap := make(map[string]interface{})
@@ -4747,11 +5018,41 @@ func (r *OriginPoolResource) Update(ctx context.Context, req resource.UpdateRequ
 	if !data.HealthCheckPort.IsNull() && !data.HealthCheckPort.IsUnknown() {
 		apiResource.Spec["health_check_port"] = data.HealthCheckPort.ValueInt64()
 	}
+	if !data.Healthcheck.IsNull() && !data.Healthcheck.IsUnknown() {
+		var healthcheckItems []OriginPoolHealthcheckModel
+		diags := data.Healthcheck.ElementsAs(ctx, &healthcheckItems, false)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() && len(healthcheckItems) > 0 {
+			var healthcheckList []map[string]interface{}
+			for _, item := range healthcheckItems {
+				itemMap := make(map[string]interface{})
+				if !item.Name.IsNull() && !item.Name.IsUnknown() {
+					itemMap["name"] = item.Name.ValueString()
+				}
+				if !item.Namespace.IsNull() && !item.Namespace.IsUnknown() {
+					itemMap["namespace"] = item.Namespace.ValueString()
+				}
+				if !item.Tenant.IsNull() && !item.Tenant.IsUnknown() {
+					itemMap["tenant"] = item.Tenant.ValueString()
+				}
+				healthcheckList = append(healthcheckList, itemMap)
+			}
+			apiResource.Spec["healthcheck"] = healthcheckList
+		}
+	}
 	if !data.LoadBalancerAlgorithm.IsNull() && !data.LoadBalancerAlgorithm.IsUnknown() {
 		apiResource.Spec["loadbalancer_algorithm"] = data.LoadBalancerAlgorithm.ValueString()
 	}
+	if data.NoTLS != nil {
+		no_tlsMap := make(map[string]interface{})
+		apiResource.Spec["no_tls"] = no_tlsMap
+	}
 	if !data.Port.IsNull() && !data.Port.IsUnknown() {
 		apiResource.Spec["port"] = data.Port.ValueInt64()
+	}
+	if data.SameAsEndpointPort != nil {
+		same_as_endpoint_portMap := make(map[string]interface{})
+		apiResource.Spec["same_as_endpoint_port"] = same_as_endpoint_portMap
 	}
 
 	_, err := r.client.UpdateOriginPool(ctx, apiResource)
@@ -4793,381 +5094,11 @@ func (r *OriginPoolResource) Update(ctx context.Context, req resource.UpdateRequ
 		data.LoadBalancerAlgorithm = types.StringNull()
 	}
 	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["port"].(float64); ok {
-		data.Port = types.Int64Value(int64(v))
-	} else if data.Port.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Port = types.Int64Null()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
-	if blockData, ok := apiResource.Spec["advanced_options"].(map[string]interface{}); ok && (isImport || data.AdvancedOptions != nil) {
-		data.AdvancedOptions = &OriginPoolAdvancedOptionsModel{
-			AutoHTTPConfig: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.AutoHTTPConfig
-				}
-				// Import case: read from API
-				if _, ok := blockData["auto_http_config"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			CircuitBreaker: func() *OriginPoolAdvancedOptionsCircuitBreakerModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.CircuitBreaker != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.CircuitBreaker
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["circuit_breaker"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsCircuitBreakerModel{
-						ConnectionLimit: func() types.Int64 {
-							if v, ok := nestedBlockData["connection_limit"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						MaxRequests: func() types.Int64 {
-							if v, ok := nestedBlockData["max_requests"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						PendingRequests: func() types.Int64 {
-							if v, ok := nestedBlockData["pending_requests"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						Priority: func() types.String {
-							if v, ok := nestedBlockData["priority"].(string); ok && v != "" {
-								return types.StringValue(v)
-							}
-							return types.StringNull()
-						}(),
-						Retries: func() types.Int64 {
-							if v, ok := nestedBlockData["retries"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-					}
-				}
-				return nil
-			}(),
-			ConnectionTimeout: func() types.Int64 {
-				if !isImport && data.AdvancedOptions != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults (like 0) from overwriting user intent
-					return data.AdvancedOptions.ConnectionTimeout
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.Int64Null()
-				}
-				// Import case: read from API
-				if v, ok := blockData["connection_timeout"].(float64); ok {
-					return types.Int64Value(int64(v))
-				}
-				return types.Int64Null()
-			}(),
-			DefaultCircuitBreaker: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DefaultCircuitBreaker
-				}
-				// Import case: read from API
-				if _, ok := blockData["default_circuit_breaker"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableCircuitBreaker: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableCircuitBreaker
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_circuit_breaker"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableLBSourceIPPersistance
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_lb_source_ip_persistance"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableOutlierDetection: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableOutlierDetection
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_outlier_detection"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableProxyProtocol: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableProxyProtocol
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_proxy_protocol"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			DisableSubsets: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.DisableSubsets
-				}
-				// Import case: read from API
-				if _, ok := blockData["disable_subsets"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			EnableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.EnableLBSourceIPPersistance
-				}
-				// Import case: read from API
-				if _, ok := blockData["enable_lb_source_ip_persistance"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			EnableSubsets: func() *OriginPoolAdvancedOptionsEnableSubsetsModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.EnableSubsets != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.EnableSubsets
-				}
-				// Import case: read from API
-				if _, ok := blockData["enable_subsets"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsEnableSubsetsModel{}
-				}
-				return nil
-			}(),
-			Http1Config: func() *OriginPoolAdvancedOptionsHttp1ConfigModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http1Config != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.Http1Config
-				}
-				// Import case: read from API
-				if _, ok := blockData["http1_config"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsHttp1ConfigModel{}
-				}
-				return nil
-			}(),
-			Http2Options: func() *OriginPoolAdvancedOptionsHttp2OptionsModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http2Options != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.Http2Options
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["http2_options"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsHttp2OptionsModel{
-						Enabled: func() types.Bool {
-							if v, ok := nestedBlockData["enabled"].(bool); ok {
-								return types.BoolValue(v)
-							}
-							return types.BoolNull()
-						}(),
-					}
-				}
-				return nil
-			}(),
-			HTTPIdleTimeout: func() types.Int64 {
-				if !isImport && data.AdvancedOptions != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults (like 0) from overwriting user intent
-					return data.AdvancedOptions.HTTPIdleTimeout
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.Int64Null()
-				}
-				// Import case: read from API
-				if v, ok := blockData["http_idle_timeout"].(float64); ok {
-					return types.Int64Value(int64(v))
-				}
-				return types.Int64Null()
-			}(),
-			NoPanicThreshold: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.NoPanicThreshold
-				}
-				// Import case: read from API
-				if _, ok := blockData["no_panic_threshold"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			OutlierDetection: func() *OriginPoolAdvancedOptionsOutlierDetectionModel {
-				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.OutlierDetection != nil {
-					// Normal Read: preserve existing state value
-					return data.AdvancedOptions.OutlierDetection
-				}
-				// Import case: read from API
-				if nestedBlockData, ok := blockData["outlier_detection"].(map[string]interface{}); ok {
-					return &OriginPoolAdvancedOptionsOutlierDetectionModel{
-						BaseEjectionTime: func() types.Int64 {
-							if v, ok := nestedBlockData["base_ejection_time"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						Consecutive5xx: func() types.Int64 {
-							if v, ok := nestedBlockData["consecutive_5xx"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						ConsecutiveGatewayFailure: func() types.Int64 {
-							if v, ok := nestedBlockData["consecutive_gateway_failure"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						Interval: func() types.Int64 {
-							if v, ok := nestedBlockData["interval"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-						MaxEjectionPercent: func() types.Int64 {
-							if v, ok := nestedBlockData["max_ejection_percent"].(float64); ok {
-								return types.Int64Value(int64(v))
-							}
-							return types.Int64Null()
-						}(),
-					}
-				}
-				return nil
-			}(),
-			PanicThreshold: func() types.Int64 {
-				if !isImport && data.AdvancedOptions != nil {
-					// Preserve existing state (null or user-set value)
-					// This prevents API defaults (like 0) from overwriting user intent
-					return data.AdvancedOptions.PanicThreshold
-				}
-				if !isImport {
-					// Block not in user config - return null, not API default
-					return types.Int64Null()
-				}
-				// Import case: read from API
-				if v, ok := blockData["panic_threshold"].(float64); ok {
-					return types.Int64Value(int64(v))
-				}
-				return types.Int64Null()
-			}(),
-			ProxyProtocolV1: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.ProxyProtocolV1
-				}
-				// Import case: read from API
-				if _, ok := blockData["proxy_protocol_v1"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-			ProxyProtocolV2: func() *OriginPoolEmptyModel {
-				if !isImport && data.AdvancedOptions != nil {
-					// Normal Read: preserve existing state value (even if nil)
-					// This prevents API returning empty objects from overwriting user's 'not configured' intent
-					return data.AdvancedOptions.ProxyProtocolV2
-				}
-				// Import case: read from API
-				if _, ok := blockData["proxy_protocol_v2"].(map[string]interface{}); ok {
-					return &OriginPoolEmptyModel{}
-				}
-				return nil
-			}(),
-		}
-	}
-	if _, ok := apiResource.Spec["automatic_port"].(map[string]interface{}); ok && isImport && data.AutomaticPort == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.AutomaticPort = &OriginPoolEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if listData, ok := apiResource.Spec["healthcheck"].([]interface{}); ok && len(listData) > 0 {
-		var healthcheckList []OriginPoolHealthcheckModel
-		var existingHealthcheckItems []OriginPoolHealthcheckModel
-		if !data.Healthcheck.IsNull() && !data.Healthcheck.IsUnknown() {
-			data.Healthcheck.ElementsAs(ctx, &existingHealthcheckItems, false)
-		}
-		for listIdx, item := range listData {
-			_ = listIdx // May be unused if no empty marker blocks in list item
-			if itemMap, ok := item.(map[string]interface{}); ok {
-				healthcheckList = append(healthcheckList, OriginPoolHealthcheckModel{
-					Name: func() types.String {
-						if v, ok := itemMap["name"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Namespace: func() types.String {
-						if v, ok := itemMap["namespace"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-					Tenant: func() types.String {
-						if v, ok := itemMap["tenant"].(string); ok && v != "" {
-							return types.StringValue(v)
-						}
-						return types.StringNull()
-					}(),
-				})
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes}, healthcheckList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Healthcheck = listVal
-		}
-	} else {
-		// No data from API - set to null list
-		data.Healthcheck = types.ListNull(types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes})
-	}
-	if _, ok := apiResource.Spec["lb_port"].(map[string]interface{}); ok && isImport && data.LBPort == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.LBPort = &OriginPoolEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["no_tls"].(map[string]interface{}); ok && isImport && data.NoTLS == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.NoTLS = &OriginPoolEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["origin_servers"].([]interface{}); ok && len(listData) > 0 {
 		var origin_serversList []OriginPoolOriginServersModel
 		var existingOriginServersItems []OriginPoolOriginServersModel
@@ -5391,9 +5322,350 @@ func (r *OriginPoolResource) Update(ctx context.Context, req resource.UpdateRequ
 		// No data from API - set to null list
 		data.OriginServers = types.ListNull(types.ObjectType{AttrTypes: OriginPoolOriginServersModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["same_as_endpoint_port"].(map[string]interface{}); ok && isImport && data.SameAsEndpointPort == nil {
+	if blockData, ok := apiResource.Spec["advanced_options"].(map[string]interface{}); ok && (isImport || data.AdvancedOptions != nil) {
+		data.AdvancedOptions = &OriginPoolAdvancedOptionsModel{
+			AutoHTTPConfig: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.AutoHTTPConfig
+				}
+				// Import case: read from API
+				if _, ok := blockData["auto_http_config"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			CircuitBreaker: func() *OriginPoolAdvancedOptionsCircuitBreakerModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.CircuitBreaker != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.CircuitBreaker
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["circuit_breaker"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsCircuitBreakerModel{
+						ConnectionLimit: func() types.Int64 {
+							if v, ok := nestedBlockData["connection_limit"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						MaxRequests: func() types.Int64 {
+							if v, ok := nestedBlockData["max_requests"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						PendingRequests: func() types.Int64 {
+							if v, ok := nestedBlockData["pending_requests"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						Priority: func() types.String {
+							if v, ok := nestedBlockData["priority"].(string); ok && v != "" {
+								return types.StringValue(v)
+							}
+							return types.StringNull()
+						}(),
+						Retries: func() types.Int64 {
+							if v, ok := nestedBlockData["retries"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+					}
+				}
+				return nil
+			}(),
+			ConnectionTimeout: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.ConnectionTimeout
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["connection_timeout"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			DefaultCircuitBreaker: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DefaultCircuitBreaker
+				}
+				// Import case: read from API
+				if _, ok := blockData["default_circuit_breaker"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableCircuitBreaker: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableCircuitBreaker
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_circuit_breaker"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableLBSourceIPPersistance
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_lb_source_ip_persistance"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableOutlierDetection: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableOutlierDetection
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_outlier_detection"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableProxyProtocol: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableProxyProtocol
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_proxy_protocol"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			DisableSubsets: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.DisableSubsets
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_subsets"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			EnableLBSourceIPPersistance: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.EnableLBSourceIPPersistance
+				}
+				// Import case: read from API
+				if _, ok := blockData["enable_lb_source_ip_persistance"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			EnableSubsets: func() *OriginPoolAdvancedOptionsEnableSubsetsModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.EnableSubsets != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.EnableSubsets
+				}
+				// Import case: read from API
+				if _, ok := blockData["enable_subsets"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsEnableSubsetsModel{}
+				}
+				return nil
+			}(),
+			Http1Config: func() *OriginPoolAdvancedOptionsHttp1ConfigModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http1Config != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.Http1Config
+				}
+				// Import case: read from API
+				if _, ok := blockData["http1_config"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsHttp1ConfigModel{}
+				}
+				return nil
+			}(),
+			Http2Options: func() *OriginPoolAdvancedOptionsHttp2OptionsModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.Http2Options != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.Http2Options
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["http2_options"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsHttp2OptionsModel{
+						Enabled: func() types.Bool {
+							if v, ok := nestedBlockData["enabled"].(bool); ok {
+								return types.BoolValue(v)
+							}
+							return types.BoolNull()
+						}(),
+					}
+				}
+				return nil
+			}(),
+			HTTPIdleTimeout: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.HTTPIdleTimeout
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["http_idle_timeout"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			MaxRequestsPerConnection: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.MaxRequestsPerConnection
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["max_requests_per_connection"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			NoPanicThreshold: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.NoPanicThreshold
+				}
+				// Import case: read from API
+				if _, ok := blockData["no_panic_threshold"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			NoRequestLimitPerConnection: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.NoRequestLimitPerConnection
+				}
+				// Import case: read from API
+				if _, ok := blockData["no_request_limit_per_connection"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			OutlierDetection: func() *OriginPoolAdvancedOptionsOutlierDetectionModel {
+				if !isImport && data.AdvancedOptions != nil && data.AdvancedOptions.OutlierDetection != nil {
+					// Normal Read: preserve existing state value
+					return data.AdvancedOptions.OutlierDetection
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["outlier_detection"].(map[string]interface{}); ok {
+					return &OriginPoolAdvancedOptionsOutlierDetectionModel{
+						BaseEjectionTime: func() types.Int64 {
+							if v, ok := nestedBlockData["base_ejection_time"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						Consecutive5xx: func() types.Int64 {
+							if v, ok := nestedBlockData["consecutive_5xx"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						ConsecutiveGatewayFailure: func() types.Int64 {
+							if v, ok := nestedBlockData["consecutive_gateway_failure"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						Interval: func() types.Int64 {
+							if v, ok := nestedBlockData["interval"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+						MaxEjectionPercent: func() types.Int64 {
+							if v, ok := nestedBlockData["max_ejection_percent"].(float64); ok {
+								return types.Int64Value(int64(v))
+							}
+							return types.Int64Null()
+						}(),
+					}
+				}
+				return nil
+			}(),
+			PanicThreshold: func() types.Int64 {
+				if !isImport && data.AdvancedOptions != nil {
+					// Preserve existing state (null or user-set value)
+					// This prevents API defaults (like 0) from overwriting user intent
+					return data.AdvancedOptions.PanicThreshold
+				}
+				if !isImport {
+					// Block not in user config - return null, not API default
+					return types.Int64Null()
+				}
+				// Import case: read from API
+				if v, ok := blockData["panic_threshold"].(float64); ok {
+					return types.Int64Value(int64(v))
+				}
+				return types.Int64Null()
+			}(),
+			ProxyProtocolV1: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.ProxyProtocolV1
+				}
+				// Import case: read from API
+				if _, ok := blockData["proxy_protocol_v1"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+			ProxyProtocolV2: func() *OriginPoolEmptyModel {
+				if !isImport && data.AdvancedOptions != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AdvancedOptions.ProxyProtocolV2
+				}
+				// Import case: read from API
+				if _, ok := blockData["proxy_protocol_v2"].(map[string]interface{}); ok {
+					return &OriginPoolEmptyModel{}
+				}
+				return nil
+			}(),
+		}
+	}
+	if _, ok := apiResource.Spec["automatic_port"].(map[string]interface{}); ok && isImport && data.AutomaticPort == nil {
 		// Import case: populate from API since state is nil and psd is empty
-		data.SameAsEndpointPort = &OriginPoolEmptyModel{}
+		data.AutomaticPort = &OriginPoolEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["lb_port"].(map[string]interface{}); ok && isImport && data.LBPort == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.LBPort = &OriginPoolEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["upstream_conn_pool_reuse_type"].(map[string]interface{}); ok && isImport && data.UpstreamConnPoolReuseType == nil {
@@ -5591,16 +5863,66 @@ func (r *OriginPoolResource) Update(ctx context.Context, req resource.UpdateRequ
 	} else {
 		data.HealthCheckPort = types.Int64Null()
 	}
+	if listData, ok := apiResource.Spec["healthcheck"].([]interface{}); ok && len(listData) > 0 {
+		var healthcheckList []OriginPoolHealthcheckModel
+		var existingHealthcheckItems []OriginPoolHealthcheckModel
+		if !data.Healthcheck.IsNull() && !data.Healthcheck.IsUnknown() {
+			data.Healthcheck.ElementsAs(ctx, &existingHealthcheckItems, false)
+		}
+		for listIdx, item := range listData {
+			_ = listIdx // May be unused if no empty marker blocks in list item
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				healthcheckList = append(healthcheckList, OriginPoolHealthcheckModel{
+					Name: func() types.String {
+						if v, ok := itemMap["name"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Namespace: func() types.String {
+						if v, ok := itemMap["namespace"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+					Tenant: func() types.String {
+						if v, ok := itemMap["tenant"].(string); ok && v != "" {
+							return types.StringValue(v)
+						}
+						return types.StringNull()
+					}(),
+				})
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes}, healthcheckList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Healthcheck = listVal
+		}
+	} else {
+		// No data from API - set to null list
+		data.Healthcheck = types.ListNull(types.ObjectType{AttrTypes: OriginPoolHealthcheckModelAttrTypes})
+	}
 	if v, ok := apiResource.Spec["loadbalancer_algorithm"].(string); ok && v != "" {
 		data.LoadBalancerAlgorithm = types.StringValue(v)
 	} else {
 		data.LoadBalancerAlgorithm = types.StringNull()
 	}
+	if _, ok := apiResource.Spec["no_tls"].(map[string]interface{}); ok && isImport && data.NoTLS == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoTLS = &OriginPoolEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if v, ok := apiResource.Spec["port"].(float64); ok {
 		data.Port = types.Int64Value(int64(v))
 	} else {
 		data.Port = types.Int64Null()
 	}
+	if _, ok := apiResource.Spec["same_as_endpoint_port"].(map[string]interface{}); ok && isImport && data.SameAsEndpointPort == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.SameAsEndpointPort = &OriginPoolEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

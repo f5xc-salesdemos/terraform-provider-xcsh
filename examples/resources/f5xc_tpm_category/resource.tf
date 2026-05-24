@@ -2,6 +2,18 @@
 # Manages Category object, which is a grouping of APIKeys used for TPM provisioning in F5 Distributed Cloud.
 
 # Basic Tpm Category configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_tpm_category" "example" {
   name      = "example-tpm-category"
   namespace = "staging"
