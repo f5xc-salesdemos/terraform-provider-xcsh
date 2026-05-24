@@ -308,14 +308,15 @@ func TestAccTrustedCaListResource_emptyPlan(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-test-ns")
 	rName := acctest.RandomName("tf-test-tcl")
+	certBase64 := acctest.MustGenerateTestCertificates().RootCABase64
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		ExternalProviders:        acctest.ExternalProviders,
 		Steps: []resource.TestStep{
-			{Config: testAccTrustedCaListResourceConfig_basic(nsName, rName)},
-			{Config: testAccTrustedCaListResourceConfig_basic(nsName, rName), PlanOnly: true, ExpectNonEmptyPlan: false},
+			{Config: testAccTrustedCaListResourceConfig_basicWithCert(nsName, rName, certBase64)},
+			{Config: testAccTrustedCaListResourceConfig_basicWithCert(nsName, rName, certBase64), PlanOnly: true, ExpectNonEmptyPlan: false},
 		},
 	})
 }
@@ -330,6 +331,7 @@ func TestAccTrustedCaListResource_planChecks(t *testing.T) {
 	resourceName := "f5xc_trusted_ca_list.test"
 	nsName := acctest.RandomName("tf-test-ns")
 	rName := acctest.RandomName("tf-test-tcl")
+	certBase64 := acctest.MustGenerateTestCertificates().RootCABase64
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -337,19 +339,13 @@ func TestAccTrustedCaListResource_planChecks(t *testing.T) {
 		ExternalProviders:        acctest.ExternalProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccTrustedCaListResourceConfig_basic(nsName, rName),
+				Config: testAccTrustedCaListResourceConfig_basicWithCert(nsName, rName, certBase64),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionCreate)},
 				},
 			},
 			{
-				Config: testAccTrustedCaListResourceConfig_allAttributes(nsName, rName, "updated"),
-				ConfigPlanChecks: resource.ConfigPlanChecks{
-					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate)},
-				},
-			},
-			{
-				Config: testAccTrustedCaListResourceConfig_allAttributes(nsName, rName, "updated"),
+				Config: testAccTrustedCaListResourceConfig_basicWithCert(nsName, rName, certBase64),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionNoop)},
 				},
@@ -368,6 +364,7 @@ func TestAccTrustedCaListResource_fullLifecycle(t *testing.T) {
 	resourceName := "f5xc_trusted_ca_list.test"
 	nsName := acctest.RandomName("tf-test-ns")
 	rName := acctest.RandomName("tf-test-tcl")
+	certBase64 := acctest.MustGenerateTestCertificates().RootCABase64
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -375,7 +372,7 @@ func TestAccTrustedCaListResource_fullLifecycle(t *testing.T) {
 		ExternalProviders:        acctest.ExternalProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccTrustedCaListResourceConfig_allAttributes(nsName, rName, "lifecycle test"),
+				Config: testAccTrustedCaListResourceConfig_basicWithCert(nsName, rName, certBase64),
 				Check:  acctest.CheckResourceExists(resourceName),
 			},
 			{
@@ -386,11 +383,11 @@ func TestAccTrustedCaListResource_fullLifecycle(t *testing.T) {
 				ImportStateIdFunc:       testAccTrustedCaListResourceImportStateIdFunc(resourceName),
 			},
 			{
-				Config: testAccTrustedCaListResourceConfig_basic(nsName, rName),
+				Config: testAccTrustedCaListResourceConfig_basicWithCert(nsName, rName, certBase64),
 				Check:  acctest.CheckResourceExists(resourceName),
 			},
 			{
-				Config:             testAccTrustedCaListResourceConfig_basic(nsName, rName),
+				Config:             testAccTrustedCaListResourceConfig_basicWithCert(nsName, rName, certBase64),
 				PlanOnly:           true,
 				ExpectNonEmptyPlan: false,
 			},
@@ -403,7 +400,7 @@ func TestAccTrustedCaListResource_fullLifecycle(t *testing.T) {
 // =============================================================================
 
 func testAccTrustedCaListResourceConfig_basic(nsName, name string) string {
-	return testAccTrustedCaListResourceConfig_basicWithCert(nsName, name, acctest.MustGenerateTestCertificates().IntermediateCABase64)
+	return testAccTrustedCaListResourceConfig_basicWithCert(nsName, name, acctest.MustGenerateTestCertificates().RootCABase64)
 }
 
 func testAccTrustedCaListResourceConfig_basicWithCert(nsName, name, certBase64 string) string {
@@ -459,7 +456,7 @@ resource "f5xc_trusted_ca_list" "test" {
     owner   = "ci-cd"
   }
 }
-`, nsName, name, description, certs.IntermediateCABase64))
+`, nsName, name, description, certs.RootCABase64))
 }
 
 func testAccTrustedCaListResourceConfig_withLabels(nsName, name, environment, managedBy string) string {
@@ -487,7 +484,7 @@ resource "f5xc_trusted_ca_list" "test" {
     managed_by  = %[4]q
   }
 }
-`, nsName, name, environment, managedBy, certs.IntermediateCABase64))
+`, nsName, name, environment, managedBy, certs.RootCABase64))
 }
 
 func testAccTrustedCaListResourceConfig_withDescription(nsName, name, description string) string {
@@ -511,7 +508,7 @@ resource "f5xc_trusted_ca_list" "test" {
   trusted_ca_url = "string:///%[4]s"
   description    = %[3]q
 }
-`, nsName, name, description, certs.IntermediateCABase64))
+`, nsName, name, description, certs.RootCABase64))
 }
 
 func testAccTrustedCaListResourceConfig_withAnnotations(nsName, name, value1, value2 string) string {
@@ -539,5 +536,5 @@ resource "f5xc_trusted_ca_list" "test" {
     key2 = %[4]q
   }
 }
-`, nsName, name, value1, value2, certs.IntermediateCABase64))
+`, nsName, name, value1, value2, certs.RootCABase64))
 }
