@@ -620,6 +620,199 @@ resource "f5xc_malicious_user_mitigation" "test" {
 `, nsName, mumName, annotationsStr)
 }
 
+// =============================================================================
+// DOMAIN-SPECIFIC TESTS — mitigation action variants
+// =============================================================================
+
+func TestAccMaliciousUserMitigationResource_captchaChallenge(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_malicious_user_mitigation.test"
+	rName := acctest.RandomName("tf-test-mum")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckMaliciousUserMitigationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccMaliciousUserMitigationConfig_captchaSystem(rName),
+				Check:  acctest.CheckMaliciousUserMitigationExists(resourceName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccMaliciousUserMitigationImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccMaliciousUserMitigationResource_jsChallenge(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_malicious_user_mitigation.test"
+	rName := acctest.RandomName("tf-test-mum")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckMaliciousUserMitigationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccMaliciousUserMitigationConfig_jsChallengeSystem(rName),
+				Check:  acctest.CheckMaliciousUserMitigationExists(resourceName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccMaliciousUserMitigationImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccMaliciousUserMitigationResource_switchAction(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_malicious_user_mitigation.test"
+	rName := acctest.RandomName("tf-test-mum")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckMaliciousUserMitigationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccMaliciousUserMitigationConfig_blockSystem(rName),
+				Check:  acctest.CheckMaliciousUserMitigationExists(resourceName),
+			},
+			{
+				Config: testAccMaliciousUserMitigationConfig_captchaSystem(rName),
+				Check:  acctest.CheckMaliciousUserMitigationExists(resourceName),
+			},
+			{
+				Config: testAccMaliciousUserMitigationConfig_jsChallengeSystem(rName),
+				Check:  acctest.CheckMaliciousUserMitigationExists(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccMaliciousUserMitigationResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_malicious_user_mitigation.test"
+	rName := acctest.RandomName("tf-test-mum")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckMaliciousUserMitigationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccMaliciousUserMitigationConfig_blockSystem(rName),
+				Check:  acctest.CheckMaliciousUserMitigationExists(resourceName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccMaliciousUserMitigationImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccMaliciousUserMitigationConfig_captchaSystem(rName),
+				Check:  acctest.CheckMaliciousUserMitigationExists(resourceName),
+			},
+			{
+				Config: testAccMaliciousUserMitigationConfig_captchaSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// DOMAIN-SPECIFIC CONFIG HELPERS — system namespace
+// =============================================================================
+
+func testAccMaliciousUserMitigationConfig_blockSystem(mumName string) string {
+	return fmt.Sprintf(`
+resource "f5xc_malicious_user_mitigation" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  mitigation_type {
+    rules {
+      threat_level {
+        high {}
+      }
+      mitigation_action {
+        block_temporarily {}
+      }
+    }
+  }
+}
+`, mumName)
+}
+
+func testAccMaliciousUserMitigationConfig_captchaSystem(mumName string) string {
+	return fmt.Sprintf(`
+resource "f5xc_malicious_user_mitigation" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  mitigation_type {
+    rules {
+      threat_level {
+        high {}
+      }
+      mitigation_action {
+        captcha_challenge {}
+      }
+    }
+  }
+}
+`, mumName)
+}
+
+func testAccMaliciousUserMitigationConfig_jsChallengeSystem(mumName string) string {
+	return fmt.Sprintf(`
+resource "f5xc_malicious_user_mitigation" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  mitigation_type {
+    rules {
+      threat_level {
+        medium {}
+      }
+      mitigation_action {
+        javascript_challenge {}
+      }
+    }
+  }
+}
+`, mumName)
+}
+
 func testAccMaliciousUserMitigationResourceConfig_withMitigationType(nsName, mumName string) string {
 	return fmt.Sprintf(`
 resource "f5xc_namespace" "test" {

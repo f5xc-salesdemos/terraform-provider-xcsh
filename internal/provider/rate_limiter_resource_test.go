@@ -522,6 +522,195 @@ resource "f5xc_rate_limiter" "test" {
 `, rlName, annotationsStr)
 }
 
+// =============================================================================
+// DOMAIN-SPECIFIC TESTS
+// =============================================================================
+
+func TestAccRateLimiterResource_tokenBucket(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_rate_limiter.test"
+	rName := acctest.RandomName("tf-test-rl")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckRateLimiterDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRateLimiterConfig_tokenBucketSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckRateLimiterExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "limits.0.total_number", "50"),
+					resource.TestCheckResourceAttr(resourceName, "limits.0.unit", "SECOND"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccRateLimiterImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccRateLimiterResource_switchAlgorithm(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_rate_limiter.test"
+	rName := acctest.RandomName("tf-test-rl")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckRateLimiterDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRateLimiterConfig_withLimitsSystem(rName),
+				Check:  acctest.CheckRateLimiterExists(resourceName),
+			},
+			{
+				Config: testAccRateLimiterConfig_tokenBucketSystem(rName),
+				Check:  acctest.CheckRateLimiterExists(resourceName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccRateLimiterConfig_tokenBucketSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+		},
+	})
+}
+
+func TestAccRateLimiterResource_unitVariations(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_rate_limiter.test"
+	rName := acctest.RandomName("tf-test-rl")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckRateLimiterDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRateLimiterConfig_unitSystem(rName, "SECOND", 1000),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckRateLimiterExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "limits.0.unit", "SECOND"),
+				),
+			},
+			{
+				Config: testAccRateLimiterConfig_unitSystem(rName, "MINUTE", 100),
+				Check:  resource.TestCheckResourceAttr(resourceName, "limits.0.unit", "MINUTE"),
+			},
+			{
+				Config: testAccRateLimiterConfig_unitSystem(rName, "HOUR", 5000),
+				Check:  resource.TestCheckResourceAttr(resourceName, "limits.0.unit", "HOUR"),
+			},
+		},
+	})
+}
+
+func TestAccRateLimiterResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_rate_limiter.test"
+	rName := acctest.RandomName("tf-test-rl")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckRateLimiterDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRateLimiterConfig_withLimitsSystem(rName),
+				Check:  acctest.CheckRateLimiterExists(resourceName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccRateLimiterImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccRateLimiterConfig_tokenBucketSystem(rName),
+				Check:  acctest.CheckRateLimiterExists(resourceName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccRateLimiterConfig_tokenBucketSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+			{
+				Config: testAccRateLimiterConfig_basicSystem(rName),
+				Check:  acctest.CheckRateLimiterExists(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// CONFIG HELPERS - Domain-specific
+// =============================================================================
+
+func testAccRateLimiterConfig_tokenBucketSystem(rlName string) string {
+	return fmt.Sprintf(`
+resource "f5xc_rate_limiter" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  limits {
+    total_number     = 50
+    unit             = "SECOND"
+    burst_multiplier = 5
+
+    token_bucket {}
+  }
+}
+`, rlName)
+}
+
+func testAccRateLimiterConfig_unitSystem(rlName, unit string, totalNumber int) string {
+	return fmt.Sprintf(`
+resource "f5xc_rate_limiter" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  limits {
+    total_number     = %[3]d
+    unit             = %[2]q
+    burst_multiplier = 2
+
+    leaky_bucket {}
+  }
+}
+`, rlName, unit, totalNumber)
+}
+
 func testAccRateLimiterConfig_withLimitsSystem(rlName string) string {
 	return fmt.Sprintf(`
 resource "f5xc_rate_limiter" "test" {

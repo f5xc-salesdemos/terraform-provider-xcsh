@@ -4,10 +4,14 @@ package provider_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
 )
@@ -208,6 +212,283 @@ func testAccServicePolicyImportStateIdFunc(resourceName string) resource.ImportS
 }
 
 // =============================================================================
+// TEST: All attributes
+// =============================================================================
+func TestAccServicePolicyResource_allAttributes(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_service_policy.test"
+	rName := acctest.RandomName("tf-test-sp")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckServicePolicyDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccServicePolicyConfig_withLabelsSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckServicePolicyExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttr(resourceName, "description", "Test service policy"),
+					resource.TestCheckResourceAttr(resourceName, "labels.environment", "test"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "disable", "description"},
+				ImportStateIdFunc:       testAccServicePolicyImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Plan checks (create, update, noop)
+// =============================================================================
+func TestAccServicePolicyResource_planChecks(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_service_policy.test"
+	rName := acctest.RandomName("tf-test-sp")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckServicePolicyDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccServicePolicyConfig_basicSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionCreate),
+					},
+				},
+			},
+			{
+				Config: testAccServicePolicyConfig_withLabelsSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccServicePolicyConfig_withLabelsSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionNoop),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Known values
+// =============================================================================
+func TestAccServicePolicyResource_knownValues(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_service_policy.test"
+	rName := acctest.RandomName("tf-test-sp")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckServicePolicyDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccServicePolicyConfig_basicSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectKnownValue(resourceName, tfjsonpath.New("name"), knownvalue.StringExact(rName)),
+						plancheck.ExpectKnownValue(resourceName, tfjsonpath.New("namespace"), knownvalue.StringExact("system")),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Name validation
+// =============================================================================
+func TestAccServicePolicyResource_invalidName(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccServicePolicyConfig_basicSystem("Invalid-NAME"),
+				ExpectError: regexp.MustCompile(`(?i)(invalid|name|must)`),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Requires replace
+// =============================================================================
+func TestAccServicePolicyResource_requiresReplace(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_service_policy.test"
+	rName1 := acctest.RandomName("tf-test-sp")
+	rName2 := acctest.RandomName("tf-test-sp")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckServicePolicyDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccServicePolicyConfig_basicSystem(rName1),
+				Check:  acctest.CheckServicePolicyExists(resourceName),
+			},
+			{
+				Config: testAccServicePolicyConfig_basicSystem(rName2),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionDestroyBeforeCreate),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Switch policy type (allow → deny → allowList)
+// =============================================================================
+func TestAccServicePolicyResource_switchType(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_service_policy.test"
+	rName := acctest.RandomName("tf-test-sp")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckServicePolicyDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccServicePolicyConfig_basicSystem(rName),
+				Check:  acctest.CheckServicePolicyExists(resourceName),
+			},
+			{
+				Config: testAccServicePolicyConfig_denyAllSystem(rName),
+				Check:  acctest.CheckServicePolicyExists(resourceName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccServicePolicyConfig_allowListSystem(rName),
+				Check:  acctest.CheckServicePolicyExists(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Deny list with IP prefixes
+// =============================================================================
+func TestAccServicePolicyResource_denyList(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_service_policy.test"
+	rName := acctest.RandomName("tf-test-sp")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckServicePolicyDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccServicePolicyConfig_denyListSystem(rName),
+				Check:  acctest.CheckServicePolicyExists(resourceName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "deny_list.prefix_list.prefixes.#", "deny_list.prefix_list.prefixes.0"},
+				ImportStateIdFunc:       testAccServicePolicyImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Full lifecycle
+// =============================================================================
+func TestAccServicePolicyResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_service_policy.test"
+	rName := acctest.RandomName("tf-test-sp")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckServicePolicyDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccServicePolicyConfig_withLabelsSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckServicePolicyExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "description", "Test service policy"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "disable", "description"},
+				ImportStateIdFunc:       testAccServicePolicyImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccServicePolicyConfig_denyAllSystem(rName),
+				Check:  acctest.CheckServicePolicyExists(resourceName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccServicePolicyConfig_denyAllSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+			{
+				Config: testAccServicePolicyConfig_basicSystem(rName),
+				Check:  acctest.CheckServicePolicyExists(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
 // CONFIG HELPERS - Use "system" namespace
 // =============================================================================
 
@@ -257,6 +538,24 @@ resource "f5xc_service_policy" "test" {
   deny_all_requests {}
 
   # Apply to any server
+  any_server {}
+}
+`, name)
+}
+
+func testAccServicePolicyConfig_denyListSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_service_policy" "test" {
+  name       = %[1]q
+  namespace  = "system"
+
+  deny_list {
+    prefix_list {
+      prefixes = ["172.16.0.0/12"]
+    }
+    default_action_allow {}
+  }
+
   any_server {}
 }
 `, name)

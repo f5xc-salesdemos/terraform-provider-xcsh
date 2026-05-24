@@ -540,6 +540,210 @@ resource "f5xc_user_identification" "test" {
 `, uiName, annotationsStr)
 }
 
+// =============================================================================
+// DOMAIN-SPECIFIC TESTS
+// =============================================================================
+
+func TestAccUserIdentificationResource_cookieRule(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_user_identification.test"
+	rName := acctest.RandomName("tf-test-uid")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckUserIdentificationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccUserIdentificationConfig_cookieSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckUserIdentificationExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "rules.0.cookie_name", "session_id"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccUserIdentificationImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccUserIdentificationResource_httpHeaderRule(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_user_identification.test"
+	rName := acctest.RandomName("tf-test-uid")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckUserIdentificationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccUserIdentificationConfig_httpHeaderSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckUserIdentificationExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "rules.0.http_header_name", "X-Forwarded-For"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccUserIdentificationImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccUserIdentificationResource_tlsFingerprintRule(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_user_identification.test"
+	rName := acctest.RandomName("tf-test-uid")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckUserIdentificationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccUserIdentificationConfig_tlsFingerprintSystem(rName),
+				Check:  acctest.CheckUserIdentificationExists(resourceName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccUserIdentificationImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+func TestAccUserIdentificationResource_switchRuleType(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_user_identification.test"
+	rName := acctest.RandomName("tf-test-uid")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckUserIdentificationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccUserIdentificationConfig_withRulesSystem(rName),
+				Check:  acctest.CheckUserIdentificationExists(resourceName),
+			},
+			{
+				Config: testAccUserIdentificationConfig_cookieSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckUserIdentificationExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "rules.0.cookie_name", "session_id"),
+				),
+			},
+			{
+				Config: testAccUserIdentificationConfig_httpHeaderSystem(rName),
+				Check:  resource.TestCheckResourceAttr(resourceName, "rules.0.http_header_name", "X-Forwarded-For"),
+			},
+		},
+	})
+}
+
+func TestAccUserIdentificationResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_user_identification.test"
+	rName := acctest.RandomName("tf-test-uid")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckUserIdentificationDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccUserIdentificationConfig_cookieSystem(rName),
+				Check:  acctest.CheckUserIdentificationExists(resourceName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccUserIdentificationImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccUserIdentificationConfig_httpHeaderSystem(rName),
+				Check:  acctest.CheckUserIdentificationExists(resourceName),
+			},
+			{
+				Config: testAccUserIdentificationConfig_httpHeaderSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// DOMAIN-SPECIFIC CONFIG HELPERS
+// =============================================================================
+
+func testAccUserIdentificationConfig_cookieSystem(uiName string) string {
+	return fmt.Sprintf(`
+resource "f5xc_user_identification" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  rules {
+    cookie_name = "session_id"
+  }
+}
+`, uiName)
+}
+
+func testAccUserIdentificationConfig_httpHeaderSystem(uiName string) string {
+	return fmt.Sprintf(`
+resource "f5xc_user_identification" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  rules {
+    http_header_name = "X-Forwarded-For"
+  }
+}
+`, uiName)
+}
+
+func testAccUserIdentificationConfig_tlsFingerprintSystem(uiName string) string {
+	return fmt.Sprintf(`
+resource "f5xc_user_identification" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  rules {
+    tls_fingerprint {}
+  }
+}
+`, uiName)
+}
+
 func testAccUserIdentificationConfig_withRulesSystem(uiName string) string {
 	return fmt.Sprintf(`
 resource "f5xc_user_identification" "test" {
