@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Service Policy Rule by name
 data "f5xc_service_policy_rule" "example" {
   name      = "example-service-policy-rule"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "service_policy_rule_id" {

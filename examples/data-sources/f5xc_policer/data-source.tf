@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Policer by name
 data "f5xc_policer" "example" {
   name      = "example-policer"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "policer_id" {

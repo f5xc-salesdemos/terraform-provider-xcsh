@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Dc Cluster Group by name
 data "f5xc_dc_cluster_group" "example" {
   name      = "example-dc-cluster-group"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "dc_cluster_group_id" {

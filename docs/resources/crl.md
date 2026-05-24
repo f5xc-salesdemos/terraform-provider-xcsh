@@ -31,7 +31,7 @@ terraform {
 # Basic CRL configuration
 resource "f5xc_crl" "example" {
   name      = "example-crl"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

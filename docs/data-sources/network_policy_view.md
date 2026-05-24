@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Network Policy View by name
 data "f5xc_network_policy_view" "example" {
   name      = "example-network-policy-view"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "network_policy_view_id" {

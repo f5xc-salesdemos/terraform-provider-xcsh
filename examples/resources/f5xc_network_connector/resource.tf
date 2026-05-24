@@ -15,7 +15,7 @@ terraform {
 # Basic Network Connector configuration
 resource "f5xc_network_connector" "example" {
   name      = "example-network-connector"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -31,7 +31,7 @@ resource "f5xc_network_connector" "example" {
   sli_to_global_dr {
     global_vn {
       name      = "global-network"
-      namespace = "system"
+      namespace = "staging"
     }
   }
 

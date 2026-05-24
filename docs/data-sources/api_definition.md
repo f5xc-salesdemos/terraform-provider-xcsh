@@ -31,7 +31,7 @@ terraform {
 # Look up an existing API Definition by name
 data "f5xc_api_definition" "example" {
   name      = "example-api-definition"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "api_definition_id" {

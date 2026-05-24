@@ -31,7 +31,7 @@ terraform {
 # Basic Certificate Chain configuration
 resource "f5xc_certificate_chain" "example" {
   name      = "example-certificate-chain"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

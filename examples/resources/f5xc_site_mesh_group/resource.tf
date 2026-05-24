@@ -15,7 +15,7 @@ terraform {
 # Basic Site Mesh Group configuration
 resource "f5xc_site_mesh_group" "example" {
   name      = "example-site-mesh-group"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -40,6 +40,6 @@ resource "f5xc_site_mesh_group" "example" {
   # Virtual site reference
   virtual_site {
     name      = "example-virtual-site"
-    namespace = "system"
+    namespace = "staging"
   }
 }

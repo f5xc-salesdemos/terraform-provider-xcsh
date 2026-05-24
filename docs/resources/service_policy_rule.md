@@ -31,7 +31,7 @@ terraform {
 # Basic Service Policy Rule configuration
 resource "f5xc_service_policy_rule" "example" {
   name      = "example-service-policy-rule"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

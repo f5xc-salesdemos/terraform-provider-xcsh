@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Azure VNET Site by name
 data "f5xc_azure_vnet_site" "example" {
   name      = "example-Azure-vnet-site"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "azure_vnet_site_id" {

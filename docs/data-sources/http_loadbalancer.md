@@ -41,7 +41,7 @@ output "http_loadbalancer_id" {
 # Example: Reference in another load balancer configuration
 # resource "f5xc_service_policy" "example" {
 #   name      = "policy-for-lb"
-#   namespace = "shared"
+#   namespace = "staging"
 #
 #   # Use the load balancer's domains
 #   # domain = data.f5xc_http_loadbalancer.example.domains[0]

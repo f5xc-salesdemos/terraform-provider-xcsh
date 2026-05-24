@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Subnet by name
 data "f5xc_subnet" "example" {
   name      = "example-subnet"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "subnet_id" {

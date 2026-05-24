@@ -15,7 +15,7 @@ terraform {
 # Basic Policer configuration
 resource "f5xc_policer" "example" {
   name      = "example-policer"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

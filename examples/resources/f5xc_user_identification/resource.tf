@@ -15,7 +15,7 @@ terraform {
 # Basic User Identification configuration
 resource "f5xc_user_identification" "example" {
   name      = "example-user-identification"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

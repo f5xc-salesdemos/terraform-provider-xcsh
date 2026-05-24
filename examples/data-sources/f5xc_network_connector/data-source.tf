@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Network Connector by name
 data "f5xc_network_connector" "example" {
   name      = "example-network-connector"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "network_connector_id" {

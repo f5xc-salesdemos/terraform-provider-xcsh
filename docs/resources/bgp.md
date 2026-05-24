@@ -31,7 +31,7 @@ terraform {
 # Basic BGP configuration
 resource "f5xc_bgp" "example" {
   name      = "example-bgp"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -60,7 +60,7 @@ resource "f5xc_bgp" "example" {
   # Site reference
   site {
     name      = "example-site"
-    namespace = "system"
+    namespace = "staging"
   }
 }
 ```

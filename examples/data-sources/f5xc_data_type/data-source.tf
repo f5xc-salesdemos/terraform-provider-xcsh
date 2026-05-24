@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Data Type by name
 data "f5xc_data_type" "example" {
   name      = "example-data-type"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "data_type_id" {

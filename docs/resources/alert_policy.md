@@ -31,7 +31,7 @@ terraform {
 # Basic Alert Policy configuration
 resource "f5xc_alert_policy" "example" {
   name      = "example-alert-policy"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -46,7 +46,7 @@ resource "f5xc_alert_policy" "example" {
   # Alert receivers
   receivers {
     name      = "slack-receiver"
-    namespace = "shared"
+    namespace = "staging"
   }
 
   # Alert routes

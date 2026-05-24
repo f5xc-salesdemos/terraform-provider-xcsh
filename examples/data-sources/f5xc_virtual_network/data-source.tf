@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Virtual Network by name
 data "f5xc_virtual_network" "example" {
   name      = "example-virtual-network"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "virtual_network_id" {

@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Route by name
 data "f5xc_route" "example" {
   name      = "example-route"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "route_id" {

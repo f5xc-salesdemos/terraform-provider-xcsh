@@ -46,7 +46,7 @@ resource "f5xc_discovery" "example" {
     site {
       ref {
         name      = "example-site"
-        namespace = "system"
+        namespace = "staging"
       }
       network_type = "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE"
     }

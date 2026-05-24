@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Tunnel by name
 data "f5xc_tunnel" "example" {
   name      = "example-tunnel"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "tunnel_id" {

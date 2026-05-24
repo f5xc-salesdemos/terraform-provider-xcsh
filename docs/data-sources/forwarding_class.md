@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Forwarding Class by name
 data "f5xc_forwarding_class" "example" {
   name      = "example-forwarding-class"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "forwarding_class_id" {

@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Namespace by name
 data "f5xc_namespace" "example" {
   name      = "example-namespace"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "namespace_id" {

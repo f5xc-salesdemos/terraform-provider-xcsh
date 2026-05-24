@@ -31,7 +31,7 @@ terraform {
 # Basic Protocol Policer configuration
 resource "f5xc_protocol_policer" "example" {
   name      = "example-protocol-policer"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

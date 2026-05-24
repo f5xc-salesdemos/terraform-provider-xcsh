@@ -15,7 +15,7 @@ terraform {
 # Look up an existing BGP by name
 data "f5xc_bgp" "example" {
   name      = "example-bgp"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "bgp_id" {

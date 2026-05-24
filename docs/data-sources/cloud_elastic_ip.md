@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Cloud Elastic IP by name
 data "f5xc_cloud_elastic_ip" "example" {
   name      = "example-cloud-elastic-ip"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "cloud_elastic_ip_id" {

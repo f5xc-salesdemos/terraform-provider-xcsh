@@ -31,7 +31,7 @@ terraform {
 # Basic Network Interface configuration
 resource "f5xc_network_interface" "example" {
   name      = "example-network-interface"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

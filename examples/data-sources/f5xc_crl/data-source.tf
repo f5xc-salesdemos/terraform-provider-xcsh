@@ -15,7 +15,7 @@ terraform {
 # Look up an existing CRL by name
 data "f5xc_crl" "example" {
   name      = "example-crl"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "crl_id" {

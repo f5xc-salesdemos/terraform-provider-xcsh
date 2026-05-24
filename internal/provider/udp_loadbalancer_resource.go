@@ -451,7 +451,7 @@ func (r *UDPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				Required:            true,
 			},
 			"enable_per_packet_load_balancing": schema.BoolAttribute{
-				MarkdownDescription: "Per packet load balancing: If disabled (default): First packet identified by source IP/port and local IP/port is sent to an upstream server as the load balancing algorithm dictates, and subsequent packets with the same identity are forwarded to the same upstream server without recheckinggg the..",
+				MarkdownDescription: "Per packet load balancing: If disabled (default): First packet identified by source IP/port and local IP/port is sent to an upstream server as the load balancing algorithm dictates, and subsequent packets with the same identity are forwarded to the same upstream server without recheckingg the..",
 				Required:            true,
 			},
 			"idle_timeout": schema.Int64Attribute{

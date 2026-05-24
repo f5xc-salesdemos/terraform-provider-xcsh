@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Protocol Inspection by name
 data "f5xc_protocol_inspection" "example" {
   name      = "example-protocol-inspection"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "protocol_inspection_id" {

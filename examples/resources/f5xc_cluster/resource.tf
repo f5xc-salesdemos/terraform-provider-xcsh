@@ -15,7 +15,7 @@ terraform {
 # Basic Cluster configuration
 resource "f5xc_cluster" "example" {
   name      = "example-cluster"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

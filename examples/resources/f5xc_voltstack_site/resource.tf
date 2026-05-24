@@ -15,7 +15,7 @@ terraform {
 # Basic Voltstack Site configuration
 resource "f5xc_voltstack_site" "example" {
   name      = "example-voltstack-site"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -30,7 +30,7 @@ resource "f5xc_voltstack_site" "example" {
   # Kubernetes configuration
   k8s_cluster {
     name      = "example-k8s-cluster"
-    namespace = "system"
+    namespace = "staging"
   }
 
   # Master nodes configuration

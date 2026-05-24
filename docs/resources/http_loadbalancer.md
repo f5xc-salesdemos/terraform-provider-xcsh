@@ -118,7 +118,7 @@ resource "f5xc_http_loadbalancer" "example" {
   rate_limit {
     rate_limiter {
       name      = "example-rate-limiter"
-      namespace = "shared"
+      namespace = "staging"
     }
     no_ip_allowed_list {}
   }
@@ -132,7 +132,7 @@ resource "f5xc_http_loadbalancer" "example" {
   active_service_policies {
     policies {
       name      = "example-service-policy"
-      namespace = "shared"
+      namespace = "staging"
     }
   }
 
@@ -148,14 +148,14 @@ resource "f5xc_http_loadbalancer" "example" {
 
   user_identification {
     name      = "example-user-identification"
-    namespace = "shared"
+    namespace = "staging"
   }
 
   // One of the arguments from this list "app_firewall disable_waf" must be set
 
   app_firewall {
     name      = "example-app-firewall"
-    namespace = "shared"
+    namespace = "staging"
   }
 
   // One of the arguments from this list "bot_defense bot_defense_advanced disable_bot_defense" must be set
@@ -2334,7 +2334,7 @@ An [`advanced_options`](#default-pool-advanced-options) block (within [`default_
 
 <a id="connection-081822"></a>&#x2022; [`no_request_limit_per_connection`](#connection-081822) - Optional Block<br>Configuration parameter for no request limit per connection
 
-<a id="detection-c89e70"></a>&#x2022; [`outlier_detection`](#detection-c89e70) - Optional Block<br>Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkinggg. Algorithm 1<br>See [Outlier
+<a id="detection-c89e70"></a>&#x2022; [`outlier_detection`](#detection-c89e70) - Optional Block<br>Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkingg. Algorithm 1<br>See [Outlier
 Detection](#detection-c89e70) below.
 
 <a id="threshold-61a03f"></a>&#x2022; [`panic_threshold`](#threshold-61a03f) - Optional Number<br>Configure a threshold (percentage of unhealthy endpoints) below which all endpoints will be considered for load balancing ignoring its health status

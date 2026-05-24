@@ -15,7 +15,7 @@ terraform {
 # Basic Cloud Connect configuration
 resource "f5xc_cloud_connect" "example" {
   name      = "example-cloud-connect"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

@@ -15,7 +15,7 @@ terraform {
 # Basic Log Receiver configuration
 resource "f5xc_log_receiver" "example" {
   name      = "example-log-receiver"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

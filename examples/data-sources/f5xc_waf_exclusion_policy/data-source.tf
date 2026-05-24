@@ -15,7 +15,7 @@ terraform {
 # Look up an existing WAF Exclusion Policy by name
 data "f5xc_waf_exclusion_policy" "example" {
   name      = "example-waf-exclusion-policy"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "waf_exclusion_policy_id" {

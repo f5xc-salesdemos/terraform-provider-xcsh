@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Tenant Configuration by name
 data "f5xc_tenant_configuration" "example" {
   name      = "example-tenant-configuration"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "tenant_configuration_id" {

@@ -15,7 +15,7 @@ terraform {
 # Basic Subnet configuration
 resource "f5xc_subnet" "example" {
   name      = "example-subnet"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

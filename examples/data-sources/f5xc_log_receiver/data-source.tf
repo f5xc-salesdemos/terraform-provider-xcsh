@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Log Receiver by name
 data "f5xc_log_receiver" "example" {
   name      = "example-log-receiver"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "log_receiver_id" {
@@ -25,7 +25,7 @@ output "log_receiver_id" {
 # Example: Reference log receiver in site configuration
 # resource "f5xc_securemesh_site_v2" "example" {
 #   name      = "example-site"
-#   namespace = "system"
+#   namespace = "staging"
 #
 #   log_receiver {
 #     name      = data.f5xc_log_receiver.example.name

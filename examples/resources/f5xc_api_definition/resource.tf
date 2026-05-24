@@ -15,7 +15,7 @@ terraform {
 # Basic API Definition configuration
 resource "f5xc_api_definition" "example" {
   name      = "example-api-definition"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

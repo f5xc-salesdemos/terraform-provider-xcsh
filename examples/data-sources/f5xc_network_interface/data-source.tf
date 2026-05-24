@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Network Interface by name
 data "f5xc_network_interface" "example" {
   name      = "example-network-interface"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "network_interface_id" {

@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Fast ACL by name
 data "f5xc_fast_acl" "example" {
   name      = "example-fast-acl"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "fast_acl_id" {

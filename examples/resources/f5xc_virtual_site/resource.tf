@@ -15,7 +15,7 @@ terraform {
 # Basic Virtual Site configuration
 resource "f5xc_virtual_site" "example" {
   name      = "example-virtual-site"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

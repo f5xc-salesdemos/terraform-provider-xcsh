@@ -31,7 +31,7 @@ terraform {
 # Basic Network Firewall configuration
 resource "f5xc_network_firewall" "example" {
   name      = "example-network-firewall"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

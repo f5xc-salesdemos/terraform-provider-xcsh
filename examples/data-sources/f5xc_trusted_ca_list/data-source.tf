@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Trusted CA List by name
 data "f5xc_trusted_ca_list" "example" {
   name      = "example-trusted-ca-list"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "trusted_ca_list_id" {

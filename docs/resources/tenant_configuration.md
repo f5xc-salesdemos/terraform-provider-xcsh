@@ -31,7 +31,7 @@ terraform {
 # Basic Tenant Configuration configuration
 resource "f5xc_tenant_configuration" "example" {
   name      = "example-tenant-configuration"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

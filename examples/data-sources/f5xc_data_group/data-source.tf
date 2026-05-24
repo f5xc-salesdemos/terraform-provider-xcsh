@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Data Group by name
 data "f5xc_data_group" "example" {
   name      = "example-data-group"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "data_group_id" {

@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Cluster by name
 data "f5xc_cluster" "example" {
   name      = "example-cluster"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "cluster_id" {

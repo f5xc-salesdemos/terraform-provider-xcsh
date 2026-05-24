@@ -31,7 +31,7 @@ terraform {
 # Basic Route configuration
 resource "f5xc_route" "example" {
   name      = "example-route"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -53,7 +53,7 @@ resource "f5xc_route" "example" {
       destinations {
         cluster {
           name      = "api-cluster"
-          namespace = "system"
+          namespace = "staging"
         }
         weight = 100
       }

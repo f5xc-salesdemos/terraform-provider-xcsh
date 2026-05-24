@@ -39,7 +39,7 @@ resource "f5xc_enhanced_firewall_policy" "example" {
       source_prefix_list {
         ip_prefix_set {
           name      = "trusted-ips"
-          namespace = "shared"
+          namespace = "staging"
         }
       }
       all_traffic {}

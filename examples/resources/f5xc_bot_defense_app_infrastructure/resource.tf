@@ -15,7 +15,7 @@ terraform {
 # Basic Bot Defense App Infrastructure configuration
 resource "f5xc_bot_defense_app_infrastructure" "example" {
   name      = "example-bot-defense-app-infrastructure"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

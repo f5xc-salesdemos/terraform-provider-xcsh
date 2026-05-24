@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Voltstack Site by name
 data "f5xc_voltstack_site" "example" {
   name      = "example-voltstack-site"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "voltstack_site_id" {

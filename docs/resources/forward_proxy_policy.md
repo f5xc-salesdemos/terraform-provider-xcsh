@@ -31,7 +31,7 @@ terraform {
 # Basic Forward Proxy Policy configuration
 resource "f5xc_forward_proxy_policy" "example" {
   name      = "example-forward-proxy-policy"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

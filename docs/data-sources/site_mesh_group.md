@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Site Mesh Group by name
 data "f5xc_site_mesh_group" "example" {
   name      = "example-site-mesh-group"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "site_mesh_group_id" {

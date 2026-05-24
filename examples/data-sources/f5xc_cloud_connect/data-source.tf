@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Cloud Connect by name
 data "f5xc_cloud_connect" "example" {
   name      = "example-cloud-connect"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "cloud_connect_id" {

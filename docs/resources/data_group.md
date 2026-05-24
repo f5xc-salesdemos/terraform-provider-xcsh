@@ -31,7 +31,7 @@ terraform {
 # Basic Data Group configuration
 resource "f5xc_data_group" "example" {
   name      = "example-data-group"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

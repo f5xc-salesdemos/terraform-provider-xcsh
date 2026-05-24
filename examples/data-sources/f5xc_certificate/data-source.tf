@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Certificate by name
 data "f5xc_certificate" "example" {
   name      = "example-certificate"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "certificate_id" {

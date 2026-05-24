@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Virtual Site by name
 data "f5xc_virtual_site" "example" {
   name      = "example-virtual-site"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "virtual_site_id" {

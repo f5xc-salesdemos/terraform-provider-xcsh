@@ -15,7 +15,7 @@ terraform {
 # Basic Forwarding Class configuration
 resource "f5xc_forwarding_class" "example" {
   name      = "example-forwarding-class"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

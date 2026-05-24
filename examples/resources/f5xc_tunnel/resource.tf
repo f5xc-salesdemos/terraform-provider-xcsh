@@ -15,7 +15,7 @@ terraform {
 # Basic Tunnel configuration
 resource "f5xc_tunnel" "example" {
   name      = "example-tunnel"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -41,6 +41,6 @@ resource "f5xc_tunnel" "example" {
   # Site reference
   site {
     name      = "example-site"
-    namespace = "system"
+    namespace = "staging"
   }
 }

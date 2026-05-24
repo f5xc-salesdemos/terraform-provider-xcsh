@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Bot Defense App Infrastructure by name
 data "f5xc_bot_defense_app_infrastructure" "example" {
   name      = "example-bot-defense-app-infrastructure"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "bot_defense_app_infrastructure_id" {

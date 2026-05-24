@@ -31,7 +31,7 @@ terraform {
 # Basic Cloud Elastic IP configuration
 resource "f5xc_cloud_elastic_ip" "example" {
   name      = "example-cloud-elastic-ip"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

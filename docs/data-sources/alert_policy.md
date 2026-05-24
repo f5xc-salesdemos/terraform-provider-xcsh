@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Alert Policy by name
 data "f5xc_alert_policy" "example" {
   name      = "example-alert-policy"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "alert_policy_id" {

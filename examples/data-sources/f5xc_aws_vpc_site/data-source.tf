@@ -15,7 +15,7 @@ terraform {
 # Look up an existing AWS VPC Site by name
 data "f5xc_aws_vpc_site" "example" {
   name      = "example-aws-vpc-site"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "aws_vpc_site_id" {

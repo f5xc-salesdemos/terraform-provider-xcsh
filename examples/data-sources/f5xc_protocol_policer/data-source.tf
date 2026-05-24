@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Protocol Policer by name
 data "f5xc_protocol_policer" "example" {
   name      = "example-protocol-policer"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "protocol_policer_id" {

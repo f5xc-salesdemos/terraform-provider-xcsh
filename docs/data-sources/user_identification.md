@@ -31,7 +31,7 @@ terraform {
 # Look up an existing User Identification by name
 data "f5xc_user_identification" "example" {
   name      = "example-user-identification"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "user_identification_id" {

@@ -31,7 +31,7 @@ terraform {
 # Basic Cloud Link configuration
 resource "f5xc_cloud_link" "example" {
   name      = "example-cloud-link"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

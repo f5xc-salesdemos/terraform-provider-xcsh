@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Global Log Receiver by name
 data "f5xc_global_log_receiver" "example" {
   name      = "example-global-log-receiver"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "global_log_receiver_id" {

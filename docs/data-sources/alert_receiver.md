@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Alert Receiver by name
 data "f5xc_alert_receiver" "example" {
   name      = "example-alert-receiver"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "alert_receiver_id" {
@@ -41,7 +41,7 @@ output "alert_receiver_id" {
 # Example: Reference alert receiver in alert policy
 # resource "f5xc_alert_policy" "example" {
 #   name      = "example-policy"
-#   namespace = "shared"
+#   namespace = "staging"
 #
 #   receivers {
 #     name      = data.f5xc_alert_receiver.example.name

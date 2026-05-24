@@ -55,7 +55,7 @@ resource "f5xc_origin_pool" "example" {
 
         site {
           name      = "example-site"
-          namespace = "system"
+          namespace = "staging"
         }
       }
     }

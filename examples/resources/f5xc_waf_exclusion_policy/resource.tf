@@ -15,7 +15,7 @@ terraform {
 # Basic WAF Exclusion Policy configuration
 resource "f5xc_waf_exclusion_policy" "example" {
   name      = "example-waf-exclusion-policy"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

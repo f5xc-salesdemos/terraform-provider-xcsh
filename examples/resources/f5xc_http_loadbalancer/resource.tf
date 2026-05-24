@@ -102,7 +102,7 @@ resource "f5xc_http_loadbalancer" "example" {
   rate_limit {
     rate_limiter {
       name      = "example-rate-limiter"
-      namespace = "shared"
+      namespace = "staging"
     }
     no_ip_allowed_list {}
   }
@@ -116,7 +116,7 @@ resource "f5xc_http_loadbalancer" "example" {
   active_service_policies {
     policies {
       name      = "example-service-policy"
-      namespace = "shared"
+      namespace = "staging"
     }
   }
 
@@ -132,14 +132,14 @@ resource "f5xc_http_loadbalancer" "example" {
 
   user_identification {
     name      = "example-user-identification"
-    namespace = "shared"
+    namespace = "staging"
   }
 
   // One of the arguments from this list "app_firewall disable_waf" must be set
 
   app_firewall {
     name      = "example-app-firewall"
-    namespace = "shared"
+    namespace = "staging"
   }
 
   // One of the arguments from this list "bot_defense bot_defense_advanced disable_bot_defense" must be set

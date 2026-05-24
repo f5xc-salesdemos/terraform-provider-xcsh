@@ -31,7 +31,7 @@ terraform {
 # Basic Virtual Network configuration
 resource "f5xc_virtual_network" "example" {
   name      = "example-virtual-network"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

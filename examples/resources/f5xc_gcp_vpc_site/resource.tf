@@ -15,7 +15,7 @@ terraform {
 # Basic GCP VPC Site configuration
 resource "f5xc_gcp_vpc_site" "example" {
   name      = "example-gcp-vpc-site"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -32,7 +32,7 @@ resource "f5xc_gcp_vpc_site" "example" {
   # GCP credentials reference
   cloud_credentials {
     name      = "gcp-credentials"
-    namespace = "system"
+    namespace = "staging"
   }
 
   # Instance type

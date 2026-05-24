@@ -41,7 +41,7 @@ resource "f5xc_workload" "example" {
   deploy_on_re {
     virtual_site {
       name      = "example-virtual-site"
-      namespace = "system"
+      namespace = "staging"
     }
   }
 }

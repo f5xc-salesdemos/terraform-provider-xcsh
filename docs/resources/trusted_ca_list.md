@@ -31,7 +31,7 @@ terraform {
 # Basic Trusted CA List configuration
 resource "f5xc_trusted_ca_list" "example" {
   name      = "example-trusted-ca-list"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

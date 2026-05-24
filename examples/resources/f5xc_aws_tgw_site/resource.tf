@@ -15,7 +15,7 @@ terraform {
 # Basic AWS TGW Site configuration
 resource "f5xc_aws_tgw_site" "example" {
   name      = "example-aws-tgw-site"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -32,7 +32,7 @@ resource "f5xc_aws_tgw_site" "example" {
   # AWS credentials
   aws_cred {
     name      = "aws-credentials"
-    namespace = "system"
+    namespace = "staging"
   }
 
   # VPC configuration

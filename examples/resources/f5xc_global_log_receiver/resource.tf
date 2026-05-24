@@ -15,7 +15,7 @@ terraform {
 # Basic Global Log Receiver configuration
 resource "f5xc_global_log_receiver" "example" {
   name      = "example-global-log-receiver"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

@@ -15,7 +15,7 @@ terraform {
 # Look up an existing BGP Routing Policy by name
 data "f5xc_bgp_routing_policy" "example" {
   name      = "example-bgp-routing-policy"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "bgp_routing_policy_id" {

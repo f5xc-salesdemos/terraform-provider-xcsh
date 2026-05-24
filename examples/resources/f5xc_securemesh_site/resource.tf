@@ -15,7 +15,7 @@ terraform {
 # Basic Securemesh Site configuration
 resource "f5xc_securemesh_site" "example" {
   name      = "example-securemesh-site"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

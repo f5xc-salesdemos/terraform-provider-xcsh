@@ -15,7 +15,7 @@ terraform {
 # Look up an existing IP Prefix Set by name
 data "f5xc_ip_prefix_set" "example" {
   name      = "example-ip-prefix-set"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "ip_prefix_set_id" {

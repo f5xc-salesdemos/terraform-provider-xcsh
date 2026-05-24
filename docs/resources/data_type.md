@@ -31,7 +31,7 @@ terraform {
 # Basic Data Type configuration
 resource "f5xc_data_type" "example" {
   name      = "example-data-type"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

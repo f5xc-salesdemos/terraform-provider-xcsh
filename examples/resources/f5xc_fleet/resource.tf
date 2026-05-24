@@ -15,7 +15,7 @@ terraform {
 # Basic Fleet configuration
 resource "f5xc_fleet" "example" {
   name      = "example-fleet"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -32,12 +32,12 @@ resource "f5xc_fleet" "example" {
   # Network connectors
   inside_virtual_network {
     name      = "inside-network"
-    namespace = "system"
+    namespace = "staging"
   }
 
   outside_virtual_network {
     name      = "outside-network"
-    namespace = "system"
+    namespace = "staging"
   }
 
   # Default config

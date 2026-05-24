@@ -15,7 +15,7 @@ terraform {
 # Basic BGP Routing Policy configuration
 resource "f5xc_bgp_routing_policy" "example" {
   name      = "example-bgp-routing-policy"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

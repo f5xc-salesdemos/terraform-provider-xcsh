@@ -31,7 +31,7 @@ terraform {
 # Look up an existing BGP Asn Set by name
 data "f5xc_bgp_asn_set" "example" {
   name      = "example-bgp-asn-set"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "bgp_asn_set_id" {

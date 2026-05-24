@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Certificate Chain by name
 data "f5xc_certificate_chain" "example" {
   name      = "example-certificate-chain"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "certificate_chain_id" {

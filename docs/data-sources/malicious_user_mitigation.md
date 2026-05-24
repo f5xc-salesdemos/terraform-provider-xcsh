@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Malicious User Mitigation by name
 data "f5xc_malicious_user_mitigation" "example" {
   name      = "example-malicious-user-mitigation"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "malicious_user_mitigation_id" {

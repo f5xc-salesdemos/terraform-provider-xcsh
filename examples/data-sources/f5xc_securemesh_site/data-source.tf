@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Securemesh Site by name
 data "f5xc_securemesh_site" "example" {
   name      = "example-securemesh-site"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "securemesh_site_id" {

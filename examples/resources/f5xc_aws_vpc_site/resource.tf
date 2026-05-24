@@ -15,7 +15,7 @@ terraform {
 # Basic AWS VPC Site configuration
 resource "f5xc_aws_vpc_site" "example" {
   name      = "example-aws-vpc-site"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -32,7 +32,7 @@ resource "f5xc_aws_vpc_site" "example" {
   # AWS credentials reference
   aws_cred {
     name      = "aws-credentials"
-    namespace = "system"
+    namespace = "staging"
   }
 
   # VPC configuration

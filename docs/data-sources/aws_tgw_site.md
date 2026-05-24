@@ -31,7 +31,7 @@ terraform {
 # Look up an existing AWS TGW Site by name
 data "f5xc_aws_tgw_site" "example" {
   name      = "example-aws-tgw-site"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "aws_tgw_site_id" {

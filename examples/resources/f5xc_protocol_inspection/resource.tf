@@ -15,7 +15,7 @@ terraform {
 # Basic Protocol Inspection configuration
 resource "f5xc_protocol_inspection" "example" {
   name      = "example-protocol-inspection"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

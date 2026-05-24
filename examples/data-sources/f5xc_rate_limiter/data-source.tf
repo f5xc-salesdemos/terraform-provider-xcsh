@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Rate Limiter by name
 data "f5xc_rate_limiter" "example" {
   name      = "example-rate-limiter"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "rate_limiter_id" {

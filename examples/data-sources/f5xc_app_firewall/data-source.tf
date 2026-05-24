@@ -15,7 +15,7 @@ terraform {
 # Look up an existing App Firewall by name
 data "f5xc_app_firewall" "example" {
   name      = "example-app-firewall"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "app_firewall_id" {

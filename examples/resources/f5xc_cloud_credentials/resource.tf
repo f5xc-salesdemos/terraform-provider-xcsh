@@ -15,7 +15,7 @@ terraform {
 # Basic Cloud Credentials configuration
 resource "f5xc_cloud_credentials" "example" {
   name      = "example-cloud-credentials"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

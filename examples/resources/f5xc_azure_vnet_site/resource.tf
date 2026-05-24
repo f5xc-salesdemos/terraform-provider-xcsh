@@ -15,7 +15,7 @@ terraform {
 # Basic Azure VNET Site configuration
 resource "f5xc_azure_vnet_site" "example" {
   name      = "example-azure-vnet-site"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
@@ -32,7 +32,7 @@ resource "f5xc_azure_vnet_site" "example" {
   # Azure credentials reference
   azure_cred {
     name      = "azure-credentials"
-    namespace = "system"
+    namespace = "staging"
   }
 
   # Resource group

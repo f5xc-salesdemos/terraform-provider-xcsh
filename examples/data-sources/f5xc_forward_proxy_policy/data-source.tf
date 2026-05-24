@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Forward Proxy Policy by name
 data "f5xc_forward_proxy_policy" "example" {
   name      = "example-forward-proxy-policy"
-  namespace = "shared"
+  namespace = "staging"
 }
 
 output "forward_proxy_policy_id" {

@@ -15,7 +15,7 @@ terraform {
 # Look up an existing GCP VPC Site by name
 data "f5xc_gcp_vpc_site" "example" {
   name      = "example-gcp-vpc-site"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "gcp_vpc_site_id" {

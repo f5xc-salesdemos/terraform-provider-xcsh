@@ -15,7 +15,7 @@ terraform {
 # Basic Rate Limiter Policy configuration
 resource "f5xc_rate_limiter_policy" "example" {
   name      = "example-rate-limiter-policy"
-  namespace = "shared"
+  namespace = "staging"
 
   labels = {
     environment = "production"

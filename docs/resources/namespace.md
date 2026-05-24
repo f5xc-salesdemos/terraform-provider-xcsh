@@ -31,7 +31,7 @@ terraform {
 # Basic Namespace configuration
 resource "f5xc_namespace" "example" {
   name      = "example-namespace"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

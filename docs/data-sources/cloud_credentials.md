@@ -31,7 +31,7 @@ terraform {
 # Look up an existing Cloud Credentials by name
 data "f5xc_cloud_credentials" "example" {
   name      = "example-cloud-credentials"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "cloud_credentials_id" {
@@ -41,7 +41,7 @@ output "cloud_credentials_id" {
 # Example: Reference cloud credentials in site configuration
 # resource "f5xc_aws_vpc_site" "example" {
 #   name      = "example-aws-site"
-#   namespace = "system"
+#   namespace = "staging"
 #
 #   aws_cred {
 #     name      = data.f5xc_cloud_credentials.example.name

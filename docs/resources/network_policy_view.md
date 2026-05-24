@@ -31,7 +31,7 @@ terraform {
 # Basic Network Policy View configuration
 resource "f5xc_network_policy_view" "example" {
   name      = "example-network-policy-view"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"

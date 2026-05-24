@@ -15,7 +15,7 @@ terraform {
 # Look up an existing Fleet by name
 data "f5xc_fleet" "example" {
   name      = "example-fleet"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "fleet_id" {

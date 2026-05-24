@@ -15,7 +15,7 @@ terraform {
 # Basic Dc Cluster Group configuration
 resource "f5xc_dc_cluster_group" "example" {
   name      = "example-dc-cluster-group"
-  namespace = "system"
+  namespace = "staging"
 
   labels = {
     environment = "production"
