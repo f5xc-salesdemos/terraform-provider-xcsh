@@ -41,7 +41,7 @@ export F5XC_API_TOKEN="your-api-token"
 # Option 2: P12 Certificate
 export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
 export F5XC_P12_FILE="/path/to/credentials.p12"
-export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
+export F5XC_P12_PASSWORD="your-p12-password"  # gitleaks:allow
 ```
 
 ### 2. Configure Variables

@@ -76,11 +76,9 @@ func generateDataSourceExample(dataSourceName string) string {
 	sb.WriteString(fmt.Sprintf("  namespace = %q\n", ns))
 	sb.WriteString("}\n\n")
 
-	// Usage example
-	sb.WriteString("# Example: Use the data source in another resource\n")
-	sb.WriteString(fmt.Sprintf("# output \"%s_id\" {\n", dataSourceName))
-	sb.WriteString(fmt.Sprintf("#   value = data.f5xc_%s.example.id\n", dataSourceName))
-	sb.WriteString("# }\n")
+	sb.WriteString(fmt.Sprintf("output \"%s_id\" {\n", dataSourceName))
+	sb.WriteString(fmt.Sprintf("  value = data.f5xc_%s.example.id\n", dataSourceName))
+	sb.WriteString("}\n")
 
 	// Add resource-specific examples
 	addDataSourceSpecificExample(&sb, dataSourceName)

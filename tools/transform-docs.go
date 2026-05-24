@@ -3365,6 +3365,10 @@ func fixUpstreamTerminology(content string) string {
 		"User Name", "username",
 		"Host Name", "hostname",
 		"name space", "namespace",
+		"Javascript", "JavaScript",
+		"javascript", "JavaScript",
+		"MAC OS", "macOS",
+		"Clientside", "client-side",
 	).Replace(content)
 
 	cdnRegex := regexp.MustCompile(`\bcdn\b`)
@@ -3374,6 +3378,33 @@ func fixUpstreamTerminology(content string) string {
 	content = clickhouseRegex.ReplaceAllStringFunc(content, func(_ string) string {
 		return "ClickHouse"
 	})
+
+	sdkRegex := regexp.MustCompile(`\bSdk\b`)
+	content = sdkRegex.ReplaceAllString(content, "SDK")
+
+	githubRegex := regexp.MustCompile(`\b[Gg]ithub\b`)
+	content = githubRegex.ReplaceAllString(content, "GitHub")
+
+	gitlabRegex := regexp.MustCompile(`\b[Gg]itlab\b`)
+	content = gitlabRegex.ReplaceAllString(content, "GitLab")
+
+	bitbucketRegex := regexp.MustCompile(`\b[Bb]it[Bb]ucket\b`)
+	content = bitbucketRegex.ReplaceAllString(content, "Bitbucket")
+
+	dockerRegex := regexp.MustCompile(`\bdocker\b`)
+	content = dockerRegex.ReplaceAllString(content, "Docker")
+
+	ubuntuRegex := regexp.MustCompile(`\bubuntu\b`)
+	content = ubuntuRegex.ReplaceAllString(content, "Ubuntu")
+
+	azureRegex := regexp.MustCompile(`\bazure\b`)
+	content = azureRegex.ReplaceAllString(content, "Azure")
+
+	cassandraRegex := regexp.MustCompile(`\bcassandra\b`)
+	content = cassandraRegex.ReplaceAllString(content, "Cassandra")
+
+	mongodbRegex := regexp.MustCompile(`\bmongodb\b`)
+	content = mongodbRegex.ReplaceAllString(content, "MongoDB")
 
 	return content
 }

@@ -13,7 +13,7 @@
 #    OR for P12 certificate authentication:
 #    export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
 #    export F5XC_P12_FILE="/path/to/your-credentials.p12"
-#    export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
+#    export F5XC_P12_PASSWORD="your-p12-password"  # gitleaks:allow
 #
 # 4. Run terraform:
 #    terraform init
@@ -69,7 +69,7 @@ enable_container_registry_example = false  # Requires registry credentials below
 # 2. Set enable_aws_credentials_example = true above
 # 3. Fill in the values below
 
-aws_access_key_id     = ""  # e.g., "AKIAIOSFODNN7EXAMPLE"  # pragma: allowlist secret
+aws_access_key_id     = ""  # e.g., "AKIAIOSFODNN7EXAMPLE"  # gitleaks:allow
 aws_secret_access_key = ""  # Your AWS secret access key (will be encrypted)
 
 # -----------------------------------------------------------------------------

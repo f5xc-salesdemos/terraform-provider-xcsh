@@ -24,4 +24,4 @@ variable "f5xc_api_token" {
 # Environment variables for P12 authentication:
 # export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
 # export F5XC_P12_FILE="/path/to/certificate.p12"
-# export F5XC_P12_PASSWORD="your-p12-password"
+# export F5XC_P12_PASSWORD="your-p12-password"  # gitleaks:allow

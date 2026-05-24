@@ -350,6 +350,7 @@ jobs:
         if: needs.regenerate-docs.outputs.changed == 'true' || needs.regenerate-provider.outputs.changed == 'true'
         run: |
           go run tools/generate-examples.go
+          go run tools/generate-datasource-examples.go
           scripts/go-retry.sh 3 tfplugindocs generate
           go run tools/transform-docs.go
 
@@ -386,6 +387,37 @@ jobs:
                               if fixed != txt:
                                   open(fp, 'w').write(fixed)
 
+          # Fix terminology in generated docs (fallback for terms not caught by transform-docs.go)
+          import re
+          term_fixes = {
+              'Javascript': 'JavaScript', 'javascript': 'JavaScript',
+              'MAC OS': 'macOS', 'Clientside': 'client-side',
+          }
+          term_regex_fixes = [
+              (re.compile(r'\bSdk\b'), 'SDK'),
+              (re.compile(r'\b[Gg]ithub\b'), 'GitHub'),
+              (re.compile(r'\b[Gg]itlab\b'), 'GitLab'),
+              (re.compile(r'\b[Bb]it[Bb]ucket\b'), 'Bitbucket'),
+              (re.compile(r'\bdocker\b'), 'Docker'),
+              (re.compile(r'\bubuntu\b'), 'Ubuntu'),
+              (re.compile(r'\bazure\b'), 'Azure'),
+              (re.compile(r'\bcassandra\b'), 'Cassandra'),
+              (re.compile(r'\bmongodb\b'), 'MongoDB'),
+          ]
+          for root in ['docs', 'examples']:
+              for dirpath, _, filenames in os.walk(root):
+                  for fn in filenames:
+                      if fn.endswith('.md'):
+                          fp = os.path.join(dirpath, fn)
+                          txt = open(fp).read()
+                          fixed = txt
+                          for wrong, right in term_fixes.items():
+                              fixed = fixed.replace(wrong, right)
+                          for pattern, replacement in term_regex_fixes:
+                              fixed = pattern.sub(replacement, fixed)
+                          if fixed != txt:
+                              open(fp, 'w').write(fixed)
+
           # Inject terraform block into any .tf example missing it
           tf_block = '''terraform {
             required_version = \">= 1.0\"
@@ -402,7 +434,6 @@ jobs:
           for tf_file in glob.glob('examples/**/resource.tf', recursive=True) + glob.glob('examples/**/data-source.tf', recursive=True):
               content = open(tf_file).read()
               if 'required_providers' not in content:
-                  # Find first non-comment line to insert before
                   lines = content.split('\n')
                   insert_at = 0
                   for i, line in enumerate(lines):
@@ -411,6 +442,16 @@ jobs:
                           break
                   lines.insert(insert_at, tf_block)
                   open(tf_file, 'w').write('\n'.join(lines))
+
+          # Inject output block into data-source.tf examples missing one (tflint unused declarations)
+          for ds_file in glob.glob('examples/data-sources/**/data-source.tf', recursive=True):
+              content = open(ds_file).read()
+              if 'output ' not in content:
+                  m = re.search(r'data\s+\"f5xc_(\w+)\"\s+\"(\w+)\"', content)
+                  if m:
+                      res_name, label = m.group(1), m.group(2)
+                      output_block = f'\noutput \"{res_name}_id\" {{\n  value = data.f5xc_{res_name}.{label}.id\n}}\n'
+                      open(ds_file, 'w').write(content.rstrip() + '\n' + output_block)
           "
 
       - name: Check for changes
