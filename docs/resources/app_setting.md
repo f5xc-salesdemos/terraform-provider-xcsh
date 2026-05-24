@@ -99,7 +99,7 @@ An [`app_type_settings`](#app-type-settings) block supports the following:
 
 <a id="setting-ebbad6"></a>&#x2022; [`business_logic_markup_setting`](#setting-ebbad6) - Optional Block<br>Settings specifying how API Discovery will be performed<br>See [Business Logic Markup Setting](#setting-ebbad6) below.
 
-<a id="setting-7d0042"></a>&#x2022; [`timeseries_analyses_setting`](#setting-7d0042) - Optional Block<br>DDOS Settings. Configuration for DDOS Detection<br>See [Timeseries Analyses Setting](#setting-7d0042) below.
+<a id="setting-7d0042"></a>&#x2022; [`timeseries_analyses_setting`](#setting-7d0042) - Optional Block<br>Configuration parameter for timeseries analyses setting<br>See [Timeseries Analyses Setting](#setting-7d0042) below.
 
 <a id="setting-2c7217"></a>&#x2022; [`user_behavior_analysis_setting`](#setting-2c7217) - Optional Block<br>Configuration for user behavior analysis<br>See [User Behavior Analysis Setting](#setting-2c7217) below.
 
@@ -121,7 +121,7 @@ An [`app_type_ref`](#app-type-settings-app-type-ref) block (within [`app_type_se
 
 A [`business_logic_markup_setting`](#setting-ebbad6) block (within [`app_type_settings`](#app-type-settings)) supports the following:
 
-<a id="disable-d65146"></a>&#x2022; [`disable`](#disable-d65146) - Optional Block<br>Enable this option
+<a id="spec-b147ce"></a>&#x2022; [`disable_spec`](#spec-b147ce) - Optional Block<br>Enable this option
 
 <a id="enable-280dfb"></a>&#x2022; [`enable`](#enable-280dfb) - Optional Block<br>Enable this option
 
@@ -139,13 +139,13 @@ A [`timeseries_analyses_setting`](#setting-7d0042) block (within [`app_type_sett
 
 An [`user_behavior_analysis_setting`](#setting-2c7217) block (within [`app_type_settings`](#app-type-settings)) supports the following:
 
-<a id="detection-dd4d64"></a>&#x2022; [`disable_detection`](#detection-dd4d64) - Optional Block<br>Enable this option
+<a id="detection-dd4d64"></a>&#x2022; [`disable_detection`](#detection-dd4d64) - Optional Block<br>Configuration parameter for disable detection
 
-<a id="learning-b549ee"></a>&#x2022; [`disable_learning`](#learning-b549ee) - Optional Block<br>Enable this option
+<a id="learning-b549ee"></a>&#x2022; [`disable_learning`](#learning-b549ee) - Optional Block<br>Configuration parameter for disable learning
 
 <a id="detection-4127d2"></a>&#x2022; [`enable_detection`](#detection-4127d2) - Optional Block<br>Various factors about user activity are monitored and analysed to determine malicious users. These settings allow tuning those factors used by the system to detect malicious users<br>See [Enable Detection](#detection-4127d2) below.
 
-<a id="learning-94d2dc"></a>&#x2022; [`enable_learning`](#learning-94d2dc) - Optional Block<br>Enable this option
+<a id="learning-94d2dc"></a>&#x2022; [`enable_learning`](#learning-94d2dc) - Optional Block<br>Configuration parameter for enable learning
 
 #### App Type Settings User Behavior Analysis Setting Enable Detection
 

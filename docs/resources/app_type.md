@@ -48,8 +48,8 @@ resource "f5xc_app_type" "example" {
     # Configure business_logic_markup_setting settings
   }
   # Enable this option
-  disable {
-    # Configure disable settings
+  disable_spec {
+    # Configure disable_spec settings
   }
   # Discovered API Settings. Configure Discovered API Settings.
   discovered_api_settings {
@@ -97,7 +97,7 @@ In addition to all arguments above, the following attributes are exported:
 
 A [`business_logic_markup_setting`](#business-logic-markup-setting) block supports the following:
 
-<a id="business-logic-markup-setting-disable"></a>&#x2022; [`disable`](#business-logic-markup-setting-disable) - Optional Block<br>Enable this option
+<a id="spec-b70952"></a>&#x2022; [`disable_spec`](#spec-b70952) - Optional Block<br>Enable this option
 
 <a id="settings-c32a65"></a>&#x2022; [`discovered_api_settings`](#settings-c32a65) - Optional Block<br>Discovered API Settings. Configure Discovered API Settings<br>See [Discovered API Settings](#settings-c32a65) below.
 

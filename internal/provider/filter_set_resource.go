@@ -108,12 +108,12 @@ var FilterSetFilterFieldsStringFieldModelAttrTypes = map[string]attr.Type{
 type FilterSetResourceModel struct {
 	Name         types.String   `tfsdk:"name"`
 	Namespace    types.String   `tfsdk:"namespace"`
+	ContextKey   types.String   `tfsdk:"context_key"`
 	Annotations  types.Map      `tfsdk:"annotations"`
 	Description  types.String   `tfsdk:"description"`
 	Disable      types.Bool     `tfsdk:"disable"`
 	Labels       types.Map      `tfsdk:"labels"`
 	ID           types.String   `tfsdk:"id"`
-	ContextKey   types.String   `tfsdk:"context_key"`
 	Timeouts     timeouts.Value `tfsdk:"timeouts"`
 	FilterFields types.List     `tfsdk:"filter_fields"`
 }
@@ -146,6 +146,10 @@ func (r *FilterSetResource) Schema(ctx context.Context, req resource.SchemaReque
 					validators.NamespaceValidator(),
 				},
 			},
+			"context_key": schema.StringAttribute{
+				MarkdownDescription: "Indexable context key that identifies a page or page type for which the FilterSet is applicable .",
+				Required:            true,
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -166,14 +170,6 @@ func (r *FilterSetResource) Schema(ctx context.Context, req resource.SchemaReque
 			},
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique identifier for the resource.",
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"context_key": schema.StringAttribute{
-				MarkdownDescription: "Indexable context key that identifies a page or page type for which the FilterSet is applicable .",
-				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -201,7 +197,7 @@ func (r *FilterSetResource) Schema(ctx context.Context, req resource.SchemaReque
 							MarkdownDescription: "Either an absolute time range or a relative time interval.",
 							Attributes: map[string]schema.Attribute{
 								"relative": schema.StringAttribute{
-									MarkdownDescription: "relative time duration.",
+									MarkdownDescription: "Exclusive with [absolute] relative time duration.",
 									Optional:            true,
 								},
 							},
@@ -349,6 +345,9 @@ func (r *FilterSetResource) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.ContextKey.IsNull() && !data.ContextKey.IsUnknown() {
+		createReq.Spec["context_key"] = data.ContextKey.ValueString()
+	}
 	if !data.FilterFields.IsNull() && !data.FilterFields.IsUnknown() {
 		var filter_fieldsItems []FilterSetFilterFieldsModel
 		diags := data.FilterFields.ElementsAs(ctx, &filter_fieldsItems, false)
@@ -400,9 +399,6 @@ func (r *FilterSetResource) Create(ctx context.Context, req resource.CreateReque
 			createReq.Spec["filter_fields"] = filter_fieldsList
 		}
 	}
-	if !data.ContextKey.IsNull() && !data.ContextKey.IsUnknown() {
-		createReq.Spec["context_key"] = data.ContextKey.ValueString()
-	}
 
 	apiResource, err := r.client.CreateFilterSet(ctx, createReq)
 	if err != nil {
@@ -416,6 +412,11 @@ func (r *FilterSetResource) Create(ctx context.Context, req resource.CreateReque
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["context_key"].(string); ok && v != "" {
+		data.ContextKey = types.StringValue(v)
+	} else {
+		data.ContextKey = types.StringNull()
+	}
 	if listData, ok := apiResource.Spec["filter_fields"].([]interface{}); ok && len(listData) > 0 {
 		var filter_fieldsList []FilterSetFilterFieldsModel
 		var existingFilterFieldsItems []FilterSetFilterFieldsModel
@@ -489,11 +490,6 @@ func (r *FilterSetResource) Create(ctx context.Context, req resource.CreateReque
 	} else {
 		// No data from API - set to null list
 		data.FilterFields = types.ListNull(types.ObjectType{AttrTypes: FilterSetFilterFieldsModelAttrTypes})
-	}
-	if v, ok := apiResource.Spec["context_key"].(string); ok && v != "" {
-		data.ContextKey = types.StringValue(v)
-	} else {
-		data.ContextKey = types.StringNull()
 	}
 
 	tflog.Trace(ctx, "created FilterSet resource")
@@ -575,6 +571,11 @@ func (r *FilterSetResource) Read(ctx context.Context, req resource.ReadRequest, 
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["context_key"].(string); ok && v != "" {
+		data.ContextKey = types.StringValue(v)
+	} else {
+		data.ContextKey = types.StringNull()
+	}
 	if listData, ok := apiResource.Spec["filter_fields"].([]interface{}); ok && len(listData) > 0 {
 		var filter_fieldsList []FilterSetFilterFieldsModel
 		var existingFilterFieldsItems []FilterSetFilterFieldsModel
@@ -648,11 +649,6 @@ func (r *FilterSetResource) Read(ctx context.Context, req resource.ReadRequest, 
 	} else {
 		// No data from API - set to null list
 		data.FilterFields = types.ListNull(types.ObjectType{AttrTypes: FilterSetFilterFieldsModelAttrTypes})
-	}
-	if v, ok := apiResource.Spec["context_key"].(string); ok && v != "" {
-		data.ContextKey = types.StringValue(v)
-	} else {
-		data.ContextKey = types.StringNull()
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -705,6 +701,9 @@ func (r *FilterSetResource) Update(ctx context.Context, req resource.UpdateReque
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.ContextKey.IsNull() && !data.ContextKey.IsUnknown() {
+		apiResource.Spec["context_key"] = data.ContextKey.ValueString()
+	}
 	if !data.FilterFields.IsNull() && !data.FilterFields.IsUnknown() {
 		var filter_fieldsItems []FilterSetFilterFieldsModel
 		diags := data.FilterFields.ElementsAs(ctx, &filter_fieldsItems, false)
@@ -756,9 +755,6 @@ func (r *FilterSetResource) Update(ctx context.Context, req resource.UpdateReque
 			apiResource.Spec["filter_fields"] = filter_fieldsList
 		}
 	}
-	if !data.ContextKey.IsNull() && !data.ContextKey.IsUnknown() {
-		apiResource.Spec["context_key"] = data.ContextKey.ValueString()
-	}
 
 	_, err := r.client.UpdateFilterSet(ctx, apiResource)
 	if err != nil {
@@ -778,18 +774,16 @@ func (r *FilterSetResource) Update(ctx context.Context, req resource.UpdateReque
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["context_key"].(string); ok && v != "" {
-		data.ContextKey = types.StringValue(v)
-	} else if data.ContextKey.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.ContextKey = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["context_key"].(string); ok && v != "" {
+		data.ContextKey = types.StringValue(v)
+	} else {
+		data.ContextKey = types.StringNull()
+	}
 	if listData, ok := apiResource.Spec["filter_fields"].([]interface{}); ok && len(listData) > 0 {
 		var filter_fieldsList []FilterSetFilterFieldsModel
 		var existingFilterFieldsItems []FilterSetFilterFieldsModel
@@ -863,11 +857,6 @@ func (r *FilterSetResource) Update(ctx context.Context, req resource.UpdateReque
 	} else {
 		// No data from API - set to null list
 		data.FilterFields = types.ListNull(types.ObjectType{AttrTypes: FilterSetFilterFieldsModelAttrTypes})
-	}
-	if v, ok := apiResource.Spec["context_key"].(string); ok && v != "" {
-		data.ContextKey = types.StringValue(v)
-	} else {
-		data.ContextKey = types.StringNull()
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

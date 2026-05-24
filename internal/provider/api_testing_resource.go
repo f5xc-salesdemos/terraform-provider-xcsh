@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -354,10 +355,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"custom_header_value": schema.StringAttribute{
 				MarkdownDescription: "Add x-F5-API-testing-identifier header value to prevent security flags on API testing traffic.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(128),
 				},
 			},
 		},
@@ -373,12 +373,15 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"allow_destructive_methods": schema.BoolAttribute{
-							MarkdownDescription: "Enable to allow API test to execute destructive methods. Be cautious as these can alter or DELETE data.",
+							MarkdownDescription: "Enable to allow API Testing to execute against destructive methods. Use with caution as these may modify or DELETE data.",
 							Optional:            true,
 						},
 						"domain": schema.StringAttribute{
 							MarkdownDescription: "Add your testing environment domain. Be aware that running tests on a production domain can impact live applications, as API testing cannot distinguish between production and testing environments.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -389,6 +392,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 									"credential_name": schema.StringAttribute{
 										MarkdownDescription: "Enter a unique name for the credentials used in API testing .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -401,6 +407,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 											"key": schema.StringAttribute{
 												MarkdownDescription: "Key.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(128),
+												},
 											},
 										},
 										Blocks: map[string]schema.Block{
@@ -418,6 +427,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 															"location": schema.StringAttribute{
 																MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(1024),
+																},
 															},
 															"store_provider": schema.StringAttribute{
 																MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -435,6 +447,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 															"url": schema.StringAttribute{
 																MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 131072),
+																},
 															},
 														},
 													},
@@ -448,6 +463,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 											"user": schema.StringAttribute{
 												MarkdownDescription: "User.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
+												},
 											},
 										},
 										Blocks: map[string]schema.Block{
@@ -465,6 +483,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 															"location": schema.StringAttribute{
 																MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(1024),
+																},
 															},
 															"store_provider": schema.StringAttribute{
 																MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -482,6 +503,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 															"url": schema.StringAttribute{
 																MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 131072),
+																},
 															},
 														},
 													},
@@ -490,7 +514,7 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 										},
 									},
 									"bearer_token": schema.SingleNestedBlock{
-										MarkdownDescription: "Bearer",
+										MarkdownDescription: "Configuration parameter for bearer token.",
 										Attributes:          map[string]schema.Attribute{},
 										Blocks: map[string]schema.Block{
 											"token": schema.SingleNestedBlock{
@@ -507,6 +531,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 															"location": schema.StringAttribute{
 																MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(1024),
+																},
 															},
 															"store_provider": schema.StringAttribute{
 																MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -524,6 +551,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 															"url": schema.StringAttribute{
 																MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 131072),
+																},
 															},
 														},
 													},
@@ -537,10 +567,16 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 											"method": schema.StringAttribute{
 												MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] Specifies the HTTP method used to access a resource. Any HTTP Method. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("ANY", "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH", "COPY"),
+												},
 											},
 											"path": schema.StringAttribute{
 												MarkdownDescription: "Path.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 1024),
+												},
 											},
 											"token_response_key": schema.StringAttribute{
 												MarkdownDescription: "Token Response Key. .",
@@ -562,6 +598,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 															"location": schema.StringAttribute{
 																MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(1024),
+																},
 															},
 															"store_provider": schema.StringAttribute{
 																MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -579,6 +618,9 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 															"url": schema.StringAttribute{
 																MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 131072),
+																},
 															},
 														},
 													},
@@ -599,7 +641,7 @@ func (r *APITestingResource) Schema(ctx context.Context, req resource.SchemaRequ
 				MarkdownDescription: "[OneOf: every_day, every_month, every_week] Enable this option",
 			},
 			"every_month": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for every month.",
 			},
 			"every_week": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
@@ -1109,13 +1151,6 @@ func (r *APITestingResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["custom_header_value"].(string); ok && v != "" {
-		data.CustomHeaderValue = types.StringValue(v)
-	} else if data.CustomHeaderValue.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.CustomHeaderValue = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields

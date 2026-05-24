@@ -147,15 +147,15 @@ An [`egress_rules`](#rules-egress-rules) block (within [`rules`](#rules)) suppor
 
 <a id="rules-egress-rules-adv-action"></a>&#x2022; [`adv_action`](#rules-egress-rules-adv-action) - Optional Block<br>Network Policy Rule Advanced Action provides additional OPTIONS along with RuleAction and PBRRuleAction<br>See [Adv Action](#rules-egress-rules-adv-action) below.
 
-<a id="rules-egress-rules-all-tcp-traffic"></a>&#x2022; [`all_tcp_traffic`](#rules-egress-rules-all-tcp-traffic) - Optional Block<br>Enable this option
+<a id="rules-egress-rules-all-tcp-traffic"></a>&#x2022; [`all_tcp_traffic`](#rules-egress-rules-all-tcp-traffic) - Optional Block<br>Configuration parameter for all TCP traffic
 
-<a id="rules-egress-rules-all-traffic"></a>&#x2022; [`all_traffic`](#rules-egress-rules-all-traffic) - Optional Block<br>Enable this option
+<a id="rules-egress-rules-all-traffic"></a>&#x2022; [`all_traffic`](#rules-egress-rules-all-traffic) - Optional Block<br>Configuration parameter for all traffic
 
-<a id="rules-egress-rules-all-udp-traffic"></a>&#x2022; [`all_udp_traffic`](#rules-egress-rules-all-udp-traffic) - Optional Block<br>Enable this option
+<a id="rules-egress-rules-all-udp-traffic"></a>&#x2022; [`all_udp_traffic`](#rules-egress-rules-all-udp-traffic) - Optional Block<br>Configuration parameter for all UDP traffic
 
 <a id="rules-egress-rules-any"></a>&#x2022; [`any`](#rules-egress-rules-any) - Optional Block<br>Enable this option
 
-<a id="rules-egress-rules-applications"></a>&#x2022; [`applications`](#rules-egress-rules-applications) - Optional Block<br>Applications. Application protocols like HTTP, SNMP<br>See [Applications](#rules-egress-rules-applications) below.
+<a id="rules-egress-rules-applications"></a>&#x2022; [`applications`](#rules-egress-rules-applications) - Optional Block<br>Configuration parameter for applications<br>See [Applications](#rules-egress-rules-applications) below.
 
 <a id="rules-egress-rules-inside-endpoints"></a>&#x2022; [`inside_endpoints`](#rules-egress-rules-inside-endpoints) - Optional Block<br>Enable this option
 
@@ -250,15 +250,15 @@ An [`ingress_rules`](#rules-ingress-rules) block (within [`rules`](#rules)) supp
 
 <a id="rules-ingress-rules-adv-action"></a>&#x2022; [`adv_action`](#rules-ingress-rules-adv-action) - Optional Block<br>Network Policy Rule Advanced Action provides additional OPTIONS along with RuleAction and PBRRuleAction<br>See [Adv Action](#rules-ingress-rules-adv-action) below.
 
-<a id="rules-ingress-rules-all-tcp-traffic"></a>&#x2022; [`all_tcp_traffic`](#rules-ingress-rules-all-tcp-traffic) - Optional Block<br>Enable this option
+<a id="rules-ingress-rules-all-tcp-traffic"></a>&#x2022; [`all_tcp_traffic`](#rules-ingress-rules-all-tcp-traffic) - Optional Block<br>Configuration parameter for all TCP traffic
 
-<a id="rules-ingress-rules-all-traffic"></a>&#x2022; [`all_traffic`](#rules-ingress-rules-all-traffic) - Optional Block<br>Enable this option
+<a id="rules-ingress-rules-all-traffic"></a>&#x2022; [`all_traffic`](#rules-ingress-rules-all-traffic) - Optional Block<br>Configuration parameter for all traffic
 
-<a id="rules-ingress-rules-all-udp-traffic"></a>&#x2022; [`all_udp_traffic`](#rules-ingress-rules-all-udp-traffic) - Optional Block<br>Enable this option
+<a id="rules-ingress-rules-all-udp-traffic"></a>&#x2022; [`all_udp_traffic`](#rules-ingress-rules-all-udp-traffic) - Optional Block<br>Configuration parameter for all UDP traffic
 
 <a id="rules-ingress-rules-any"></a>&#x2022; [`any`](#rules-ingress-rules-any) - Optional Block<br>Enable this option
 
-<a id="rules-ingress-rules-applications"></a>&#x2022; [`applications`](#rules-ingress-rules-applications) - Optional Block<br>Applications. Application protocols like HTTP, SNMP<br>See [Applications](#rules-ingress-rules-applications) below.
+<a id="rules-ingress-rules-applications"></a>&#x2022; [`applications`](#rules-ingress-rules-applications) - Optional Block<br>Configuration parameter for applications<br>See [Applications](#rules-ingress-rules-applications) below.
 
 <a id="rules-ingress-rules-inside-endpoints"></a>&#x2022; [`inside_endpoints`](#rules-ingress-rules-inside-endpoints) - Optional Block<br>Enable this option
 

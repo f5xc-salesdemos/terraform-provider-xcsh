@@ -129,7 +129,7 @@ A [`rules`](#rules) block supports the following:
 
 <a id="rules-ip-and-tls-fingerprint"></a>&#x2022; [`ip_and_tls_fingerprint`](#rules-ip-and-tls-fingerprint) - Optional Block<br>Enable this option
 
-<a id="rules-ja4-tls-fingerprint"></a>&#x2022; [`ja4_tls_fingerprint`](#rules-ja4-tls-fingerprint) - Optional Block<br>Enable this option
+<a id="rules-ja4-tls-fingerprint"></a>&#x2022; [`ja4_tls_fingerprint`](#rules-ja4-tls-fingerprint) - Optional Block<br>Configuration parameter for ja4 TLS fingerprint
 
 <a id="rules-jwt-claim-name"></a>&#x2022; [`jwt_claim_name`](#rules-jwt-claim-name) - Optional String<br>Use the JWT claim value as user identifier
 
@@ -137,7 +137,7 @@ A [`rules`](#rules) block supports the following:
 
 <a id="rules-query-param-key"></a>&#x2022; [`query_param_key`](#rules-query-param-key) - Optional String<br>Use the query parameter value for the given key as user
 
-<a id="rules-tls-fingerprint"></a>&#x2022; [`tls_fingerprint`](#rules-tls-fingerprint) - Optional Block<br>Enable this option
+<a id="rules-tls-fingerprint"></a>&#x2022; [`tls_fingerprint`](#rules-tls-fingerprint) - Optional Block<br>Configuration parameter for TLS fingerprint
 
 #### Timeouts
 

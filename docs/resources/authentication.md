@@ -2,12 +2,12 @@
 page_title: "f5xc_authentication Resource - terraform-provider-f5xc"
 subcategory: "Authentication"
 description: |-
-  Manages a Authentication resource in F5 Distributed Cloud.
+  Manages an Authentication resource in F5 Distributed Cloud.
 ---
 
 # f5xc_authentication (Resource)
 
-Manages a Authentication resource in F5 Distributed Cloud.
+Manages an Authentication resource in F5 Distributed Cloud.
 
 ~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
@@ -15,7 +15,7 @@ Manages a Authentication resource in F5 Distributed Cloud.
 
 ```terraform
 # Authentication Resource Example
-# Manages a Authentication resource in F5 Distributed Cloud.
+# Manages an Authentication resource in F5 Distributed Cloud.
 
 terraform {
   required_version = ">= 1.0"
@@ -104,7 +104,7 @@ A [`cookie_params`](#cookie-params) block supports the following:
 <a id="cookie-params-cookie-refresh-interval"></a>&#x2022; [`cookie_refresh_interval`](#cookie-params-cookie-refresh-interval) - Optional Number<br>Specifies in seconds refresh interval for session cookie. This is used to keep the active user active and reduce RE-login. When an incoming cookie's session expiry is still valid, and time to expire falls behind this interval, RE-issue a cookie with
 new expiry and with the same original session
 
-<a id="cookie-params-kms-key-hmac"></a>&#x2022; [`kms_key_hmac`](#cookie-params-kms-key-hmac) - Optional Block<br>KMS Key Reference. Reference to KMS Key Object
+<a id="cookie-params-kms-key-hmac"></a>&#x2022; [`kms_key_hmac`](#cookie-params-kms-key-hmac) - Optional Block<br>Configuration parameter for kms key HMAC
 
 <a id="cookie-params-session-expiry"></a>&#x2022; [`session_expiry`](#cookie-params-session-expiry) - Optional Number<br>Specifies in seconds max lifetime of an authenticated session after which the user will be forced to login again. Default session expiry is 86400 seconds(24 hours)
 
@@ -158,7 +158,7 @@ An [`oidc_auth`](#oidc-auth) block supports the following:
 
 <a id="oidc-auth-client-secret"></a>&#x2022; [`client_secret`](#oidc-auth-client-secret) - Optional Block<br>SecretType is used in an object to indicate a sensitive/confidential field<br>See [Client Secret](#oidc-auth-client-secret) below.
 
-<a id="oidc-auth-oidc-auth-params"></a>&#x2022; [`oidc_auth_params`](#oidc-auth-oidc-auth-params) - Optional Block<br>OIDCAuthParams<br>See [OIDC Auth Params](#oidc-auth-oidc-auth-params) below.
+<a id="oidc-auth-oidc-auth-params"></a>&#x2022; [`oidc_auth_params`](#oidc-auth-oidc-auth-params) - Optional Block<br>Configuration parameter for OIDC auth params<br>See [OIDC Auth Params](#oidc-auth-oidc-auth-params) below.
 
 <a id="oidc-auth-oidc-client-id"></a>&#x2022; [`oidc_client_id`](#oidc-auth-oidc-client-id) - Optional String<br>Client ID used while sending the Authorization Request to OIDC server
 

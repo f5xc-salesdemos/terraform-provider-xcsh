@@ -2,12 +2,12 @@
 page_title: "f5xc_alert_receiver Data Source - terraform-provider-f5xc"
 subcategory: "Monitoring"
 description: |-
-  Manages new Alert Receiver object. in F5 Distributed Cloud.
+  Retrieves information about an existing Alert Receiver object. in F5 Distributed Cloud.
 ---
 
 # f5xc_alert_receiver (Data Source)
 
-Manages new Alert Receiver object. in F5 Distributed Cloud.
+Retrieves information about new Alert Receiver object. in F5 Distributed Cloud. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

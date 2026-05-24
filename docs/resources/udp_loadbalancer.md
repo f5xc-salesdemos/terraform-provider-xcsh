@@ -86,31 +86,37 @@ resource "f5xc_udp_loadbalancer" "example" {
 ### Spec Argument Reference
 
 -> **One of the following:**
+&#x2022; <a id="active-service-policies"></a>[`active_service_policies`](#active-service-policies) - Optional Block<br>Configuration parameter for active service policies<br>See [Active Service Policies](#active-service-policies) below for details.
+<br><br>&#x2022; <a id="no-service-policies"></a>[`no_service_policies`](#no-service-policies) - Optional Block<br>Configuration parameter for no service policies
+
+-> **One of the following:**
 &#x2022; <a id="advertise-custom"></a>[`advertise_custom`](#advertise-custom) - Optional Block<br>Defines a way to advertise a VIP on specific sites<br>See [Advertise Custom](#advertise-custom) below for details.
 <br><br>&#x2022; <a id="advertise-on-public"></a>[`advertise_on_public`](#advertise-on-public) - Optional Block<br>Defines a way to advertise a load balancer on public. If optional public_ip is provided, it will only be advertised on RE sites where that public_ip is available<br>See [Advertise On Public](#advertise-on-public) below for details.
 <br><br>&#x2022; <a id="advertise-on-public-default-vip"></a>[`advertise_on_public_default_vip`](#advertise-on-public-default-vip) - Optional Block<br>Enable this option
 
-<a id="dns-volterra-managed"></a>&#x2022; [`dns_volterra_managed`](#dns-volterra-managed) - Optional Bool<br>DNS records for domains will be managed automatically by F5 Distributed Cloud. As a prerequisite, the domain to be delegated to F5 Distributed Cloud using the Delegated Domain feature or a DNS CNAME record must be created in your DNS provider's portal
+<a id="dns-volterra-managed"></a>&#x2022; [`dns_volterra_managed`](#dns-volterra-managed) - Required Bool<br>DNS records for domains will be managed automatically by F5 Distributed Cloud. As a prerequisite, the domain to be delegated to F5 Distributed Cloud using the Delegated Domain feature or a DNS CNAME record must be created in your DNS provider's portal
 
-<a id="do-not-advertise"></a>&#x2022; [`do_not_advertise`](#do-not-advertise) - Optional Block<br>Enable this option
+<a id="do-not-advertise"></a>&#x2022; [`do_not_advertise`](#do-not-advertise) - Optional Block<br>Configuration parameter for do not advertise
 
-<a id="domains"></a>&#x2022; [`domains`](#domains) - Optional List<br>List of domains (host/authority header) that will be matched to this load balancer
+<a id="domains"></a>&#x2022; [`domains`](#domains) - Required List<br>List of domains (host/authority header) that will be matched to this load balancer
 
-<a id="enable-per-packet-load-balancing"></a>&#x2022; [`enable_per_packet_load_balancing`](#enable-per-packet-load-balancing) - Optional Bool<br>Per packet load balancing: If disabled (default): First packet identified by source IP/port and local IP/port is sent to an upstream server as the load balancing algorithm dictates, and subsequent packets with the same identity are forwarded to the same
+<a id="enable-per-packet-load-balancing"></a>&#x2022; [`enable_per_packet_load_balancing`](#enable-per-packet-load-balancing) - Required Bool<br>Per packet load balancing: If disabled (default): First packet identified by source IP/port and local IP/port is sent to an upstream server as the load balancing algorithm dictates, and subsequent packets with the same identity are forwarded to the same
 upstream server without recheckingg the
 
 -> **One of the following:**
-&#x2022; <a id="hash-policy-choice-random"></a>[`hash_policy_choice_random`](#hash-policy-choice-random) - Optional Block<br>Enable this option
-<br><br>&#x2022; <a id="hash-policy-choice-round-robin"></a>[`hash_policy_choice_round_robin`](#hash-policy-choice-round-robin) - Optional Block<br>Enable this option
+&#x2022; <a id="hash-policy-choice-random"></a>[`hash_policy_choice_random`](#hash-policy-choice-random) - Optional Block<br>Configuration parameter for hash policy choice random
+<br><br>&#x2022; <a id="hash-policy-choice-round-robin"></a>[`hash_policy_choice_round_robin`](#hash-policy-choice-round-robin) - Optional Block<br>Configuration parameter for hash policy choice round robin
 <br><br>&#x2022; <a id="hash-policy-choice-source-ip-stickiness"></a>[`hash_policy_choice_source_ip_stickiness`](#hash-policy-choice-source-ip-stickiness) - Optional Block<br>Enable this option
 
-<a id="idle-timeout"></a>&#x2022; [`idle_timeout`](#idle-timeout) - Optional Number<br>The amount of time that a session can exist without upstream or downstream activity, in milliseconds
+<a id="idle-timeout"></a>&#x2022; [`idle_timeout`](#idle-timeout) - Required Number<br>The amount of time that a session can exist without upstream or downstream activity, in milliseconds
 
 -> **One of the following:**
-&#x2022; <a id="listen-port"></a>[`listen_port`](#listen-port) - Optional Number<br>Listen Port for this load balancer
-<br><br>&#x2022; <a id="port-ranges"></a>[`port_ranges`](#port-ranges) - Optional String<br>A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'
+&#x2022; <a id="listen-port"></a>[`listen_port`](#listen-port) - Required Number<br>Listen Port for this load balancer
+<br><br>&#x2022; <a id="port-ranges"></a>[`port_ranges`](#port-ranges) - Required String<br>A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'
 
 <a id="origin-pools-weights"></a>&#x2022; [`origin_pools_weights`](#origin-pools-weights) - Optional Block<br>Origin pools with weights and priorities used for this load balancer<br>See [Origin Pools Weights](#origin-pools-weights) below for details.
+
+<a id="service-policies-from-namespace"></a>&#x2022; [`service_policies_from_namespace`](#service-policies-from-namespace) - Optional Block<br>Enable this option
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 
@@ -123,6 +129,23 @@ In addition to all arguments above, the following attributes are exported:
 <a id="id"></a>&#x2022; [`id`](#id) - Optional String<br>Unique identifier for the resource
 
 ---
+
+#### Active Service Policies
+
+An [`active_service_policies`](#active-service-policies) block supports the following:
+
+<a id="active-service-policies-policies"></a>&#x2022; [`policies`](#active-service-policies-policies) - Optional Block<br>Service Policies is a sequential engine where policies (and rules within the policy) are evaluated one after the other. It's important to define the correct order (policies evaluated from top to bottom in the list) for service policies, to GET the intended result. For each
+request, its<br>See [Policies](#active-service-policies-policies) below.
+
+#### Active Service Policies Policies
+
+A [`policies`](#active-service-policies-policies) block (within [`active_service_policies`](#active-service-policies)) supports the following:
+
+<a id="active-service-policies-policies-name"></a>&#x2022; [`name`](#active-service-policies-policies-name) - Optional String<br>When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name
+
+<a id="namespace-df0e5f"></a>&#x2022; [`namespace`](#namespace-df0e5f) - Optional String<br>When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace
+
+<a id="active-service-policies-policies-tenant"></a>&#x2022; [`tenant`](#active-service-policies-policies-tenant) - Optional String<br>When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant
 
 #### Advertise Custom
 
@@ -266,7 +289,7 @@ An [`origin_pools_weights`](#origin-pools-weights) block supports the following:
 
 <a id="origin-pools-weights-cluster"></a>&#x2022; [`cluster`](#origin-pools-weights-cluster) - Optional Block<br>Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name<br>See [Cluster](#origin-pools-weights-cluster) below.
 
-<a id="origin-pools-weights-endpoint-subsets"></a>&#x2022; [`endpoint_subsets`](#origin-pools-weights-endpoint-subsets) - Optional Block<br>Upstream origin pool may be configured to divide its origin servers into subsets based on metadata attached to the origin servers. Routes may then specify the metadata that a endpoint must match in order to be selected by the load balancer For origin servers
+<a id="origin-pools-weights-endpoint-subsets"></a>&#x2022; [`endpoint_subsets`](#origin-pools-weights-endpoint-subsets) - Optional Block<br>Upstream origin pool may be configured to divide its origin servers into subsets based on metadata attached to the origin servers. Routes may then specify the metadata that an endpoint must match in order to be selected by the load balancer For origin servers
 which are discovered in K8S or Consul
 
 <a id="origin-pools-weights-pool"></a>&#x2022; [`pool`](#origin-pools-weights-pool) - Optional Block<br>Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name<br>See [Pool](#origin-pools-weights-pool) below.

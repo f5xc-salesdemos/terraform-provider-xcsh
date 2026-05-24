@@ -1,5 +1,5 @@
 # Workload Resource Example
-# Manages workload_flavor. in F5 Distributed Cloud.
+# Manages a Workload resource in F5 Distributed Cloud for workload. configuration.
 
 terraform {
   required_version = ">= 1.0"

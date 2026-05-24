@@ -71,7 +71,7 @@ resource "f5xc_cloud_elastic_ip" "example" {
 
 ### Spec Argument Reference
 
-<a id="item-count"></a>&#x2022; [`item_count`](#item-count) - Optional Number<br>Number of Elastic Ips / Public Ips associated with this object per Node
+<a id="item-count"></a>&#x2022; [`item_count`](#item-count) - Required Number<br>Number of Elastic Ips / Public Ips associated with this object per Node
 
 <a id="site-ref"></a>&#x2022; [`site_ref`](#site-ref) - Optional Block<br>Site to which this cloud elastic IP object is attached<br>See [Site Ref](#site-ref) below for details.
 

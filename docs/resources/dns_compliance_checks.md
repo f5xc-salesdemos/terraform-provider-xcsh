@@ -65,15 +65,15 @@ resource "f5xc_dns_compliance_checks" "example" {
 
 ### Spec Argument Reference
 
-<a id="disallowed-query-type-list"></a>&#x2022; [`disallowed_query_type_list`](#disallowed-query-type-list) - Optional List  Defaults to `QUERY`<br>Possible values are `QUERY`, `IQUERY`, `STATUS`, `NOTIFY`, `UPDATE`<br>[Enum: QUERY|IQUERY|STATUS|NOTIFY|UPDATE] Disallowed Query Type Values. Disallowed Query Type Values
+<a id="disallowed-query-type-list"></a>&#x2022; [`disallowed_query_type_list`](#disallowed-query-type-list) - Required List  Defaults to `QUERY`<br>Possible values are `QUERY`, `IQUERY`, `STATUS`, `NOTIFY`, `UPDATE`<br>[Enum: QUERY|IQUERY|STATUS|NOTIFY|UPDATE] Disallowed Query Type Values. Disallowed Query Type Values
 
-<a id="disallowed-resource-record-type-list"></a>&#x2022; [`disallowed_resource_record_type_list`](#disallowed-resource-record-type-list) - Optional List  Defaults to `T`<br>Possible values are `T`, `A`, `NS`, `MD`, `MF`, `CNAME`, `SOA`, `MB`, `MG`, `MR`, `NULL`, `WKS`, `PTR`, `HINFO`, `MINFO`, `MX`, `TXT`, `RP`, `AFSDB`, `X25`, `ISDN`, `RT`, `NSAP`, `NSAP_PTR`, `SIG`, `KEY`, `PX`, `GPOS`, `AAAA`,
+<a id="disallowed-resource-record-type-list"></a>&#x2022; [`disallowed_resource_record_type_list`](#disallowed-resource-record-type-list) - Required List  Defaults to `T`<br>Possible values are `T`, `A`, `NS`, `MD`, `MF`, `CNAME`, `SOA`, `MB`, `MG`, `MR`, `NULL`, `WKS`, `PTR`, `HINFO`, `MINFO`, `MX`, `TXT`, `RP`, `AFSDB`, `X25`, `ISDN`, `RT`, `NSAP`, `NSAP_PTR`, `SIG`, `KEY`, `PX`, `GPOS`, `AAAA`,
 `LOC`, `NXT`, `EID`, `NIMLOC`, `SRV`, `ATMA`, `NAPTR`, `KX`, `CERT`, `A6`, `DNAME`, `SINK`, `OPT`, `APL`, `DS`, `SSHFP`, `IPSECKEY`, `RRSIG`, `NSEC`, `DNSKEY`, `DHCID`, `NSEC3`, `NSEC3PARAM`, `TLSA`, `SMIMEA`, `HIP`, `NINFO`, `RKEY`, `TALINK`, `CDS`, `CDNSKEY`, `OPENPGPKEY`, `CSYNC`, `SPF`, `UINFO`, `UID`, `GID`, `UNSPEC`, `NID`, `L32`, `L64`, `LP`, `EUI48`, `EUI64`, `TKEY`, `TSIG`, `IXFR`,
 `AXFR`, `MAILB`, `MAILA`, `URI`, `CAA`, `TA`, `DLV`<br>[Enum:
 T|A|NS|MD|MF|CNAME|SOA|MB|MG|MR|NULL|WKS|PTR|HINFO|MINFO|MX|TXT|RP|AFSDB|X25|ISDN|RT|NSAP|NSAP_PTR|SIG|KEY|PX|GPOS|AAAA|LOC|NXT|EID|NIMLOC|SRV|ATMA|NAPTR|KX|CERT|A6|DNAME|SINK|OPT|APL|DS|SSHFP|IPSECKEY|RRSIG|NSEC|DNSKEY|DHCID|NSEC3|NSEC3PARAM|TLSA|SMIMEA|HIP|NINFO|RKEY|TALINK|CDS|CDNSKEY|OPENPGPKEY|CSYNC|SPF|UINFO|UID|GID|UNSPEC|NID|L32|L64|LP|EUI48|EUI64|TKEY|TSIG|IXFR|AXFR|MAILB|MAILA|URI|CAA|TA|DLV]
 Disallowed Resource Record Types. Disallowed Resource Record Type List
 
-<a id="domain-denylist"></a>&#x2022; [`domain_denylist`](#domain-denylist) - Optional List<br>List of domains to be denied by configuration object
+<a id="domain-denylist"></a>&#x2022; [`domain_denylist`](#domain-denylist) - Required List<br>List of domains to be denied by configuration object
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 

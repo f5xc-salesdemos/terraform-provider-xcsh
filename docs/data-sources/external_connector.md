@@ -2,12 +2,12 @@
 page_title: "f5xc_external_connector Data Source - terraform-provider-f5xc"
 subcategory: "Networking"
 description: |-
-  Manages a External Connector resource in F5 Distributed Cloud for external_connector configuration specification. configuration.
+  Retrieves information about an existing External Connector resource in F5 Distributed Cloud for external_connector configuration specification. configuration.
 ---
 
 # f5xc_external_connector (Data Source)
 
-Manages a External Connector resource in F5 Distributed Cloud for external_connector configuration specification. configuration.
+Retrieves information about an External Connector resource in F5 Distributed Cloud for external_connector configuration specification. configuration. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

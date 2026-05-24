@@ -105,7 +105,7 @@ A [`routes`](#routes) block supports the following:
 
 <a id="injection-2c38a2"></a>&#x2022; [`inherited_bot_defense_JavaScript_injection`](#injection-2c38a2) - Optional Block<br>Enable this option
 
-<a id="routes-inherited-waf-exclusion"></a>&#x2022; [`inherited_waf_exclusion`](#routes-inherited-waf-exclusion) - Optional Block<br>Enable this option
+<a id="routes-inherited-waf-exclusion"></a>&#x2022; [`inherited_waf_exclusion`](#routes-inherited-waf-exclusion) - Optional Block<br>Configuration parameter for inherited WAF exclusion
 
 <a id="routes-match"></a>&#x2022; [`match`](#routes-match) - Optional Block<br>Match. Route match condition<br>See [Match](#routes-match) below.
 
@@ -279,23 +279,23 @@ A [`response_cookies_to_add`](#routes-response-cookies-to-add) block (within [`r
 
 <a id="expiry-62b700"></a>&#x2022; [`add_expiry`](#expiry-62b700) - Optional String<br>Add expiry attribute
 
-<a id="httponly-c2890d"></a>&#x2022; [`add_httponly`](#httponly-c2890d) - Optional Block<br>Enable this option
+<a id="httponly-c2890d"></a>&#x2022; [`add_httponly`](#httponly-c2890d) - Optional Block<br>Configuration parameter for add httponly
 
-<a id="partitioned-aa1f08"></a>&#x2022; [`add_partitioned`](#partitioned-aa1f08) - Optional Block<br>Enable this option
+<a id="partitioned-aa1f08"></a>&#x2022; [`add_partitioned`](#partitioned-aa1f08) - Optional Block<br>Configuration parameter for add partitioned
 
 <a id="routes-response-cookies-to-add-add-path"></a>&#x2022; [`add_path`](#routes-response-cookies-to-add-add-path) - Optional String<br>Add path attribute
 
 <a id="secure-9cd35a"></a>&#x2022; [`add_secure`](#secure-9cd35a) - Optional Block<br>Enable this option
 
-<a id="domain-c754cb"></a>&#x2022; [`ignore_domain`](#domain-c754cb) - Optional Block<br>Enable this option
+<a id="domain-c754cb"></a>&#x2022; [`ignore_domain`](#domain-c754cb) - Optional Block<br>Configuration parameter for ignore domain
 
-<a id="expiry-44cdc8"></a>&#x2022; [`ignore_expiry`](#expiry-44cdc8) - Optional Block<br>Enable this option
+<a id="expiry-44cdc8"></a>&#x2022; [`ignore_expiry`](#expiry-44cdc8) - Optional Block<br>Configuration parameter for ignore expiry
 
-<a id="httponly-99def6"></a>&#x2022; [`ignore_httponly`](#httponly-99def6) - Optional Block<br>Enable this option
+<a id="httponly-99def6"></a>&#x2022; [`ignore_httponly`](#httponly-99def6) - Optional Block<br>Configuration parameter for ignore httponly
 
-<a id="age-478fc0"></a>&#x2022; [`ignore_max_age`](#age-478fc0) - Optional Block<br>Enable this option
+<a id="age-478fc0"></a>&#x2022; [`ignore_max_age`](#age-478fc0) - Optional Block<br>Configuration parameter for ignore max age
 
-<a id="partitioned-7a224c"></a>&#x2022; [`ignore_partitioned`](#partitioned-7a224c) - Optional Block<br>Enable this option
+<a id="partitioned-7a224c"></a>&#x2022; [`ignore_partitioned`](#partitioned-7a224c) - Optional Block<br>Configuration parameter for ignore partitioned
 
 <a id="path-3677c1"></a>&#x2022; [`ignore_path`](#path-3677c1) - Optional Block<br>Enable this option
 
@@ -303,7 +303,7 @@ A [`response_cookies_to_add`](#routes-response-cookies-to-add) block (within [`r
 
 <a id="secure-effaa1"></a>&#x2022; [`ignore_secure`](#secure-effaa1) - Optional Block<br>Enable this option
 
-<a id="value-0e603e"></a>&#x2022; [`ignore_value`](#value-0e603e) - Optional Block<br>Enable this option
+<a id="value-0e603e"></a>&#x2022; [`ignore_value`](#value-0e603e) - Optional Block<br>Configuration parameter for ignore value
 
 <a id="value-e8b96e"></a>&#x2022; [`max_age_value`](#value-e8b96e) - Optional Number<br>Add max age attribute
 
@@ -385,7 +385,7 @@ that caused the user agent to<br>See [CSRF Policy](#routes-route-destination-csr
 
 <a id="cluster-098c21"></a>&#x2022; [`do_not_retract_cluster`](#cluster-098c21) - Optional Block<br>Enable this option
 
-<a id="subsets-17b178"></a>&#x2022; [`endpoint_subsets`](#subsets-17b178) - Optional Block<br>Upstream cluster may be configured to divide its endpoints into subsets based on metadata attached to the endpoints. Routes may then specify the metadata that a endpoint must match in order to be selected by the load balancer Labels field of endpoint object's metadata is used for subset
+<a id="subsets-17b178"></a>&#x2022; [`endpoint_subsets`](#subsets-17b178) - Optional Block<br>Upstream cluster may be configured to divide its endpoints into subsets based on metadata attached to the endpoints. Routes may then specify the metadata that an endpoint must match in order to be selected by the load balancer Labels field of endpoint object's metadata is used for subset
 
 <a id="routes-route-destination-hash-policy"></a>&#x2022; [`hash_policy`](#routes-route-destination-hash-policy) - Optional Block<br>Specifies a list of hash policies to use for ring hash load balancing. Each hash policy is evaluated individually and the combined result is used to route the request<br>See [Hash Policy](#routes-route-destination-hash-policy) below.
 
@@ -448,7 +448,7 @@ A [`cors_policy`](#routes-route-destination-cors-policy) block (within [`routes.
 
 A [`csrf_policy`](#routes-route-destination-csrf-policy) block (within [`routes.route_destination`](#routes-route-destination)) supports the following:
 
-<a id="domains-a58e7f"></a>&#x2022; [`all_load_balancer_domains`](#domains-a58e7f) - Optional Block<br>Enable this option
+<a id="domains-a58e7f"></a>&#x2022; [`all_load_balancer_domains`](#domains-a58e7f) - Optional Block<br>Configuration parameter for all load balancer domains
 
 <a id="list-904516"></a>&#x2022; [`custom_domain_list`](#list-904516) - Optional Block<br>List of domain names used for Host header matching<br>See [Custom Domain List](#list-904516) below.
 
@@ -464,7 +464,7 @@ A [`destinations`](#routes-route-destination-destinations) block (within [`route
 
 <a id="cluster-d8ac1b"></a>&#x2022; [`cluster`](#cluster-d8ac1b) - Optional Block<br>Indicates the upstream cluster to which the request should be sent. If the cluster does not exist ServiceUnavailable response will be sent<br>See [Cluster](#cluster-d8ac1b) below.
 
-<a id="subsets-23862f"></a>&#x2022; [`endpoint_subsets`](#subsets-23862f) - Optional Block<br>Upstream cluster may be configured to divide its endpoints into subsets based on metadata attached to the endpoints. Routes may then specify the metadata that a endpoint must match in order to be selected by the load balancer Labels field of endpoint object's metadata is used for subset
+<a id="subsets-23862f"></a>&#x2022; [`endpoint_subsets`](#subsets-23862f) - Optional Block<br>Upstream cluster may be configured to divide its endpoints into subsets based on metadata attached to the endpoints. Routes may then specify the metadata that an endpoint must match in order to be selected by the load balancer Labels field of endpoint object's metadata is used for subset
 
 <a id="priority-830655"></a>&#x2022; [`priority`](#priority-830655) - Optional Number<br>Priority of this cluster, valid only with multiple destinations are configured. Value of 0 will make the cluster as lowest priority upstream cluster Priority of 1 means highest priority and is considered active. When active cluster is not available, lower priority clusters are made active as per
 
@@ -501,11 +501,11 @@ A [`hash_policy`](#routes-route-destination-hash-policy) block (within [`routes.
 
 A [`cookie`](#cookie-fa8e38) block (within [`routes.route_destination.hash_policy`](#routes-route-destination-hash-policy)) supports the following:
 
-<a id="httponly-c187b0"></a>&#x2022; [`add_httponly`](#httponly-c187b0) - Optional Block<br>Enable this option
+<a id="httponly-c187b0"></a>&#x2022; [`add_httponly`](#httponly-c187b0) - Optional Block<br>Configuration parameter for add httponly
 
 <a id="secure-141faf"></a>&#x2022; [`add_secure`](#secure-141faf) - Optional Block<br>Enable this option
 
-<a id="httponly-d1eb99"></a>&#x2022; [`ignore_httponly`](#httponly-d1eb99) - Optional Block<br>Enable this option
+<a id="httponly-d1eb99"></a>&#x2022; [`ignore_httponly`](#httponly-d1eb99) - Optional Block<br>Configuration parameter for ignore httponly
 
 <a id="samesite-dc4309"></a>&#x2022; [`ignore_samesite`](#samesite-dc4309) - Optional Block<br>Enable this option
 
@@ -557,11 +557,11 @@ A [`percent`](#percent-e76235) block (within [`routes.route_destination.mirror_p
 
 A [`query_params`](#routes-route-destination-query-params) block (within [`routes.route_destination`](#routes-route-destination)) supports the following:
 
-<a id="params-29da85"></a>&#x2022; [`remove_all_params`](#params-29da85) - Optional Block<br>Enable this option
+<a id="params-29da85"></a>&#x2022; [`remove_all_params`](#params-29da85) - Optional Block<br>Configuration parameter for remove all params
 
 <a id="params-cfccb5"></a>&#x2022; [`replace_params`](#params-cfccb5) - Optional String
 
-<a id="params-7e3845"></a>&#x2022; [`retain_all_params`](#params-7e3845) - Optional Block<br>Enable this option
+<a id="params-7e3845"></a>&#x2022; [`retain_all_params`](#params-7e3845) - Optional Block<br>Configuration parameter for retain all params
 
 #### Routes Route Destination Regex Rewrite
 
@@ -625,19 +625,19 @@ A [`route_redirect`](#routes-route-redirect) block (within [`routes`](#routes)) 
 
 <a id="routes-route-redirect-proto-redirect"></a>&#x2022; [`proto_redirect`](#routes-route-redirect-proto-redirect) - Optional String<br>Swap protocol part of incoming URL in redirect URL The protocol can be swapped with either HTTP or HTTPS When incoming-proto option is specified, swapping of protocol is not done
 
-<a id="routes-route-redirect-remove-all-params"></a>&#x2022; [`remove_all_params`](#routes-route-redirect-remove-all-params) - Optional Block<br>Enable this option
+<a id="routes-route-redirect-remove-all-params"></a>&#x2022; [`remove_all_params`](#routes-route-redirect-remove-all-params) - Optional Block<br>Configuration parameter for remove all params
 
 <a id="routes-route-redirect-replace-params"></a>&#x2022; [`replace_params`](#routes-route-redirect-replace-params) - Optional String
 
 <a id="routes-route-redirect-response-code"></a>&#x2022; [`response_code`](#routes-route-redirect-response-code) - Optional Number<br>The HTTP status code to use in the redirect response
 
-<a id="routes-route-redirect-retain-all-params"></a>&#x2022; [`retain_all_params`](#routes-route-redirect-retain-all-params) - Optional Block<br>Enable this option
+<a id="routes-route-redirect-retain-all-params"></a>&#x2022; [`retain_all_params`](#routes-route-redirect-retain-all-params) - Optional Block<br>Configuration parameter for retain all params
 
 #### Routes Service Policy
 
 A [`service_policy`](#routes-service-policy) block (within [`routes`](#routes)) supports the following:
 
-<a id="routes-service-policy-disable"></a>&#x2022; [`disable`](#routes-service-policy-disable) - Optional Bool<br>disable service policy at route level, if it is configured at virtual-host level
+<a id="routes-service-policy-disable-spec"></a>&#x2022; [`disable_spec`](#routes-service-policy-disable-spec) - Optional Bool<br>disable service policy at route level, if it is configured at virtual-host level
 
 #### Routes WAF Exclusion Policy
 
@@ -655,9 +655,9 @@ A [`waf_type`](#routes-waf-type) block (within [`routes`](#routes)) supports the
 
 <a id="routes-waf-type-app-firewall"></a>&#x2022; [`app_firewall`](#routes-waf-type-app-firewall) - Optional Block<br>List of references to the app_firewall configuration objects<br>See [App Firewall](#routes-waf-type-app-firewall) below.
 
-<a id="routes-waf-type-disable-waf"></a>&#x2022; [`disable_waf`](#routes-waf-type-disable-waf) - Optional Block<br>Enable this option
+<a id="routes-waf-type-disable-waf"></a>&#x2022; [`disable_waf`](#routes-waf-type-disable-waf) - Optional Block<br>Configuration parameter for disable WAF
 
-<a id="routes-waf-type-inherit-waf"></a>&#x2022; [`inherit_waf`](#routes-waf-type-inherit-waf) - Optional Block<br>Enable this option
+<a id="routes-waf-type-inherit-waf"></a>&#x2022; [`inherit_waf`](#routes-waf-type-inherit-waf) - Optional Block<br>Configuration parameter for inherit WAF
 
 #### Routes WAF Type App Firewall
 

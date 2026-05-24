@@ -32,8 +32,8 @@ resource "f5xc_app_type" "example" {
     # Configure business_logic_markup_setting settings
   }
   # Enable this option
-  disable {
-    # Configure disable settings
+  disable_spec {
+    # Configure disable_spec settings
   }
   # Discovered API Settings. Configure Discovered API Settings.
   discovered_api_settings {

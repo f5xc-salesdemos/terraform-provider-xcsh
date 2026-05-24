@@ -40,3 +40,6 @@ resource "f5xc_service_policy_rule" "example" {
     # Configure any_ip settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - port_matcher

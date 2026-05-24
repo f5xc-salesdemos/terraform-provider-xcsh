@@ -1,10 +1,7 @@
 ---
-page_title: "F5XC Terraform Provider"
-title: "F5XC Terraform Provider"
+page_title: "F5XC Provider"
 description: |-
   Terraform provider for F5 Distributed Cloud (F5XC) enabling infrastructure as code for load balancers, security policies, sites, and networking. Community-maintained provider built from public F5 API documentation.
-sidebar:
-  hidden: true
 ---
 
 # F5XC Provider

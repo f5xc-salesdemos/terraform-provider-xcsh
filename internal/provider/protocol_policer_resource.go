@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -204,6 +207,10 @@ func (r *ProtocolPolicerResource) Schema(ctx context.Context, req resource.Schem
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 1024),
+											stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -211,6 +218,10 @@ func (r *ProtocolPolicerResource) Schema(ctx context.Context, req resource.Schem
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 1024),
+											stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 										},
 									},
 									"tenant": schema.StringAttribute{

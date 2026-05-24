@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -199,18 +200,16 @@ func (r *BotDefenseAppInfrastructureResource) Schema(ctx context.Context, req re
 			},
 			"environment_type": schema.StringAttribute{
 				MarkdownDescription: "[Enum: PRODUCTION|TESTING] Environment Type Production environment Testing environment. Possible values are `PRODUCTION`, `TESTING`. Defaults to `PRODUCTION`.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("PRODUCTION", "TESTING"),
 				},
 			},
 			"traffic_type": schema.StringAttribute{
 				MarkdownDescription: "[Enum: WEB|MOBILE] Traffic Type Web traffic Mobile traffic. Possible values are `WEB`, `MOBILE`. Defaults to `WEB`.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("WEB", "MOBILE"),
 				},
 			},
 		},
@@ -227,10 +226,16 @@ func (r *BotDefenseAppInfrastructureResource) Schema(ctx context.Context, req re
 					"infra_host_name": schema.StringAttribute{
 						MarkdownDescription: "Infra Host Name. Infra Host Name .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(1024),
+						},
 					},
 					"region": schema.StringAttribute{
 						MarkdownDescription: "[Enum: US|EU|ASIA] Defines a selection for Bot Defense Advanced region - US: US US region - EU: EU European Union region - ASIA: ASIA Asia region. Possible values are `US`, `EU`, `ASIA`. Defaults to `US`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("US", "EU", "ASIA"),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -241,10 +246,16 @@ func (r *BotDefenseAppInfrastructureResource) Schema(ctx context.Context, req re
 								"ip_address": schema.StringAttribute{
 									MarkdownDescription: "IP Address. Egress IP address .",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(7, 1024),
+									},
 								},
 								"location": schema.StringAttribute{
 									MarkdownDescription: "[Enum: AWS_AP_NORTHEAST_1|AWS_AP_NORTHEAST_3|AWS_AP_SOUTH_1|AWS_AP_SOUTH_2|AWS_AP_SOUTHEAST_1|AWS_AP_SOUTHEAST_2|AWS_AP_SOUTHEAST_3|AWS_EU_CENTRAL_1|AWS_EU_NORTH_1|AWS_EU_WEST_1|AWS_ME_SOUTH_1|AWS_SA_EAST_1|AWS_US_EAST_1|AWS_US_EAST_2|AWS_US_WEST_1|AWS_US_WEST_2|GCP_ASIA_EAST_1|GCP_ASIA_EAST_2|GCP_ASIA_NORTHEAST_1|GCP_ASIA_NORTHEAST_2|GCP_ASIA_NORTHEAST_3|GCP_ASIA_SOUTH_1|GCP_ASIA_SOUTHEAST_1|GCP_ASIA_SOUTHEAST_2|GCP_AUSTRALIA_SOUTHEAST_1|GCP_EUROPE_WEST_1|GCP_EUROPE_WEST_2|GCP_EUROPE_WEST_3|GCP_NORTHAMERICA_NORTHEAST_1|GCP_NORTHAMERICA_NORTHEAST_2|GCP_SOUTHAMERICA_EAST_1|GCP_SOUTHAMERICA_WEST_1|GCP_US_CENTRAL_1|GCP_US_EAST_1|GCP_US_EAST_4|GCP_US_WEST_1|GCP_US_WEST_2] Region location AWS_AP_NORTHEAST_1 AWS_AP_NORTHEAST_3 AWS_AP_SOUTH_1 AWS_AP_SOUTH_2 AWS_AP_SOUTHEAST_1 AWS_AP_SOUTHEAST_2 AWS_AP_SOUTHEAST_3 AWS_EU_CENTRAL_1 AWS_EU_NORTH_1 AWS_EU_WEST_1 AWS_ME_SOUTH_1 AWS_SA_EAST_1 AWS_US_EAST_1 AWS_US_EAST_2 AWS_US_WEST_1 AWS_US_WEST_2 GCP_ASIA_EAST_1.. Possible values are `AWS_AP_NORTHEAST_1`, `AWS_AP_NORTHEAST_3`, `AWS_AP_SOUTH_1`, `AWS_AP_SOUTH_2`, `AWS_AP_SOUTHEAST_1`, `AWS_AP_SOUTHEAST_2`, `AWS_AP_SOUTHEAST_3`, `AWS_EU_CENTRAL_1`, `AWS_EU_NORTH_1`, `AWS_EU_WEST_1`, `AWS_ME_SOUTH_1`, `AWS_SA_EAST_1`, `AWS_US_EAST_1`, `AWS_US_EAST_2`, `AWS_US_WEST_1`, `AWS_US_WEST_2`, `GCP_ASIA_EAST_1`, `GCP_ASIA_EAST_2`, `GCP_ASIA_NORTHEAST_1`, `GCP_ASIA_NORTHEAST_2`, `GCP_ASIA_NORTHEAST_3`, `GCP_ASIA_SOUTH_1`, `GCP_ASIA_SOUTHEAST_1`, `GCP_ASIA_SOUTHEAST_2`, `GCP_AUSTRALIA_SOUTHEAST_1`, `GCP_EUROPE_WEST_1`, `GCP_EUROPE_WEST_2`, `GCP_EUROPE_WEST_3`, `GCP_NORTHAMERICA_NORTHEAST_1`, `GCP_NORTHAMERICA_NORTHEAST_2`, `GCP_SOUTHAMERICA_EAST_1`, `GCP_SOUTHAMERICA_WEST_1`, `GCP_US_CENTRAL_1`, `GCP_US_EAST_1`, `GCP_US_EAST_4`, `GCP_US_WEST_1`, `GCP_US_WEST_2`. Defaults to `AWS_AP_NORTHEAST_1`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("AWS_AP_NORTHEAST_1", "AWS_AP_NORTHEAST_3", "AWS_AP_SOUTH_1", "AWS_AP_SOUTH_2", "AWS_AP_SOUTHEAST_1", "AWS_AP_SOUTHEAST_2", "AWS_AP_SOUTHEAST_3", "AWS_EU_CENTRAL_1", "AWS_EU_NORTH_1", "AWS_EU_WEST_1", "AWS_ME_SOUTH_1", "AWS_SA_EAST_1", "AWS_US_EAST_1", "AWS_US_EAST_2", "AWS_US_WEST_1", "AWS_US_WEST_2", "GCP_ASIA_EAST_1", "GCP_ASIA_EAST_2", "GCP_ASIA_NORTHEAST_1", "GCP_ASIA_NORTHEAST_2", "GCP_ASIA_NORTHEAST_3", "GCP_ASIA_SOUTH_1", "GCP_ASIA_SOUTHEAST_1", "GCP_ASIA_SOUTHEAST_2", "GCP_AUSTRALIA_SOUTHEAST_1", "GCP_EUROPE_WEST_1", "GCP_EUROPE_WEST_2", "GCP_EUROPE_WEST_3", "GCP_NORTHAMERICA_NORTHEAST_1", "GCP_NORTHAMERICA_NORTHEAST_2", "GCP_SOUTHAMERICA_EAST_1", "GCP_SOUTHAMERICA_WEST_1", "GCP_US_CENTRAL_1", "GCP_US_EAST_1", "GCP_US_EAST_4", "GCP_US_WEST_1", "GCP_US_WEST_2"),
+									},
 								},
 							},
 						},
@@ -254,16 +265,25 @@ func (r *BotDefenseAppInfrastructureResource) Schema(ctx context.Context, req re
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"host_name": schema.StringAttribute{
-									MarkdownDescription: "Ingress Host Name.",
+									MarkdownDescription: "Exclusive with [ip_address] Ingress Host Name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
 								},
 								"ip_address": schema.StringAttribute{
-									MarkdownDescription: "Ingress IP Address.",
+									MarkdownDescription: "Exclusive with [host_name] Ingress IP Address.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(7, 1024),
+									},
 								},
 								"location": schema.StringAttribute{
 									MarkdownDescription: "[Enum: AWS_AP_NORTHEAST_1|AWS_AP_NORTHEAST_3|AWS_AP_SOUTH_1|AWS_AP_SOUTH_2|AWS_AP_SOUTHEAST_1|AWS_AP_SOUTHEAST_2|AWS_AP_SOUTHEAST_3|AWS_EU_CENTRAL_1|AWS_EU_NORTH_1|AWS_EU_WEST_1|AWS_ME_SOUTH_1|AWS_SA_EAST_1|AWS_US_EAST_1|AWS_US_EAST_2|AWS_US_WEST_1|AWS_US_WEST_2|GCP_ASIA_EAST_1|GCP_ASIA_EAST_2|GCP_ASIA_NORTHEAST_1|GCP_ASIA_NORTHEAST_2|GCP_ASIA_NORTHEAST_3|GCP_ASIA_SOUTH_1|GCP_ASIA_SOUTHEAST_1|GCP_ASIA_SOUTHEAST_2|GCP_AUSTRALIA_SOUTHEAST_1|GCP_EUROPE_WEST_1|GCP_EUROPE_WEST_2|GCP_EUROPE_WEST_3|GCP_NORTHAMERICA_NORTHEAST_1|GCP_NORTHAMERICA_NORTHEAST_2|GCP_SOUTHAMERICA_EAST_1|GCP_SOUTHAMERICA_WEST_1|GCP_US_CENTRAL_1|GCP_US_EAST_1|GCP_US_EAST_4|GCP_US_WEST_1|GCP_US_WEST_2] Region location AWS_AP_NORTHEAST_1 AWS_AP_NORTHEAST_3 AWS_AP_SOUTH_1 AWS_AP_SOUTH_2 AWS_AP_SOUTHEAST_1 AWS_AP_SOUTHEAST_2 AWS_AP_SOUTHEAST_3 AWS_EU_CENTRAL_1 AWS_EU_NORTH_1 AWS_EU_WEST_1 AWS_ME_SOUTH_1 AWS_SA_EAST_1 AWS_US_EAST_1 AWS_US_EAST_2 AWS_US_WEST_1 AWS_US_WEST_2 GCP_ASIA_EAST_1.. Possible values are `AWS_AP_NORTHEAST_1`, `AWS_AP_NORTHEAST_3`, `AWS_AP_SOUTH_1`, `AWS_AP_SOUTH_2`, `AWS_AP_SOUTHEAST_1`, `AWS_AP_SOUTHEAST_2`, `AWS_AP_SOUTHEAST_3`, `AWS_EU_CENTRAL_1`, `AWS_EU_NORTH_1`, `AWS_EU_WEST_1`, `AWS_ME_SOUTH_1`, `AWS_SA_EAST_1`, `AWS_US_EAST_1`, `AWS_US_EAST_2`, `AWS_US_WEST_1`, `AWS_US_WEST_2`, `GCP_ASIA_EAST_1`, `GCP_ASIA_EAST_2`, `GCP_ASIA_NORTHEAST_1`, `GCP_ASIA_NORTHEAST_2`, `GCP_ASIA_NORTHEAST_3`, `GCP_ASIA_SOUTH_1`, `GCP_ASIA_SOUTHEAST_1`, `GCP_ASIA_SOUTHEAST_2`, `GCP_AUSTRALIA_SOUTHEAST_1`, `GCP_EUROPE_WEST_1`, `GCP_EUROPE_WEST_2`, `GCP_EUROPE_WEST_3`, `GCP_NORTHAMERICA_NORTHEAST_1`, `GCP_NORTHAMERICA_NORTHEAST_2`, `GCP_SOUTHAMERICA_EAST_1`, `GCP_SOUTHAMERICA_WEST_1`, `GCP_US_CENTRAL_1`, `GCP_US_EAST_1`, `GCP_US_EAST_4`, `GCP_US_WEST_1`, `GCP_US_WEST_2`. Defaults to `AWS_AP_NORTHEAST_1`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("AWS_AP_NORTHEAST_1", "AWS_AP_NORTHEAST_3", "AWS_AP_SOUTH_1", "AWS_AP_SOUTH_2", "AWS_AP_SOUTHEAST_1", "AWS_AP_SOUTHEAST_2", "AWS_AP_SOUTHEAST_3", "AWS_EU_CENTRAL_1", "AWS_EU_NORTH_1", "AWS_EU_WEST_1", "AWS_ME_SOUTH_1", "AWS_SA_EAST_1", "AWS_US_EAST_1", "AWS_US_EAST_2", "AWS_US_WEST_1", "AWS_US_WEST_2", "GCP_ASIA_EAST_1", "GCP_ASIA_EAST_2", "GCP_ASIA_NORTHEAST_1", "GCP_ASIA_NORTHEAST_2", "GCP_ASIA_NORTHEAST_3", "GCP_ASIA_SOUTH_1", "GCP_ASIA_SOUTHEAST_1", "GCP_ASIA_SOUTHEAST_2", "GCP_AUSTRALIA_SOUTHEAST_1", "GCP_EUROPE_WEST_1", "GCP_EUROPE_WEST_2", "GCP_EUROPE_WEST_3", "GCP_NORTHAMERICA_NORTHEAST_1", "GCP_NORTHAMERICA_NORTHEAST_2", "GCP_SOUTHAMERICA_EAST_1", "GCP_SOUTHAMERICA_WEST_1", "GCP_US_CENTRAL_1", "GCP_US_EAST_1", "GCP_US_EAST_4", "GCP_US_WEST_1", "GCP_US_WEST_2"),
+									},
 								},
 							},
 						},
@@ -276,10 +296,16 @@ func (r *BotDefenseAppInfrastructureResource) Schema(ctx context.Context, req re
 					"infra_host_name": schema.StringAttribute{
 						MarkdownDescription: "Infra Host Name. Infra Host Name .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(1024),
+						},
 					},
 					"region": schema.StringAttribute{
 						MarkdownDescription: "[Enum: US|EU|ASIA] Defines a selection for Bot Defense Advanced region - US: US US region - EU: EU European Union region - ASIA: ASIA Asia region. Possible values are `US`, `EU`, `ASIA`. Defaults to `US`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("US", "EU", "ASIA"),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -290,10 +316,16 @@ func (r *BotDefenseAppInfrastructureResource) Schema(ctx context.Context, req re
 								"ip_address": schema.StringAttribute{
 									MarkdownDescription: "IP Address. Egress IP address .",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(7, 1024),
+									},
 								},
 								"location": schema.StringAttribute{
 									MarkdownDescription: "[Enum: AWS_AP_NORTHEAST_1|AWS_AP_NORTHEAST_3|AWS_AP_SOUTH_1|AWS_AP_SOUTH_2|AWS_AP_SOUTHEAST_1|AWS_AP_SOUTHEAST_2|AWS_AP_SOUTHEAST_3|AWS_EU_CENTRAL_1|AWS_EU_NORTH_1|AWS_EU_WEST_1|AWS_ME_SOUTH_1|AWS_SA_EAST_1|AWS_US_EAST_1|AWS_US_EAST_2|AWS_US_WEST_1|AWS_US_WEST_2|GCP_ASIA_EAST_1|GCP_ASIA_EAST_2|GCP_ASIA_NORTHEAST_1|GCP_ASIA_NORTHEAST_2|GCP_ASIA_NORTHEAST_3|GCP_ASIA_SOUTH_1|GCP_ASIA_SOUTHEAST_1|GCP_ASIA_SOUTHEAST_2|GCP_AUSTRALIA_SOUTHEAST_1|GCP_EUROPE_WEST_1|GCP_EUROPE_WEST_2|GCP_EUROPE_WEST_3|GCP_NORTHAMERICA_NORTHEAST_1|GCP_NORTHAMERICA_NORTHEAST_2|GCP_SOUTHAMERICA_EAST_1|GCP_SOUTHAMERICA_WEST_1|GCP_US_CENTRAL_1|GCP_US_EAST_1|GCP_US_EAST_4|GCP_US_WEST_1|GCP_US_WEST_2] Region location AWS_AP_NORTHEAST_1 AWS_AP_NORTHEAST_3 AWS_AP_SOUTH_1 AWS_AP_SOUTH_2 AWS_AP_SOUTHEAST_1 AWS_AP_SOUTHEAST_2 AWS_AP_SOUTHEAST_3 AWS_EU_CENTRAL_1 AWS_EU_NORTH_1 AWS_EU_WEST_1 AWS_ME_SOUTH_1 AWS_SA_EAST_1 AWS_US_EAST_1 AWS_US_EAST_2 AWS_US_WEST_1 AWS_US_WEST_2 GCP_ASIA_EAST_1.. Possible values are `AWS_AP_NORTHEAST_1`, `AWS_AP_NORTHEAST_3`, `AWS_AP_SOUTH_1`, `AWS_AP_SOUTH_2`, `AWS_AP_SOUTHEAST_1`, `AWS_AP_SOUTHEAST_2`, `AWS_AP_SOUTHEAST_3`, `AWS_EU_CENTRAL_1`, `AWS_EU_NORTH_1`, `AWS_EU_WEST_1`, `AWS_ME_SOUTH_1`, `AWS_SA_EAST_1`, `AWS_US_EAST_1`, `AWS_US_EAST_2`, `AWS_US_WEST_1`, `AWS_US_WEST_2`, `GCP_ASIA_EAST_1`, `GCP_ASIA_EAST_2`, `GCP_ASIA_NORTHEAST_1`, `GCP_ASIA_NORTHEAST_2`, `GCP_ASIA_NORTHEAST_3`, `GCP_ASIA_SOUTH_1`, `GCP_ASIA_SOUTHEAST_1`, `GCP_ASIA_SOUTHEAST_2`, `GCP_AUSTRALIA_SOUTHEAST_1`, `GCP_EUROPE_WEST_1`, `GCP_EUROPE_WEST_2`, `GCP_EUROPE_WEST_3`, `GCP_NORTHAMERICA_NORTHEAST_1`, `GCP_NORTHAMERICA_NORTHEAST_2`, `GCP_SOUTHAMERICA_EAST_1`, `GCP_SOUTHAMERICA_WEST_1`, `GCP_US_CENTRAL_1`, `GCP_US_EAST_1`, `GCP_US_EAST_4`, `GCP_US_WEST_1`, `GCP_US_WEST_2`. Defaults to `AWS_AP_NORTHEAST_1`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("AWS_AP_NORTHEAST_1", "AWS_AP_NORTHEAST_3", "AWS_AP_SOUTH_1", "AWS_AP_SOUTH_2", "AWS_AP_SOUTHEAST_1", "AWS_AP_SOUTHEAST_2", "AWS_AP_SOUTHEAST_3", "AWS_EU_CENTRAL_1", "AWS_EU_NORTH_1", "AWS_EU_WEST_1", "AWS_ME_SOUTH_1", "AWS_SA_EAST_1", "AWS_US_EAST_1", "AWS_US_EAST_2", "AWS_US_WEST_1", "AWS_US_WEST_2", "GCP_ASIA_EAST_1", "GCP_ASIA_EAST_2", "GCP_ASIA_NORTHEAST_1", "GCP_ASIA_NORTHEAST_2", "GCP_ASIA_NORTHEAST_3", "GCP_ASIA_SOUTH_1", "GCP_ASIA_SOUTHEAST_1", "GCP_ASIA_SOUTHEAST_2", "GCP_AUSTRALIA_SOUTHEAST_1", "GCP_EUROPE_WEST_1", "GCP_EUROPE_WEST_2", "GCP_EUROPE_WEST_3", "GCP_NORTHAMERICA_NORTHEAST_1", "GCP_NORTHAMERICA_NORTHEAST_2", "GCP_SOUTHAMERICA_EAST_1", "GCP_SOUTHAMERICA_WEST_1", "GCP_US_CENTRAL_1", "GCP_US_EAST_1", "GCP_US_EAST_4", "GCP_US_WEST_1", "GCP_US_WEST_2"),
+									},
 								},
 							},
 						},
@@ -303,16 +335,25 @@ func (r *BotDefenseAppInfrastructureResource) Schema(ctx context.Context, req re
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"host_name": schema.StringAttribute{
-									MarkdownDescription: "Ingress Host Name.",
+									MarkdownDescription: "Exclusive with [ip_address] Ingress Host Name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
 								},
 								"ip_address": schema.StringAttribute{
-									MarkdownDescription: "Ingress IP Address.",
+									MarkdownDescription: "Exclusive with [host_name] Ingress IP Address.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(7, 1024),
+									},
 								},
 								"location": schema.StringAttribute{
 									MarkdownDescription: "[Enum: AWS_AP_NORTHEAST_1|AWS_AP_NORTHEAST_3|AWS_AP_SOUTH_1|AWS_AP_SOUTH_2|AWS_AP_SOUTHEAST_1|AWS_AP_SOUTHEAST_2|AWS_AP_SOUTHEAST_3|AWS_EU_CENTRAL_1|AWS_EU_NORTH_1|AWS_EU_WEST_1|AWS_ME_SOUTH_1|AWS_SA_EAST_1|AWS_US_EAST_1|AWS_US_EAST_2|AWS_US_WEST_1|AWS_US_WEST_2|GCP_ASIA_EAST_1|GCP_ASIA_EAST_2|GCP_ASIA_NORTHEAST_1|GCP_ASIA_NORTHEAST_2|GCP_ASIA_NORTHEAST_3|GCP_ASIA_SOUTH_1|GCP_ASIA_SOUTHEAST_1|GCP_ASIA_SOUTHEAST_2|GCP_AUSTRALIA_SOUTHEAST_1|GCP_EUROPE_WEST_1|GCP_EUROPE_WEST_2|GCP_EUROPE_WEST_3|GCP_NORTHAMERICA_NORTHEAST_1|GCP_NORTHAMERICA_NORTHEAST_2|GCP_SOUTHAMERICA_EAST_1|GCP_SOUTHAMERICA_WEST_1|GCP_US_CENTRAL_1|GCP_US_EAST_1|GCP_US_EAST_4|GCP_US_WEST_1|GCP_US_WEST_2] Region location AWS_AP_NORTHEAST_1 AWS_AP_NORTHEAST_3 AWS_AP_SOUTH_1 AWS_AP_SOUTH_2 AWS_AP_SOUTHEAST_1 AWS_AP_SOUTHEAST_2 AWS_AP_SOUTHEAST_3 AWS_EU_CENTRAL_1 AWS_EU_NORTH_1 AWS_EU_WEST_1 AWS_ME_SOUTH_1 AWS_SA_EAST_1 AWS_US_EAST_1 AWS_US_EAST_2 AWS_US_WEST_1 AWS_US_WEST_2 GCP_ASIA_EAST_1.. Possible values are `AWS_AP_NORTHEAST_1`, `AWS_AP_NORTHEAST_3`, `AWS_AP_SOUTH_1`, `AWS_AP_SOUTH_2`, `AWS_AP_SOUTHEAST_1`, `AWS_AP_SOUTHEAST_2`, `AWS_AP_SOUTHEAST_3`, `AWS_EU_CENTRAL_1`, `AWS_EU_NORTH_1`, `AWS_EU_WEST_1`, `AWS_ME_SOUTH_1`, `AWS_SA_EAST_1`, `AWS_US_EAST_1`, `AWS_US_EAST_2`, `AWS_US_WEST_1`, `AWS_US_WEST_2`, `GCP_ASIA_EAST_1`, `GCP_ASIA_EAST_2`, `GCP_ASIA_NORTHEAST_1`, `GCP_ASIA_NORTHEAST_2`, `GCP_ASIA_NORTHEAST_3`, `GCP_ASIA_SOUTH_1`, `GCP_ASIA_SOUTHEAST_1`, `GCP_ASIA_SOUTHEAST_2`, `GCP_AUSTRALIA_SOUTHEAST_1`, `GCP_EUROPE_WEST_1`, `GCP_EUROPE_WEST_2`, `GCP_EUROPE_WEST_3`, `GCP_NORTHAMERICA_NORTHEAST_1`, `GCP_NORTHAMERICA_NORTHEAST_2`, `GCP_SOUTHAMERICA_EAST_1`, `GCP_SOUTHAMERICA_WEST_1`, `GCP_US_CENTRAL_1`, `GCP_US_EAST_1`, `GCP_US_EAST_4`, `GCP_US_WEST_1`, `GCP_US_WEST_2`. Defaults to `AWS_AP_NORTHEAST_1`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("AWS_AP_NORTHEAST_1", "AWS_AP_NORTHEAST_3", "AWS_AP_SOUTH_1", "AWS_AP_SOUTH_2", "AWS_AP_SOUTHEAST_1", "AWS_AP_SOUTHEAST_2", "AWS_AP_SOUTHEAST_3", "AWS_EU_CENTRAL_1", "AWS_EU_NORTH_1", "AWS_EU_WEST_1", "AWS_ME_SOUTH_1", "AWS_SA_EAST_1", "AWS_US_EAST_1", "AWS_US_EAST_2", "AWS_US_WEST_1", "AWS_US_WEST_2", "GCP_ASIA_EAST_1", "GCP_ASIA_EAST_2", "GCP_ASIA_NORTHEAST_1", "GCP_ASIA_NORTHEAST_2", "GCP_ASIA_NORTHEAST_3", "GCP_ASIA_SOUTH_1", "GCP_ASIA_SOUTHEAST_1", "GCP_ASIA_SOUTHEAST_2", "GCP_AUSTRALIA_SOUTHEAST_1", "GCP_EUROPE_WEST_1", "GCP_EUROPE_WEST_2", "GCP_EUROPE_WEST_3", "GCP_NORTHAMERICA_NORTHEAST_1", "GCP_NORTHAMERICA_NORTHEAST_2", "GCP_SOUTHAMERICA_EAST_1", "GCP_SOUTHAMERICA_WEST_1", "GCP_US_CENTRAL_1", "GCP_US_EAST_1", "GCP_US_EAST_4", "GCP_US_WEST_1", "GCP_US_WEST_2"),
+									},
 								},
 							},
 						},
@@ -1072,20 +1113,6 @@ func (r *BotDefenseAppInfrastructureResource) Update(ctx context.Context, req re
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["environment_type"].(string); ok && v != "" {
-		data.EnvironmentType = types.StringValue(v)
-	} else if data.EnvironmentType.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.EnvironmentType = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["traffic_type"].(string); ok && v != "" {
-		data.TrafficType = types.StringValue(v)
-	} else if data.TrafficType.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.TrafficType = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields

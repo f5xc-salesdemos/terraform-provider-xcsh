@@ -32,3 +32,6 @@ resource "f5xc_api_discovery" "example" {
     # Configure custom_auth_types settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - custom_auth_types

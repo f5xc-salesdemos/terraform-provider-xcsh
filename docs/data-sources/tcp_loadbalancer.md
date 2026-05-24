@@ -2,12 +2,12 @@
 page_title: "f5xc_tcp_loadbalancer Data Source - terraform-provider-f5xc"
 subcategory: "Load Balancing"
 description: |-
-  Manages a TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools.
+  Retrieves information about an existing TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools.
 ---
 
 # f5xc_tcp_loadbalancer (Data Source)
 
-Manages a TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools.
+Retrieves information about a TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

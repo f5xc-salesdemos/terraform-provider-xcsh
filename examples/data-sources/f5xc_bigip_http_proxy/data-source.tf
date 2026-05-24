@@ -1,0 +1,23 @@
+# Bigip HTTP Proxy Data Source Example
+# Retrieves information about an existing Bigip HTTP Proxy
+
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+# Look up an existing Bigip HTTP Proxy by name
+data "f5xc_bigip_http_proxy" "example" {
+  name      = "example-bigip-http-proxy"
+  namespace = "staging"
+}
+
+output "bigip_http_proxy_id" {
+  value = data.f5xc_bigip_http_proxy.example.id
+}

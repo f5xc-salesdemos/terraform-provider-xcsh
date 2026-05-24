@@ -216,7 +216,7 @@ during create<br>See [Metadata](#gcp-byoc-connections-metadata) below.
 
 <a id="gcp-byoc-connections-region"></a>&#x2022; [`region`](#gcp-byoc-connections-region) - Optional String<br>GCP Region in which the GCP Cloud Interconnect attachment is configured
 
-<a id="gcp-byoc-connections-same-as-credential"></a>&#x2022; [`same_as_credential`](#gcp-byoc-connections-same-as-credential) - Optional Block<br>Enable this option
+<a id="gcp-byoc-connections-same-as-credential"></a>&#x2022; [`same_as_credential`](#gcp-byoc-connections-same-as-credential) - Optional Block<br>Configuration parameter for same as credential
 
 #### GCP Byoc Connections Metadata
 

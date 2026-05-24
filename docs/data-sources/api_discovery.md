@@ -2,12 +2,12 @@
 page_title: "f5xc_api_discovery Data Source - terraform-provider-f5xc"
 subcategory: "API Security"
 description: |-
-  Manages API discovery creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
+  Retrieves information about API discovery creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
 # f5xc_api_discovery (Data Source)
 
-Manages API discovery creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
+Manages API discovery creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

@@ -122,7 +122,7 @@ A [`tls_server`](#syslog-tls-server) block (within [`syslog`](#syslog)) supports
 
 <a id="syslog-tls-server-mtls-disabled"></a>&#x2022; [`mtls_disabled`](#syslog-tls-server-mtls-disabled) - Optional Block<br>Enable this option
 
-<a id="syslog-tls-server-mtls-enable"></a>&#x2022; [`mtls_enable`](#syslog-tls-server-mtls-enable) - Optional Block<br>mTLS Client Config. TLS config for client<br>See [mTLS Enable](#syslog-tls-server-mtls-enable) below.
+<a id="syslog-tls-server-mtls-enable"></a>&#x2022; [`mtls_enable`](#syslog-tls-server-mtls-enable) - Optional Block<br>Configuration parameter for mTLS enable<br>See [mTLS Enable](#syslog-tls-server-mtls-enable) below.
 
 <a id="syslog-tls-server-port"></a>&#x2022; [`port`](#syslog-tls-server-port) - Optional Number<br>Custom port number used for communication
 
@@ -130,7 +130,7 @@ A [`tls_server`](#syslog-tls-server) block (within [`syslog`](#syslog)) supports
 
 <a id="syslog-tls-server-trusted-ca-url"></a>&#x2022; [`trusted_ca_url`](#syslog-tls-server-trusted-ca-url) - Optional String<br>The URL or value for trusted Server CA certificate or certificate chain Certificates in PEM format including the PEM headers
 
-<a id="syslog-tls-server-volterra-ca"></a>&#x2022; [`volterra_ca`](#syslog-tls-server-volterra-ca) - Optional Block<br>Enable this option
+<a id="syslog-tls-server-volterra-ca"></a>&#x2022; [`volterra_ca`](#syslog-tls-server-volterra-ca) - Optional Block<br>Configuration parameter for volterra CA
 
 #### Syslog TLS Server mTLS Enable
 

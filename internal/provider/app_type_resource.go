@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -47,14 +48,14 @@ type AppTypeEmptyModel struct {
 
 // AppTypeBusinessLogicMarkupSettingModel represents business_logic_markup_setting block
 type AppTypeBusinessLogicMarkupSettingModel struct {
-	Disable               *AppTypeEmptyModel                                           `tfsdk:"disable"`
+	DisableSpec           *AppTypeEmptyModel                                           `tfsdk:"disable_spec"`
 	DiscoveredAPISettings *AppTypeBusinessLogicMarkupSettingDiscoveredAPISettingsModel `tfsdk:"discovered_api_settings"`
 	Enable                *AppTypeEmptyModel                                           `tfsdk:"enable"`
 }
 
 // AppTypeBusinessLogicMarkupSettingModelAttrTypes defines the attribute types for AppTypeBusinessLogicMarkupSettingModel
 var AppTypeBusinessLogicMarkupSettingModelAttrTypes = map[string]attr.Type{
-	"disable":                 types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"disable_spec":            types.ObjectType{AttrTypes: map[string]attr.Type{}},
 	"discovered_api_settings": types.ObjectType{AttrTypes: AppTypeBusinessLogicMarkupSettingDiscoveredAPISettingsModelAttrTypes},
 	"enable":                  types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
@@ -157,7 +158,7 @@ func (r *AppTypeResource) Schema(ctx context.Context, req resource.SchemaRequest
 				MarkdownDescription: "Settings specifying how API Discovery will be performed.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
-					"disable": schema.SingleNestedBlock{
+					"disable_spec": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
 					},
 					"discovered_api_settings": schema.SingleNestedBlock{
@@ -181,6 +182,9 @@ func (r *AppTypeResource) Schema(ctx context.Context, req resource.SchemaRequest
 						"type": schema.StringAttribute{
 							MarkdownDescription: "[Enum: BUSINESS_LOGIC_MARKUP|TIMESERIES_ANOMALY_DETECTION|PER_REQ_ANOMALY_DETECTION|USER_BEHAVIOR_ANALYSIS] Enumeration for AI/ML features supported API Discovery enables generation of model for various API interactions between services of App type. Enable analysis of timeseries for various metric collected like requests, errors, latency etc. Enable anomaly detection per API request, i.e. Possible values are `BUSINESS_LOGIC_MARKUP`, `TIMESERIES_ANOMALY_DETECTION`, `PER_REQ_ANOMALY_DETECTION`, `USER_BEHAVIOR_ANALYSIS`. Defaults to `BUSINESS_LOGIC_MARKUP`.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf("BUSINESS_LOGIC_MARKUP", "TIMESERIES_ANOMALY_DETECTION", "PER_REQ_ANOMALY_DETECTION", "USER_BEHAVIOR_ANALYSIS"),
+							},
 						},
 					},
 				},
@@ -293,7 +297,7 @@ func (r *AppTypeResource) Create(ctx context.Context, req resource.CreateRequest
 	// Marshal spec fields from Terraform state to API struct
 	if data.BusinessLogicMarkupSetting != nil {
 		business_logic_markup_settingMap := make(map[string]interface{})
-		if data.BusinessLogicMarkupSetting.Disable != nil {
+		if data.BusinessLogicMarkupSetting.DisableSpec != nil {
 			business_logic_markup_settingMap["disable"] = map[string]interface{}{}
 		}
 		if data.BusinessLogicMarkupSetting.DiscoveredAPISettings != nil {
@@ -536,7 +540,7 @@ func (r *AppTypeResource) Update(ctx context.Context, req resource.UpdateRequest
 	// Marshal spec fields from Terraform state to API struct
 	if data.BusinessLogicMarkupSetting != nil {
 		business_logic_markup_settingMap := make(map[string]interface{})
-		if data.BusinessLogicMarkupSetting.Disable != nil {
+		if data.BusinessLogicMarkupSetting.DisableSpec != nil {
 			business_logic_markup_settingMap["disable"] = map[string]interface{}{}
 		}
 		if data.BusinessLogicMarkupSetting.DiscoveredAPISettings != nil {

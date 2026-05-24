@@ -98,7 +98,7 @@ spec:
 <a id="site-selector"></a>&#x2022; [`site_selector`](#site-selector) - Optional Block<br>Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects<br>See [Site Selector](#site-selector)
 below for details.
 
-<a id="site-type"></a>&#x2022; [`site_type`](#site-type) - Optional String<br>Possible values are `INVALID`, `REGIONAL_EDGE`, `CUSTOMER_EDGE`, `NGINX_ONE`<br>[Enum: INVALID|REGIONAL_EDGE|CUSTOMER_EDGE|NGINX_ONE] Site Type which can either RE or CE Invalid type of site Regional Edge site Customer Edge site
+<a id="site-type"></a>&#x2022; [`site_type`](#site-type) - Required String<br>Possible values are `INVALID`, `REGIONAL_EDGE`, `CUSTOMER_EDGE`, `NGINX_ONE`<br>[Enum: INVALID|REGIONAL_EDGE|CUSTOMER_EDGE|NGINX_ONE] Site Type which can either RE or CE Invalid type of site Regional Edge site Customer Edge site
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 

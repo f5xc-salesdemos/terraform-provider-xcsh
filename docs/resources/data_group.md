@@ -51,7 +51,7 @@ resource "f5xc_data_group" "example" {
   records {
     # Configure records settings
   }
-  # Integer record List. Data group with integer record List.
+  # Configuration parameter for integer records.
   integer_records {
     # Configure integer_records settings
   }
@@ -81,8 +81,8 @@ resource "f5xc_data_group" "example" {
 
 -> **One of the following:**
 &#x2022; <a id="address-records"></a>[`address_records`](#address-records) - Optional Block<br>Address Record. Data group with address record List<br>See [Address Records](#address-records) below for details.
-<br><br>&#x2022; <a id="integer-records"></a>[`integer_records`](#integer-records) - Optional Block<br>Integer record List. Data group with integer record List<br>See [Integer Records](#integer-records) below for details.
-<br><br>&#x2022; <a id="string-records"></a>[`string_records`](#string-records) - Optional Block<br>String record List. Data group with strings record List<br>See [String Records](#string-records) below for details.
+<br><br>&#x2022; <a id="integer-records"></a>[`integer_records`](#integer-records) - Optional Block<br>Configuration parameter for integer records<br>See [Integer Records](#integer-records) below for details.
+<br><br>&#x2022; <a id="string-records"></a>[`string_records`](#string-records) - Optional Block<br>Configuration parameter for string records<br>See [String Records](#string-records) below for details.
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 

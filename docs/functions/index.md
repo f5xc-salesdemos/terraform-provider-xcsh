@@ -1,10 +1,3 @@
----
-page_title: "Functions - terraform-provider-f5xc"
-subcategory: "Functions"
-description: |-
-  Provider-defined functions for F5 Distributed Cloud operations including blindfold encryption.
----
-
 # Functions
 
 Provider-defined functions for F5 Distributed Cloud operations.

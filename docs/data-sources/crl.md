@@ -2,12 +2,12 @@
 page_title: "f5xc_crl Data Source - terraform-provider-f5xc"
 subcategory: "Certificates"
 description: |-
-  Manages a CRL resource in F5 Distributed Cloud for api to create crl object. configuration.
+  Retrieves information about an existing CRL resource in F5 Distributed Cloud for api to create crl object. configuration.
 ---
 
 # f5xc_crl (Data Source)
 
-Manages a CRL resource in F5 Distributed Cloud for api to create crl object. configuration.
+Retrieves information about a CRL resource in F5 Distributed Cloud for api to create crl object. configuration. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

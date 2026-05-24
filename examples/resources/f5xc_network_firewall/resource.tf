@@ -40,3 +40,8 @@ resource "f5xc_network_firewall" "example" {
     # Configure active_fast_acls settings
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - disable_fast_acl
+# - disable_forward_proxy_policy
+# - disable_network_policy

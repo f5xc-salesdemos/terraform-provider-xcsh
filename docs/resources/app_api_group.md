@@ -43,6 +43,10 @@ resource "f5xc_app_api_group" "example" {
   }
 
   # Resource-specific configuration
+  # List of API group elements with methods and path regex fo...
+  elements {
+    # Configure elements settings
+  }
   # [OneOf: bigip_virtual_server, cdn_loadbalancer, http_load...
   bigip_virtual_server {
     # Configure bigip_virtual_server settings
@@ -50,10 +54,6 @@ resource "f5xc_app_api_group" "example" {
   # Set the scope of the API Group to a specific CDN Loadbala...
   cdn_loadbalancer {
     # Configure cdn_loadbalancer settings
-  }
-  # List of API group elements with methods and path regex fo...
-  elements {
-    # Configure elements settings
   }
 }
 ```

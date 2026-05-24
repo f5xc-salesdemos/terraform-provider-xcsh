@@ -160,7 +160,7 @@ func (r *DataGroupResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"integer_records": schema.SingleNestedBlock{
-				MarkdownDescription: "Integer record List. Data group with integer record List.",
+				MarkdownDescription: "Configuration parameter for integer records.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"records": schema.SingleNestedBlock{
@@ -169,7 +169,7 @@ func (r *DataGroupResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"string_records": schema.SingleNestedBlock{
-				MarkdownDescription: "String record List. Data group with strings record List.",
+				MarkdownDescription: "Configuration parameter for string records.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"records": schema.SingleNestedBlock{

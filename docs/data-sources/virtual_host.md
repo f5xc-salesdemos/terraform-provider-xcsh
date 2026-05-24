@@ -2,12 +2,12 @@
 page_title: "f5xc_virtual_host Data Source - terraform-provider-f5xc"
 subcategory: "Load Balancing"
 description: |-
-  Manages virtual host in a given namespace. in F5 Distributed Cloud.
+  Retrieves information about virtual host in a given namespace. in F5 Distributed Cloud.
 ---
 
 # f5xc_virtual_host (Data Source)
 
-Manages virtual host in a given namespace. in F5 Distributed Cloud.
+Manages virtual host in a given namespace. in F5 Distributed Cloud. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

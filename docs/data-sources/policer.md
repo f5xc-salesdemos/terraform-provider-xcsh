@@ -2,12 +2,12 @@
 page_title: "f5xc_policer Data Source - terraform-provider-f5xc"
 subcategory: "Service Mesh"
 description: |-
-  Manages new policer with traffic rate limits. in F5 Distributed Cloud.
+  Retrieves information about an existing policer with traffic rate limits. in F5 Distributed Cloud.
 ---
 
 # f5xc_policer (Data Source)
 
-Manages new policer with traffic rate limits. in F5 Distributed Cloud.
+Retrieves information about new policer with traffic rate limits. in F5 Distributed Cloud. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

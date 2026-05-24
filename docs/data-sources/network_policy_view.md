@@ -2,12 +2,12 @@
 page_title: "f5xc_network_policy_view Data Source - terraform-provider-f5xc"
 subcategory: "Security"
 description: |-
-  Manages a Network Policy View resource in F5 Distributed Cloud for network policy view specification. configuration.
+  Retrieves information about an existing Network Policy View resource in F5 Distributed Cloud for network policy view specification. configuration.
 ---
 
 # f5xc_network_policy_view (Data Source)
 
-Manages a Network Policy View resource in F5 Distributed Cloud for network policy view specification. configuration.
+Retrieves information about a Network Policy View resource in F5 Distributed Cloud for network policy view specification. configuration. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

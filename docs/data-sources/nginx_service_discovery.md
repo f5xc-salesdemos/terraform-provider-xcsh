@@ -1,13 +1,13 @@
 ---
 page_title: "f5xc_nginx_service_discovery Data Source - terraform-provider-f5xc"
-subcategory: "Uncategorized"
+subcategory: "Networking"
 description: |-
-  Manages a Nginx Service Discovery resource in F5 Distributed Cloud for api to create nginx service discovery object for a site or virtual site in system namespace. configuration.
+  Retrieves information about an existing Nginx Service Discovery resource in F5 Distributed Cloud for api to create nginx service discovery object for a site or virtual site in system namespace. configuration.
 ---
 
 # f5xc_nginx_service_discovery (Data Source)
 
-Manages a Nginx Service Discovery resource in F5 Distributed Cloud for api to create nginx service discovery object for a site or virtual site in system namespace. configuration.
+Retrieves information about a Nginx Service Discovery resource in F5 Distributed Cloud for api to create nginx service discovery object for a site or virtual site in system namespace. configuration. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

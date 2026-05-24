@@ -2,12 +2,12 @@
 page_title: "f5xc_tunnel Data Source - terraform-provider-f5xc"
 subcategory: "Networking"
 description: |-
-  Manages tunnel in a given namespace. If one already exist it will give a error. in F5 Distributed Cloud.
+  Retrieves information about tunnel in a given namespace. If one already exist it will give a error. in F5 Distributed Cloud.
 ---
 
 # f5xc_tunnel (Data Source)
 
-Manages tunnel in a given namespace. If one already exist it will give a error. in F5 Distributed Cloud.
+Manages tunnel in a given namespace. If one already exist it will give a error. in F5 Distributed Cloud. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

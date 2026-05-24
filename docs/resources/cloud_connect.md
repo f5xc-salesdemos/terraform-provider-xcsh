@@ -43,17 +43,17 @@ resource "f5xc_cloud_connect" "example" {
   }
 
   # Resource-specific configuration
-  # [OneOf: aws_tgw_site, azure_vnet_site] AWS TGW Site Type....
+  # Configuration parameter for aws provider.
+  aws_provider {
+    # Configure aws_provider settings
+  }
+  # AWS TGW Site Type. Cloud Connect AWS TGW Site Type.
   aws_tgw_site {
     # Configure aws_tgw_site settings
   }
   # Type establishes a direct reference from one object(the r...
   cred {
     # Configure cred settings
-  }
-  # Type establishes a direct reference from one object(the r...
-  site {
-    # Configure site settings
   }
 }
 ```
@@ -79,6 +79,8 @@ resource "f5xc_cloud_connect" "example" {
 
 ### Spec Argument Reference
 
+<a id="aws-provider"></a>&#x2022; [`aws_provider`](#aws-provider) - Optional Block<br>Configuration parameter for AWS provider<br>See [AWS Provider](#aws-provider) below for details.
+
 -> **One of the following:**
 &#x2022; <a id="aws-tgw-site"></a>[`aws_tgw_site`](#aws-tgw-site) - Optional Block<br>AWS TGW Site Type. Cloud Connect AWS TGW Site Type<br>See [AWS TGW Site](#aws-tgw-site) below for details.
 <br><br>&#x2022; <a id="Azure-vnet-site"></a>[`azure_vnet_site`](#Azure-vnet-site) - Optional Block<br>Azure VNET Site Type. Cloud Connect Azure VNET Site Type<br>See [Azure VNET Site](#Azure-vnet-site) below for details.
@@ -95,6 +97,68 @@ In addition to all arguments above, the following attributes are exported:
 
 ---
 
+#### AWS Provider
+
+An [`aws_provider`](#aws-provider) block supports the following:
+
+<a id="aws-provider-aws-tgw-site"></a>&#x2022; [`aws_tgw_site`](#aws-provider-aws-tgw-site) - Optional Block<br>AWS TGW Site Type. Cloud Connect AWS TGW Site Type<br>See [AWS TGW Site](#aws-provider-aws-tgw-site) below.
+
+#### AWS Provider AWS TGW Site
+
+An [`aws_tgw_site`](#aws-provider-aws-tgw-site) block (within [`aws_provider`](#aws-provider)) supports the following:
+
+<a id="aws-provider-aws-tgw-site-cred"></a>&#x2022; [`cred`](#aws-provider-aws-tgw-site-cred) - Optional Block<br>Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name<br>See [Cred](#aws-provider-aws-tgw-site-cred) below.
+
+<a id="aws-provider-aws-tgw-site-site"></a>&#x2022; [`site`](#aws-provider-aws-tgw-site-site) - Optional Block<br>Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name<br>See [Site](#aws-provider-aws-tgw-site-site) below.
+
+<a id="attachments-467d0a"></a>&#x2022; [`vpc_attachments`](#attachments-467d0a) - Optional Block<br>Configuration parameter for VPC attachments<br>See [VPC Attachments](#attachments-467d0a) below.
+
+#### AWS Provider AWS TGW Site Cred
+
+A [`cred`](#aws-provider-aws-tgw-site-cred) block (within [`aws_provider.aws_tgw_site`](#aws-provider-aws-tgw-site)) supports the following:
+
+<a id="aws-provider-aws-tgw-site-cred-name"></a>&#x2022; [`name`](#aws-provider-aws-tgw-site-cred-name) - Optional String<br>When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name
+
+<a id="namespace-384ef6"></a>&#x2022; [`namespace`](#namespace-384ef6) - Optional String<br>When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace
+
+<a id="aws-provider-aws-tgw-site-cred-tenant"></a>&#x2022; [`tenant`](#aws-provider-aws-tgw-site-cred-tenant) - Optional String<br>When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant
+
+#### AWS Provider AWS TGW Site Site
+
+A [`site`](#aws-provider-aws-tgw-site-site) block (within [`aws_provider.aws_tgw_site`](#aws-provider-aws-tgw-site)) supports the following:
+
+<a id="aws-provider-aws-tgw-site-site-name"></a>&#x2022; [`name`](#aws-provider-aws-tgw-site-site-name) - Optional String<br>When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name
+
+<a id="namespace-005ba4"></a>&#x2022; [`namespace`](#namespace-005ba4) - Optional String<br>When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace
+
+<a id="aws-provider-aws-tgw-site-site-tenant"></a>&#x2022; [`tenant`](#aws-provider-aws-tgw-site-site-tenant) - Optional String<br>When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant
+
+#### AWS Provider AWS TGW Site VPC Attachments
+
+A [`vpc_attachments`](#attachments-467d0a) block (within [`aws_provider.aws_tgw_site`](#aws-provider-aws-tgw-site)) supports the following:
+
+<a id="list-c69a82"></a>&#x2022; [`vpc_list`](#list-c69a82) - Optional Block<br>VPC List. Collection of items or values<br>See [VPC List](#list-c69a82) below.
+
+#### AWS Provider AWS TGW Site VPC Attachments VPC List
+
+<a id="deep-d3d824"></a>Deeply nested **List** block collapsed for readability.
+
+#### AWS Provider AWS TGW Site VPC Attachments VPC List Custom Routing
+
+<a id="deep-6a4c8f"></a>Deeply nested **Routing** block collapsed for readability.
+
+#### AWS Provider AWS TGW Site VPC Attachments VPC List Custom Routing Route Tables
+
+<a id="deep-c86b40"></a>Deeply nested **Tables** block collapsed for readability.
+
+#### AWS Provider AWS TGW Site VPC Attachments VPC List Default Route
+
+<a id="deep-895e96"></a>Deeply nested **Route** block collapsed for readability.
+
+#### AWS Provider AWS TGW Site VPC Attachments VPC List Default Route Selective Route Tables
+
+<a id="deep-907164"></a>Deeply nested **Tables** block collapsed for readability.
+
 #### AWS TGW Site
 
 An [`aws_tgw_site`](#aws-tgw-site) block supports the following:
@@ -103,7 +167,7 @@ An [`aws_tgw_site`](#aws-tgw-site) block supports the following:
 
 <a id="aws-tgw-site-site"></a>&#x2022; [`site`](#aws-tgw-site-site) - Optional Block<br>Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name<br>See [Site](#aws-tgw-site-site) below.
 
-<a id="aws-tgw-site-vpc-attachments"></a>&#x2022; [`vpc_attachments`](#aws-tgw-site-vpc-attachments) - Optional Block<br>VPC Attachments<br>See [VPC Attachments](#aws-tgw-site-vpc-attachments) below.
+<a id="aws-tgw-site-vpc-attachments"></a>&#x2022; [`vpc_attachments`](#aws-tgw-site-vpc-attachments) - Optional Block<br>Configuration parameter for VPC attachments<br>See [VPC Attachments](#aws-tgw-site-vpc-attachments) below.
 
 #### AWS TGW Site Cred
 
@@ -137,7 +201,7 @@ A [`vpc_list`](#aws-tgw-site-vpc-attachments-vpc-list) block (within [`aws_tgw_s
 
 <a id="routing-287a5f"></a>&#x2022; [`custom_routing`](#routing-287a5f) - Optional Block<br>AWS Route Table List. AWS Route Table List<br>See [Custom Routing](#routing-287a5f) below.
 
-<a id="route-44d7f5"></a>&#x2022; [`default_route`](#route-44d7f5) - Optional Block<br>Override Default Route Choice. Select Override Default Route Choice<br>See [Default Route](#route-44d7f5) below.
+<a id="route-44d7f5"></a>&#x2022; [`default_route`](#route-44d7f5) - Optional Block<br>Configuration parameter for default route<br>See [Default Route](#route-44d7f5) below.
 
 <a id="labels-3555f3"></a>&#x2022; [`labels`](#labels-3555f3) - Optional Block<br>Add labels for the VPC attachment. These labels can then be used in policies such as enhanced firewall
 
@@ -167,7 +231,7 @@ An [`azure_vnet_site`](#Azure-vnet-site) block supports the following:
 
 <a id="Azure-vnet-site-site"></a>&#x2022; [`site`](#Azure-vnet-site-site) - Optional Block<br>Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name<br>See [Site](#Azure-vnet-site-site) below.
 
-<a id="Azure-vnet-site-vnet-attachments"></a>&#x2022; [`vnet_attachments`](#Azure-vnet-site-vnet-attachments) - Optional Block<br>VNET Attachments<br>See [VNET Attachments](#Azure-vnet-site-vnet-attachments) below.
+<a id="Azure-vnet-site-vnet-attachments"></a>&#x2022; [`vnet_attachments`](#Azure-vnet-site-vnet-attachments) - Optional Block<br>Configuration parameter for VNET attachments<br>See [VNET Attachments](#Azure-vnet-site-vnet-attachments) below.
 
 #### Azure VNET Site Site
 
@@ -191,7 +255,7 @@ A [`vnet_list`](#list-5826e3) block (within [`azure_vnet_site.vnet_attachments`]
 
 <a id="routing-724341"></a>&#x2022; [`custom_routing`](#routing-724341) - Optional Block<br>List Azure Route Table with Static Route<br>See [Custom Routing](#routing-724341) below.
 
-<a id="route-fd5eea"></a>&#x2022; [`default_route`](#route-fd5eea) - Optional Block<br>Override Default Route Choice. Select Override Default Route Choice<br>See [Default Route](#route-fd5eea) below.
+<a id="route-fd5eea"></a>&#x2022; [`default_route`](#route-fd5eea) - Optional Block<br>Configuration parameter for default route<br>See [Default Route](#route-fd5eea) below.
 
 <a id="labels-e777f2"></a>&#x2022; [`labels`](#labels-e777f2) - Optional Block<br>Add labels for the VNET attachments. These labels can then be used in policies such as enhanced firewall policies
 

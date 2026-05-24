@@ -8,12 +8,14 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -67,12 +69,12 @@ var CloudElasticIPSiteRefModelAttrTypes = map[string]attr.Type{
 type CloudElasticIPResourceModel struct {
 	Name        types.String   `tfsdk:"name"`
 	Namespace   types.String   `tfsdk:"namespace"`
+	Count       types.Int64    `tfsdk:"item_count"`
 	Annotations types.Map      `tfsdk:"annotations"`
 	Description types.String   `tfsdk:"description"`
 	Disable     types.Bool     `tfsdk:"disable"`
 	Labels      types.Map      `tfsdk:"labels"`
 	ID          types.String   `tfsdk:"id"`
-	Count       types.Int64    `tfsdk:"item_count"`
 	Timeouts    timeouts.Value `tfsdk:"timeouts"`
 	SiteRef     types.List     `tfsdk:"site_ref"`
 }
@@ -105,6 +107,10 @@ func (r *CloudElasticIPResource) Schema(ctx context.Context, req resource.Schema
 					validators.NamespaceValidator(),
 				},
 			},
+			"item_count": schema.Int64Attribute{
+				MarkdownDescription: "Number of Elastic Ips / Public Ips associated with this object per Node.",
+				Required:            true,
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -130,14 +136,6 @@ func (r *CloudElasticIPResource) Schema(ctx context.Context, req resource.Schema
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"item_count": schema.Int64Attribute{
-				MarkdownDescription: "Number of Elastic Ips / Public Ips associated with this object per Node.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
 		},
 		Blocks: map[string]schema.Block{
 			"timeouts": timeouts.Block(ctx, timeouts.Opts{
@@ -161,6 +159,10 @@ func (r *CloudElasticIPResource) Schema(ctx context.Context, req resource.Schema
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -168,6 +170,10 @@ func (r *CloudElasticIPResource) Schema(ctx context.Context, req resource.Schema
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -295,6 +301,9 @@ func (r *CloudElasticIPResource) Create(ctx context.Context, req resource.Create
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Count.IsNull() && !data.Count.IsUnknown() {
+		createReq.Spec["count"] = data.Count.ValueInt64()
+	}
 	if !data.SiteRef.IsNull() && !data.SiteRef.IsUnknown() {
 		var site_refItems []CloudElasticIPSiteRefModel
 		diags := data.SiteRef.ElementsAs(ctx, &site_refItems, false)
@@ -323,9 +332,6 @@ func (r *CloudElasticIPResource) Create(ctx context.Context, req resource.Create
 			createReq.Spec["site_ref"] = site_refList
 		}
 	}
-	if !data.Count.IsNull() && !data.Count.IsUnknown() {
-		createReq.Spec["count"] = data.Count.ValueInt64()
-	}
 
 	apiResource, err := r.client.CreateCloudElasticIP(ctx, createReq)
 	if err != nil {
@@ -339,6 +345,11 @@ func (r *CloudElasticIPResource) Create(ctx context.Context, req resource.Create
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["count"].(float64); ok {
+		data.Count = types.Int64Value(int64(v))
+	} else {
+		data.Count = types.Int64Null()
+	}
 	if listData, ok := apiResource.Spec["site_ref"].([]interface{}); ok && len(listData) > 0 {
 		var site_refList []CloudElasticIPSiteRefModel
 		var existingSiteRefItems []CloudElasticIPSiteRefModel
@@ -390,11 +401,6 @@ func (r *CloudElasticIPResource) Create(ctx context.Context, req resource.Create
 	} else {
 		// No data from API - set to null list
 		data.SiteRef = types.ListNull(types.ObjectType{AttrTypes: CloudElasticIPSiteRefModelAttrTypes})
-	}
-	if v, ok := apiResource.Spec["count"].(float64); ok {
-		data.Count = types.Int64Value(int64(v))
-	} else {
-		data.Count = types.Int64Null()
 	}
 
 	tflog.Trace(ctx, "created CloudElasticIP resource")
@@ -476,6 +482,11 @@ func (r *CloudElasticIPResource) Read(ctx context.Context, req resource.ReadRequ
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["count"].(float64); ok {
+		data.Count = types.Int64Value(int64(v))
+	} else {
+		data.Count = types.Int64Null()
+	}
 	if listData, ok := apiResource.Spec["site_ref"].([]interface{}); ok && len(listData) > 0 {
 		var site_refList []CloudElasticIPSiteRefModel
 		var existingSiteRefItems []CloudElasticIPSiteRefModel
@@ -527,11 +538,6 @@ func (r *CloudElasticIPResource) Read(ctx context.Context, req resource.ReadRequ
 	} else {
 		// No data from API - set to null list
 		data.SiteRef = types.ListNull(types.ObjectType{AttrTypes: CloudElasticIPSiteRefModelAttrTypes})
-	}
-	if v, ok := apiResource.Spec["count"].(float64); ok {
-		data.Count = types.Int64Value(int64(v))
-	} else {
-		data.Count = types.Int64Null()
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -584,6 +590,9 @@ func (r *CloudElasticIPResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Count.IsNull() && !data.Count.IsUnknown() {
+		apiResource.Spec["count"] = data.Count.ValueInt64()
+	}
 	if !data.SiteRef.IsNull() && !data.SiteRef.IsUnknown() {
 		var site_refItems []CloudElasticIPSiteRefModel
 		diags := data.SiteRef.ElementsAs(ctx, &site_refItems, false)
@@ -612,9 +621,6 @@ func (r *CloudElasticIPResource) Update(ctx context.Context, req resource.Update
 			apiResource.Spec["site_ref"] = site_refList
 		}
 	}
-	if !data.Count.IsNull() && !data.Count.IsUnknown() {
-		apiResource.Spec["count"] = data.Count.ValueInt64()
-	}
 
 	_, err := r.client.UpdateCloudElasticIP(ctx, apiResource)
 	if err != nil {
@@ -634,18 +640,16 @@ func (r *CloudElasticIPResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["count"].(float64); ok {
-		data.Count = types.Int64Value(int64(v))
-	} else if data.Count.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Count = types.Int64Null()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["count"].(float64); ok {
+		data.Count = types.Int64Value(int64(v))
+	} else {
+		data.Count = types.Int64Null()
+	}
 	if listData, ok := apiResource.Spec["site_ref"].([]interface{}); ok && len(listData) > 0 {
 		var site_refList []CloudElasticIPSiteRefModel
 		var existingSiteRefItems []CloudElasticIPSiteRefModel
@@ -697,11 +701,6 @@ func (r *CloudElasticIPResource) Update(ctx context.Context, req resource.Update
 	} else {
 		// No data from API - set to null list
 		data.SiteRef = types.ListNull(types.ObjectType{AttrTypes: CloudElasticIPSiteRefModelAttrTypes})
-	}
-	if v, ok := apiResource.Spec["count"].(float64); ok {
-		data.Count = types.Int64Value(int64(v))
-	} else {
-		data.Count = types.Int64Null()
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

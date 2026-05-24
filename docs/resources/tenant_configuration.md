@@ -43,17 +43,17 @@ resource "f5xc_tenant_configuration" "example" {
   }
 
   # Resource-specific configuration
-  # BasicConfiguration.
+  # Configuration parameter for basic configuration.
   basic_configuration {
     # Configure basic_configuration settings
   }
-  # BruteForceDetectionSettings.
+  # Configuration parameter for brute force detection.
+  brute_force_detection {
+    # Configure brute_force_detection settings
+  }
+  # Configuration parameter for brute force detection settings.
   brute_force_detection_settings {
     # Configure brute_force_detection_settings settings
-  }
-  # PasswordPolicy.
-  password_policy {
-    # Configure password_policy settings
   }
 }
 ```
@@ -79,13 +79,20 @@ resource "f5xc_tenant_configuration" "example" {
 
 ### Spec Argument Reference
 
-<a id="basic-configuration"></a>&#x2022; [`basic_configuration`](#basic-configuration) - Optional Block<br>BasicConfiguration<br>See [Basic Configuration](#basic-configuration) below for details.
+<a id="basic-configuration"></a>&#x2022; [`basic_configuration`](#basic-configuration) - Optional Block<br>Configuration parameter for basic configuration<br>See [Basic Configuration](#basic-configuration) below for details.
 
-<a id="brute-force-detection-settings"></a>&#x2022; [`brute_force_detection_settings`](#brute-force-detection-settings) - Optional Block<br>BruteForceDetectionSettings<br>See [Brute Force Detection Settings](#brute-force-detection-settings) below for details.
+<a id="brute-force-detection"></a>&#x2022; [`brute_force_detection`](#brute-force-detection) - Optional Block<br>Configuration parameter for brute force detection<br>See [Brute Force Detection](#brute-force-detection) below for details.
 
-<a id="password-policy"></a>&#x2022; [`password_policy`](#password-policy) - Optional Block<br>PasswordPolicy<br>See [Password Policy](#password-policy) below for details.
+<a id="brute-force-detection-settings"></a>&#x2022; [`brute_force_detection_settings`](#brute-force-detection-settings) - Optional Block<br>Configuration parameter for brute force detection settings<br>See [Brute Force Detection Settings](#brute-force-detection-settings) below for details.
+
+<a id="password-policy"></a>&#x2022; [`password_policy`](#password-policy) - Optional Block<br>Policy configuration for this feature<br>See [Password Policy](#password-policy) below for details.
+
+<a id="tenant-details"></a>&#x2022; [`tenant_details`](#tenant-details) - Optional Block<br>BasicConfiguration<br>See [Tenant Details](#tenant-details) below for details.
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
+
+<a id="user-session-expiration"></a>&#x2022; [`user_session_expiration`](#user-session-expiration) - Optional Block<br>Defines all session-related expiration for user sessions within a tenant's environment. Relationship between session_expiry and cookie_expiry: - session_expiry defines the 'absolute maximum duration' of a session and enforces RE-authentication after this time. - cookie_expiry
+defines the<br>See [User Session Expiration](#user-session-expiration) below for details.
 
 ### Attributes Reference
 
@@ -99,7 +106,13 @@ In addition to all arguments above, the following attributes are exported:
 
 A [`basic_configuration`](#basic-configuration) block supports the following:
 
-<a id="basic-configuration-display-name"></a>&#x2022; [`display_name`](#basic-configuration-display-name) - Optional String<br>Tenant display name in the login screen
+<a id="basic-configuration-display-name"></a>&#x2022; [`display_name`](#basic-configuration-display-name) - Optional String<br>Changes the tenant name displayed during login without affecting your company’s domain name
+
+#### Brute Force Detection
+
+A [`brute_force_detection`](#brute-force-detection) block supports the following:
+
+<a id="failures-0ea5eb"></a>&#x2022; [`max_login_failures`](#failures-0ea5eb) - Optional Number<br>How many failures before wait is triggered. When login failure count is hit, user will be temporarily locked for a max duration of 15 minutes
 
 #### Brute Force Detection Settings
 
@@ -127,6 +140,12 @@ A [`password_policy`](#password-policy) block supports the following:
 
 <a id="password-policy-uppercase-characters"></a>&#x2022; [`uppercase_characters`](#password-policy-uppercase-characters) - Optional Number<br>The number of upper case letters required to be in the password string
 
+#### Tenant Details
+
+A [`tenant_details`](#tenant-details) block supports the following:
+
+<a id="tenant-details-display-name"></a>&#x2022; [`display_name`](#tenant-details-display-name) - Optional String<br>Changes the tenant name displayed during login without affecting your company’s domain name
+
 #### Timeouts
 
 A [`timeouts`](#timeouts) block supports the following:
@@ -138,6 +157,54 @@ A [`timeouts`](#timeouts) block supports the following:
 <a id="timeouts-read"></a>&#x2022; [`read`](#timeouts-read) - Optional String (Defaults to `5 minutes`)<br>Used when retrieving the resource
 
 <a id="timeouts-update"></a>&#x2022; [`update`](#timeouts-update) - Optional String (Defaults to `10 minutes`)<br>Used when updating the resource
+
+#### User Session Expiration
+
+An [`user_session_expiration`](#user-session-expiration) block supports the following:
+
+<a id="timeout-40fe61"></a>&#x2022; [`absolute_timeout`](#timeout-40fe61) - Optional Block<br>Represents the session expiration duration<br>See [Absolute Timeout](#timeout-40fe61) below.
+
+<a id="user-session-expiration-idle-timeout"></a>&#x2022; [`idle_timeout`](#user-session-expiration-idle-timeout) - Optional Block<br>Represents the cookie expiration duration<br>See [Idle Timeout](#user-session-expiration-idle-timeout) below.
+
+#### User Session Expiration Absolute Timeout
+
+An [`absolute_timeout`](#timeout-40fe61) block (within [`user_session_expiration`](#user-session-expiration)) supports the following:
+
+<a id="hours-f6f193"></a>&#x2022; [`hours`](#hours-f6f193) - Optional Block<br>Represents the session duration in hours<br>See [Hours](#hours-f6f193) below.
+
+<a id="minutes-35a806"></a>&#x2022; [`minutes`](#minutes-35a806) - Optional Block<br>Represents the session duration in minutes<br>See [Minutes](#minutes-35a806) below.
+
+#### User Session Expiration Absolute Timeout Hours
+
+A [`hours`](#hours-f6f193) block (within [`user_session_expiration.absolute_timeout`](#timeout-40fe61)) supports the following:
+
+<a id="duration-002967"></a>&#x2022; [`duration`](#duration-002967) - Optional Number<br>Duration
+
+#### User Session Expiration Absolute Timeout Minutes
+
+A [`minutes`](#minutes-35a806) block (within [`user_session_expiration.absolute_timeout`](#timeout-40fe61)) supports the following:
+
+<a id="duration-1bb577"></a>&#x2022; [`duration`](#duration-1bb577) - Optional Number<br>Duration
+
+#### User Session Expiration Idle Timeout
+
+An [`idle_timeout`](#user-session-expiration-idle-timeout) block (within [`user_session_expiration`](#user-session-expiration)) supports the following:
+
+<a id="hours-338ce5"></a>&#x2022; [`hours`](#hours-338ce5) - Optional Block<br>Represents the cookie duration in hours<br>See [Hours](#hours-338ce5) below.
+
+<a id="minutes-6044ef"></a>&#x2022; [`minutes`](#minutes-6044ef) - Optional Block<br>Represents the cookie duration in minutes<br>See [Minutes](#minutes-6044ef) below.
+
+#### User Session Expiration Idle Timeout Hours
+
+A [`hours`](#hours-338ce5) block (within [`user_session_expiration.idle_timeout`](#user-session-expiration-idle-timeout)) supports the following:
+
+<a id="duration-5d3ae0"></a>&#x2022; [`duration`](#duration-5d3ae0) - Optional Number<br>Duration
+
+#### User Session Expiration Idle Timeout Minutes
+
+A [`minutes`](#minutes-6044ef) block (within [`user_session_expiration.idle_timeout`](#user-session-expiration-idle-timeout)) supports the following:
+
+<a id="duration-4f5160"></a>&#x2022; [`duration`](#duration-4f5160) - Optional Number<br>Duration
 
 ---
 

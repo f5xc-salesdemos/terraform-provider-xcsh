@@ -2,12 +2,12 @@
 page_title: "f5xc_cloud_connect Data Source - terraform-provider-f5xc"
 subcategory: "Networking"
 description: |-
-  Manages a Cloud Connect resource in F5 Distributed Cloud for establishing connectivity to cloud provider networks.
+  Retrieves information about an existing Cloud Connect resource in F5 Distributed Cloud for establishing connectivity to cloud provider networks.
 ---
 
 # f5xc_cloud_connect (Data Source)
 
-Manages a Cloud Connect resource in F5 Distributed Cloud for establishing connectivity to cloud provider networks.
+Retrieves information about a Cloud Connect resource in F5 Distributed Cloud for establishing connectivity to cloud provider networks. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

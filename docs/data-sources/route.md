@@ -2,12 +2,12 @@
 page_title: "f5xc_route Data Source - terraform-provider-f5xc"
 subcategory: "Load Balancing"
 description: |-
-  Manages route object in a given namespace. Route object is list of route rules. Each rule has match condition to match incoming requests and actions to take on matching requests. in F5 Distributed Cloud.
+  Retrieves information about route object in a given namespace. Route object is list of route rules. Each rule has match condition to match incoming requests and actions to take on matching requests. in F5 Distributed Cloud.
 ---
 
 # f5xc_route (Data Source)
 
-Manages route object in a given namespace. Route object is list of route rules. Each rule has match condition to match incoming requests and actions to take on matching requests. in F5 Distributed Cloud.
+Manages route object in a given namespace. Route object is list of route rules. Each rule has match condition to match incoming requests and actions to take on matching requests. in F5 Distributed Cloud. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

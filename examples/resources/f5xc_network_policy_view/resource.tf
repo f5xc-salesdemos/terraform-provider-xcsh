@@ -35,7 +35,7 @@ resource "f5xc_network_policy_view" "example" {
   adv_action {
     # Configure adv_action settings
   }
-  # Enable this option
+  # Configuration parameter for all tcp traffic.
   all_tcp_traffic {
     # Configure all_tcp_traffic settings
   }

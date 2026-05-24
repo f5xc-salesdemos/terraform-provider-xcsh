@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -43,6 +45,130 @@ type CloudConnectResource struct {
 
 // CloudConnectEmptyModel represents empty nested blocks
 type CloudConnectEmptyModel struct {
+}
+
+// CloudConnectAWSProviderModel represents aws_provider block
+type CloudConnectAWSProviderModel struct {
+	AWSTGWSite *CloudConnectAWSProviderAWSTGWSiteModel `tfsdk:"aws_tgw_site"`
+}
+
+// CloudConnectAWSProviderModelAttrTypes defines the attribute types for CloudConnectAWSProviderModel
+var CloudConnectAWSProviderModelAttrTypes = map[string]attr.Type{
+	"aws_tgw_site": types.ObjectType{AttrTypes: CloudConnectAWSProviderAWSTGWSiteModelAttrTypes},
+}
+
+// CloudConnectAWSProviderAWSTGWSiteModel represents aws_tgw_site block
+type CloudConnectAWSProviderAWSTGWSiteModel struct {
+	Cred           *CloudConnectAWSProviderAWSTGWSiteCredModel           `tfsdk:"cred"`
+	Site           *CloudConnectAWSProviderAWSTGWSiteSiteModel           `tfsdk:"site"`
+	VPCAttachments *CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsModel `tfsdk:"vpc_attachments"`
+}
+
+// CloudConnectAWSProviderAWSTGWSiteModelAttrTypes defines the attribute types for CloudConnectAWSProviderAWSTGWSiteModel
+var CloudConnectAWSProviderAWSTGWSiteModelAttrTypes = map[string]attr.Type{
+	"cred":            types.ObjectType{AttrTypes: CloudConnectAWSProviderAWSTGWSiteCredModelAttrTypes},
+	"site":            types.ObjectType{AttrTypes: CloudConnectAWSProviderAWSTGWSiteSiteModelAttrTypes},
+	"vpc_attachments": types.ObjectType{AttrTypes: CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsModelAttrTypes},
+}
+
+// CloudConnectAWSProviderAWSTGWSiteCredModel represents cred block
+type CloudConnectAWSProviderAWSTGWSiteCredModel struct {
+	Name      types.String `tfsdk:"name"`
+	Namespace types.String `tfsdk:"namespace"`
+	Tenant    types.String `tfsdk:"tenant"`
+}
+
+// CloudConnectAWSProviderAWSTGWSiteCredModelAttrTypes defines the attribute types for CloudConnectAWSProviderAWSTGWSiteCredModel
+var CloudConnectAWSProviderAWSTGWSiteCredModelAttrTypes = map[string]attr.Type{
+	"name":      types.StringType,
+	"namespace": types.StringType,
+	"tenant":    types.StringType,
+}
+
+// CloudConnectAWSProviderAWSTGWSiteSiteModel represents site block
+type CloudConnectAWSProviderAWSTGWSiteSiteModel struct {
+	Name      types.String `tfsdk:"name"`
+	Namespace types.String `tfsdk:"namespace"`
+	Tenant    types.String `tfsdk:"tenant"`
+}
+
+// CloudConnectAWSProviderAWSTGWSiteSiteModelAttrTypes defines the attribute types for CloudConnectAWSProviderAWSTGWSiteSiteModel
+var CloudConnectAWSProviderAWSTGWSiteSiteModelAttrTypes = map[string]attr.Type{
+	"name":      types.StringType,
+	"namespace": types.StringType,
+	"tenant":    types.StringType,
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsModel represents vpc_attachments block
+type CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsModel struct {
+	VPCList []CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListModel `tfsdk:"vpc_list"`
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsModelAttrTypes defines the attribute types for CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsModel
+var CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsModelAttrTypes = map[string]attr.Type{
+	"vpc_list": types.ListType{ElemType: types.ObjectType{AttrTypes: CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListModelAttrTypes}},
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListModel represents vpc_list block
+type CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListModel struct {
+	VPCID         types.String                                                              `tfsdk:"vpc_id"`
+	CustomRouting *CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingModel `tfsdk:"custom_routing"`
+	DefaultRoute  *CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteModel  `tfsdk:"default_route"`
+	Labels        *CloudConnectEmptyModel                                                   `tfsdk:"labels"`
+	ManualRouting *CloudConnectEmptyModel                                                   `tfsdk:"manual_routing"`
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListModelAttrTypes defines the attribute types for CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListModel
+var CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListModelAttrTypes = map[string]attr.Type{
+	"vpc_id":         types.StringType,
+	"custom_routing": types.ObjectType{AttrTypes: CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingModelAttrTypes},
+	"default_route":  types.ObjectType{AttrTypes: CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteModelAttrTypes},
+	"labels":         types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"manual_routing": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingModel represents custom_routing block
+type CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingModel struct {
+	RouteTables []CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingRouteTablesModel `tfsdk:"route_tables"`
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingModelAttrTypes defines the attribute types for CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingModel
+var CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingModelAttrTypes = map[string]attr.Type{
+	"route_tables": types.ListType{ElemType: types.ObjectType{AttrTypes: CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingRouteTablesModelAttrTypes}},
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingRouteTablesModel represents route_tables block
+type CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingRouteTablesModel struct {
+	RouteTableID types.String `tfsdk:"route_table_id"`
+	StaticRoutes types.List   `tfsdk:"static_routes"`
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingRouteTablesModelAttrTypes defines the attribute types for CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingRouteTablesModel
+var CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListCustomRoutingRouteTablesModelAttrTypes = map[string]attr.Type{
+	"route_table_id": types.StringType,
+	"static_routes":  types.ListType{ElemType: types.StringType},
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteModel represents default_route block
+type CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteModel struct {
+	AllRouteTables       *CloudConnectEmptyModel                                                                      `tfsdk:"all_route_tables"`
+	SelectiveRouteTables *CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteSelectiveRouteTablesModel `tfsdk:"selective_route_tables"`
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteModelAttrTypes defines the attribute types for CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteModel
+var CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteModelAttrTypes = map[string]attr.Type{
+	"all_route_tables":       types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"selective_route_tables": types.ObjectType{AttrTypes: CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteSelectiveRouteTablesModelAttrTypes},
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteSelectiveRouteTablesModel represents selective_route_tables block
+type CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteSelectiveRouteTablesModel struct {
+	RouteTableID types.List `tfsdk:"route_table_id"`
+}
+
+// CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteSelectiveRouteTablesModelAttrTypes defines the attribute types for CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteSelectiveRouteTablesModel
+var CloudConnectAWSProviderAWSTGWSiteVPCAttachmentsVPCListDefaultRouteSelectiveRouteTablesModelAttrTypes = map[string]attr.Type{
+	"route_table_id": types.ListType{ElemType: types.StringType},
 }
 
 // CloudConnectAWSTGWSiteModel represents aws_tgw_site block
@@ -282,6 +408,7 @@ type CloudConnectResourceModel struct {
 	Labels        types.Map                       `tfsdk:"labels"`
 	ID            types.String                    `tfsdk:"id"`
 	Timeouts      timeouts.Value                  `tfsdk:"timeouts"`
+	AWSProvider   *CloudConnectAWSProviderModel   `tfsdk:"aws_provider"`
 	AWSTGWSite    *CloudConnectAWSTGWSiteModel    `tfsdk:"aws_tgw_site"`
 	AzureVNETSite *CloudConnectAzureVNETSiteModel `tfsdk:"azure_vnet_site"`
 	Segment       *CloudConnectSegmentModel       `tfsdk:"segment"`
@@ -348,6 +475,161 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 				Update: true,
 				Delete: true,
 			}),
+			"aws_provider": schema.SingleNestedBlock{
+				MarkdownDescription: "Configuration parameter for aws provider.",
+				Attributes:          map[string]schema.Attribute{},
+				Blocks: map[string]schema.Block{
+					"aws_tgw_site": schema.SingleNestedBlock{
+						MarkdownDescription: "AWS TGW Site Type. Cloud Connect AWS TGW Site Type.",
+						Attributes:          map[string]schema.Attribute{},
+						Blocks: map[string]schema.Block{
+							"cred": schema.SingleNestedBlock{
+								MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+								Attributes: map[string]schema.Attribute{
+									"name": schema.StringAttribute{
+										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
+									},
+									"namespace": schema.StringAttribute{
+										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+										Optional:            true,
+										Computed:            true,
+										PlanModifiers: []planmodifier.String{
+											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
+										},
+									},
+									"tenant": schema.StringAttribute{
+										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+										Optional:            true,
+										Computed:            true,
+										PlanModifiers: []planmodifier.String{
+											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
+										},
+									},
+								},
+							},
+							"site": schema.SingleNestedBlock{
+								MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
+								Attributes: map[string]schema.Attribute{
+									"name": schema.StringAttribute{
+										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
+									},
+									"namespace": schema.StringAttribute{
+										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+										Optional:            true,
+										Computed:            true,
+										PlanModifiers: []planmodifier.String{
+											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
+										},
+									},
+									"tenant": schema.StringAttribute{
+										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+										Optional:            true,
+										Computed:            true,
+										PlanModifiers: []planmodifier.String{
+											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
+										},
+									},
+								},
+							},
+							"vpc_attachments": schema.SingleNestedBlock{
+								MarkdownDescription: "Configuration parameter for vpc attachments.",
+								Attributes:          map[string]schema.Attribute{},
+								Blocks: map[string]schema.Block{
+									"vpc_list": schema.ListNestedBlock{
+										MarkdownDescription: "VPC List. Collection of items or values",
+										NestedObject: schema.NestedBlockObject{
+											Attributes: map[string]schema.Attribute{
+												"vpc_id": schema.StringAttribute{
+													MarkdownDescription: "Enter the VPC ID of the VPC to be attached .",
+													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
+												},
+											},
+											Blocks: map[string]schema.Block{
+												"custom_routing": schema.SingleNestedBlock{
+													MarkdownDescription: "AWS Route Table List. AWS Route Table List.",
+													Attributes:          map[string]schema.Attribute{},
+													Blocks: map[string]schema.Block{
+														"route_tables": schema.ListNestedBlock{
+															MarkdownDescription: "List of route tables. Route Tables .",
+															NestedObject: schema.NestedBlockObject{
+																Attributes: map[string]schema.Attribute{
+																	"route_table_id": schema.StringAttribute{
+																		MarkdownDescription: "Route table ID. Route table ID.",
+																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(64),
+																		},
+																	},
+																	"static_routes": schema.ListAttribute{
+																		MarkdownDescription: "Static Routes. List of Static Routes .",
+																		Optional:            true,
+																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeBetween(1, 50),
+																		},
+																	},
+																},
+															},
+														},
+													},
+												},
+												"default_route": schema.SingleNestedBlock{
+													MarkdownDescription: "Configuration parameter for default route.",
+													Attributes:          map[string]schema.Attribute{},
+													Blocks: map[string]schema.Block{
+														"all_route_tables": schema.SingleNestedBlock{
+															MarkdownDescription: "Configuration parameter for all route tables.",
+														},
+														"selective_route_tables": schema.SingleNestedBlock{
+															MarkdownDescription: "Configuration parameter for selective route tables.",
+															Attributes: map[string]schema.Attribute{
+																"route_table_id": schema.ListAttribute{
+																	MarkdownDescription: "Route table ID. Route table ID.",
+																	Optional:            true,
+																	ElementType:         types.StringType,
+																},
+															},
+														},
+													},
+												},
+												"labels": schema.SingleNestedBlock{
+													MarkdownDescription: "Add labels for the VPC attachment. These labels can then be used in policies such as enhanced firewall.",
+												},
+												"manual_routing": schema.SingleNestedBlock{
+													MarkdownDescription: "Enable this option",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"aws_tgw_site": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: aws_tgw_site, azure_vnet_site] AWS TGW Site Type. Cloud Connect AWS TGW Site Type.",
 				Attributes:          map[string]schema.Attribute{},
@@ -358,6 +640,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -366,6 +651,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -373,6 +661,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -383,6 +674,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -390,6 +684,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
 								},
 							},
 							"tenant": schema.StringAttribute{
@@ -399,11 +696,14 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 						},
 					},
 					"vpc_attachments": schema.SingleNestedBlock{
-						MarkdownDescription: "VPC Attachments.",
+						MarkdownDescription: "Configuration parameter for vpc attachments.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"vpc_list": schema.ListNestedBlock{
@@ -413,6 +713,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 										"vpc_id": schema.StringAttribute{
 											MarkdownDescription: "Enter the VPC ID of the VPC to be attached .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -427,11 +730,17 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 															"route_table_id": schema.StringAttribute{
 																MarkdownDescription: "Route table ID. Route table ID.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(64),
+																},
 															},
 															"static_routes": schema.ListAttribute{
 																MarkdownDescription: "Static Routes. List of Static Routes .",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeBetween(1, 50),
+																},
 															},
 														},
 													},
@@ -439,14 +748,14 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 											},
 										},
 										"default_route": schema.SingleNestedBlock{
-											MarkdownDescription: "Override Default Route Choice. Select Override Default Route Choice.",
+											MarkdownDescription: "Configuration parameter for default route.",
 											Attributes:          map[string]schema.Attribute{},
 											Blocks: map[string]schema.Block{
 												"all_route_tables": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for all route tables.",
 												},
 												"selective_route_tables": schema.SingleNestedBlock{
-													MarkdownDescription: "AWS Route Table. AWS Route Table.",
+													MarkdownDescription: "Configuration parameter for selective route tables.",
 													Attributes: map[string]schema.Attribute{
 														"route_table_id": schema.ListAttribute{
 															MarkdownDescription: "Route table ID. Route table ID.",
@@ -480,6 +789,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -487,6 +799,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
 								},
 							},
 							"tenant": schema.StringAttribute{
@@ -496,11 +811,14 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 						},
 					},
 					"vnet_attachments": schema.SingleNestedBlock{
-						MarkdownDescription: "VNet Attachments.",
+						MarkdownDescription: "Configuration parameter for vnet attachments.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"vnet_list": schema.ListNestedBlock{
@@ -510,10 +828,16 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 										"subscription_id": schema.StringAttribute{
 											MarkdownDescription: "Enter the Subscription ID of the VNet to be attached .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 										"vnet_id": schema.StringAttribute{
 											MarkdownDescription: "Enter the VNet ID of the VNet to be attached in format /<resource-group-name>/<VNet-name> .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -528,11 +852,17 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 															"route_table_id": schema.StringAttribute{
 																MarkdownDescription: "Route table ID in the format /<resource-group-name>/<route-table-name>.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(256),
+																},
 															},
 															"static_routes": schema.ListAttribute{
 																MarkdownDescription: "Static Routes. List of Static Routes .",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeBetween(1, 50),
+																},
 															},
 														},
 													},
@@ -540,14 +870,14 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 											},
 										},
 										"default_route": schema.SingleNestedBlock{
-											MarkdownDescription: "Override Default Route Choice. Select Override Default Route Choice.",
+											MarkdownDescription: "Configuration parameter for default route.",
 											Attributes:          map[string]schema.Attribute{},
 											Blocks: map[string]schema.Block{
 												"all_route_tables": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for all route tables.",
 												},
 												"selective_route_tables": schema.SingleNestedBlock{
-													MarkdownDescription: "Azure Route Table. Azure Route Table.",
+													MarkdownDescription: "Configuration parameter for selective route tables.",
 													Attributes: map[string]schema.Attribute{
 														"route_table_id": schema.ListAttribute{
 															MarkdownDescription: "Route table ID in the format /<resource-group-name>/<route-table-name>.",
@@ -577,6 +907,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -585,6 +918,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"tenant": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -592,6 +928,9 @@ func (r *CloudConnectResource) Schema(ctx context.Context, req resource.SchemaRe
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
 						},
 					},
 				},
@@ -702,6 +1041,14 @@ func (r *CloudConnectResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if data.AWSProvider != nil {
+		aws_providerMap := make(map[string]interface{})
+		if data.AWSProvider.AWSTGWSite != nil {
+			aws_tgw_siteNestedMap := make(map[string]interface{})
+			aws_providerMap["aws_tgw_site"] = aws_tgw_siteNestedMap
+		}
+		createReq.Spec["aws_provider"] = aws_providerMap
+	}
 	if data.AWSTGWSite != nil {
 		aws_tgw_siteMap := make(map[string]interface{})
 		if data.AWSTGWSite.Cred != nil {
@@ -778,13 +1125,16 @@ func (r *CloudConnectResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	data.ID = types.StringValue(apiResource.Metadata.Name)
-	// For resources without namespace in API path, namespace is computed from API response
-	data.Namespace = types.StringValue(apiResource.Metadata.Namespace)
 
 	// Unmarshal spec fields from API response to Terraform state
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["aws_provider"].(map[string]interface{}); ok && isImport && data.AWSProvider == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.AWSProvider = &CloudConnectAWSProviderModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["aws_tgw_site"].(map[string]interface{}); ok && isImport && data.AWSTGWSite == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.AWSTGWSite = &CloudConnectAWSTGWSiteModel{}
@@ -897,6 +1247,11 @@ func (r *CloudConnectResource) Read(ctx context.Context, req resource.ReadReques
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["aws_provider"].(map[string]interface{}); ok && isImport && data.AWSProvider == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.AWSProvider = &CloudConnectAWSProviderModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["aws_tgw_site"].(map[string]interface{}); ok && isImport && data.AWSTGWSite == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.AWSTGWSite = &CloudConnectAWSTGWSiteModel{}
@@ -980,6 +1335,14 @@ func (r *CloudConnectResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if data.AWSProvider != nil {
+		aws_providerMap := make(map[string]interface{})
+		if data.AWSProvider.AWSTGWSite != nil {
+			aws_tgw_siteNestedMap := make(map[string]interface{})
+			aws_providerMap["aws_tgw_site"] = aws_tgw_siteNestedMap
+		}
+		apiResource.Spec["aws_provider"] = aws_providerMap
+	}
 	if data.AWSTGWSite != nil {
 		aws_tgw_siteMap := make(map[string]interface{})
 		if data.AWSTGWSite.Cred != nil {
@@ -1072,6 +1435,11 @@ func (r *CloudConnectResource) Update(ctx context.Context, req resource.UpdateRe
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["aws_provider"].(map[string]interface{}); ok && isImport && data.AWSProvider == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.AWSProvider = &CloudConnectAWSProviderModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["aws_tgw_site"].(map[string]interface{}); ok && isImport && data.AWSTGWSite == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.AWSTGWSite = &CloudConnectAWSTGWSiteModel{}
@@ -1148,17 +1516,19 @@ func (r *CloudConnectResource) Delete(ctx context.Context, req resource.DeleteRe
 }
 
 func (r *CloudConnectResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	// Import ID format: name (no namespace for this resource type)
-	name := req.ID
-	if name == "" {
+	// Import ID format: namespace/name
+	parts := strings.Split(req.ID, "/")
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
 		resp.Diagnostics.AddError(
 			"Invalid Import ID",
-			"Expected import ID to be the resource name, got empty string",
+			fmt.Sprintf("Expected import ID format: namespace/name, got: %s", req.ID),
 		)
 		return
 	}
+	namespace := parts[0]
+	name := parts[1]
 
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("namespace"), "")...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("namespace"), namespace)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("name"), name)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), name)...)
 

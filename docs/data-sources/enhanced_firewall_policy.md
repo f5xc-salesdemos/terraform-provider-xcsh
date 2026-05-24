@@ -2,12 +2,12 @@
 page_title: "f5xc_enhanced_firewall_policy Data Source - terraform-provider-f5xc"
 subcategory: "Security"
 description: |-
-  Manages a Enhanced Firewall Policy resource in F5 Distributed Cloud for enhanced firewall policy specification. configuration.
+  Retrieves information about an existing Enhanced Firewall Policy resource in F5 Distributed Cloud for enhanced firewall policy specification. configuration.
 ---
 
 # f5xc_enhanced_firewall_policy (Data Source)
 
-Manages a Enhanced Firewall Policy resource in F5 Distributed Cloud for enhanced firewall policy specification. configuration.
+Retrieves information about an Enhanced Firewall Policy resource in F5 Distributed Cloud for enhanced firewall policy specification. configuration. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

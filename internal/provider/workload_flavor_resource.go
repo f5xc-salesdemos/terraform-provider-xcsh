@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -110,27 +109,15 @@ func (r *WorkloadFlavorResource) Schema(ctx context.Context, req resource.Schema
 			},
 			"ephemeral_storage": schema.StringAttribute{
 				MarkdownDescription: "Ephemeral storage in MiB (mebibyte) allocated for the workload_flavor.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"memory": schema.StringAttribute{
 				MarkdownDescription: "Memory in MiB (mebibyte) allocated for the workload_flavor.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"vcpus": schema.Int64Attribute{
 				MarkdownDescription: "Number of vCPUs allocated for the workload_flavor. Each vCPU is a thread on a CPU core.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 		},
 		Blocks: map[string]schema.Block{
@@ -457,27 +444,6 @@ func (r *WorkloadFlavorResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["ephemeral_storage"].(string); ok && v != "" {
-		data.EphemeralStorage = types.StringValue(v)
-	} else if data.EphemeralStorage.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.EphemeralStorage = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["memory"].(string); ok && v != "" {
-		data.Memory = types.StringValue(v)
-	} else if data.Memory.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Memory = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["vcpus"].(float64); ok {
-		data.Vcpus = types.Int64Value(int64(v))
-	} else if data.Vcpus.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Vcpus = types.Int64Null()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields

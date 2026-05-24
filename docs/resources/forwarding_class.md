@@ -47,7 +47,7 @@ resource "f5xc_forwarding_class" "example" {
   dscp {
     # Configure dscp settings
   }
-  # [OneOf: dscp_based_queue, queue_id_to_use] Enable this op...
+  # [OneOf: dscp_based_queue, queue_id_to_use] Configuration ...
   dscp_based_queue {
     # Configure dscp_based_queue settings
   }
@@ -84,12 +84,12 @@ resource "f5xc_forwarding_class" "example" {
 <br><br>&#x2022; <a id="no-marking"></a>[`no_marking`](#no-marking) - Optional Block<br>Enable this option
 
 -> **One of the following:**
-&#x2022; <a id="dscp-based-queue"></a>[`dscp_based_queue`](#dscp-based-queue) - Optional Block<br>Enable this option
-<br><br>&#x2022; <a id="queue-id-to-use"></a>[`queue_id_to_use`](#queue-id-to-use) - Optional String  Defaults to `DSCP_BEST_EFFORT`<br>Possible values are `DSCP_BEST_EFFORT`, `DSCP_CLASS1`, `DSCP_CLASS2`, `DSCP_CLASS3`, `DSCP_CLASS4`, `DSCP_EXPRESS_FORWARDING`, `DSCP_CONTROL_L3`, `DSCP_CONTROL_L2`<br>[Enum:
+&#x2022; <a id="dscp-based-queue"></a>[`dscp_based_queue`](#dscp-based-queue) - Optional Block<br>Configuration parameter for dscp based queue
+<br><br>&#x2022; <a id="queue-id-to-use"></a>[`queue_id_to_use`](#queue-id-to-use) - Required String  Defaults to `DSCP_BEST_EFFORT`<br>Possible values are `DSCP_BEST_EFFORT`, `DSCP_CLASS1`, `DSCP_CLASS2`, `DSCP_CLASS3`, `DSCP_CLASS4`, `DSCP_EXPRESS_FORWARDING`, `DSCP_CONTROL_L3`, `DSCP_CONTROL_L2`<br>[Enum:
 DSCP_BEST_EFFORT|DSCP_CLASS1|DSCP_CLASS2|DSCP_CLASS3|DSCP_CLASS4|DSCP_EXPRESS_FORWARDING|DSCP_CONTROL_L3|DSCP_CONTROL_L2] DSCP Precedence Level Values Best Effort service will GET any available bandwidth DSCP Class 1 service DSCP Class 2 service DSCP Class 3 service DSCP Class 4 service Express Forwarding is used for low latency traffic Control is used for routing traffic, not recommended Link
 Layer traffic like
 
-<a id="interface-group"></a>&#x2022; [`interface_group`](#interface-group) - Optional String  Defaults to `ANY_AVAILABLE_INTERFACE`<br>Possible values are `ANY_AVAILABLE_INTERFACE`, `INTERFACE_GROUP1`, `INTERFACE_GROUP2`, `INTERFACE_GROUP3`<br>[Enum: ANY_AVAILABLE_INTERFACE|INTERFACE_GROUP1|INTERFACE_GROUP2|INTERFACE_GROUP3] Interface group, group membership by adding group label to interface
+<a id="interface-group"></a>&#x2022; [`interface_group`](#interface-group) - Required String  Defaults to `ANY_AVAILABLE_INTERFACE`<br>Possible values are `ANY_AVAILABLE_INTERFACE`, `INTERFACE_GROUP1`, `INTERFACE_GROUP2`, `INTERFACE_GROUP3`<br>[Enum: ANY_AVAILABLE_INTERFACE|INTERFACE_GROUP1|INTERFACE_GROUP2|INTERFACE_GROUP3] Interface group, group membership by adding group label to interface
 Choose any of the available interfaces Choose all interfaces with label group1 Choose all interfaces with label group2 Choose all interfaces with label group3
 
 -> **One of the following:**
@@ -99,7 +99,7 @@ Choose any of the available interfaces Choose all interfaces with label group1 C
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 
-<a id="tos-value"></a>&#x2022; [`tos_value`](#tos-value) - Optional Number<br>Decimal value of raw 8 bit TOS. In above example DSCP 10 = Precedence Class 1 and drop precedence low
+<a id="tos-value"></a>&#x2022; [`tos_value`](#tos-value) - Required Number<br>Decimal value of raw 8 bit TOS. In above example DSCP 10 = Precedence Class 1 and drop precedence low
 
 ### Attributes Reference
 
@@ -113,8 +113,8 @@ In addition to all arguments above, the following attributes are exported:
 
 A [`dscp`](#dscp) block supports the following:
 
-<a id="dscp-drop-precedence"></a>&#x2022; [`drop_precedence`](#dscp-drop-precedence) - Optional String  Defaults to `DSCP_AF_FAKE`<br>Possible values are `DSCP_AF_LOW`, `DSCP_AF_MEDIUM`, `DSCP_AF_HIGH`, `DSCP_AF_POLICER`<br>[Enum: DSCP_AF_LOW|DSCP_AF_MEDIUM|DSCP_AF_HIGH|DSCP_AF_POLICER] DSCP Assured forwarding drop precedence DSCP Low drop precedence DSCP Low drop precedence DSCP Low drop
-precedence DSCP drop precedence value is taken from output of policer
+<a id="dscp-drop-precedence"></a>&#x2022; [`drop_precedence`](#dscp-drop-precedence) - Optional String<br>Possible values are `DSCP_AF_LOW`, `DSCP_AF_MEDIUM`, `DSCP_AF_HIGH`, `DSCP_AF_POLICER`<br>[Enum: DSCP_AF_LOW|DSCP_AF_MEDIUM|DSCP_AF_HIGH|DSCP_AF_POLICER] DSCP Assured forwarding drop precedence DSCP Low drop precedence DSCP Low drop precedence DSCP Low drop precedence DSCP drop precedence
+value is taken from output of policer
 
 <a id="dscp-dscp-class"></a>&#x2022; [`dscp_class`](#dscp-dscp-class) - Optional String  Defaults to `DSCP_BEST_EFFORT`<br>Possible values are `DSCP_BEST_EFFORT`, `DSCP_CLASS1`, `DSCP_CLASS2`, `DSCP_CLASS3`, `DSCP_CLASS4`, `DSCP_EXPRESS_FORWARDING`, `DSCP_CONTROL_L3`, `DSCP_CONTROL_L2`<br>[Enum:
 DSCP_BEST_EFFORT|DSCP_CLASS1|DSCP_CLASS2|DSCP_CLASS3|DSCP_CLASS4|DSCP_EXPRESS_FORWARDING|DSCP_CONTROL_L3|DSCP_CONTROL_L2] DSCP Precedence Level Values Best Effort service will GET any available bandwidth DSCP Class 1 service DSCP Class 2 service DSCP Class 3 service DSCP Class 4 service Express Forwarding is used for low latency traffic Control is used for routing traffic, not recommended Link

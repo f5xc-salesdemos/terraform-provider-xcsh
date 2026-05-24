@@ -65,7 +65,7 @@ resource "f5xc_bgp_asn_set" "example" {
 
 ### Spec Argument Reference
 
-<a id="as-numbers"></a>&#x2022; [`as_numbers`](#as-numbers) - Optional List<br>Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create whitelists or blacklists for use in network policy or service policy
+<a id="as-numbers"></a>&#x2022; [`as_numbers`](#as-numbers) - Required List<br>Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create whitelists or blacklists for use in network policy or service policy
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 

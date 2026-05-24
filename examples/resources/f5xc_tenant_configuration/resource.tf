@@ -27,16 +27,16 @@ resource "f5xc_tenant_configuration" "example" {
   }
 
   # Resource-specific configuration
-  # BasicConfiguration.
+  # Configuration parameter for basic configuration.
   basic_configuration {
     # Configure basic_configuration settings
   }
-  # BruteForceDetectionSettings.
+  # Configuration parameter for brute force detection.
+  brute_force_detection {
+    # Configure brute_force_detection settings
+  }
+  # Configuration parameter for brute force detection settings.
   brute_force_detection_settings {
     # Configure brute_force_detection_settings settings
-  }
-  # PasswordPolicy.
-  password_policy {
-    # Configure password_policy settings
   }
 }

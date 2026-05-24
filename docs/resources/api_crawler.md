@@ -2,12 +2,12 @@
 page_title: "f5xc_api_crawler Resource - terraform-provider-f5xc"
 subcategory: "API Security"
 description: |-
-  Manages a API Crawler resource in F5 Distributed Cloud.
+  Manages an API Crawler resource in F5 Distributed Cloud.
 ---
 
 # f5xc_api_crawler (Resource)
 
-Manages a API Crawler resource in F5 Distributed Cloud.
+Manages an API Crawler resource in F5 Distributed Cloud.
 
 ~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
@@ -15,7 +15,7 @@ Manages a API Crawler resource in F5 Distributed Cloud.
 
 ```terraform
 # API Crawler Resource Example
-# Manages a API Crawler resource in F5 Distributed Cloud.
+# Manages an API Crawler resource in F5 Distributed Cloud.
 
 terraform {
   required_version = ">= 1.0"
@@ -47,7 +47,7 @@ resource "f5xc_api_crawler" "example" {
   domains {
     # Configure domains settings
   }
-  # Simple Login.
+  # Configuration parameter for simple login.
   simple_login {
     # Configure simple_login settings
   }
@@ -97,7 +97,7 @@ A [`domains`](#domains) block supports the following:
 
 <a id="domains-domain"></a>&#x2022; [`domain`](#domains-domain) - Optional String<br>Select the domain to execute API Crawling with given credentials
 
-<a id="domains-simple-login"></a>&#x2022; [`simple_login`](#domains-simple-login) - Optional Block<br>Simple Login<br>See [Simple Login](#domains-simple-login) below.
+<a id="domains-simple-login"></a>&#x2022; [`simple_login`](#domains-simple-login) - Optional Block<br>Configuration parameter for simple login<br>See [Simple Login](#domains-simple-login) below.
 
 #### Domains Simple Login
 

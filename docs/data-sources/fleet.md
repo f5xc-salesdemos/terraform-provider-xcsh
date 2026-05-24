@@ -2,12 +2,12 @@
 page_title: "f5xc_fleet Data Source - terraform-provider-f5xc"
 subcategory: "Sites"
 description: |-
-  Manages fleet will create a fleet object in 'system' namespace of the user. in F5 Distributed Cloud.
+  Retrieves information about fleet will create a fleet object in 'system' namespace of the user. in F5 Distributed Cloud.
 ---
 
 # f5xc_fleet (Data Source)
 
-Manages fleet will create a fleet object in 'system' namespace of the user. in F5 Distributed Cloud.
+Manages fleet will create a fleet object in 'system' namespace of the user. in F5 Distributed Cloud. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

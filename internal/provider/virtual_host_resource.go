@@ -8,12 +8,15 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -1048,61 +1051,63 @@ var VirtualHostWAFTypeAppFirewallAppFirewallModelAttrTypes = map[string]attr.Typ
 }
 
 type VirtualHostResourceModel struct {
-	Name                       types.String                         `tfsdk:"name"`
-	Namespace                  types.String                         `tfsdk:"namespace"`
-	Annotations                types.Map                            `tfsdk:"annotations"`
-	Description                types.String                         `tfsdk:"description"`
-	Disable                    types.Bool                           `tfsdk:"disable"`
-	Domains                    types.List                           `tfsdk:"domains"`
-	Labels                     types.Map                            `tfsdk:"labels"`
-	RequestCookiesToRemove     types.List                           `tfsdk:"request_cookies_to_remove"`
-	RequestHeadersToRemove     types.List                           `tfsdk:"request_headers_to_remove"`
-	ResponseCookiesToRemove    types.List                           `tfsdk:"response_cookies_to_remove"`
-	ResponseHeadersToRemove    types.List                           `tfsdk:"response_headers_to_remove"`
-	ID                         types.String                         `tfsdk:"id"`
-	AddLocation                types.Bool                           `tfsdk:"add_location"`
-	AppendServerName           types.String                         `tfsdk:"append_server_name"`
-	ConnectionIdleTimeout      types.Int64                          `tfsdk:"connection_idle_timeout"`
-	DisableDefaultErrorPages   types.Bool                           `tfsdk:"disable_default_error_pages"`
-	DisableDNSResolve          types.Bool                           `tfsdk:"disable_dns_resolve"`
-	IdleTimeout                types.Int64                          `tfsdk:"idle_timeout"`
-	MaxRequestHeaderSize       types.Int64                          `tfsdk:"max_request_header_size"`
-	Proxy                      types.String                         `tfsdk:"proxy"`
-	ServerName                 types.String                         `tfsdk:"server_name"`
-	Timeouts                   timeouts.Value                       `tfsdk:"timeouts"`
-	AdvertisePolicies          types.List                           `tfsdk:"advertise_policies"`
-	Authentication             *VirtualHostAuthenticationModel      `tfsdk:"authentication"`
-	BufferPolicy               *VirtualHostBufferPolicyModel        `tfsdk:"buffer_policy"`
-	CaptchaChallenge           *VirtualHostCaptchaChallengeModel    `tfsdk:"captcha_challenge"`
-	CoalescingOptions          *VirtualHostCoalescingOptionsModel   `tfsdk:"coalescing_options"`
-	CompressionParams          *VirtualHostCompressionParamsModel   `tfsdk:"compression_params"`
-	CORSPolicy                 *VirtualHostCORSPolicyModel          `tfsdk:"cors_policy"`
-	CSRFPolicy                 *VirtualHostCSRFPolicyModel          `tfsdk:"csrf_policy"`
-	CustomErrors               *VirtualHostEmptyModel               `tfsdk:"custom_errors"`
-	DefaultHeader              *VirtualHostEmptyModel               `tfsdk:"default_header"`
-	DefaultLoadBalancer        *VirtualHostEmptyModel               `tfsdk:"default_loadbalancer"`
-	DisablePathNormalize       *VirtualHostEmptyModel               `tfsdk:"disable_path_normalize"`
-	DynamicReverseProxy        *VirtualHostDynamicReverseProxyModel `tfsdk:"dynamic_reverse_proxy"`
-	EnablePathNormalize        *VirtualHostEmptyModel               `tfsdk:"enable_path_normalize"`
-	HTTPProtocolOptions        *VirtualHostHTTPProtocolOptionsModel `tfsdk:"http_protocol_options"`
-	JsChallenge                *VirtualHostJsChallengeModel         `tfsdk:"js_challenge"`
-	NoAuthentication           *VirtualHostEmptyModel               `tfsdk:"no_authentication"`
-	NoChallenge                *VirtualHostEmptyModel               `tfsdk:"no_challenge"`
-	NonDefaultLoadBalancer     *VirtualHostEmptyModel               `tfsdk:"non_default_loadbalancer"`
-	PassThrough                *VirtualHostEmptyModel               `tfsdk:"pass_through"`
-	RateLimiterAllowedPrefixes types.List                           `tfsdk:"rate_limiter_allowed_prefixes"`
-	RequestCookiesToAdd        types.List                           `tfsdk:"request_cookies_to_add"`
-	RequestHeadersToAdd        types.List                           `tfsdk:"request_headers_to_add"`
-	ResponseCookiesToAdd       types.List                           `tfsdk:"response_cookies_to_add"`
-	ResponseHeadersToAdd       types.List                           `tfsdk:"response_headers_to_add"`
-	RetryPolicy                *VirtualHostRetryPolicyModel         `tfsdk:"retry_policy"`
-	Routes                     types.List                           `tfsdk:"routes"`
-	SensitiveDataPolicy        types.List                           `tfsdk:"sensitive_data_policy"`
-	SlowDDOSMitigation         *VirtualHostSlowDDOSMitigationModel  `tfsdk:"slow_ddos_mitigation"`
-	TLSCertParams              *VirtualHostTLSCertParamsModel       `tfsdk:"tls_cert_params"`
-	TLSParameters              *VirtualHostTLSParametersModel       `tfsdk:"tls_parameters"`
-	UserIdentification         types.List                           `tfsdk:"user_identification"`
-	WAFType                    *VirtualHostWAFTypeModel             `tfsdk:"waf_type"`
+	Name                        types.String                         `tfsdk:"name"`
+	Namespace                   types.String                         `tfsdk:"namespace"`
+	Annotations                 types.Map                            `tfsdk:"annotations"`
+	Description                 types.String                         `tfsdk:"description"`
+	Disable                     types.Bool                           `tfsdk:"disable"`
+	Domains                     types.List                           `tfsdk:"domains"`
+	Labels                      types.Map                            `tfsdk:"labels"`
+	RequestCookiesToRemove      types.List                           `tfsdk:"request_cookies_to_remove"`
+	RequestHeadersToRemove      types.List                           `tfsdk:"request_headers_to_remove"`
+	ResponseCookiesToRemove     types.List                           `tfsdk:"response_cookies_to_remove"`
+	ResponseHeadersToRemove     types.List                           `tfsdk:"response_headers_to_remove"`
+	ID                          types.String                         `tfsdk:"id"`
+	AddLocation                 types.Bool                           `tfsdk:"add_location"`
+	AppendServerName            types.String                         `tfsdk:"append_server_name"`
+	ConnectionIdleTimeout       types.Int64                          `tfsdk:"connection_idle_timeout"`
+	DisableDefaultErrorPages    types.Bool                           `tfsdk:"disable_default_error_pages"`
+	DisableDNSResolve           types.Bool                           `tfsdk:"disable_dns_resolve"`
+	IdleTimeout                 types.Int64                          `tfsdk:"idle_timeout"`
+	MaxRequestHeaderSize        types.Int64                          `tfsdk:"max_request_header_size"`
+	MaxRequestsPerConnection    types.Int64                          `tfsdk:"max_requests_per_connection"`
+	Proxy                       types.String                         `tfsdk:"proxy"`
+	ServerName                  types.String                         `tfsdk:"server_name"`
+	Timeouts                    timeouts.Value                       `tfsdk:"timeouts"`
+	AdvertisePolicies           types.List                           `tfsdk:"advertise_policies"`
+	Authentication              *VirtualHostAuthenticationModel      `tfsdk:"authentication"`
+	BufferPolicy                *VirtualHostBufferPolicyModel        `tfsdk:"buffer_policy"`
+	CaptchaChallenge            *VirtualHostCaptchaChallengeModel    `tfsdk:"captcha_challenge"`
+	CoalescingOptions           *VirtualHostCoalescingOptionsModel   `tfsdk:"coalescing_options"`
+	CompressionParams           *VirtualHostCompressionParamsModel   `tfsdk:"compression_params"`
+	CORSPolicy                  *VirtualHostCORSPolicyModel          `tfsdk:"cors_policy"`
+	CSRFPolicy                  *VirtualHostCSRFPolicyModel          `tfsdk:"csrf_policy"`
+	CustomErrors                *VirtualHostEmptyModel               `tfsdk:"custom_errors"`
+	DefaultHeader               *VirtualHostEmptyModel               `tfsdk:"default_header"`
+	DefaultLoadBalancer         *VirtualHostEmptyModel               `tfsdk:"default_loadbalancer"`
+	DisablePathNormalize        *VirtualHostEmptyModel               `tfsdk:"disable_path_normalize"`
+	DynamicReverseProxy         *VirtualHostDynamicReverseProxyModel `tfsdk:"dynamic_reverse_proxy"`
+	EnablePathNormalize         *VirtualHostEmptyModel               `tfsdk:"enable_path_normalize"`
+	HTTPProtocolOptions         *VirtualHostHTTPProtocolOptionsModel `tfsdk:"http_protocol_options"`
+	JsChallenge                 *VirtualHostJsChallengeModel         `tfsdk:"js_challenge"`
+	NoAuthentication            *VirtualHostEmptyModel               `tfsdk:"no_authentication"`
+	NoChallenge                 *VirtualHostEmptyModel               `tfsdk:"no_challenge"`
+	NoRequestLimitPerConnection *VirtualHostEmptyModel               `tfsdk:"no_request_limit_per_connection"`
+	NonDefaultLoadBalancer      *VirtualHostEmptyModel               `tfsdk:"non_default_loadbalancer"`
+	PassThrough                 *VirtualHostEmptyModel               `tfsdk:"pass_through"`
+	RateLimiterAllowedPrefixes  types.List                           `tfsdk:"rate_limiter_allowed_prefixes"`
+	RequestCookiesToAdd         types.List                           `tfsdk:"request_cookies_to_add"`
+	RequestHeadersToAdd         types.List                           `tfsdk:"request_headers_to_add"`
+	ResponseCookiesToAdd        types.List                           `tfsdk:"response_cookies_to_add"`
+	ResponseHeadersToAdd        types.List                           `tfsdk:"response_headers_to_add"`
+	RetryPolicy                 *VirtualHostRetryPolicyModel         `tfsdk:"retry_policy"`
+	Routes                      types.List                           `tfsdk:"routes"`
+	SensitiveDataPolicy         types.List                           `tfsdk:"sensitive_data_policy"`
+	SlowDDOSMitigation          *VirtualHostSlowDDOSMitigationModel  `tfsdk:"slow_ddos_mitigation"`
+	TLSCertParams               *VirtualHostTLSCertParamsModel       `tfsdk:"tls_cert_params"`
+	TLSParameters               *VirtualHostTLSParametersModel       `tfsdk:"tls_parameters"`
+	UserIdentification          types.List                           `tfsdk:"user_identification"`
+	WAFType                     *VirtualHostWAFTypeModel             `tfsdk:"waf_type"`
 }
 
 func (r *VirtualHostResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -1148,8 +1153,11 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 			},
 			"domains": schema.ListAttribute{
 				MarkdownDescription: "List of domain names matched to this virtual host for routing incoming requests. Supports wildcard patterns like *.example.com for subdomain matching.",
-				Optional:            true,
+				Required:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeBetween(1, 33),
+				},
 			},
 			"labels": schema.MapAttribute{
 				MarkdownDescription: "Labels is a user defined key value map that can be attached to resources for organization and filtering.",
@@ -1158,23 +1166,35 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 			},
 			"request_cookies_to_remove": schema.ListAttribute{
 				MarkdownDescription: "List of keys of Cookies to be removed from the HTTP request being sent towards upstream.",
-				Optional:            true,
+				Required:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(32),
+				},
 			},
 			"request_headers_to_remove": schema.ListAttribute{
 				MarkdownDescription: "List of keys of Headers to be removed from the HTTP request being sent towards upstream.",
-				Optional:            true,
+				Required:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(32),
+				},
 			},
 			"response_cookies_to_remove": schema.ListAttribute{
 				MarkdownDescription: "List of name of Cookies to be removed from the HTTP response being sent towards downstream. Entire set-cookie header will be removed.",
-				Optional:            true,
+				Required:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(32),
+				},
 			},
 			"response_headers_to_remove": schema.ListAttribute{
 				MarkdownDescription: "List of keys of Headers to be removed from the HTTP response being sent towards downstream.",
-				Optional:            true,
+				Required:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(32),
+				},
 			},
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique identifier for the resource.",
@@ -1185,54 +1205,37 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 			},
 			"add_location": schema.BoolAttribute{
 				MarkdownDescription: "Add Location. X-example: true Appends header x-F5 Distributed Cloud-location = <RE-site-name> in responses. This configuration is ignored on CE sites.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"append_server_name": schema.StringAttribute{
-				MarkdownDescription: "[OneOf: append_server_name, default_header, pass_through, server_name; Default: default_header] Specifies the value to be used for Server header if it is not already present. If Server Header is already present it is not overwritten. It is just passed.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				MarkdownDescription: "[OneOf: append_server_name, default_header, pass_through, server_name; Default: default_header] Exclusive with [default_header pass_through server_name] Specifies the value to be used for Server header if it is not already present. If Server Header is already present it is not overwritten. It is just passed.",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(8096),
 				},
 			},
 			"connection_idle_timeout": schema.Int64Attribute{
 				MarkdownDescription: "The idle timeout for downstream connections. The idle timeout is defined as the period in which there are no active requests. When the idle timeout is reached the connection will be closed.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"disable_default_error_pages": schema.BoolAttribute{
 				MarkdownDescription: "Option to specify whether to disable using default F5XC error pages.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"disable_dns_resolve": schema.BoolAttribute{
 				MarkdownDescription: "Disable DNS resolution for domains specified in the virtual host When the virtual host is configured as Dynamive Resolve Proxy (DRP), disable DNS resolution for domains configured. This configuration is suitable for HTTP CONNECT proxy.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"idle_timeout": schema.Int64Attribute{
 				MarkdownDescription: "Idle timeout is the amount of time that the loadbalancer will allow a stream to exist with no upstream or downstream activity. Idle timeout and Proxy Type: HTTP_PROXY, HTTPS_PROXY: Idle timer is started when the first byte is received on the connection. Each time an encode/decode event for..",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"max_request_header_size": schema.Int64Attribute{
 				MarkdownDescription: "The maximum request header size in KiB for incoming connections. If un-configured, the default max request headers allowed is 60 KiB. Requests that exceed this limit will receive a 431 response.",
+				Required:            true,
+			},
+			"max_requests_per_connection": schema.Int64Attribute{
+				MarkdownDescription: "[OneOf: max_requests_per_connection, no_request_limit_per_connection; Default: no_request_limit_per_connection] Exclusive with [no_request_limit_per_connection] Sets the maximum number of requests a downstream client can send over a single connection to Envoy. Enter a value >=1 to define the request limit per connection.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.Int64{
@@ -1240,19 +1243,17 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 				},
 			},
 			"proxy": schema.StringAttribute{
-				MarkdownDescription: "[Enum: UDP_PROXY|SMA_PROXY|DNS_PROXY|ZTNA_PROXY|UZTNA_PROXY] ProxyType tells the type of proxy to install for the virtual host. Only the following combination of VirtualHosts within same AdvertisePolicy is permitted (None of them should have '*' in domains when used with other VirtualHosts in same AdvertisePolicy) 1. Multiple TCP_PROXY_WITH_SNI and.. Possible values are `UDP_PROXY`, `SMA_PROXY`, `DNS_PROXY`, `ZTNA_PROXY`, `UZTNA_PROXY`. Defaults to `HTTP_PROXY`.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				MarkdownDescription: "[Enum: UDP_PROXY|SMA_PROXY|DNS_PROXY|ZTNA_PROXY|UZTNA_PROXY] ProxyType tells the type of proxy to install for the virtual host. Only the following combination of VirtualHosts within same AdvertisePolicy is permitted (None of them should have '*' in domains when used with other VirtualHosts in same AdvertisePolicy) 1. Multiple TCP_PROXY_WITH_SNI and.. Possible values are `UDP_PROXY`, `SMA_PROXY`, `DNS_PROXY`, `ZTNA_PROXY`, `UZTNA_PROXY`.",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("UDP_PROXY", "SMA_PROXY", "DNS_PROXY", "ZTNA_PROXY", "UZTNA_PROXY"),
 				},
 			},
 			"server_name": schema.StringAttribute{
-				MarkdownDescription: "Specifies the value to be used for Server header inserted in responses. This will overwrite existing values if any for Server Header.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				MarkdownDescription: "Exclusive with [append_server_name default_header pass_through] Specifies the value to be used for Server header inserted in responses. This will overwrite existing values if any for Server Header.",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(8096),
 				},
 			},
 		},
@@ -1278,6 +1279,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1285,6 +1290,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -1310,8 +1319,11 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 				MarkdownDescription: "[OneOf: authentication, no_authentication; Default: no_authentication] Authentication related information. This allows to configure the URL to redirect after the authentication Authentication Object Reference, configuration of cookie params etc.",
 				Attributes: map[string]schema.Attribute{
 					"redirect_url": schema.StringAttribute{
-						MarkdownDescription: "user can provide a URL for e.g https://abc.xyz.com where user gets redirected. This URL configured here must match with the redirect URL configured with the OIDC provider.",
+						MarkdownDescription: "Exclusive with [redirect_dynamic] user can provide a URL for e.g https://abc.xyz.com where user gets redirected. This URL configured here must match with the redirect URL configured with the OIDC provider.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -1330,6 +1342,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1337,6 +1353,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -1402,6 +1422,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1419,6 +1442,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -1438,6 +1464,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 													"location": schema.StringAttribute{
 														MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 													"store_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1455,6 +1484,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 													"url": schema.StringAttribute{
 														MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 131072),
+														},
 													},
 												},
 											},
@@ -1463,12 +1495,12 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 								},
 							},
 							"kms_key_hmac": schema.SingleNestedBlock{
-								MarkdownDescription: "KMS Key Reference. Reference to KMS Key Object.",
+								MarkdownDescription: "Configuration parameter for kms key hmac.",
 							},
 						},
 					},
 					"redirect_dynamic": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for redirect dynamic.",
 					},
 					"use_auth_object_config": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
@@ -1498,6 +1530,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 					"custom_page": schema.StringAttribute{
 						MarkdownDescription: "Custom message is of type uri_ref. Currently supported URL schemes is string:///. For string:/// scheme, message needs to be encoded in Base64 format.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(65536),
+						},
 					},
 				},
 			},
@@ -1506,10 +1541,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"default_coalescing": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for default coalescing.",
 					},
 					"strict_coalescing": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for strict coalescing.",
 					},
 				},
 			},
@@ -1524,6 +1559,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						MarkdownDescription: "Set of strings that allows specifying which mime-types yield compression When this field is not defined, compression will be applied to the following mime-types: 'application/javascript' 'application/JSON', 'application/xhtml+XML' 'image/svg+XML' 'text/CSS' 'text/HTML' 'text/plain' 'text/XML'.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(50),
+						},
 					},
 					"disable_on_etag_header": schema.BoolAttribute{
 						MarkdownDescription: "If true, disables compression when the response contains an etag header. When it is false, weak etags will be preserved and the ones that require strong validation will be removed.",
@@ -1554,11 +1592,17 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						MarkdownDescription: "Specifies the origins that will be allowed to do CORS requests. An origin is allowed if either allow_origin or allow_origin_regex match.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(128),
+						},
 					},
 					"allow_origin_regex": schema.ListAttribute{
 						MarkdownDescription: "Specifies regex patterns that match allowed origins. An origin is allowed if either allow_origin or allow_origin_regex match.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"disabled": schema.BoolAttribute{
 						MarkdownDescription: "Disable the CorsPolicy for a particular route. This is useful when virtual-host has CorsPolicy, but we need to disable it on a specific route. The value of this field is ignored for virtual-host.",
@@ -1579,7 +1623,7 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"all_load_balancer_domains": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for all load balancer domains.",
 					},
 					"custom_domain_list": schema.SingleNestedBlock{
 						MarkdownDescription: "List of domain names used for Host header matching.",
@@ -1588,6 +1632,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 								MarkdownDescription: "List of domain names that will be matched to loadbalancer. These domains are not used for SNI match. Wildcard names are supported in the suffix or prefix form.",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeBetween(1, 32),
+								},
 							},
 						},
 					},
@@ -1600,10 +1647,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 				MarkdownDescription: "Map of integer error codes as keys and string values that can be used to provide custom HTTP pages for each error code. Key of the map can be either response code class or HTTP Error code. Response code classes for key is configured as follows 3 -- for 3xx response code class 4 -- for 4xx..",
 			},
 			"default_header": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for default header.",
 			},
 			"default_loadbalancer": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: default_loadbalancer, non_default_loadbalancer; Default: default_loadbalancer] Enable this option",
+				MarkdownDescription: "[OneOf: default_loadbalancer, non_default_loadbalancer; Default: default_loadbalancer] Configuration parameter for default loadbalancer.",
 			},
 			"disable_path_normalize": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: disable_path_normalize, enable_path_normalize; Default: disable_path_normalize] Enable this option",
@@ -1616,8 +1663,11 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						Optional:            true,
 					},
 					"resolution_network_type": schema.StringAttribute{
-						MarkdownDescription: "[Enum: VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT] Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to.. Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`. Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`.",
+						MarkdownDescription: "[Enum: VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT|VIRTUAL_NETWORK_MANAGEMENT] Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to.. Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`, `VIRTUAL_NETWORK_MANAGEMENT`. Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("VIRTUAL_NETWORK_SITE_LOCAL", "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE", "VIRTUAL_NETWORK_PER_SITE", "VIRTUAL_NETWORK_PUBLIC", "VIRTUAL_NETWORK_GLOBAL", "VIRTUAL_NETWORK_SITE_SERVICE", "VIRTUAL_NETWORK_VER_INTERNAL", "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE", "VIRTUAL_NETWORK_IP_AUTO", "VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK", "VIRTUAL_NETWORK_SRV6_NETWORK", "VIRTUAL_NETWORK_IP_FABRIC", "VIRTUAL_NETWORK_SEGMENT", "VIRTUAL_NETWORK_MANAGEMENT"),
+						},
 					},
 					"resolve_endpoint_dynamically": schema.BoolAttribute{
 						MarkdownDescription: "X-example : true In this mode of proxy, virtual host will resolve the destination endpoint dynamically. The dynamic resolution is done using a predefined field in the request. This predefined field depends on the ProxyType configured on the Virtual Host.",
@@ -1640,6 +1690,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1647,6 +1701,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -1702,10 +1760,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						},
 					},
 					"http_protocol_enable_v1_v2": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for http protocol enable v1 v2.",
 					},
 					"http_protocol_enable_v2_only": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for http protocol enable v2 only.",
 					},
 				},
 			},
@@ -1719,6 +1777,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 					"custom_page": schema.StringAttribute{
 						MarkdownDescription: "Custom message is of type uri_ref. Currently supported URL schemes is string:///. For string:/// scheme, message needs to be encoded in Base64 format.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(65536),
+						},
 					},
 					"js_script_delay": schema.Int64Attribute{
 						MarkdownDescription: "Delay introduced by Javascript, in milliseconds.",
@@ -1727,16 +1788,19 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 				},
 			},
 			"no_authentication": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for no authentication.",
 			},
 			"no_challenge": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for no challenge.",
+			},
+			"no_request_limit_per_connection": schema.SingleNestedBlock{
+				MarkdownDescription: "Configuration parameter for no request limit per connection.",
 			},
 			"non_default_loadbalancer": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for non default loadbalancer.",
 			},
 			"pass_through": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for pass through.",
 			},
 			"rate_limiter_allowed_prefixes": schema.ListNestedBlock{
 				MarkdownDescription: "References to ip_prefix_set objects. Requests from source IP addresses that are covered by one of the allowed IP Prefixes are not subjected to rate limiting.",
@@ -1753,6 +1817,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1760,6 +1828,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -1788,14 +1860,20 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Name of the cookie in Cookie header.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"overwrite": schema.BoolAttribute{
 							MarkdownDescription: "Should the value be overwritten? If true, the value is overwritten to existing values.  not overwrite. Defaults to `do`.",
 							Optional:            true,
 						},
 						"value": schema.StringAttribute{
-							MarkdownDescription: "Value of the Cookie header.",
+							MarkdownDescription: "Exclusive with [secret_value] Value of the Cookie header.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(8096),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -1813,6 +1891,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										"location": schema.StringAttribute{
 											MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"store_provider": schema.StringAttribute{
 											MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1830,6 +1911,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										"url": schema.StringAttribute{
 											MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 									},
 								},
@@ -1849,10 +1933,16 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Name. Name of the HTTP header.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"value": schema.StringAttribute{
-							MarkdownDescription: "Value of the HTTP header.",
+							MarkdownDescription: "Exclusive with [secret_value] Value of the HTTP header.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(8096),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -1870,6 +1960,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										"location": schema.StringAttribute{
 											MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"store_provider": schema.StringAttribute{
 											MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1887,6 +1980,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										"url": schema.StringAttribute{
 											MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 									},
 								},
@@ -1900,58 +1996,73 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"add_domain": schema.StringAttribute{
-							MarkdownDescription: "Add domain attribute.",
+							MarkdownDescription: "Exclusive with [ignore_domain] Add domain attribute.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"add_expiry": schema.StringAttribute{
-							MarkdownDescription: "Add expiry attribute.",
+							MarkdownDescription: "Exclusive with [ignore_expiry] Add expiry attribute.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(256),
+							},
 						},
 						"add_path": schema.StringAttribute{
-							MarkdownDescription: "Add path attribute.",
+							MarkdownDescription: "Exclusive with [ignore_path] Add path attribute.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(256),
+							},
 						},
 						"max_age_value": schema.Int64Attribute{
-							MarkdownDescription: "Add max age attribute.",
+							MarkdownDescription: "Exclusive with [ignore_max_age] Add max age attribute.",
 							Optional:            true,
 						},
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Name of the cookie in Cookie header.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"overwrite": schema.BoolAttribute{
 							MarkdownDescription: "Should the value be overwritten? If true, the value is overwritten to existing values.  not overwrite. Defaults to `do`.",
 							Optional:            true,
 						},
 						"value": schema.StringAttribute{
-							MarkdownDescription: "Value of the Cookie header.",
+							MarkdownDescription: "Exclusive with [ignore_value secret_value] Value of the Cookie header.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(8096),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
 						"add_httponly": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for add httponly.",
 						},
 						"add_partitioned": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for add partitioned.",
 						},
 						"add_secure": schema.SingleNestedBlock{
 							MarkdownDescription: "Enable this option",
 						},
 						"ignore_domain": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for ignore domain.",
 						},
 						"ignore_expiry": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for ignore expiry.",
 						},
 						"ignore_httponly": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for ignore httponly.",
 						},
 						"ignore_max_age": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for ignore max age.",
 						},
 						"ignore_partitioned": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for ignore partitioned.",
 						},
 						"ignore_path": schema.SingleNestedBlock{
 							MarkdownDescription: "Enable this option",
@@ -1963,7 +2074,7 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 							MarkdownDescription: "Enable this option",
 						},
 						"ignore_value": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for ignore value.",
 						},
 						"samesite_lax": schema.SingleNestedBlock{
 							MarkdownDescription: "Enable this option",
@@ -1988,6 +2099,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										"location": schema.StringAttribute{
 											MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"store_provider": schema.StringAttribute{
 											MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2005,6 +2119,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										"url": schema.StringAttribute{
 											MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 									},
 								},
@@ -2024,10 +2141,16 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Name. Name of the HTTP header.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"value": schema.StringAttribute{
-							MarkdownDescription: "Value of the HTTP header.",
+							MarkdownDescription: "Exclusive with [secret_value] Value of the HTTP header.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(8096),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -2045,6 +2168,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										"location": schema.StringAttribute{
 											MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"store_provider": schema.StringAttribute{
 											MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2062,6 +2188,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										"url": schema.StringAttribute{
 											MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 									},
 								},
@@ -2085,11 +2214,17 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						MarkdownDescription: "HTTP status codes that should trigger a retry in addition to those specified by retry_on.",
 						Optional:            true,
 						ElementType:         types.Int64Type,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"retry_condition": schema.ListAttribute{
 						MarkdownDescription: "Specifies the conditions under which retry takes place. Retries can be on different types of condition depending on application requirements. For example, network failure, all 5xx response codes, idempotent 4xx response codes, etc The possible values are '5xx' : Retry will be done if the..",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeBetween(1, 7),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -2123,6 +2258,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2130,6 +2269,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -2166,6 +2309,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2173,6 +2320,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -2202,13 +2353,13 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						Optional:            true,
 					},
 					"request_timeout": schema.Int64Attribute{
-						MarkdownDescription: ".",
+						MarkdownDescription: "Exclusive with [disable_request_timeout].",
 						Optional:            true,
 					},
 				},
 				Blocks: map[string]schema.Block{
 					"disable_request_timeout": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable request timeout.",
 					},
 				},
 			},
@@ -2223,10 +2374,16 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 					"maximum_protocol_version": schema.StringAttribute{
 						MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+						},
 					},
 					"minimum_protocol_version": schema.StringAttribute{
 						MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+						},
 					},
 					"xfcc_header_elements": schema.ListAttribute{
 						MarkdownDescription: "[Enum: XFCC_NONE|XFCC_CERT|XFCC_CHAIN|XFCC_SUBJECT|XFCC_URI|XFCC_DNS] X-Forwarded-Client-Cert header elements to be set in an mTLS enabled connections. If none are defined, the header will not be added. Possible values are `XFCC_NONE`, `XFCC_CERT`, `XFCC_CHAIN`, `XFCC_SUBJECT`, `XFCC_URI`, `XFCC_DNS`. Defaults to `XFCC_NONE`.",
@@ -2250,6 +2407,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2257,6 +2418,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -2295,8 +2460,11 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 								Optional:            true,
 							},
 							"trusted_ca_url": schema.StringAttribute{
-								MarkdownDescription: "Inline Root CA Certificate.",
+								MarkdownDescription: "Exclusive with [trusted_ca] Inline Root CA Certificate.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(131072),
+								},
 							},
 							"verify_subject_alt_names": schema.ListAttribute{
 								MarkdownDescription: "List of acceptable Subject Alt Names/CN in the peer's certificate. When skip_hostname_verification is false and verify_subject_alt_names is empty, the hostname of the peer will be used for matching against SAN/CN of peer's certificate.",
@@ -2324,6 +2492,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+														stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2331,6 +2503,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+														stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 													},
 												},
 												"tenant": schema.StringAttribute{
@@ -2385,10 +2561,16 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 							"maximum_protocol_version": schema.StringAttribute{
 								MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+								},
 							},
 							"minimum_protocol_version": schema.StringAttribute{
 								MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -2399,6 +2581,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										"certificate_url": schema.StringAttribute{
 											MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 131072),
+											},
 										},
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Description for the certificate.",
@@ -2413,11 +2598,14 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 													MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeBetween(1, 4),
+													},
 												},
 											},
 										},
 										"disable_ocsp_stapling": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 										},
 										"private_key": schema.SingleNestedBlock{
 											MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -2433,6 +2621,9 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2450,13 +2641,16 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
 											},
 										},
 										"use_system_defaults": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for use system defaults.",
 										},
 									},
 								},
@@ -2469,8 +2663,11 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										Optional:            true,
 									},
 									"trusted_ca_url": schema.StringAttribute{
-										MarkdownDescription: "Inline Root CA Certificate.",
+										MarkdownDescription: "Exclusive with [trusted_ca] Inline Root CA Certificate.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(131072),
+										},
 									},
 									"verify_subject_alt_names": schema.ListAttribute{
 										MarkdownDescription: "List of acceptable Subject Alt Names/CN in the peer's certificate. When skip_hostname_verification is false and verify_subject_alt_names is empty, the hostname of the peer will be used for matching against SAN/CN of peer's certificate.",
@@ -2498,6 +2695,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 														"name": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+																stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+															},
 														},
 														"namespace": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2505,6 +2706,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 															Computed:            true,
 															PlanModifiers: []planmodifier.String{
 																stringplanmodifier.UseStateForUnknown(),
+															},
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+																stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 															},
 														},
 														"tenant": schema.StringAttribute{
@@ -2552,6 +2757,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2559,6 +2768,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -2603,6 +2816,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2610,6 +2827,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+												stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -2634,10 +2855,10 @@ func (r *VirtualHostResource) Schema(ctx context.Context, req resource.SchemaReq
 						},
 					},
 					"disable_waf": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable waf.",
 					},
 					"inherit_waf": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for inherit waf.",
 					},
 				},
 			},
@@ -2667,6 +2888,14 @@ func (r *VirtualHostResource) ValidateConfig(ctx context.Context, req resource.V
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	if !data.AppendServerName.IsNull() && !data.ServerName.IsNull() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("append_server_name"),
+			"Conflicting Configuration",
+			"append_server_name and server_name are mutually exclusive.",
+		)
+	}
+
 }
 
 // ModifyPlan implements resource.ResourceWithModifyPlan
@@ -3021,6 +3250,10 @@ func (r *VirtualHostResource) Create(ctx context.Context, req resource.CreateReq
 	if data.NoChallenge != nil {
 		no_challengeMap := make(map[string]interface{})
 		createReq.Spec["no_challenge"] = no_challengeMap
+	}
+	if data.NoRequestLimitPerConnection != nil {
+		no_request_limit_per_connectionMap := make(map[string]interface{})
+		createReq.Spec["no_request_limit_per_connection"] = no_request_limit_per_connectionMap
 	}
 	if data.NonDefaultLoadBalancer != nil {
 		non_default_loadbalancerMap := make(map[string]interface{})
@@ -3600,6 +3833,9 @@ func (r *VirtualHostResource) Create(ctx context.Context, req resource.CreateReq
 	}
 	if !data.MaxRequestHeaderSize.IsNull() && !data.MaxRequestHeaderSize.IsUnknown() {
 		createReq.Spec["max_request_header_size"] = data.MaxRequestHeaderSize.ValueInt64()
+	}
+	if !data.MaxRequestsPerConnection.IsNull() && !data.MaxRequestsPerConnection.IsUnknown() {
+		createReq.Spec["max_requests_per_connection"] = data.MaxRequestsPerConnection.ValueInt64()
 	}
 	if !data.Proxy.IsNull() && !data.Proxy.IsUnknown() {
 		createReq.Spec["proxy"] = data.Proxy.ValueString()
@@ -4192,6 +4428,11 @@ func (r *VirtualHostResource) Create(ctx context.Context, req resource.CreateReq
 	if _, ok := apiResource.Spec["no_challenge"].(map[string]interface{}); ok && isImport && data.NoChallenge == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.NoChallenge = &VirtualHostEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["no_request_limit_per_connection"].(map[string]interface{}); ok && isImport && data.NoRequestLimitPerConnection == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoRequestLimitPerConnection = &VirtualHostEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["non_default_loadbalancer"].(map[string]interface{}); ok && isImport && data.NonDefaultLoadBalancer == nil {
@@ -5157,16 +5398,10 @@ func (r *VirtualHostResource) Create(ctx context.Context, req resource.CreateReq
 		data.WAFType = &VirtualHostWAFTypeModel{}
 	}
 	// Normal Read: preserve existing state value
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.AddLocation.IsNull() && !data.AddLocation.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["add_location"].(bool); ok {
+		data.AddLocation = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["add_location"].(bool); ok {
-			data.AddLocation = types.BoolValue(v)
-		} else {
-			data.AddLocation = types.BoolNull()
-		}
+		data.AddLocation = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["append_server_name"].(string); ok && v != "" {
 		data.AppendServerName = types.StringValue(v)
@@ -5178,27 +5413,15 @@ func (r *VirtualHostResource) Create(ctx context.Context, req resource.CreateReq
 	} else {
 		data.ConnectionIdleTimeout = types.Int64Null()
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.DisableDefaultErrorPages.IsNull() && !data.DisableDefaultErrorPages.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["disable_default_error_pages"].(bool); ok {
+		data.DisableDefaultErrorPages = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["disable_default_error_pages"].(bool); ok {
-			data.DisableDefaultErrorPages = types.BoolValue(v)
-		} else {
-			data.DisableDefaultErrorPages = types.BoolNull()
-		}
+		data.DisableDefaultErrorPages = types.BoolNull()
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.DisableDNSResolve.IsNull() && !data.DisableDNSResolve.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["disable_dns_resolve"].(bool); ok {
+		data.DisableDNSResolve = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["disable_dns_resolve"].(bool); ok {
-			data.DisableDNSResolve = types.BoolValue(v)
-		} else {
-			data.DisableDNSResolve = types.BoolNull()
-		}
+		data.DisableDNSResolve = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["idle_timeout"].(float64); ok {
 		data.IdleTimeout = types.Int64Value(int64(v))
@@ -5209,6 +5432,11 @@ func (r *VirtualHostResource) Create(ctx context.Context, req resource.CreateReq
 		data.MaxRequestHeaderSize = types.Int64Value(int64(v))
 	} else {
 		data.MaxRequestHeaderSize = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["max_requests_per_connection"].(float64); ok {
+		data.MaxRequestsPerConnection = types.Int64Value(int64(v))
+	} else {
+		data.MaxRequestsPerConnection = types.Int64Null()
 	}
 	if v, ok := apiResource.Spec["proxy"].(string); ok && v != "" {
 		data.Proxy = types.StringValue(v)
@@ -5874,6 +6102,11 @@ func (r *VirtualHostResource) Read(ctx context.Context, req resource.ReadRequest
 		data.NoChallenge = &VirtualHostEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["no_request_limit_per_connection"].(map[string]interface{}); ok && isImport && data.NoRequestLimitPerConnection == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoRequestLimitPerConnection = &VirtualHostEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["non_default_loadbalancer"].(map[string]interface{}); ok && isImport && data.NonDefaultLoadBalancer == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.NonDefaultLoadBalancer = &VirtualHostEmptyModel{}
@@ -6837,16 +7070,10 @@ func (r *VirtualHostResource) Read(ctx context.Context, req resource.ReadRequest
 		data.WAFType = &VirtualHostWAFTypeModel{}
 	}
 	// Normal Read: preserve existing state value
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.AddLocation.IsNull() && !data.AddLocation.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["add_location"].(bool); ok {
+		data.AddLocation = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["add_location"].(bool); ok {
-			data.AddLocation = types.BoolValue(v)
-		} else {
-			data.AddLocation = types.BoolNull()
-		}
+		data.AddLocation = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["append_server_name"].(string); ok && v != "" {
 		data.AppendServerName = types.StringValue(v)
@@ -6858,27 +7085,15 @@ func (r *VirtualHostResource) Read(ctx context.Context, req resource.ReadRequest
 	} else {
 		data.ConnectionIdleTimeout = types.Int64Null()
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.DisableDefaultErrorPages.IsNull() && !data.DisableDefaultErrorPages.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["disable_default_error_pages"].(bool); ok {
+		data.DisableDefaultErrorPages = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["disable_default_error_pages"].(bool); ok {
-			data.DisableDefaultErrorPages = types.BoolValue(v)
-		} else {
-			data.DisableDefaultErrorPages = types.BoolNull()
-		}
+		data.DisableDefaultErrorPages = types.BoolNull()
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.DisableDNSResolve.IsNull() && !data.DisableDNSResolve.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["disable_dns_resolve"].(bool); ok {
+		data.DisableDNSResolve = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["disable_dns_resolve"].(bool); ok {
-			data.DisableDNSResolve = types.BoolValue(v)
-		} else {
-			data.DisableDNSResolve = types.BoolNull()
-		}
+		data.DisableDNSResolve = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["idle_timeout"].(float64); ok {
 		data.IdleTimeout = types.Int64Value(int64(v))
@@ -6889,6 +7104,11 @@ func (r *VirtualHostResource) Read(ctx context.Context, req resource.ReadRequest
 		data.MaxRequestHeaderSize = types.Int64Value(int64(v))
 	} else {
 		data.MaxRequestHeaderSize = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["max_requests_per_connection"].(float64); ok {
+		data.MaxRequestsPerConnection = types.Int64Value(int64(v))
+	} else {
+		data.MaxRequestsPerConnection = types.Int64Null()
 	}
 	if v, ok := apiResource.Spec["proxy"].(string); ok && v != "" {
 		data.Proxy = types.StringValue(v)
@@ -7225,6 +7445,10 @@ func (r *VirtualHostResource) Update(ctx context.Context, req resource.UpdateReq
 	if data.NoChallenge != nil {
 		no_challengeMap := make(map[string]interface{})
 		apiResource.Spec["no_challenge"] = no_challengeMap
+	}
+	if data.NoRequestLimitPerConnection != nil {
+		no_request_limit_per_connectionMap := make(map[string]interface{})
+		apiResource.Spec["no_request_limit_per_connection"] = no_request_limit_per_connectionMap
 	}
 	if data.NonDefaultLoadBalancer != nil {
 		non_default_loadbalancerMap := make(map[string]interface{})
@@ -7805,6 +8029,9 @@ func (r *VirtualHostResource) Update(ctx context.Context, req resource.UpdateReq
 	if !data.MaxRequestHeaderSize.IsNull() && !data.MaxRequestHeaderSize.IsUnknown() {
 		apiResource.Spec["max_request_header_size"] = data.MaxRequestHeaderSize.ValueInt64()
 	}
+	if !data.MaxRequestsPerConnection.IsNull() && !data.MaxRequestsPerConnection.IsUnknown() {
+		apiResource.Spec["max_requests_per_connection"] = data.MaxRequestsPerConnection.ValueInt64()
+	}
 	if !data.Proxy.IsNull() && !data.Proxy.IsUnknown() {
 		apiResource.Spec["proxy"] = data.Proxy.ValueString()
 	}
@@ -7830,67 +8057,11 @@ func (r *VirtualHostResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["add_location"].(bool); ok {
-		data.AddLocation = types.BoolValue(v)
-	} else if data.AddLocation.IsUnknown() {
+	if v, ok := fetched.Spec["max_requests_per_connection"].(float64); ok {
+		data.MaxRequestsPerConnection = types.Int64Value(int64(v))
+	} else if data.MaxRequestsPerConnection.IsUnknown() {
 		// API didn't return value and plan was unknown - set to null
-		data.AddLocation = types.BoolNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["append_server_name"].(string); ok && v != "" {
-		data.AppendServerName = types.StringValue(v)
-	} else if data.AppendServerName.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.AppendServerName = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["connection_idle_timeout"].(float64); ok {
-		data.ConnectionIdleTimeout = types.Int64Value(int64(v))
-	} else if data.ConnectionIdleTimeout.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.ConnectionIdleTimeout = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["disable_default_error_pages"].(bool); ok {
-		data.DisableDefaultErrorPages = types.BoolValue(v)
-	} else if data.DisableDefaultErrorPages.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.DisableDefaultErrorPages = types.BoolNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["disable_dns_resolve"].(bool); ok {
-		data.DisableDNSResolve = types.BoolValue(v)
-	} else if data.DisableDNSResolve.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.DisableDNSResolve = types.BoolNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["idle_timeout"].(float64); ok {
-		data.IdleTimeout = types.Int64Value(int64(v))
-	} else if data.IdleTimeout.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.IdleTimeout = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["max_request_header_size"].(float64); ok {
-		data.MaxRequestHeaderSize = types.Int64Value(int64(v))
-	} else if data.MaxRequestHeaderSize.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.MaxRequestHeaderSize = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["proxy"].(string); ok && v != "" {
-		data.Proxy = types.StringValue(v)
-	} else if data.Proxy.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Proxy = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["server_name"].(string); ok && v != "" {
-		data.ServerName = types.StringValue(v)
-	} else if data.ServerName.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.ServerName = types.StringNull()
+		data.MaxRequestsPerConnection = types.Int64Null()
 	}
 	// If plan had a value, preserve it
 
@@ -8472,6 +8643,11 @@ func (r *VirtualHostResource) Update(ctx context.Context, req resource.UpdateReq
 		data.NoChallenge = &VirtualHostEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["no_request_limit_per_connection"].(map[string]interface{}); ok && isImport && data.NoRequestLimitPerConnection == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.NoRequestLimitPerConnection = &VirtualHostEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["non_default_loadbalancer"].(map[string]interface{}); ok && isImport && data.NonDefaultLoadBalancer == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.NonDefaultLoadBalancer = &VirtualHostEmptyModel{}
@@ -9435,16 +9611,10 @@ func (r *VirtualHostResource) Update(ctx context.Context, req resource.UpdateReq
 		data.WAFType = &VirtualHostWAFTypeModel{}
 	}
 	// Normal Read: preserve existing state value
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.AddLocation.IsNull() && !data.AddLocation.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["add_location"].(bool); ok {
+		data.AddLocation = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["add_location"].(bool); ok {
-			data.AddLocation = types.BoolValue(v)
-		} else {
-			data.AddLocation = types.BoolNull()
-		}
+		data.AddLocation = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["append_server_name"].(string); ok && v != "" {
 		data.AppendServerName = types.StringValue(v)
@@ -9456,27 +9626,15 @@ func (r *VirtualHostResource) Update(ctx context.Context, req resource.UpdateReq
 	} else {
 		data.ConnectionIdleTimeout = types.Int64Null()
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.DisableDefaultErrorPages.IsNull() && !data.DisableDefaultErrorPages.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["disable_default_error_pages"].(bool); ok {
+		data.DisableDefaultErrorPages = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["disable_default_error_pages"].(bool); ok {
-			data.DisableDefaultErrorPages = types.BoolValue(v)
-		} else {
-			data.DisableDefaultErrorPages = types.BoolNull()
-		}
+		data.DisableDefaultErrorPages = types.BoolNull()
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.DisableDNSResolve.IsNull() && !data.DisableDNSResolve.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["disable_dns_resolve"].(bool); ok {
+		data.DisableDNSResolve = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["disable_dns_resolve"].(bool); ok {
-			data.DisableDNSResolve = types.BoolValue(v)
-		} else {
-			data.DisableDNSResolve = types.BoolNull()
-		}
+		data.DisableDNSResolve = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["idle_timeout"].(float64); ok {
 		data.IdleTimeout = types.Int64Value(int64(v))
@@ -9487,6 +9645,11 @@ func (r *VirtualHostResource) Update(ctx context.Context, req resource.UpdateReq
 		data.MaxRequestHeaderSize = types.Int64Value(int64(v))
 	} else {
 		data.MaxRequestHeaderSize = types.Int64Null()
+	}
+	if v, ok := apiResource.Spec["max_requests_per_connection"].(float64); ok {
+		data.MaxRequestsPerConnection = types.Int64Value(int64(v))
+	} else {
+		data.MaxRequestsPerConnection = types.Int64Null()
 	}
 	if v, ok := apiResource.Spec["proxy"].(string); ok && v != "" {
 		data.Proxy = types.StringValue(v)

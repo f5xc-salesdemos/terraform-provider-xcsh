@@ -95,7 +95,7 @@ resource "f5xc_forward_proxy_policy" "example" {
 
 -> **One of the following:**
 &#x2022; <a id="any-proxy"></a>[`any_proxy`](#any-proxy) - Optional Block<br>Enable this option
-<br><br>&#x2022; <a id="drp-http-connect"></a>[`drp_http_connect`](#drp-http-connect) - Optional Block<br>Enable this option
+<br><br>&#x2022; <a id="drp-http-connect"></a>[`drp_http_connect`](#drp-http-connect) - Optional Block<br>Configuration parameter for drp HTTP connect
 <br><br>&#x2022; <a id="network-connector"></a>[`network_connector`](#network-connector) - Optional Block<br>Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name<br>See [Network Connector](#network-connector) below for details.
 <br><br>&#x2022; <a id="proxy-label-selector"></a>[`proxy_label_selector`](#proxy-label-selector) - Optional Block<br>Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects<br>See [Proxy
 Label Selector](#proxy-label-selector) below for details.
@@ -118,7 +118,7 @@ An [`allow_list`](#allow-list) block supports the following:
 
 <a id="allow-list-default-action-deny"></a>&#x2022; [`default_action_deny`](#allow-list-default-action-deny) - Optional Block<br>Enable this option
 
-<a id="allow-list-default-action-next-policy"></a>&#x2022; [`default_action_next_policy`](#allow-list-default-action-next-policy) - Optional Block<br>Enable this option
+<a id="allow-list-default-action-next-policy"></a>&#x2022; [`default_action_next_policy`](#allow-list-default-action-next-policy) - Optional Block<br>Policy configuration for this feature
 
 <a id="allow-list-dest-list"></a>&#x2022; [`dest_list`](#allow-list-dest-list) - Optional Block<br>L4 destinations for non-HTTP and non-TLS connections and TLS connections without SNI<br>See [Dest List](#allow-list-dest-list) below.
 
@@ -172,7 +172,7 @@ A [`deny_list`](#deny-list) block supports the following:
 
 <a id="deny-list-default-action-deny"></a>&#x2022; [`default_action_deny`](#deny-list-default-action-deny) - Optional Block<br>Enable this option
 
-<a id="deny-list-default-action-next-policy"></a>&#x2022; [`default_action_next_policy`](#deny-list-default-action-next-policy) - Optional Block<br>Enable this option
+<a id="deny-list-default-action-next-policy"></a>&#x2022; [`default_action_next_policy`](#deny-list-default-action-next-policy) - Optional Block<br>Policy configuration for this feature
 
 <a id="deny-list-dest-list"></a>&#x2022; [`dest_list`](#deny-list-dest-list) - Optional Block<br>L4 destinations for non-HTTP and non-TLS connections and TLS connections without SNI<br>See [Dest List](#deny-list-dest-list) below.
 
@@ -247,9 +247,9 @@ A [`rules`](#rule-list-rules) block (within [`rule_list`](#rule-list)) supports 
 <a id="rule-list-rules-action"></a>&#x2022; [`action`](#rule-list-rules-action) - Optional String  Defaults to `DENY`<br>Possible values are `DENY`, `ALLOW`, `NEXT_POLICY`<br>[Enum: DENY|ALLOW|NEXT_POLICY] The rule action determines the disposition of the input request API. If a policy matches a rule with an ALLOW action, the processing of the request proceeds forward. If it matches a rule with a
 DENY action, the processing of the request is terminated and an appropriate message/code returned to
 
-<a id="rule-list-rules-all-destinations"></a>&#x2022; [`all_destinations`](#rule-list-rules-all-destinations) - Optional Block<br>Enable this option
+<a id="rule-list-rules-all-destinations"></a>&#x2022; [`all_destinations`](#rule-list-rules-all-destinations) - Optional Block<br>Configuration parameter for all destinations
 
-<a id="rule-list-rules-all-sources"></a>&#x2022; [`all_sources`](#rule-list-rules-all-sources) - Optional Block<br>Enable this option
+<a id="rule-list-rules-all-sources"></a>&#x2022; [`all_sources`](#rule-list-rules-all-sources) - Optional Block<br>Configuration parameter for all sources
 
 <a id="rule-list-rules-dst-asn-list"></a>&#x2022; [`dst_asn_list`](#rule-list-rules-dst-asn-list) - Optional Block<br>Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer<br>See [Dst Asn List](#rule-list-rules-dst-asn-list) below.
 

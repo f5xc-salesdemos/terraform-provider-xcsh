@@ -31,11 +31,11 @@ resource "f5xc_data_type" "example" {
   rules {
     # Configure rules settings
   }
-  # Rule Pattern Type. Test
+  # Configuration parameter for key pattern.
   key_pattern {
     # Configure key_pattern settings
   }
-  # Exact Values. List of exact values to match.
+  # Configuration parameter for exact values.
   exact_values {
     # Configure exact_values settings
   }

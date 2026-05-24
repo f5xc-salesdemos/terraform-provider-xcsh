@@ -2,12 +2,12 @@
 page_title: "f5xc_api_testing Resource - terraform-provider-f5xc"
 subcategory: "API Security"
 description: |-
-  Manages a API Testing resource in F5 Distributed Cloud.
+  Manages an API Testing resource in F5 Distributed Cloud.
 ---
 
 # f5xc_api_testing (Resource)
 
-Manages a API Testing resource in F5 Distributed Cloud.
+Manages an API Testing resource in F5 Distributed Cloud.
 
 ~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
@@ -15,7 +15,7 @@ Manages a API Testing resource in F5 Distributed Cloud.
 
 ```terraform
 # API Testing Resource Example
-# Manages a API Testing resource in F5 Distributed Cloud.
+# Manages an API Testing resource in F5 Distributed Cloud.
 
 terraform {
   required_version = ">= 1.0"
@@ -79,13 +79,13 @@ resource "f5xc_api_testing" "example" {
 
 ### Spec Argument Reference
 
-<a id="custom-header-value"></a>&#x2022; [`custom_header_value`](#custom-header-value) - Optional String<br>Add x-F5-API-testing-identifier header value to prevent security flags on API testing traffic
+<a id="custom-header-value"></a>&#x2022; [`custom_header_value`](#custom-header-value) - Required String<br>Add x-F5-API-testing-identifier header value to prevent security flags on API testing traffic
 
 <a id="domains"></a>&#x2022; [`domains`](#domains) - Optional Block<br>Add and configure testing domains and credentials<br>See [Domains](#domains) below for details.
 
 -> **One of the following:**
 &#x2022; <a id="every-day"></a>[`every_day`](#every-day) - Optional Block<br>Enable this option
-<br><br>&#x2022; <a id="every-month"></a>[`every_month`](#every-month) - Optional Block<br>Enable this option
+<br><br>&#x2022; <a id="every-month"></a>[`every_month`](#every-month) - Optional Block<br>Configuration parameter for every month
 <br><br>&#x2022; <a id="every-week"></a>[`every_week`](#every-week) - Optional Block<br>Enable this option
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
@@ -102,7 +102,7 @@ In addition to all arguments above, the following attributes are exported:
 
 A [`domains`](#domains) block supports the following:
 
-<a id="domains-allow-destructive-methods"></a>&#x2022; [`allow_destructive_methods`](#domains-allow-destructive-methods) - Optional Bool<br>Enable to allow API test to execute destructive methods. Be cautious as these can alter or DELETE data
+<a id="domains-allow-destructive-methods"></a>&#x2022; [`allow_destructive_methods`](#domains-allow-destructive-methods) - Optional Bool<br>Enable to allow API Testing to execute against destructive methods. Use with caution as these may modify or DELETE data
 
 <a id="domains-credentials"></a>&#x2022; [`credentials`](#domains-credentials) - Optional Block<br>Add credentials for API testing to use in the selected environment<br>See [Credentials](#domains-credentials) below.
 
@@ -118,7 +118,7 @@ A [`credentials`](#domains-credentials) block (within [`domains`](#domains)) sup
 
 <a id="domains-credentials-basic-auth"></a>&#x2022; [`basic_auth`](#domains-credentials-basic-auth) - Optional Block<br>Basic Authentication<br>See [Basic Auth](#domains-credentials-basic-auth) below.
 
-<a id="domains-credentials-bearer-token"></a>&#x2022; [`bearer_token`](#domains-credentials-bearer-token) - Optional Block<br>Bearer<br>See [Bearer Token](#domains-credentials-bearer-token) below.
+<a id="domains-credentials-bearer-token"></a>&#x2022; [`bearer_token`](#domains-credentials-bearer-token) - Optional Block<br>Configuration parameter for bearer token<br>See [Bearer Token](#domains-credentials-bearer-token) below.
 
 <a id="domains-credentials-credential-name"></a>&#x2022; [`credential_name`](#domains-credentials-credential-name) - Optional String<br>Enter a unique name for the credentials used in API testing
 

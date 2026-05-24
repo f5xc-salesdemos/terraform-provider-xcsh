@@ -81,15 +81,15 @@ resource "f5xc_cminstance" "example" {
 
 <a id="api-token"></a>&#x2022; [`api_token`](#api-token) - Optional Block<br>SecretType is used in an object to indicate a sensitive/confidential field<br>See [API Token](#api-token) below for details.
 
-<a id="ip"></a>&#x2022; [`ip`](#ip) - Optional Block<br>IPv4 Address. IPv4 Address in dot-decimal notation<br>See [IP](#ip) below for details.
+<a id="ip"></a>&#x2022; [`ip`](#ip) - Optional Block<br>IPv4 address in dotted decimal notation (e.g., 192.0.2.1)<br>See [IP](#ip) below for details.
 
 <a id="password"></a>&#x2022; [`password`](#password) - Optional Block<br>SecretType is used in an object to indicate a sensitive/confidential field<br>See [Password](#password) below for details.
 
-<a id="port"></a>&#x2022; [`port`](#port) - Optional Number<br>Port of the Central Manager instance to connect to
+<a id="port"></a>&#x2022; [`port`](#port) - Required Number<br>Port of the Central Manager instance to connect to
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 
-<a id="username"></a>&#x2022; [`username`](#username) - Optional String<br>Username for the Central Manager instance
+<a id="username"></a>&#x2022; [`username`](#username) - Required String<br>Username for the Central Manager instance
 
 ### Attributes Reference
 

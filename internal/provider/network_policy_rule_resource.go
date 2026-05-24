@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -182,6 +186,9 @@ func (r *NetworkPolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 				MarkdownDescription: "List of port ranges. Each range is a single port or a pair of start and end ports e.g. 8080-8192.",
 				Optional:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(128),
+				},
 			},
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique identifier for the resource.",
@@ -196,6 +203,9 @@ func (r *NetworkPolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.String{
+					stringvalidator.OneOf("DENY", "ALLOW"),
 				},
 			},
 			"protocol": schema.StringAttribute{
@@ -220,6 +230,9 @@ func (r *NetworkPolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 					"action": schema.StringAttribute{
 						MarkdownDescription: "[Enum: NOLOG|LOG] Choice to choose logging or no logging This works together with option selected via NetworkPolicyRuleAction or any other action specified x-. Possible values are `NOLOG`, `LOG`. Defaults to `NOLOG`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("NOLOG", "LOG"),
+						},
 					},
 				},
 			},
@@ -242,6 +255,10 @@ func (r *NetworkPolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -249,6 +266,10 @@ func (r *NetworkPolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -279,6 +300,9 @@ func (r *NetworkPolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "The list of label key names that have to match.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 				},
 			},
@@ -289,6 +313,9 @@ func (r *NetworkPolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "IP Address prefix in string format. String must contain both prefix and prefix-length.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(256),
+						},
 					},
 				},
 			},
@@ -299,6 +326,9 @@ func (r *NetworkPolicyRuleResource) Schema(ctx context.Context, req resource.Sch
 						MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(1),
+						},
 					},
 				},
 			},

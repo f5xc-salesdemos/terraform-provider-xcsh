@@ -2,12 +2,12 @@
 page_title: "f5xc_tenant_configuration Data Source - terraform-provider-f5xc"
 subcategory: "Organization"
 description: |-
-  Manages a Tenant Configuration resource in F5 Distributed Cloud for tenant configuration specification. configuration.
+  Retrieves information about an existing Tenant Configuration resource in F5 Distributed Cloud for tenant configuration specification. configuration.
 ---
 
 # f5xc_tenant_configuration (Data Source)
 
-Manages a Tenant Configuration resource in F5 Distributed Cloud for tenant configuration specification. configuration.
+Retrieves information about a Tenant Configuration resource in F5 Distributed Cloud for tenant configuration specification. configuration. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

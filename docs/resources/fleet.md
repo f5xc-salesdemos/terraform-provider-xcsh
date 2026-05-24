@@ -83,8 +83,8 @@ resource "f5xc_fleet" "example" {
 ### Spec Argument Reference
 
 -> **One of the following:**
-&#x2022; <a id="allow-all-usb"></a>[`allow_all_usb`](#allow-all-usb) - Optional Block<br>Enable this option
-<br><br>&#x2022; <a id="deny-all-usb"></a>[`deny_all_usb`](#deny-all-usb) - Optional Block<br>Enable this option
+&#x2022; <a id="allow-all-usb"></a>[`allow_all_usb`](#allow-all-usb) - Optional Block<br>Configuration parameter for allow all usb
+<br><br>&#x2022; <a id="deny-all-usb"></a>[`deny_all_usb`](#deny-all-usb) - Optional Block<br>Configuration parameter for deny all usb
 <br><br>&#x2022; <a id="usb-policy"></a>[`usb_policy`](#usb-policy) - Optional Block<br>Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name
 
 <a id="blocked-services"></a>&#x2022; [`blocked_services`](#blocked-services) - Optional Block<br>Disable node local services on this site<br>See [Blocked Services](#blocked-services) below for details.
@@ -101,25 +101,25 @@ resource "f5xc_fleet" "example" {
 <br><br>&#x2022; <a id="device-list"></a>[`device_list`](#device-list) - Optional Block<br>Add device for all interfaces belonging to this fleet<br>See [Device List](#device-list) below for details.
 
 -> **One of the following:**
-&#x2022; <a id="default-sriov-interface"></a>[`default_sriov_interface`](#default-sriov-interface) - Optional Block<br>Enable this option
+&#x2022; <a id="default-sriov-interface"></a>[`default_sriov_interface`](#default-sriov-interface) - Optional Block<br>Configuration parameter for default sriov interface
 
 -> **One of the following:**
-&#x2022; <a id="default-storage-class"></a>[`default_storage_class`](#default-storage-class) - Optional Block<br>Enable this option
+&#x2022; <a id="default-storage-class"></a>[`default_storage_class`](#default-storage-class) - Optional Block<br>Configuration parameter for default storage class
 
 -> **One of the following:**
-&#x2022; <a id="disable-gpu"></a>[`disable_gpu`](#disable-gpu) - Optional Block<br>Enable this option
+&#x2022; <a id="disable-gpu"></a>[`disable_gpu`](#disable-gpu) - Optional Block<br>Configuration parameter for disable GPU
 <br><br>&#x2022; <a id="enable-gpu"></a>[`enable_gpu`](#enable-gpu) - Optional Block<br>Enable this option
 
 -> **One of the following:**
 &#x2022; <a id="disable-vm"></a>[`disable_vm`](#disable-vm) - Optional Block<br>Enable this option
 
-<a id="enable-default-fleet-config-download"></a>&#x2022; [`enable_default_fleet_config_download`](#enable-default-fleet-config-download) - Optional Bool<br>Enable default fleet config, It must be set for storage config and GPU config
+<a id="enable-default-fleet-config-download"></a>&#x2022; [`enable_default_fleet_config_download`](#enable-default-fleet-config-download) - Required Bool<br>Enable default fleet config, It must be set for storage config and GPU config
 
 <a id="enable-vgpu"></a>&#x2022; [`enable_vgpu`](#enable-vgpu) - Optional Block<br>Licensing configuration for NVIDIA vGPU<br>See [Enable Vgpu](#enable-vgpu) below for details.
 
 <a id="enable-vm"></a>&#x2022; [`enable_vm`](#enable-vm) - Optional Block<br>VM Configuration. VMs support configuration
 
-<a id="fleet-label"></a>&#x2022; [`fleet_label`](#fleet-label) - Optional String<br>Fleet_label value is used to create known_label 'F5 XC/fleet=`<fleet_label>`' The known_label is created in the 'shared' namespace for the tenant. A virtual_site object with name `<fleet_label>` is also created in 'shared' namespace for tenant. The virtual_site object will select all sites
+<a id="fleet-label"></a>&#x2022; [`fleet_label`](#fleet-label) - Required String<br>Fleet_label value is used to create known_label 'F5 XC/fleet=`<fleet_label>`' The known_label is created in the 'shared' namespace for the tenant. A virtual_site object with name `<fleet_label>` is also created in 'shared' namespace for tenant. The virtual_site object will select all sites
 
 <a id="inside-virtual-network"></a>&#x2022; [`inside_virtual_network`](#inside-virtual-network) - Optional Block<br>Default inside (site local) virtual network for the fleet<br>See [Inside Virtual Network](#inside-virtual-network) below for details.
 
@@ -136,20 +136,20 @@ resource "f5xc_fleet" "example" {
 <a id="network-firewall"></a>&#x2022; [`network_firewall`](#network-firewall) - Optional Block<br>Network Firewall defines firewall to be applied for the virtual networks in the fleet. The network firewall configuration is applied on all sites that are member of the fleet. Constraints The Network Firewall is applied on Virtual Networks of type site local network and site local inside
 network<br>See [Network Firewall](#network-firewall) below for details.
 
-<a id="no-bond-devices"></a>&#x2022; [`no_bond_devices`](#no-bond-devices) - Optional Block<br>Enable this option
+<a id="no-bond-devices"></a>&#x2022; [`no_bond_devices`](#no-bond-devices) - Optional Block<br>Configuration parameter for no bond devices
 
 <a id="no-dc-cluster-group"></a>&#x2022; [`no_dc_cluster_group`](#no-dc-cluster-group) - Optional Block<br>Enable this option
 
 -> **One of the following:**
-&#x2022; <a id="no-storage-device"></a>[`no_storage_device`](#no-storage-device) - Optional Block<br>Enable this option
+&#x2022; <a id="no-storage-device"></a>[`no_storage_device`](#no-storage-device) - Optional Block<br>Configuration parameter for no storage device
 
 -> **One of the following:**
-&#x2022; <a id="no-storage-interfaces"></a>[`no_storage_interfaces`](#no-storage-interfaces) - Optional Block<br>Enable this option
+&#x2022; <a id="no-storage-interfaces"></a>[`no_storage_interfaces`](#no-storage-interfaces) - Optional Block<br>Configuration parameter for no storage interfaces
 
 -> **One of the following:**
-&#x2022; <a id="no-storage-static-routes"></a>[`no_storage_static_routes`](#no-storage-static-routes) - Optional Block<br>Enable this option
+&#x2022; <a id="no-storage-static-routes"></a>[`no_storage_static_routes`](#no-storage-static-routes) - Optional Block<br>Configuration parameter for no storage static routes
 
-<a id="operating-system-version"></a>&#x2022; [`operating_system_version`](#operating-system-version) - Optional String<br>Desired Operating System version that is applied to all sites that are member of the fleet. Current Operating System version can be overridden via site config
+<a id="operating-system-version"></a>&#x2022; [`operating_system_version`](#operating-system-version) - Required String<br>Desired Operating System version that is applied to all sites that are member of the fleet. Current Operating System version can be overridden via site config
 
 <a id="outside-virtual-network"></a>&#x2022; [`outside_virtual_network`](#outside-virtual-network) - Optional Block<br>Default outside (site local) virtual network for the fleet<br>See [Outside Virtual Network](#outside-virtual-network) below for details.
 
@@ -163,11 +163,11 @@ network<br>See [Network Firewall](#network-firewall) below for details.
 
 <a id="storage-interface-list"></a>&#x2022; [`storage_interface_list`](#storage-interface-list) - Optional Block<br>Add all interfaces belonging to this fleet
 
-<a id="storage-static-routes"></a>&#x2022; [`storage_static_routes`](#storage-static-routes) - Optional Block<br>Storage Static Routes List. List of storage static routes
+<a id="storage-static-routes"></a>&#x2022; [`storage_static_routes`](#storage-static-routes) - Optional Block<br>Configuration parameter for storage static routes
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block
 
-<a id="volterra-software-version"></a>&#x2022; [`volterra_software_version`](#volterra-software-version) - Optional String<br>F5XC software version is human readable string matching released set of version components. The given software version is applied to all sites that are member of the fleet. Current software installed can be overridden via site config
+<a id="volterra-software-version"></a>&#x2022; [`volterra_software_version`](#volterra-software-version) - Required String<br>F5XC software version is human readable string matching released set of version components. The given software version is applied to all sites that are member of the fleet. Current software installed can be overridden via site config
 
 ### Attributes Reference
 
@@ -184,9 +184,9 @@ A [`blocked_services`](#blocked-services) block supports the following:
 <a id="blocked-services-dns"></a>&#x2022; [`dns`](#blocked-services-dns) - Optional Block<br>Enable this option
 
 <a id="blocked-services-network-type"></a>&#x2022; [`network_type`](#blocked-services-network-type) - Optional String  Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`<br>Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`,
-`VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`<br>[Enum:
-VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT] Different types of
-virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to
+`VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`, `VIRTUAL_NETWORK_MANAGEMENT`<br>[Enum:
+VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT|VIRTUAL_NETWORK_MANAGEMENT]
+Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to
 
 <a id="blocked-services-ssh"></a>&#x2022; [`ssh`](#blocked-services-ssh) - Optional Block<br>Enable this option
 
@@ -202,7 +202,7 @@ A [`bond_device_list`](#bond-device-list) block supports the following:
 
 A [`bond_devices`](#bond-device-list-bond-devices) block (within [`bond_device_list`](#bond-device-list)) supports the following:
 
-<a id="backup-c22794"></a>&#x2022; [`active_backup`](#backup-c22794) - Optional Block<br>Enable this option
+<a id="backup-c22794"></a>&#x2022; [`active_backup`](#backup-c22794) - Optional Block<br>Configuration parameter for active backup
 
 <a id="bond-device-list-bond-devices-devices"></a>&#x2022; [`devices`](#bond-device-list-bond-devices-devices) - Optional List<br>Ethernet devices that will make up this bond
 
@@ -325,7 +325,7 @@ An [`interfaces`](#interface-list-interfaces) block (within [`interface_list`](#
 
 A [`kubernetes_upgrade_drain`](#kubernetes-upgrade-drain) block supports the following:
 
-<a id="drain-0d0936"></a>&#x2022; [`disable_upgrade_drain`](#drain-0d0936) - Optional Block<br>Enable this option
+<a id="drain-0d0936"></a>&#x2022; [`disable_upgrade_drain`](#drain-0d0936) - Optional Block<br>Configuration parameter for disable upgrade drain
 
 <a id="drain-7e30d4"></a>&#x2022; [`enable_upgrade_drain`](#drain-7e30d4) - Optional Block<br>Specify batch upgrade settings for worker nodes within a site<br>See [Enable Upgrade Drain](#drain-7e30d4) below.
 
@@ -333,13 +333,13 @@ A [`kubernetes_upgrade_drain`](#kubernetes-upgrade-drain) block supports the fol
 
 An [`enable_upgrade_drain`](#drain-7e30d4) block (within [`kubernetes_upgrade_drain`](#kubernetes-upgrade-drain)) supports the following:
 
-<a id="mode-668699"></a>&#x2022; [`disable_vega_upgrade_mode`](#mode-668699) - Optional Block<br>Enable this option
+<a id="mode-668699"></a>&#x2022; [`disable_vega_upgrade_mode`](#mode-668699) - Optional Block<br>Configuration parameter for disable vega upgrade mode
 
 <a id="count-3aa796"></a>&#x2022; [`drain_max_unavailable_node_count`](#count-3aa796) - Optional Number<br>Node Batch Size Count
 
 <a id="timeout-ac4ee9"></a>&#x2022; [`drain_node_timeout`](#timeout-ac4ee9) - Optional Number<br>Seconds to wait before initiating upgrade on the next set of nodes. Setting it to 0 will wait indefinitely for all services on nodes to be upgraded gracefully before proceeding to the next set of nodes. (Warning: It may block upgrade if services on a node cannot be gracefully upgraded. It is
 
-<a id="mode-9c557b"></a>&#x2022; [`enable_vega_upgrade_mode`](#mode-9c557b) - Optional Block<br>Enable this option
+<a id="mode-9c557b"></a>&#x2022; [`enable_vega_upgrade_mode`](#mode-9c557b) - Optional Block<br>Configuration parameter for enable vega upgrade mode
 
 #### Log Receiver
 
@@ -397,9 +397,9 @@ An [`outside_virtual_network`](#outside-virtual-network) block supports the foll
 
 A [`performance_enhancement_mode`](#performance-enhancement-mode) block supports the following:
 
-<a id="enhanced-31b8ac"></a>&#x2022; [`perf_mode_l3_enhanced`](#enhanced-31b8ac) - Optional Block<br>L3 Mode Enhanced Performance. L3 enhanced performance mode OPTIONS<br>See [Perf Mode L3 Enhanced](#enhanced-31b8ac) below.
+<a id="enhanced-31b8ac"></a>&#x2022; [`perf_mode_l3_enhanced`](#enhanced-31b8ac) - Optional Block<br>Configuration parameter for perf mode l3 enhanced<br>See [Perf Mode L3 Enhanced](#enhanced-31b8ac) below.
 
-<a id="enhanced-38f174"></a>&#x2022; [`perf_mode_l7_enhanced`](#enhanced-38f174) - Optional Block<br>Enable this option
+<a id="enhanced-38f174"></a>&#x2022; [`perf_mode_l7_enhanced`](#enhanced-38f174) - Optional Block<br>Configuration parameter for perf mode l7 enhanced
 
 #### Performance Enhancement Mode Perf Mode L3 Enhanced
 
@@ -523,9 +523,9 @@ A [`storage_devices`](#storage-device-list-storage-devices) block (within [`stor
 
 <a id="parameters-88bc5e"></a>&#x2022; [`advanced_advanced_parameters`](#parameters-88bc5e) - Optional Block<br>Advanced Parameters. Map of parameter name and string value
 
-<a id="storage-06f9ba"></a>&#x2022; [`custom_storage`](#storage-06f9ba) - Optional Block<br>Enable this option
+<a id="storage-06f9ba"></a>&#x2022; [`custom_storage`](#storage-06f9ba) - Optional Block<br>Configuration parameter for custom storage
 
-<a id="storage-af052c"></a>&#x2022; [`hpe_storage`](#storage-af052c) - Optional Block<br>HPE Storage. Device configuration for HPE Storage<br>See [Hpe Storage](#storage-af052c) below.
+<a id="storage-af052c"></a>&#x2022; [`hpe_storage`](#storage-af052c) - Optional Block<br>Configuration parameter for hpe storage<br>See [Hpe Storage](#storage-af052c) below.
 
 <a id="trident-c1203e"></a>&#x2022; [`netapp_trident`](#trident-c1203e) - Optional Block<br>Device configuration for NetApp Trident Storage<br>See [Netapp Trident](#trident-c1203e) below.
 

@@ -31,11 +31,11 @@ resource "f5xc_cdn_cache_rule" "example" {
   cache_rules {
     # Configure cache_rules settings
   }
-  # Enable this option
+  # Configuration parameter for cache bypass.
   cache_bypass {
     # Configure cache_bypass settings
   }
-  # Cache Action OPTIONS. List of OPTIONS for Cache Action.
+  # Configuration parameter for eligible for cache.
   eligible_for_cache {
     # Configure eligible_for_cache settings
   }

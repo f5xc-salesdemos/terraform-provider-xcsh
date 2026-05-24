@@ -47,9 +47,13 @@ resource "f5xc_rate_limiter_policy" "example" {
   any_server {
     # Configure any_server settings
   }
-  # List of RateLimiterRules that are evaluated sequentially ...
-  rules {
-    # Configure rules settings
+  # Matcher specifies multiple criteria for matching an input...
+  server_name_matcher {
+    # Configure server_name_matcher settings
+  }
+  # Type can be used to establish a 'selector reference' from...
+  server_selector {
+    # Configure server_selector settings
   }
 }
 
@@ -144,17 +148,17 @@ A [`spec`](#rules-spec) block (within [`rules`](#rules)) supports the following:
 
 <a id="rules-spec-any-asn"></a>&#x2022; [`any_asn`](#rules-spec-any-asn) - Optional Block<br>Enable this option
 
-<a id="rules-spec-any-country"></a>&#x2022; [`any_country`](#rules-spec-any-country) - Optional Block<br>Enable this option
+<a id="rules-spec-any-country"></a>&#x2022; [`any_country`](#rules-spec-any-country) - Optional Block<br>Configuration parameter for any country
 
 <a id="rules-spec-any-ip"></a>&#x2022; [`any_ip`](#rules-spec-any-ip) - Optional Block<br>Enable this option
 
-<a id="rules-spec-apply-rate-limiter"></a>&#x2022; [`apply_rate_limiter`](#rules-spec-apply-rate-limiter) - Optional Block<br>Enable this option
+<a id="rules-spec-apply-rate-limiter"></a>&#x2022; [`apply_rate_limiter`](#rules-spec-apply-rate-limiter) - Optional Block<br>Configuration parameter for apply rate limiter
 
 <a id="rules-spec-asn-list"></a>&#x2022; [`asn_list`](#rules-spec-asn-list) - Optional Block<br>Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer<br>See [Asn List](#rules-spec-asn-list) below.
 
 <a id="rules-spec-asn-matcher"></a>&#x2022; [`asn_matcher`](#rules-spec-asn-matcher) - Optional Block<br>Match any AS number contained in the list of bgp_asn_sets<br>See [Asn Matcher](#rules-spec-asn-matcher) below.
 
-<a id="rules-spec-bypass-rate-limiter"></a>&#x2022; [`bypass_rate_limiter`](#rules-spec-bypass-rate-limiter) - Optional Block<br>Enable this option
+<a id="rules-spec-bypass-rate-limiter"></a>&#x2022; [`bypass_rate_limiter`](#rules-spec-bypass-rate-limiter) - Optional Block<br>Configuration parameter for bypass rate limiter
 
 <a id="rules-spec-country-list"></a>&#x2022; [`country_list`](#rules-spec-country-list) - Optional Block<br>Country Codes List. List of Country Codes to match against<br>See [Country List](#rules-spec-country-list) below.
 
@@ -243,9 +247,9 @@ A [`domain_matcher`](#rules-spec-domain-matcher) block (within [`rules.spec`](#r
 
 A [`headers`](#rules-spec-headers) block (within [`rules.spec`](#rules-spec)) supports the following:
 
-<a id="rules-spec-headers-check-not-present"></a>&#x2022; [`check_not_present`](#rules-spec-headers-check-not-present) - Optional Block<br>Enable this option
+<a id="rules-spec-headers-check-not-present"></a>&#x2022; [`check_not_present`](#rules-spec-headers-check-not-present) - Optional Block<br>Configuration parameter for check not present
 
-<a id="rules-spec-headers-check-present"></a>&#x2022; [`check_present`](#rules-spec-headers-check-present) - Optional Block<br>Enable this option
+<a id="rules-spec-headers-check-present"></a>&#x2022; [`check_present`](#rules-spec-headers-check-present) - Optional Block<br>Configuration parameter for check present
 
 <a id="rules-spec-headers-invert-matcher"></a>&#x2022; [`invert_matcher`](#rules-spec-headers-invert-matcher) - Optional Bool<br>Invert Header Matcher. Invert the match result
 
@@ -261,7 +265,7 @@ An [`item`](#rules-spec-headers-item) block (within [`rules.spec.headers`](#rule
 
 <a id="rules-spec-headers-item-regex-values"></a>&#x2022; [`regex_values`](#rules-spec-headers-item-regex-values) - Optional List<br>List of regular expressions to match the input against
 
-<a id="rules-spec-headers-item-transformers"></a>&#x2022; [`transformers`](#rules-spec-headers-item-transformers) - Optional List  Defaults to `TRANSFORMER_NONE`<br>See [Transformers](#common-transformers)<br> Ordered list of transformers (starting from index 0) to be applied to the path before matching
+<a id="rules-spec-headers-item-transformers"></a>&#x2022; [`transformers`](#rules-spec-headers-item-transformers) - Optional List<br>See [Transformers](#common-transformers)<br> Ordered list of transformers (starting from index 0) to be applied to the path before matching
 
 #### Rules Spec HTTP Method
 
@@ -315,7 +319,7 @@ A [`path`](#rules-spec-path) block (within [`rules.spec`](#rules-spec)) supports
 
 <a id="rules-spec-path-suffix-values"></a>&#x2022; [`suffix_values`](#rules-spec-path-suffix-values) - Optional List<br>List of path suffix values to match the input HTTP path against
 
-<a id="rules-spec-path-transformers"></a>&#x2022; [`transformers`](#rules-spec-path-transformers) - Optional List  Defaults to `TRANSFORMER_NONE`<br>See [Transformers](#common-transformers)<br> Ordered list of transformers (starting from index 0) to be applied to the path before matching
+<a id="rules-spec-path-transformers"></a>&#x2022; [`transformers`](#rules-spec-path-transformers) - Optional List<br>See [Transformers](#common-transformers)<br> Ordered list of transformers (starting from index 0) to be applied to the path before matching
 
 #### Server Name Matcher
 

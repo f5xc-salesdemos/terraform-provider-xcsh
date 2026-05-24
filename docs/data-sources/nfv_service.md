@@ -2,12 +2,12 @@
 page_title: "f5xc_nfv_service Data Source - terraform-provider-f5xc"
 subcategory: "Networking"
 description: |-
-  Manages new NFV service with configured parameters. in F5 Distributed Cloud.
+  Retrieves information about an existing NFV service with configured parameters. in F5 Distributed Cloud.
 ---
 
 # f5xc_nfv_service (Data Source)
 
-Manages new NFV service with configured parameters. in F5 Distributed Cloud.
+Retrieves information about new NFV service with configured parameters. in F5 Distributed Cloud. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

@@ -47,7 +47,7 @@ resource "f5xc_code_base_integration" "example" {
   code_base_integration {
     # Configure code_base_integration settings
   }
-  # Azure Repos Integration.
+  # Configuration parameter for Azure repos.
   azure_repos {
     # Configure azure_repos settings
   }
@@ -95,19 +95,19 @@ In addition to all arguments above, the following attributes are exported:
 
 A [`code_base_integration`](#code-base-integration) block supports the following:
 
-<a id="code-base-integration-Azure-repos"></a>&#x2022; [`azure_repos`](#code-base-integration-Azure-repos) - Optional Block<br>Azure Repos Integration<br>See [Azure Repos](#code-base-integration-Azure-repos) below.
+<a id="code-base-integration-Azure-repos"></a>&#x2022; [`azure_repos`](#code-base-integration-Azure-repos) - Optional Block<br>Configuration parameter for Azure repos<br>See [Azure Repos](#code-base-integration-Azure-repos) below.
 
 <a id="code-base-integration-Bitbucket"></a>&#x2022; [`Bitbucket`](#code-base-integration-Bitbucket) - Optional Block<br>Bitbucket Cloud Integration<br>See [Bitbucket](#code-base-integration-Bitbucket) below.
 
-<a id="code-base-integration-Bitbucket-server"></a>&#x2022; [`bitbucket_server`](#code-base-integration-Bitbucket-server) - Optional Block<br>Bitbucket Server Integration<br>See [Bitbucket Server](#code-base-integration-Bitbucket-server) below.
+<a id="code-base-integration-Bitbucket-server"></a>&#x2022; [`bitbucket_server`](#code-base-integration-Bitbucket-server) - Optional Block<br>Configuration parameter for Bitbucket server<br>See [Bitbucket Server](#code-base-integration-Bitbucket-server) below.
 
 <a id="code-base-integration-GitHub"></a>&#x2022; [`GitHub`](#code-base-integration-GitHub) - Optional Block<br>GitHub Integration<br>See [GitHub](#code-base-integration-GitHub) below.
 
-<a id="code-base-integration-GitHub-enterprise"></a>&#x2022; [`github_enterprise`](#code-base-integration-GitHub-enterprise) - Optional Block<br>GitHub Enterprise Integration<br>See [GitHub Enterprise](#code-base-integration-GitHub-enterprise) below.
+<a id="code-base-integration-GitHub-enterprise"></a>&#x2022; [`github_enterprise`](#code-base-integration-GitHub-enterprise) - Optional Block<br>Configuration parameter for GitHub enterprise<br>See [GitHub Enterprise](#code-base-integration-GitHub-enterprise) below.
 
 <a id="code-base-integration-GitLab"></a>&#x2022; [`GitLab`](#code-base-integration-GitLab) - Optional Block<br>GitLab Cloud Integration<br>See [GitLab](#code-base-integration-GitLab) below.
 
-<a id="code-base-integration-GitLab-enterprise"></a>&#x2022; [`gitlab_enterprise`](#code-base-integration-GitLab-enterprise) - Optional Block<br>GitLab Enterprise Integration<br>See [GitLab Enterprise](#code-base-integration-GitLab-enterprise) below.
+<a id="code-base-integration-GitLab-enterprise"></a>&#x2022; [`gitlab_enterprise`](#code-base-integration-GitLab-enterprise) - Optional Block<br>Configuration parameter for GitLab enterprise<br>See [GitLab Enterprise](#code-base-integration-GitLab-enterprise) below.
 
 #### codebase Integration Azure Repos
 

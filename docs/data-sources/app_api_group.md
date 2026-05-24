@@ -2,12 +2,12 @@
 page_title: "f5xc_app_api_group Data Source - terraform-provider-f5xc"
 subcategory: "API Security"
 description: |-
-  Manages app_api_group creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
+  Retrieves information about app_api_group creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
 # f5xc_app_api_group (Data Source)
 
-Manages app_api_group creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
+Manages app_api_group creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

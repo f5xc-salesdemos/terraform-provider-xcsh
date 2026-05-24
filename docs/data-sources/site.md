@@ -1,13 +1,13 @@
 ---
 page_title: "f5xc_site Data Source - terraform-provider-f5xc"
-subcategory: "Uncategorized"
+subcategory: "Sites"
 description: |-
-  Manages a Site resource in F5 Distributed Cloud for app stack site specification. configuration.
+  Retrieves information about virtual site object in given namespace. in F5 Distributed Cloud.
 ---
 
 # f5xc_site (Data Source)
 
-Manages a Site resource in F5 Distributed Cloud for app stack site specification. configuration.
+Manages virtual site object in given namespace. in F5 Distributed Cloud. This is a read-only data source.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 

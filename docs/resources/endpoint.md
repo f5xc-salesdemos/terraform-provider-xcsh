@@ -80,16 +80,16 @@ resource "f5xc_endpoint" "example" {
 ### Spec Argument Reference
 
 -> **One of the following:**
-&#x2022; <a id="dns-name"></a>[`dns_name`](#dns-name) - Optional String<br>Endpoint's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name
+&#x2022; <a id="dns-name"></a>[`dns_name`](#dns-name) - Required String<br>Endpoint's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name
 <br><br>&#x2022; <a id="dns-name-advanced"></a>[`dns_name_advanced`](#dns-name-advanced) - Optional Block<br>Specifies name and TTL used for DNS resolution<br>See [DNS Name Advanced](#dns-name-advanced) below for details.
-<br><br>&#x2022; <a id="ip"></a>[`ip`](#ip) - Optional String<br>Endpoint is reachable at the given IPv4/IPv6 address
+<br><br>&#x2022; <a id="ip"></a>[`ip`](#ip) - Required String<br>Endpoint is reachable at the given IPv4/IPv6 address
 <br><br>&#x2022; <a id="service-info"></a>[`service_info`](#service-info) - Optional Block<br>Specifies whether endpoint service is discovered by name or labels<br>See [Service Info](#service-info) below for details.
 
-<a id="health-check-port"></a>&#x2022; [`health_check_port`](#health-check-port) - Optional Number<br>By default the health check port of an endpoint is the same as the endpoint’s port. This option provides an alternative health check port. Setting this with a non-zero value allows an endpoint to have different health check port
+<a id="health-check-port"></a>&#x2022; [`health_check_port`](#health-check-port) - Required Number<br>By default the health check port of an endpoint is the same as the endpoint’s port. This option provides an alternative health check port. Setting this with a non-zero value allows an endpoint to have different health check port
 
-<a id="port"></a>&#x2022; [`port`](#port) - Optional Number<br>Endpoint service is available on this port
+<a id="port"></a>&#x2022; [`port`](#port) - Required Number<br>Endpoint service is available on this port
 
-<a id="protocol"></a>&#x2022; [`protocol`](#protocol) - Optional String<br>Protocol. Endpoint protocol. Default is TCP. Both TCP and UDP protocols are supported
+<a id="protocol"></a>&#x2022; [`protocol`](#protocol) - Required String<br>Protocol. Endpoint protocol. Default is TCP. Both TCP and UDP protocols are supported
 
 <a id="snat-pool"></a>&#x2022; [`snat_pool`](#snat-pool) - Optional Block<br>SNAT Pool. SNAT Pool configuration<br>See [Snat Pool](#snat-pool) below for details.
 
@@ -118,8 +118,8 @@ A [`dns_name_advanced`](#dns-name-advanced) block supports the following:
 
 A [`service_info`](#service-info) block supports the following:
 
-<a id="service-info-discovery-type"></a>&#x2022; [`discovery_type`](#service-info-discovery-type) - Optional String  Defaults to `INVALID_DISCOVERY`<br>Possible values are `INVALID_DISCOVERY`, `K8S`, `CONSUL`, `CLASSIC_BIGIP`, `THIRD_PARTY`<br>[Enum: INVALID_DISCOVERY|K8S|CONSUL|CLASSIC_BIGIP|THIRD_PARTY] Specifies whether the discovery is from Kubernetes or Consul cluster Invalid Discovery
-mechanism Discover from Kubernetes cluster Discover from Consul service Discover from Classic BIG-IP Clusters Discover for Third Party Application
+<a id="service-info-discovery-type"></a>&#x2022; [`discovery_type`](#service-info-discovery-type) - Optional String  Defaults to `INVALID_DISCOVERY`<br>Possible values are `INVALID_DISCOVERY`, `K8S`, `CONSUL`, `CLASSIC_BIGIP`, `THIRD_PARTY`, `NGINX_ONE`<br>[Enum: INVALID_DISCOVERY|K8S|CONSUL|CLASSIC_BIGIP|THIRD_PARTY|NGINX_ONE] Specifies whether the discovery is from Kubernetes or Consul cluster
+Invalid Discovery mechanism Discover from Kubernetes cluster Discover from Consul service Discover from Classic BIG-IP Clusters Discover for Third Party Application
 
 <a id="service-info-service-name"></a>&#x2022; [`service_name`](#service-info-service-name) - Optional String<br>Name of the service to discover with an optional namespace and cluster identifier. The format is service_name.namespace_name:cluster_identifier for K8S and service_name:cluster_identifier for Consul Endpoint will be discovered in all discovery objects where the
 
@@ -136,7 +136,7 @@ A [`service_selector`](#service-info-service-selector) block (within [`service_i
 
 A [`snat_pool`](#snat-pool) block supports the following:
 
-<a id="snat-pool-no-snat-pool"></a>&#x2022; [`no_snat_pool`](#snat-pool-no-snat-pool) - Optional Block<br>Enable this option
+<a id="snat-pool-no-snat-pool"></a>&#x2022; [`no_snat_pool`](#snat-pool-no-snat-pool) - Optional Block<br>Configuration parameter for no snat pool
 
 <a id="snat-pool-snat-pool"></a>&#x2022; [`snat_pool`](#snat-pool-snat-pool) - Optional Block<br>List of IPv4 prefixes that represent an endpoint<br>See [Snat Pool](#snat-pool-snat-pool) below.
 
@@ -177,9 +177,9 @@ A [`site`](#where-site) block (within [`where`](#where)) supports the following:
 <a id="where-site-enable-internet-vip"></a>&#x2022; [`enable_internet_vip`](#where-site-enable-internet-vip) - Optional Block<br>Enable this option
 
 <a id="where-site-network-type"></a>&#x2022; [`network_type`](#where-site-network-type) - Optional String  Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`<br>Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`,
-`VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`<br>[Enum:
-VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT] Different types of
-virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to
+`VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`, `VIRTUAL_NETWORK_MANAGEMENT`<br>[Enum:
+VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT|VIRTUAL_NETWORK_MANAGEMENT]
+Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to
 
 <a id="where-site-ref"></a>&#x2022; [`ref`](#where-site-ref) - Optional Block<br>Reference. A site direct reference<br>See [Ref](#where-site-ref) below.
 
@@ -226,9 +226,9 @@ A [`virtual_site`](#where-virtual-site) block (within [`where`](#where)) support
 <a id="where-virtual-site-enable-internet-vip"></a>&#x2022; [`enable_internet_vip`](#where-virtual-site-enable-internet-vip) - Optional Block<br>Enable this option
 
 <a id="where-virtual-site-network-type"></a>&#x2022; [`network_type`](#where-virtual-site-network-type) - Optional String  Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`<br>Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`,
-`VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`<br>[Enum:
-VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT] Different types of
-virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to
+`VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`, `VIRTUAL_NETWORK_MANAGEMENT`<br>[Enum:
+VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT|VIRTUAL_NETWORK_MANAGEMENT]
+Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to
 
 <a id="where-virtual-site-ref"></a>&#x2022; [`ref`](#where-virtual-site-ref) - Optional Block<br>Virtual_site direct reference<br>See [Ref](#where-virtual-site-ref) below.
 

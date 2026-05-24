@@ -79,7 +79,7 @@ resource "f5xc_filter_set" "example" {
 
 ### Spec Argument Reference
 
-<a id="context-key"></a>&#x2022; [`context_key`](#context-key) - Optional String<br>Indexable context key that identifies a page or page type for which the FilterSet is applicable
+<a id="context-key"></a>&#x2022; [`context_key`](#context-key) - Required String<br>Indexable context key that identifies a page or page type for which the FilterSet is applicable
 
 <a id="filter-fields"></a>&#x2022; [`filter_fields`](#filter-fields) - Optional Block<br>List of fields and their values selected by the user<br>See [Filter Fields](#filter-fields) below for details.
 

@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -123,10 +125,9 @@ func (r *VirtualSiteResource) Schema(ctx context.Context, req resource.SchemaReq
 			},
 			"site_type": schema.StringAttribute{
 				MarkdownDescription: "[Enum: INVALID|REGIONAL_EDGE|CUSTOMER_EDGE|NGINX_ONE] Site Type which can either RE or CE Invalid type of site Regional Edge site Customer Edge site. Possible values are `INVALID`, `REGIONAL_EDGE`, `CUSTOMER_EDGE`, `NGINX_ONE`.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("INVALID", "REGIONAL_EDGE", "CUSTOMER_EDGE", "NGINX_ONE"),
 				},
 			},
 		},
@@ -144,6 +145,9 @@ func (r *VirtualSiteResource) Schema(ctx context.Context, req resource.SchemaReq
 						MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(1),
+						},
 					},
 				},
 			},
@@ -488,13 +492,6 @@ func (r *VirtualSiteResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["site_type"].(string); ok && v != "" {
-		data.SiteType = types.StringValue(v)
-	} else if data.SiteType.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.SiteType = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields

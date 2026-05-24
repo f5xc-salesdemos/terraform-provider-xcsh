@@ -81,7 +81,7 @@ resource "f5xc_cloud_credentials" "example" {
 <br><br>&#x2022; <a id="aws-secret-key"></a>[`aws_secret_key`](#aws-secret-key) - Optional Block<br>AWS Programmatic Access Credentials type<br>See [AWS Secret Key](#aws-secret-key) below for details.
 <br><br>&#x2022; <a id="Azure-client-secret"></a>[`azure_client_secret`](#Azure-client-secret) - Optional Block<br>Azure Client Secret. Azure Credentials Client Secret type<br>See [Azure Client Secret](#Azure-client-secret) below for details.
 <br><br>&#x2022; <a id="Azure-pfx-certificate"></a>[`azure_pfx_certificate`](#Azure-pfx-certificate) - Optional Block<br>Azure Credentials Client Certificate type<br>See [Azure Pfx Certificate](#Azure-pfx-certificate) below for details.
-<br><br>&#x2022; <a id="gcp-cred-file"></a>[`gcp_cred_file`](#gcp-cred-file) - Optional Block<br>GCP Credentials. GCP Credentials type<br>See [GCP Cred File](#gcp-cred-file) below for details.
+<br><br>&#x2022; <a id="gcp-cred-file"></a>[`gcp_cred_file`](#gcp-cred-file) - Optional Block<br>Configuration parameter for GCP cred file<br>See [GCP Cred File](#gcp-cred-file) below for details.
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 
@@ -101,7 +101,7 @@ An [`aws_assume_role`](#aws-assume-role) block supports the following:
 
 <a id="aws-assume-role-duration-seconds"></a>&#x2022; [`duration_seconds`](#aws-assume-role-duration-seconds) - Optional Number<br>The duration, in seconds of the role session
 
-<a id="aws-assume-role-external-id-is-optional"></a>&#x2022; [`external_id_is_optional`](#aws-assume-role-external-id-is-optional) - Optional Block<br>Enable this option
+<a id="aws-assume-role-external-id-is-optional"></a>&#x2022; [`external_id_is_optional`](#aws-assume-role-external-id-is-optional) - Optional Block<br>Configuration parameter for external ID is optional
 
 <a id="tenant-id-b8874c"></a>&#x2022; [`external_id_is_tenant_id`](#tenant-id-b8874c) - Optional Block<br>Enable this option
 

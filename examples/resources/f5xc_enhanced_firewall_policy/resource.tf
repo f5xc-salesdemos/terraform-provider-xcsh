@@ -46,3 +46,6 @@ resource "f5xc_enhanced_firewall_policy" "example" {
     }
   }
 }
+
+# The following optional fields have server-applied defaults and can be omitted:
+# - allow_all

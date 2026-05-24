@@ -47,11 +47,11 @@ resource "f5xc_data_type" "example" {
   rules {
     # Configure rules settings
   }
-  # Rule Pattern Type. Test
+  # Configuration parameter for key pattern.
   key_pattern {
     # Configure key_pattern settings
   }
-  # Exact Values. List of exact values to match.
+  # Configuration parameter for exact values.
   exact_values {
     # Configure exact_values settings
   }
@@ -79,12 +79,12 @@ resource "f5xc_data_type" "example" {
 
 ### Spec Argument Reference
 
-<a id="compliances"></a>&#x2022; [`compliances`](#compliances) - Optional List<br>Possible values are `GDPR`, `CCPA`, `PIPEDA`, `LGPD`, `DPA_UK`, `PDPA_SG`, `APPI`, `HIPAA`, `CPRA_2023`, `CPA_CO`, `SOC2`, `PCI_DSS`, `ISO_IEC_27001`, `ISO_IEC_27701`, `EPRIVACY_DIRECTIVE`, `GLBA`, `SOX`<br>[Enum:
+<a id="compliances"></a>&#x2022; [`compliances`](#compliances) - Required List<br>Possible values are `GDPR`, `CCPA`, `PIPEDA`, `LGPD`, `DPA_UK`, `PDPA_SG`, `APPI`, `HIPAA`, `CPRA_2023`, `CPA_CO`, `SOC2`, `PCI_DSS`, `ISO_IEC_27001`, `ISO_IEC_27701`, `EPRIVACY_DIRECTIVE`, `GLBA`, `SOX`<br>[Enum:
 GDPR|CCPA|PIPEDA|LGPD|DPA_UK|PDPA_SG|APPI|HIPAA|CPRA_2023|CPA_CO|SOC2|PCI_DSS|ISO_IEC_27001|ISO_IEC_27701|EPRIVACY_DIRECTIVE|GLBA|SOX] Choose applicable compliance frameworks such as GDPR, PCI/DSS, or CCPA to ensure the platform identifies whether vulnerabilities in API endpoints handling this data type may cause a compliance breach
 
-<a id="is-pii"></a>&#x2022; [`is_pii`](#is-pii) - Optional Bool<br>Select this option to classify the custom data type as personally identifiable information (PII)
+<a id="is-pii"></a>&#x2022; [`is_pii`](#is-pii) - Required Bool<br>Select this option to classify the custom data type as personally identifiable information (PII)
 
-<a id="is-sensitive-data"></a>&#x2022; [`is_sensitive_data`](#is-sensitive-data) - Optional Bool<br>Select this option to classify the custom data type as sensitive, enabling detection of API vulnerabilities related to this data type
+<a id="is-sensitive-data"></a>&#x2022; [`is_sensitive_data`](#is-sensitive-data) - Required Bool<br>Select this option to classify the custom data type as sensitive, enabling detection of API vulnerabilities related to this data type
 
 <a id="rules"></a>&#x2022; [`rules`](#rules) - Optional Block<br>Configure key/value or regex match rules to enable the platform to detect this custom data type in the API request or response<br>See [Rules](#rules) below for details.
 
@@ -102,17 +102,17 @@ In addition to all arguments above, the following attributes are exported:
 
 A [`rules`](#rules) block supports the following:
 
-<a id="rules-key-pattern"></a>&#x2022; [`key_pattern`](#rules-key-pattern) - Optional Block<br>Rule Pattern Type. Test<br>See [Key Pattern](#rules-key-pattern) below.
+<a id="rules-key-pattern"></a>&#x2022; [`key_pattern`](#rules-key-pattern) - Optional Block<br>Configuration parameter for key pattern<br>See [Key Pattern](#rules-key-pattern) below.
 
 <a id="rules-key-value-pattern"></a>&#x2022; [`key_value_pattern`](#rules-key-value-pattern) - Optional Block<br>Search for specific key & value patterns in the specified sections<br>See [Key Value Pattern](#rules-key-value-pattern) below.
 
-<a id="rules-value-pattern"></a>&#x2022; [`value_pattern`](#rules-value-pattern) - Optional Block<br>Rule Pattern Type. Test<br>See [Value Pattern](#rules-value-pattern) below.
+<a id="rules-value-pattern"></a>&#x2022; [`value_pattern`](#rules-value-pattern) - Optional Block<br>Configuration parameter for value pattern<br>See [Value Pattern](#rules-value-pattern) below.
 
 #### Rules Key Pattern
 
 A [`key_pattern`](#rules-key-pattern) block (within [`rules`](#rules)) supports the following:
 
-<a id="rules-key-pattern-exact-values"></a>&#x2022; [`exact_values`](#rules-key-pattern-exact-values) - Optional Block<br>Exact Values. List of exact values to match<br>See [Exact Values](#rules-key-pattern-exact-values) below.
+<a id="rules-key-pattern-exact-values"></a>&#x2022; [`exact_values`](#rules-key-pattern-exact-values) - Optional Block<br>Configuration parameter for exact values<br>See [Exact Values](#rules-key-pattern-exact-values) below.
 
 <a id="rules-key-pattern-regex-value"></a>&#x2022; [`regex_value`](#rules-key-pattern-regex-value) - Optional String<br>Search for values matching this regular expression
 
@@ -128,15 +128,15 @@ An [`exact_values`](#rules-key-pattern-exact-values) block (within [`rules.key_p
 
 A [`key_value_pattern`](#rules-key-value-pattern) block (within [`rules`](#rules)) supports the following:
 
-<a id="rules-key-value-pattern-key-pattern"></a>&#x2022; [`key_pattern`](#rules-key-value-pattern-key-pattern) - Optional Block<br>Rule Pattern Type. Test<br>See [Key Pattern](#rules-key-value-pattern-key-pattern) below.
+<a id="rules-key-value-pattern-key-pattern"></a>&#x2022; [`key_pattern`](#rules-key-value-pattern-key-pattern) - Optional Block<br>Configuration parameter for key pattern<br>See [Key Pattern](#rules-key-value-pattern-key-pattern) below.
 
-<a id="rules-key-value-pattern-value-pattern"></a>&#x2022; [`value_pattern`](#rules-key-value-pattern-value-pattern) - Optional Block<br>Rule Pattern Type. Test<br>See [Value Pattern](#rules-key-value-pattern-value-pattern) below.
+<a id="rules-key-value-pattern-value-pattern"></a>&#x2022; [`value_pattern`](#rules-key-value-pattern-value-pattern) - Optional Block<br>Configuration parameter for value pattern<br>See [Value Pattern](#rules-key-value-pattern-value-pattern) below.
 
 #### Rules Key Value Pattern Key Pattern
 
 A [`key_pattern`](#rules-key-value-pattern-key-pattern) block (within [`rules.key_value_pattern`](#rules-key-value-pattern)) supports the following:
 
-<a id="values-5868e6"></a>&#x2022; [`exact_values`](#values-5868e6) - Optional Block<br>Exact Values. List of exact values to match<br>See [Exact Values](#values-5868e6) below.
+<a id="values-5868e6"></a>&#x2022; [`exact_values`](#values-5868e6) - Optional Block<br>Configuration parameter for exact values<br>See [Exact Values](#values-5868e6) below.
 
 <a id="value-cf8180"></a>&#x2022; [`regex_value`](#value-cf8180) - Optional String<br>Search for values matching this regular expression
 
@@ -150,7 +150,7 @@ A [`key_pattern`](#rules-key-value-pattern-key-pattern) block (within [`rules.ke
 
 A [`value_pattern`](#rules-key-value-pattern-value-pattern) block (within [`rules.key_value_pattern`](#rules-key-value-pattern)) supports the following:
 
-<a id="values-82342a"></a>&#x2022; [`exact_values`](#values-82342a) - Optional Block<br>Exact Values. List of exact values to match<br>See [Exact Values](#values-82342a) below.
+<a id="values-82342a"></a>&#x2022; [`exact_values`](#values-82342a) - Optional Block<br>Configuration parameter for exact values<br>See [Exact Values](#values-82342a) below.
 
 <a id="value-d5fdfc"></a>&#x2022; [`regex_value`](#value-d5fdfc) - Optional String<br>Search for values matching this regular expression
 
@@ -164,7 +164,7 @@ A [`value_pattern`](#rules-key-value-pattern-value-pattern) block (within [`rule
 
 A [`value_pattern`](#rules-value-pattern) block (within [`rules`](#rules)) supports the following:
 
-<a id="rules-value-pattern-exact-values"></a>&#x2022; [`exact_values`](#rules-value-pattern-exact-values) - Optional Block<br>Exact Values. List of exact values to match<br>See [Exact Values](#rules-value-pattern-exact-values) below.
+<a id="rules-value-pattern-exact-values"></a>&#x2022; [`exact_values`](#rules-value-pattern-exact-values) - Optional Block<br>Configuration parameter for exact values<br>See [Exact Values](#rules-value-pattern-exact-values) below.
 
 <a id="rules-value-pattern-regex-value"></a>&#x2022; [`regex_value`](#rules-value-pattern-regex-value) - Optional String<br>Search for values matching this regular expression
 

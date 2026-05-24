@@ -28,8 +28,8 @@ resource "f5xc_segment" "example" {
 
   # Resource-specific configuration
   # [OneOf: disable, enable] Enable this option
-  disable {
-    # Configure disable settings
+  disable_spec {
+    # Configure disable_spec settings
   }
   # Enable this option
   enable {

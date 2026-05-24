@@ -35,7 +35,7 @@ resource "f5xc_nfv_service" "example" {
   disable_ssh_access {
     # Configure disable_ssh_access settings
   }
-  # SSH based management. SSH based configuration.
+  # Configuration parameter for enabled ssh access.
   enabled_ssh_access {
     # Configure enabled_ssh_access settings
   }

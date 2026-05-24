@@ -43,17 +43,17 @@ resource "f5xc_policy_based_routing" "example" {
   }
 
   # Resource-specific configuration
-  # [OneOf: forward_proxy_pbr, network_pbr] L3/L4 routing rul...
+  # Ordered list of forwarding Class to be used if source app...
+  forwarding_class_list {
+    # Configure forwarding_class_list settings
+  }
+  # [OneOf: forward_proxy_pbr, network_pbr] Configuration par...
   forward_proxy_pbr {
     # Configure forward_proxy_pbr settings
   }
   # L3/L4 routing rules. Network(L3/L4) routing policy rules.
   forward_proxy_pbr_rules {
     # Configure forward_proxy_pbr_rules settings
-  }
-  # Enable this option
-  all_destinations {
-    # Configure all_destinations settings
   }
 }
 ```
@@ -80,8 +80,8 @@ resource "f5xc_policy_based_routing" "example" {
 ### Spec Argument Reference
 
 -> **One of the following:**
-&#x2022; <a id="forward-proxy-pbr"></a>[`forward_proxy_pbr`](#forward-proxy-pbr) - Optional Block<br>L3/L4 routing rule. Network(L3/L4) routing policy rule<br>See [Forward Proxy Pbr](#forward-proxy-pbr) below for details.
-<br><br>&#x2022; <a id="network-pbr"></a>[`network_pbr`](#network-pbr) - Optional Block<br>Network (L2/L3) routing Policy. Network(L3/L4) routing policy rule<br>See [Network Pbr](#network-pbr) below for details.
+&#x2022; <a id="forward-proxy-pbr"></a>[`forward_proxy_pbr`](#forward-proxy-pbr) - Optional Block<br>Configuration parameter for forward proxy pbr<br>See [Forward Proxy Pbr](#forward-proxy-pbr) below for details.
+<br><br>&#x2022; <a id="network-pbr"></a>[`network_pbr`](#network-pbr) - Optional Block<br>Configuration parameter for network pbr<br>See [Network Pbr](#network-pbr) below for details.
 
 <a id="forwarding-class-list"></a>&#x2022; [`forwarding_class_list`](#forwarding-class-list) - Optional Block<br>Ordered list of forwarding Class to be used if source application match and no rule match<br>See [Forwarding Class List](#forwarding-class-list) below for details.
 
@@ -105,9 +105,9 @@ A [`forward_proxy_pbr`](#forward-proxy-pbr) block supports the following:
 
 A [`forward_proxy_pbr_rules`](#rules-67a5cc) block (within [`forward_proxy_pbr`](#forward-proxy-pbr)) supports the following:
 
-<a id="destinations-1e0cd9"></a>&#x2022; [`all_destinations`](#destinations-1e0cd9) - Optional Block<br>Enable this option
+<a id="destinations-1e0cd9"></a>&#x2022; [`all_destinations`](#destinations-1e0cd9) - Optional Block<br>Configuration parameter for all destinations
 
-<a id="sources-4f8004"></a>&#x2022; [`all_sources`](#sources-4f8004) - Optional Block<br>Enable this option
+<a id="sources-4f8004"></a>&#x2022; [`all_sources`](#sources-4f8004) - Optional Block<br>Configuration parameter for all sources
 
 <a id="list-a3b35a"></a>&#x2022; [`forwarding_class_list`](#list-a3b35a) - Optional Block<br>Ordered list of forwarding Class to be used if no rule match<br>See [Forwarding Class List](#list-a3b35a) below.
 
@@ -194,15 +194,15 @@ A [`label_selector`](#network-pbr-label-selector) block (within [`network_pbr`](
 
 A [`network_pbr_rules`](#network-pbr-network-pbr-rules) block (within [`network_pbr`](#network-pbr)) supports the following:
 
-<a id="traffic-e56c3b"></a>&#x2022; [`all_tcp_traffic`](#traffic-e56c3b) - Optional Block<br>Enable this option
+<a id="traffic-e56c3b"></a>&#x2022; [`all_tcp_traffic`](#traffic-e56c3b) - Optional Block<br>Configuration parameter for all TCP traffic
 
-<a id="traffic-5b23a8"></a>&#x2022; [`all_traffic`](#traffic-5b23a8) - Optional Block<br>Enable this option
+<a id="traffic-5b23a8"></a>&#x2022; [`all_traffic`](#traffic-5b23a8) - Optional Block<br>Configuration parameter for all traffic
 
-<a id="traffic-d923ff"></a>&#x2022; [`all_udp_traffic`](#traffic-d923ff) - Optional Block<br>Enable this option
+<a id="traffic-d923ff"></a>&#x2022; [`all_udp_traffic`](#traffic-d923ff) - Optional Block<br>Configuration parameter for all UDP traffic
 
 <a id="network-pbr-network-pbr-rules-any"></a>&#x2022; [`any`](#network-pbr-network-pbr-rules-any) - Optional Block<br>Enable this option
 
-<a id="applications-913ddd"></a>&#x2022; [`applications`](#applications-913ddd) - Optional Block<br>Applications. Application protocols like HTTP, SNMP<br>See [Applications](#applications-913ddd) below.
+<a id="applications-913ddd"></a>&#x2022; [`applications`](#applications-913ddd) - Optional Block<br>Configuration parameter for applications<br>See [Applications](#applications-913ddd) below.
 
 <a id="network-pbr-network-pbr-rules-dns-name"></a>&#x2022; [`dns_name`](#network-pbr-network-pbr-rules-dns-name) - Optional String<br>Resolve hostname to GET the IP
 

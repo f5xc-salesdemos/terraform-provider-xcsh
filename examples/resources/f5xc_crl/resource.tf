@@ -27,7 +27,7 @@ resource "f5xc_crl" "example" {
   }
 
   # Resource-specific configuration
-  # HTTPAccessInfo.
+  # Configuration parameter for http access.
   http_access {
     # Configure http_access settings
   }
