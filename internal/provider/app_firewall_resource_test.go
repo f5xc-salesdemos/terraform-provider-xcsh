@@ -6,8 +6,13 @@ import (
 	"fmt"
 	"testing"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
 )
@@ -214,6 +219,353 @@ func testAccAppFirewallImportStateIdFunc(resourceName string) resource.ImportSta
 }
 
 // =============================================================================
+// TEST: All attributes including labels, annotations, description
+// =============================================================================
+func TestAccAppFirewallResource_allAttributes(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_app_firewall.test"
+	rName := acctest.RandomName("tf-test-waf")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckAppFirewallDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAppFirewallConfig_allAttributesSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckAppFirewallExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+					resource.TestCheckResourceAttr(resourceName, "description", "Full attributes test"),
+					resource.TestCheckResourceAttr(resourceName, "labels.environment", "test"),
+					resource.TestCheckResourceAttr(resourceName, "labels.managed_by", "terraform-acceptance-test"),
+					resource.TestCheckResourceAttr(resourceName, "annotations.purpose", "acceptance-testing"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "disable", "description"},
+				ImportStateIdFunc:       testAccAppFirewallImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Update labels lifecycle
+// =============================================================================
+func TestAccAppFirewallResource_updateLabels(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_app_firewall.test"
+	rName := acctest.RandomName("tf-test-waf")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckAppFirewallDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAppFirewallConfig_withLabelsSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckAppFirewallExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "labels.environment", "test"),
+				),
+			},
+			{
+				Config: testAccAppFirewallConfig_withUpdatedLabelsSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckAppFirewallExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "labels.environment", "staging"),
+				),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccAppFirewallConfig_basicSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckAppFirewallExists(resourceName),
+				),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Plan checks (create, update, noop)
+// =============================================================================
+func TestAccAppFirewallResource_planChecks(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_app_firewall.test"
+	rName := acctest.RandomName("tf-test-waf")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckAppFirewallDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAppFirewallConfig_basicSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionCreate),
+					},
+				},
+			},
+			{
+				Config: testAccAppFirewallConfig_withLabelsSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccAppFirewallConfig_withLabelsSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionNoop),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Known values plan check
+// =============================================================================
+func TestAccAppFirewallResource_knownValues(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_app_firewall.test"
+	rName := acctest.RandomName("tf-test-waf")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckAppFirewallDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAppFirewallConfig_basicSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectKnownValue(resourceName, tfjsonpath.New("name"), knownvalue.StringExact(rName)),
+						plancheck.ExpectKnownValue(resourceName, tfjsonpath.New("namespace"), knownvalue.StringExact("system")),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Invalid name validation
+// =============================================================================
+func TestAccAppFirewallResource_invalidName(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccAppFirewallConfig_basicSystem("Invalid-NAME-Test"),
+				ExpectError: regexp.MustCompile(`(?i)(invalid|name|must)`),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Name too long validation
+// =============================================================================
+func TestAccAppFirewallResource_nameTooLong(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccAppFirewallConfig_basicSystem("tf-test-this-name-is-way-too-long-and-should-fail-validation-check"),
+				ExpectError: regexp.MustCompile(`(?i)(invalid|name|length|long|exceed|character)`),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Empty name validation
+// =============================================================================
+func TestAccAppFirewallResource_emptyName(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccAppFirewallConfig_basicSystem(""),
+				ExpectError: regexp.MustCompile(`(?i)(invalid|name|empty|required|blank)`),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Name change requires replacement
+// =============================================================================
+func TestAccAppFirewallResource_requiresReplace(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_app_firewall.test"
+	rName1 := acctest.RandomName("tf-test-waf")
+	rName2 := acctest.RandomName("tf-test-waf")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckAppFirewallDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAppFirewallConfig_basicSystem(rName1),
+				Check:  acctest.CheckAppFirewallExists(resourceName),
+			},
+			{
+				Config: testAccAppFirewallConfig_basicSystem(rName2),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionDestroyBeforeCreate),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Switch from blocking to monitoring mode
+// =============================================================================
+func TestAccAppFirewallResource_switchMode_blockingToMonitoring(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_app_firewall.test"
+	rName := acctest.RandomName("tf-test-waf")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckAppFirewallDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAppFirewallConfig_blockingSystem(rName),
+				Check:  acctest.CheckAppFirewallExists(resourceName),
+			},
+			{
+				Config: testAccAppFirewallConfig_monitoringSystem(rName),
+				Check:  acctest.CheckAppFirewallExists(resourceName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccAppFirewallConfig_blockingSystem(rName),
+				Check:  acctest.CheckAppFirewallExists(resourceName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Full lifecycle (create → update → import → no-drift → strip → delete)
+// =============================================================================
+func TestAccAppFirewallResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_app_firewall.test"
+	rName := acctest.RandomName("tf-test-waf")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckAppFirewallDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAppFirewallConfig_allAttributesSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckAppFirewallExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "description", "Full attributes test"),
+					resource.TestCheckResourceAttr(resourceName, "labels.environment", "test"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "disable", "description"},
+				ImportStateIdFunc:       testAccAppFirewallImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccAppFirewallConfig_monitoringSystem(rName),
+				Check:  acctest.CheckAppFirewallExists(resourceName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccAppFirewallConfig_monitoringSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+			{
+				Config: testAccAppFirewallConfig_basicSystem(rName),
+				Check:  acctest.CheckAppFirewallExists(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
 // CONFIG HELPERS
 // =============================================================================
 
@@ -301,6 +653,54 @@ resource "f5xc_app_firewall" "test" {
   default_bot_setting {}
 
   # Use default anonymization
+  default_anonymization {}
+}
+`, name)
+}
+
+func testAccAppFirewallConfig_allAttributesSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_app_firewall" "test" {
+  name        = %[1]q
+  namespace   = "system"
+  description = "Full attributes test"
+
+  labels = {
+    environment = "test"
+    managed_by  = "terraform-acceptance-test"
+  }
+
+  annotations = {
+    purpose = "acceptance-testing"
+  }
+
+  default_detection_settings {}
+  allow_all_response_codes {}
+  blocking {}
+  use_default_blocking_page {}
+  default_bot_setting {}
+  default_anonymization {}
+}
+`, name)
+}
+
+func testAccAppFirewallConfig_withUpdatedLabelsSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_app_firewall" "test" {
+  name        = %[1]q
+  namespace   = "system"
+  description = "Test application firewall"
+
+  labels = {
+    environment = "staging"
+    team        = "platform"
+  }
+
+  default_detection_settings {}
+  allow_all_response_codes {}
+  blocking {}
+  use_default_blocking_page {}
+  default_bot_setting {}
   default_anonymization {}
 }
 `, name)
