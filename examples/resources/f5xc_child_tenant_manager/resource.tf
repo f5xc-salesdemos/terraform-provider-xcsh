@@ -2,6 +2,18 @@
 # Manages child_tenant_manager config instance. Name of the object is the name of the child tenant manager to be created. in F5 Distributed Cloud.
 
 # Basic Child Tenant Manager configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_child_tenant_manager" "example" {
   name      = "example-child-tenant-manager"
   namespace = "staging"
@@ -20,11 +32,11 @@ resource "f5xc_child_tenant_manager" "example" {
   group_assignments {
     # Configure group_assignments settings
   }
-  # Object reference. This type establishes a direct referenc...
+  # Object reference. This type establishes a direct reference...
   group {
     # Configure group settings
   }
-  # Object reference. This type establishes a direct referenc...
+  # Object reference. This type establishes a direct reference...
   tenant_owner_group {
     # Configure tenant_owner_group settings
   }

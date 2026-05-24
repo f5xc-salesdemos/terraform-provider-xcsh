@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -341,6 +342,9 @@ func (r *AuthenticationResource) Schema(ctx context.Context, req resource.Schema
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -358,6 +362,9 @@ func (r *AuthenticationResource) Schema(ctx context.Context, req resource.Schema
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -377,6 +384,9 @@ func (r *AuthenticationResource) Schema(ctx context.Context, req resource.Schema
 											"location": schema.StringAttribute{
 												MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(1024),
+												},
 											},
 											"store_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -394,6 +404,9 @@ func (r *AuthenticationResource) Schema(ctx context.Context, req resource.Schema
 											"url": schema.StringAttribute{
 												MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 									},
@@ -402,7 +415,7 @@ func (r *AuthenticationResource) Schema(ctx context.Context, req resource.Schema
 						},
 					},
 					"kms_key_hmac": schema.SingleNestedBlock{
-						MarkdownDescription: "KMS Key Reference. Reference to KMS Key Object.",
+						MarkdownDescription: "Configuration parameter for kms key hmac.",
 					},
 				},
 			},
@@ -412,10 +425,16 @@ func (r *AuthenticationResource) Schema(ctx context.Context, req resource.Schema
 					"oidc_client_id": schema.StringAttribute{
 						MarkdownDescription: "Client ID used while sending the Authorization Request to OIDC server .",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 256),
+						},
 					},
 					"oidc_well_known_config_url": schema.StringAttribute{
-						MarkdownDescription: "An OIDC well-known configuration URL that will be used to fetch authentication related endpoints.",
+						MarkdownDescription: "Exclusive with [oidc_auth_params] An OIDC well-known configuration URL that will be used to fetch authentication related endpoints.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -433,6 +452,9 @@ func (r *AuthenticationResource) Schema(ctx context.Context, req resource.Schema
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -450,25 +472,37 @@ func (r *AuthenticationResource) Schema(ctx context.Context, req resource.Schema
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 							},
 						},
 					},
 					"oidc_auth_params": schema.SingleNestedBlock{
-						MarkdownDescription: "OIDCAuthParams.",
+						MarkdownDescription: "Configuration parameter for oidc auth params.",
 						Attributes: map[string]schema.Attribute{
 							"auth_endpoint_url": schema.StringAttribute{
 								MarkdownDescription: "URL of the authorization server's authorization endpoint.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"end_session_endpoint_url": schema.StringAttribute{
 								MarkdownDescription: "URL of the authorization server's Logout endpoint.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"token_endpoint_url": schema.StringAttribute{
 								MarkdownDescription: "URL of the authorization server's Token endpoint.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 						},
 					},

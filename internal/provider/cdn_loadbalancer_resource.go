@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -2137,12 +2141,12 @@ var CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFinancialServic
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel represents flight block
 type CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel struct {
-	Checkin *CDNLoadBalancerEmptyModel `tfsdk:"checkin"`
+	Checking *CDNLoadBalancerEmptyModel `tfsdk:"checking"`
 }
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModelAttrTypes defines the attribute types for CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel
 var CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModelAttrTypes = map[string]attr.Type{
-	"checkin": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"checking": types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelProfileManagementModel represents profile_management block
@@ -3509,22 +3513,24 @@ var CDNLoadBalancerJsChallengeModelAttrTypes = map[string]attr.Type{
 
 // CDNLoadBalancerJWTValidationModel represents jwt_validation block
 type CDNLoadBalancerJWTValidationModel struct {
-	Action          *CDNLoadBalancerJWTValidationActionModel          `tfsdk:"action"`
-	JwksConfig      *CDNLoadBalancerJWTValidationJwksConfigModel      `tfsdk:"jwks_config"`
-	MandatoryClaims *CDNLoadBalancerJWTValidationMandatoryClaimsModel `tfsdk:"mandatory_claims"`
-	ReservedClaims  *CDNLoadBalancerJWTValidationReservedClaimsModel  `tfsdk:"reserved_claims"`
-	Target          *CDNLoadBalancerJWTValidationTargetModel          `tfsdk:"target"`
-	TokenLocation   *CDNLoadBalancerJWTValidationTokenLocationModel   `tfsdk:"token_location"`
+	Action              *CDNLoadBalancerJWTValidationActionModel              `tfsdk:"action"`
+	AuthorizationServer *CDNLoadBalancerJWTValidationAuthorizationServerModel `tfsdk:"authorization_server"`
+	JwksConfig          *CDNLoadBalancerJWTValidationJwksConfigModel          `tfsdk:"jwks_config"`
+	MandatoryClaims     *CDNLoadBalancerJWTValidationMandatoryClaimsModel     `tfsdk:"mandatory_claims"`
+	ReservedClaims      *CDNLoadBalancerJWTValidationReservedClaimsModel      `tfsdk:"reserved_claims"`
+	Target              *CDNLoadBalancerJWTValidationTargetModel              `tfsdk:"target"`
+	TokenLocation       *CDNLoadBalancerJWTValidationTokenLocationModel       `tfsdk:"token_location"`
 }
 
 // CDNLoadBalancerJWTValidationModelAttrTypes defines the attribute types for CDNLoadBalancerJWTValidationModel
 var CDNLoadBalancerJWTValidationModelAttrTypes = map[string]attr.Type{
-	"action":           types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationActionModelAttrTypes},
-	"jwks_config":      types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationJwksConfigModelAttrTypes},
-	"mandatory_claims": types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationMandatoryClaimsModelAttrTypes},
-	"reserved_claims":  types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationReservedClaimsModelAttrTypes},
-	"target":           types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationTargetModelAttrTypes},
-	"token_location":   types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationTokenLocationModelAttrTypes},
+	"action":               types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationActionModelAttrTypes},
+	"authorization_server": types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationAuthorizationServerModelAttrTypes},
+	"jwks_config":          types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationJwksConfigModelAttrTypes},
+	"mandatory_claims":     types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationMandatoryClaimsModelAttrTypes},
+	"reserved_claims":      types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationReservedClaimsModelAttrTypes},
+	"target":               types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationTargetModelAttrTypes},
+	"token_location":       types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationTokenLocationModelAttrTypes},
 }
 
 // CDNLoadBalancerJWTValidationActionModel represents action block
@@ -3537,6 +3543,30 @@ type CDNLoadBalancerJWTValidationActionModel struct {
 var CDNLoadBalancerJWTValidationActionModelAttrTypes = map[string]attr.Type{
 	"block":  types.ObjectType{AttrTypes: map[string]attr.Type{}},
 	"report": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+}
+
+// CDNLoadBalancerJWTValidationAuthorizationServerModel represents authorization_server block
+type CDNLoadBalancerJWTValidationAuthorizationServerModel struct {
+	AuthorizationServers []CDNLoadBalancerJWTValidationAuthorizationServerAuthorizationServersModel `tfsdk:"authorization_servers"`
+}
+
+// CDNLoadBalancerJWTValidationAuthorizationServerModelAttrTypes defines the attribute types for CDNLoadBalancerJWTValidationAuthorizationServerModel
+var CDNLoadBalancerJWTValidationAuthorizationServerModelAttrTypes = map[string]attr.Type{
+	"authorization_servers": types.ListType{ElemType: types.ObjectType{AttrTypes: CDNLoadBalancerJWTValidationAuthorizationServerAuthorizationServersModelAttrTypes}},
+}
+
+// CDNLoadBalancerJWTValidationAuthorizationServerAuthorizationServersModel represents authorization_servers block
+type CDNLoadBalancerJWTValidationAuthorizationServerAuthorizationServersModel struct {
+	Name      types.String `tfsdk:"name"`
+	Namespace types.String `tfsdk:"namespace"`
+	Tenant    types.String `tfsdk:"tenant"`
+}
+
+// CDNLoadBalancerJWTValidationAuthorizationServerAuthorizationServersModelAttrTypes defines the attribute types for CDNLoadBalancerJWTValidationAuthorizationServerAuthorizationServersModel
+var CDNLoadBalancerJWTValidationAuthorizationServerAuthorizationServersModelAttrTypes = map[string]attr.Type{
+	"name":      types.StringType,
+	"namespace": types.StringType,
+	"tenant":    types.StringType,
 }
 
 // CDNLoadBalancerJWTValidationJwksConfigModel represents jwks_config block
@@ -4986,10 +5016,10 @@ var CDNLoadBalancerWAFExclusionWAFExclusionPolicyModelAttrTypes = map[string]att
 type CDNLoadBalancerResourceModel struct {
 	Name                          types.String                                 `tfsdk:"name"`
 	Namespace                     types.String                                 `tfsdk:"namespace"`
+	Domains                       types.List                                   `tfsdk:"domains"`
 	Annotations                   types.Map                                    `tfsdk:"annotations"`
 	Description                   types.String                                 `tfsdk:"description"`
 	Disable                       types.Bool                                   `tfsdk:"disable"`
-	Domains                       types.List                                   `tfsdk:"domains"`
 	Labels                        types.Map                                    `tfsdk:"labels"`
 	ID                            types.String                                 `tfsdk:"id"`
 	Timeouts                      timeouts.Value                               `tfsdk:"timeouts"`
@@ -5075,6 +5105,14 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 					validators.NamespaceValidator(),
 				},
 			},
+			"domains": schema.ListAttribute{
+				MarkdownDescription: "List of fully qualified domain names. The CDN Distribution will be setup for these FQDN name(s). [This can be a domain or a sub-domain] .",
+				Required:            true,
+				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeBetween(1, 32),
+				},
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -5087,11 +5125,6 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 			"disable": schema.BoolAttribute{
 				MarkdownDescription: "A value of true will administratively disable the object.",
 				Optional:            true,
-			},
-			"domains": schema.ListAttribute{
-				MarkdownDescription: "List of fully qualified domain names. The CDN Distribution will be setup for these FQDN name(s). [This can be a domain or a sub-domain] .",
-				Optional:            true,
-				ElementType:         types.StringType,
 			},
 			"labels": schema.MapAttribute{
 				MarkdownDescription: "Labels is a user defined key value map that can be attached to resources for organization and filtering.",
@@ -5114,7 +5147,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				Delete: true,
 			}),
 			"active_service_policies": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: active_service_policies, no_service_policies, service_policies_from_namespace; Default: no_service_policies] Service Policy List. List of service policies.",
+				MarkdownDescription: "[OneOf: active_service_policies, no_service_policies, service_policies_from_namespace; Default: no_service_policies] Configuration parameter for active service policies.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"policies": schema.ListNestedBlock{
@@ -5124,6 +5157,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -5132,6 +5168,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 								"tenant": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -5139,6 +5178,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
 									},
 								},
 							},
@@ -5157,10 +5199,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"api_endpoint_path": schema.StringAttribute{
 									MarkdownDescription: "The endpoint (path) of the request.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
 								},
 								"specific_domain": schema.StringAttribute{
-									MarkdownDescription: "The rule will apply for a specific domain.",
+									MarkdownDescription: "Exclusive with [any_domain] The rule will apply for a specific domain.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(128),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -5178,6 +5226,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] List of methods values to match against. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 									},
 								},
@@ -5198,6 +5249,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer.",
 													Optional:            true,
 													ElementType:         types.Int64Type,
+													Validators: []validator.List{
+														listvalidator.SizeBetween(1, 16),
+													},
 												},
 											},
 										},
@@ -5220,6 +5274,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"name": schema.StringAttribute{
 																MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 1024),
+																	stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																},
 															},
 															"namespace": schema.StringAttribute{
 																MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -5227,6 +5285,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																Computed:            true,
 																PlanModifiers: []planmodifier.String{
 																	stringplanmodifier.UseStateForUnknown(),
+																},
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 1024),
+																	stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																},
 															},
 															"tenant": schema.StringAttribute{
@@ -5251,12 +5313,15 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											},
 										},
 										"client_selector": schema.SingleNestedBlock{
-											MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+											MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 											Attributes: map[string]schema.Attribute{
 												"expressions": schema.ListAttribute{
 													MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(1),
+													},
 												},
 											},
 										},
@@ -5284,6 +5349,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"name": schema.StringAttribute{
 																MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 1024),
+																	stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																},
 															},
 															"namespace": schema.StringAttribute{
 																MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -5291,6 +5360,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																Computed:            true,
 																PlanModifiers: []planmodifier.String{
 																	stringplanmodifier.UseStateForUnknown(),
+																},
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 1024),
+																	stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																},
 															},
 															"tenant": schema.StringAttribute{
@@ -5325,6 +5398,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "IPv4 Prefix List. List of IPv4 prefix strings.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(128),
+													},
 												},
 											},
 										},
@@ -5335,33 +5411,45 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "[Enum: SPAM_SOURCES|WINDOWS_EXPLOITS|WEB_ATTACKS|BOTNETS|SCANNERS|REPUTATION|PHISHING|PROXY|MOBILE_THREATS|TOR_PROXY|DENIAL_OF_SERVICE|NETWORK] The IP threat categories is obtained from the list and is used to auto-generate equivalent label selection expressions . Possible values are `SPAM_SOURCES`, `WINDOWS_EXPLOITS`, `WEB_ATTACKS`, `BOTNETS`, `SCANNERS`, `REPUTATION`, `PHISHING`, `PROXY`, `MOBILE_THREATS`, `TOR_PROXY`, `DENIAL_OF_SERVICE`, `NETWORK`. Defaults to `SPAM_SOURCES`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(32),
+													},
 												},
 											},
 										},
 										"tls_fingerprint_matcher": schema.SingleNestedBlock{
-											MarkdownDescription: "TLS fingerprint matcher specifies multiple criteria for matching a TLS fingerprint. The set of supported positve match criteria includes a list of known classes of TLS fingerprints and a list of exact values. The match is considered successful if either of these positive criteria are satisfied..",
+											MarkdownDescription: "TLS fingerprint matcher specifies multiple criteria for matching a TLS fingerprint. The set of supported positive match criteria includes a list of known classes of TLS fingerprints and a list of exact values. The match is considered successful if either of these positive criteria are satisfied..",
 											Attributes: map[string]schema.Attribute{
 												"classes": schema.ListAttribute{
 													MarkdownDescription: "[Enum: TLS_FINGERPRINT_NONE|ANY_MALICIOUS_FINGERPRINT|ADWARE|ADWIND|DRIDEX|GOOTKIT|GOZI|JBIFROST|QUAKBOT|RANSOMWARE|TROLDESH|TOFSEE|TORRENTLOCKER|TRICKBOT] List of known classes of TLS fingerprints to match the input TLS JA3 fingerprint against. Possible values are `TLS_FINGERPRINT_NONE`, `ANY_MALICIOUS_FINGERPRINT`, `ADWARE`, `ADWIND`, `DRIDEX`, `GOOTKIT`, `GOZI`, `JBIFROST`, `QUAKBOT`, `RANSOMWARE`, `TROLDESH`, `TOFSEE`, `TORRENTLOCKER`, `TRICKBOT`. Defaults to `TLS_FINGERPRINT_NONE`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(16),
+													},
 												},
 												"exact_values": schema.ListAttribute{
 													MarkdownDescription: "List of exact TLS JA3 fingerprints to match the input TLS JA3 fingerprint against.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(16),
+													},
 												},
 												"excluded_values": schema.ListAttribute{
 													MarkdownDescription: "List of TLS JA3 fingerprints to be excluded when matching the input TLS JA3 fingerprint. This can be used to skip known false positives when using one or more known TLS fingerprint classes in the enclosing matcher.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(32),
+													},
 												},
 											},
 										},
 									},
 								},
 								"inline_rate_limiter": schema.SingleNestedBlock{
-									MarkdownDescription: "InlineRateLimiter.",
+									MarkdownDescription: "Configuration parameter for inline rate limiter.",
 									Attributes: map[string]schema.Attribute{
 										"threshold": schema.Int64Attribute{
 											MarkdownDescription: "The total number of allowed requests for 1 unit (e.g. SECOND/MINUTE/HOUR etc.) of the specified period.",
@@ -5370,6 +5458,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"unit": schema.StringAttribute{
 											MarkdownDescription: "[Enum: SECOND|MINUTE|HOUR] Unit for the period per which the rate limit is applied. - SECOND: Second Rate limit period unit is seconds - MINUTE: Minute Rate limit period unit is minutes - HOUR: Hour Rate limit period unit is hours - DAY: Day Rate limit period unit is days. Possible values are `SECOND`, `MINUTE`, `HOUR`. Defaults to `SECOND`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("SECOND", "MINUTE", "HOUR"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -5379,6 +5470,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -5387,6 +5481,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -5394,6 +5491,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -5409,6 +5509,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -5416,6 +5519,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -5425,11 +5531,14 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 									},
 								},
 								"request_matcher": schema.SingleNestedBlock{
-									MarkdownDescription: "Request Matcher. Request conditions for matching a rule.",
+									MarkdownDescription: "Configuration parameter for request matcher.",
 									Attributes:          map[string]schema.Attribute{},
 									Blocks: map[string]schema.Block{
 										"cookie_matchers": schema.ListNestedBlock{
@@ -5443,14 +5552,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "Case-sensitive cookie name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"check_not_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check not present.",
 													},
 													"check_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check present.",
 													},
 													"item": schema.SingleNestedBlock{
 														MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -5459,16 +5571,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																MarkdownDescription: "List of exact values to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(64),
+																},
 															},
 															"regex_values": schema.ListAttribute{
 																MarkdownDescription: "List of regular expressions to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(16),
+																},
 															},
 															"transformers": schema.ListAttribute{
-																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(9),
+																},
 															},
 														},
 													},
@@ -5486,14 +5607,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "Case-insensitive HTTP header name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"check_not_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check not present.",
 													},
 													"check_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check present.",
 													},
 													"item": schema.SingleNestedBlock{
 														MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -5502,16 +5626,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																MarkdownDescription: "List of exact values to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(64),
+																},
 															},
 															"regex_values": schema.ListAttribute{
 																MarkdownDescription: "List of regular expressions to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(16),
+																},
 															},
 															"transformers": schema.ListAttribute{
-																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(9),
+																},
 															},
 														},
 													},
@@ -5529,14 +5662,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "JWT Claim Name. JWT claim name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"check_not_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check not present.",
 													},
 													"check_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check present.",
 													},
 													"item": schema.SingleNestedBlock{
 														MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -5545,16 +5681,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																MarkdownDescription: "List of exact values to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(64),
+																},
 															},
 															"regex_values": schema.ListAttribute{
 																MarkdownDescription: "List of regular expressions to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(16),
+																},
 															},
 															"transformers": schema.ListAttribute{
-																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(9),
+																},
 															},
 														},
 													},
@@ -5572,14 +5717,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"key": schema.StringAttribute{
 														MarkdownDescription: "Case-sensitive HTTP query parameter name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"check_not_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check not present.",
 													},
 													"check_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check present.",
 													},
 													"item": schema.SingleNestedBlock{
 														MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -5588,16 +5736,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																MarkdownDescription: "List of exact values to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(64),
+																},
 															},
 															"regex_values": schema.ListAttribute{
 																MarkdownDescription: "List of regular expressions to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(16),
+																},
 															},
 															"transformers": schema.ListAttribute{
-																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(9),
+																},
 															},
 														},
 													},
@@ -5618,12 +5775,18 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"base_path": schema.StringAttribute{
-											MarkdownDescription: "The base path which this validation applies to.",
+											MarkdownDescription: "Exclusive with [any_url api_endpoint api_groups] The base path which this validation applies to.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 										"specific_domain": schema.StringAttribute{
-											MarkdownDescription: "The rule will apply for a specific domain. For",
+											MarkdownDescription: "Exclusive with [any_domain] The rule will apply for a specific domain. For",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -5640,10 +5803,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] Methods. Methods to be matched. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(16),
+													},
 												},
 												"path": schema.StringAttribute{
 													MarkdownDescription: "Path. Path to be matched .",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+													},
 												},
 											},
 										},
@@ -5654,6 +5823,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "API Groups. .",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(32),
+													},
 												},
 											},
 										},
@@ -5674,6 +5846,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer.",
 															Optional:            true,
 															ElementType:         types.Int64Type,
+															Validators: []validator.List{
+																listvalidator.SizeBetween(1, 16),
+															},
 														},
 													},
 												},
@@ -5696,6 +5871,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																	"name": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																		},
 																	},
 																	"namespace": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -5703,6 +5882,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		Computed:            true,
 																		PlanModifiers: []planmodifier.String{
 																			stringplanmodifier.UseStateForUnknown(),
+																		},
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																		},
 																	},
 																	"tenant": schema.StringAttribute{
@@ -5727,12 +5910,15 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													},
 												},
 												"client_selector": schema.SingleNestedBlock{
-													MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+													MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 													Attributes: map[string]schema.Attribute{
 														"expressions": schema.ListAttribute{
 															MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(1),
+															},
 														},
 													},
 												},
@@ -5760,6 +5946,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																	"name": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																		},
 																	},
 																	"namespace": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -5767,6 +5957,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		Computed:            true,
 																		PlanModifiers: []planmodifier.String{
 																			stringplanmodifier.UseStateForUnknown(),
+																		},
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																		},
 																	},
 																	"tenant": schema.StringAttribute{
@@ -5801,6 +5995,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "IPv4 Prefix List. List of IPv4 prefix strings.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(128),
+															},
 														},
 													},
 												},
@@ -5811,33 +6008,45 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "[Enum: SPAM_SOURCES|WINDOWS_EXPLOITS|WEB_ATTACKS|BOTNETS|SCANNERS|REPUTATION|PHISHING|PROXY|MOBILE_THREATS|TOR_PROXY|DENIAL_OF_SERVICE|NETWORK] The IP threat categories is obtained from the list and is used to auto-generate equivalent label selection expressions . Possible values are `SPAM_SOURCES`, `WINDOWS_EXPLOITS`, `WEB_ATTACKS`, `BOTNETS`, `SCANNERS`, `REPUTATION`, `PHISHING`, `PROXY`, `MOBILE_THREATS`, `TOR_PROXY`, `DENIAL_OF_SERVICE`, `NETWORK`. Defaults to `SPAM_SOURCES`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(32),
+															},
 														},
 													},
 												},
 												"tls_fingerprint_matcher": schema.SingleNestedBlock{
-													MarkdownDescription: "TLS fingerprint matcher specifies multiple criteria for matching a TLS fingerprint. The set of supported positve match criteria includes a list of known classes of TLS fingerprints and a list of exact values. The match is considered successful if either of these positive criteria are satisfied..",
+													MarkdownDescription: "TLS fingerprint matcher specifies multiple criteria for matching a TLS fingerprint. The set of supported positive match criteria includes a list of known classes of TLS fingerprints and a list of exact values. The match is considered successful if either of these positive criteria are satisfied..",
 													Attributes: map[string]schema.Attribute{
 														"classes": schema.ListAttribute{
 															MarkdownDescription: "[Enum: TLS_FINGERPRINT_NONE|ANY_MALICIOUS_FINGERPRINT|ADWARE|ADWIND|DRIDEX|GOOTKIT|GOZI|JBIFROST|QUAKBOT|RANSOMWARE|TROLDESH|TOFSEE|TORRENTLOCKER|TRICKBOT] List of known classes of TLS fingerprints to match the input TLS JA3 fingerprint against. Possible values are `TLS_FINGERPRINT_NONE`, `ANY_MALICIOUS_FINGERPRINT`, `ADWARE`, `ADWIND`, `DRIDEX`, `GOOTKIT`, `GOZI`, `JBIFROST`, `QUAKBOT`, `RANSOMWARE`, `TROLDESH`, `TOFSEE`, `TORRENTLOCKER`, `TRICKBOT`. Defaults to `TLS_FINGERPRINT_NONE`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(16),
+															},
 														},
 														"exact_values": schema.ListAttribute{
 															MarkdownDescription: "List of exact TLS JA3 fingerprints to match the input TLS JA3 fingerprint against.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(16),
+															},
 														},
 														"excluded_values": schema.ListAttribute{
 															MarkdownDescription: "List of TLS JA3 fingerprints to be excluded when matching the input TLS JA3 fingerprint. This can be used to skip known false positives when using one or more known TLS fingerprint classes in the enclosing matcher.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(32),
+															},
 														},
 													},
 												},
 											},
 										},
 										"request_matcher": schema.SingleNestedBlock{
-											MarkdownDescription: "Request Matcher. Request conditions for matching a rule.",
+											MarkdownDescription: "Configuration parameter for request matcher.",
 											Attributes:          map[string]schema.Attribute{},
 											Blocks: map[string]schema.Block{
 												"cookie_matchers": schema.ListNestedBlock{
@@ -5851,14 +6060,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"name": schema.StringAttribute{
 																MarkdownDescription: "Case-sensitive cookie name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 256),
+																},
 															},
 														},
 														Blocks: map[string]schema.Block{
 															"check_not_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check not present.",
 															},
 															"check_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check present.",
 															},
 															"item": schema.SingleNestedBlock{
 																MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -5867,16 +6079,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		MarkdownDescription: "List of exact values to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(64),
+																		},
 																	},
 																	"regex_values": schema.ListAttribute{
 																		MarkdownDescription: "List of regular expressions to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(16),
+																		},
 																	},
 																	"transformers": schema.ListAttribute{
-																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(9),
+																		},
 																	},
 																},
 															},
@@ -5894,14 +6115,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"name": schema.StringAttribute{
 																MarkdownDescription: "Case-insensitive HTTP header name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 256),
+																},
 															},
 														},
 														Blocks: map[string]schema.Block{
 															"check_not_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check not present.",
 															},
 															"check_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check present.",
 															},
 															"item": schema.SingleNestedBlock{
 																MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -5910,16 +6134,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		MarkdownDescription: "List of exact values to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(64),
+																		},
 																	},
 																	"regex_values": schema.ListAttribute{
 																		MarkdownDescription: "List of regular expressions to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(16),
+																		},
 																	},
 																	"transformers": schema.ListAttribute{
-																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(9),
+																		},
 																	},
 																},
 															},
@@ -5937,14 +6170,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"name": schema.StringAttribute{
 																MarkdownDescription: "JWT Claim Name. JWT claim name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 256),
+																},
 															},
 														},
 														Blocks: map[string]schema.Block{
 															"check_not_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check not present.",
 															},
 															"check_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check present.",
 															},
 															"item": schema.SingleNestedBlock{
 																MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -5953,16 +6189,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		MarkdownDescription: "List of exact values to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(64),
+																		},
 																	},
 																	"regex_values": schema.ListAttribute{
 																		MarkdownDescription: "List of regular expressions to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(16),
+																		},
 																	},
 																	"transformers": schema.ListAttribute{
-																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(9),
+																		},
 																	},
 																},
 															},
@@ -5980,14 +6225,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"key": schema.StringAttribute{
 																MarkdownDescription: "Case-sensitive HTTP query parameter name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(256),
+																},
 															},
 														},
 														Blocks: map[string]schema.Block{
 															"check_not_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check not present.",
 															},
 															"check_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check present.",
 															},
 															"item": schema.SingleNestedBlock{
 																MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -5996,16 +6244,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		MarkdownDescription: "List of exact values to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(64),
+																		},
 																	},
 																	"regex_values": schema.ListAttribute{
 																		MarkdownDescription: "List of regular expressions to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(16),
+																		},
 																	},
 																	"transformers": schema.ListAttribute{
-																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(9),
+																		},
 																	},
 																},
 															},
@@ -6030,6 +6287,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -6038,6 +6298,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -6045,6 +6308,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -6059,6 +6325,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(128),
+								},
 							},
 						},
 					},
@@ -6072,14 +6341,23 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"api_group": schema.StringAttribute{
 									MarkdownDescription: "API groups derived from API Definition swaggers. For example oas-all-operations including all paths and methods from the swaggers, oas-base-URLs covering all requests under base-paths from the swaggers. Custom groups can be created if user tags paths or operations with 'x-F5 Distributed..",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(128),
+									},
 								},
 								"base_path": schema.StringAttribute{
 									MarkdownDescription: "Prefix of the request path.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(128),
+									},
 								},
 								"specific_domain": schema.StringAttribute{
-									MarkdownDescription: "The rule will apply for a specific domain.",
+									MarkdownDescription: "Exclusive with [any_domain] The rule will apply for a specific domain.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(128),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -6103,6 +6381,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer.",
 													Optional:            true,
 													ElementType:         types.Int64Type,
+													Validators: []validator.List{
+														listvalidator.SizeBetween(1, 16),
+													},
 												},
 											},
 										},
@@ -6125,6 +6406,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"name": schema.StringAttribute{
 																MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 1024),
+																	stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																},
 															},
 															"namespace": schema.StringAttribute{
 																MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -6132,6 +6417,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																Computed:            true,
 																PlanModifiers: []planmodifier.String{
 																	stringplanmodifier.UseStateForUnknown(),
+																},
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 1024),
+																	stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																},
 															},
 															"tenant": schema.StringAttribute{
@@ -6156,12 +6445,15 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											},
 										},
 										"client_selector": schema.SingleNestedBlock{
-											MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+											MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 											Attributes: map[string]schema.Attribute{
 												"expressions": schema.ListAttribute{
 													MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(1),
+													},
 												},
 											},
 										},
@@ -6189,6 +6481,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"name": schema.StringAttribute{
 																MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 1024),
+																	stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																},
 															},
 															"namespace": schema.StringAttribute{
 																MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -6196,6 +6492,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																Computed:            true,
 																PlanModifiers: []planmodifier.String{
 																	stringplanmodifier.UseStateForUnknown(),
+																},
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 1024),
+																	stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																},
 															},
 															"tenant": schema.StringAttribute{
@@ -6230,6 +6530,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "IPv4 Prefix List. List of IPv4 prefix strings.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(128),
+													},
 												},
 											},
 										},
@@ -6240,33 +6543,45 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "[Enum: SPAM_SOURCES|WINDOWS_EXPLOITS|WEB_ATTACKS|BOTNETS|SCANNERS|REPUTATION|PHISHING|PROXY|MOBILE_THREATS|TOR_PROXY|DENIAL_OF_SERVICE|NETWORK] The IP threat categories is obtained from the list and is used to auto-generate equivalent label selection expressions . Possible values are `SPAM_SOURCES`, `WINDOWS_EXPLOITS`, `WEB_ATTACKS`, `BOTNETS`, `SCANNERS`, `REPUTATION`, `PHISHING`, `PROXY`, `MOBILE_THREATS`, `TOR_PROXY`, `DENIAL_OF_SERVICE`, `NETWORK`. Defaults to `SPAM_SOURCES`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(32),
+													},
 												},
 											},
 										},
 										"tls_fingerprint_matcher": schema.SingleNestedBlock{
-											MarkdownDescription: "TLS fingerprint matcher specifies multiple criteria for matching a TLS fingerprint. The set of supported positve match criteria includes a list of known classes of TLS fingerprints and a list of exact values. The match is considered successful if either of these positive criteria are satisfied..",
+											MarkdownDescription: "TLS fingerprint matcher specifies multiple criteria for matching a TLS fingerprint. The set of supported positive match criteria includes a list of known classes of TLS fingerprints and a list of exact values. The match is considered successful if either of these positive criteria are satisfied..",
 											Attributes: map[string]schema.Attribute{
 												"classes": schema.ListAttribute{
 													MarkdownDescription: "[Enum: TLS_FINGERPRINT_NONE|ANY_MALICIOUS_FINGERPRINT|ADWARE|ADWIND|DRIDEX|GOOTKIT|GOZI|JBIFROST|QUAKBOT|RANSOMWARE|TROLDESH|TOFSEE|TORRENTLOCKER|TRICKBOT] List of known classes of TLS fingerprints to match the input TLS JA3 fingerprint against. Possible values are `TLS_FINGERPRINT_NONE`, `ANY_MALICIOUS_FINGERPRINT`, `ADWARE`, `ADWIND`, `DRIDEX`, `GOOTKIT`, `GOZI`, `JBIFROST`, `QUAKBOT`, `RANSOMWARE`, `TROLDESH`, `TOFSEE`, `TORRENTLOCKER`, `TRICKBOT`. Defaults to `TLS_FINGERPRINT_NONE`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(16),
+													},
 												},
 												"exact_values": schema.ListAttribute{
 													MarkdownDescription: "List of exact TLS JA3 fingerprints to match the input TLS JA3 fingerprint against.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(16),
+													},
 												},
 												"excluded_values": schema.ListAttribute{
 													MarkdownDescription: "List of TLS JA3 fingerprints to be excluded when matching the input TLS JA3 fingerprint. This can be used to skip known false positives when using one or more known TLS fingerprint classes in the enclosing matcher.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(32),
+													},
 												},
 											},
 										},
 									},
 								},
 								"inline_rate_limiter": schema.SingleNestedBlock{
-									MarkdownDescription: "InlineRateLimiter.",
+									MarkdownDescription: "Configuration parameter for inline rate limiter.",
 									Attributes: map[string]schema.Attribute{
 										"threshold": schema.Int64Attribute{
 											MarkdownDescription: "The total number of allowed requests for 1 unit (e.g. SECOND/MINUTE/HOUR etc.) of the specified period.",
@@ -6275,6 +6590,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"unit": schema.StringAttribute{
 											MarkdownDescription: "[Enum: SECOND|MINUTE|HOUR] Unit for the period per which the rate limit is applied. - SECOND: Second Rate limit period unit is seconds - MINUTE: Minute Rate limit period unit is minutes - HOUR: Hour Rate limit period unit is hours - DAY: Day Rate limit period unit is days. Possible values are `SECOND`, `MINUTE`, `HOUR`. Defaults to `SECOND`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("SECOND", "MINUTE", "HOUR"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -6284,6 +6602,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -6292,6 +6613,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -6299,6 +6623,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -6314,6 +6641,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -6321,6 +6651,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -6330,11 +6663,14 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 									},
 								},
 								"request_matcher": schema.SingleNestedBlock{
-									MarkdownDescription: "Request Matcher. Request conditions for matching a rule.",
+									MarkdownDescription: "Configuration parameter for request matcher.",
 									Attributes:          map[string]schema.Attribute{},
 									Blocks: map[string]schema.Block{
 										"cookie_matchers": schema.ListNestedBlock{
@@ -6348,14 +6684,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "Case-sensitive cookie name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"check_not_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check not present.",
 													},
 													"check_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check present.",
 													},
 													"item": schema.SingleNestedBlock{
 														MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -6364,16 +6703,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																MarkdownDescription: "List of exact values to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(64),
+																},
 															},
 															"regex_values": schema.ListAttribute{
 																MarkdownDescription: "List of regular expressions to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(16),
+																},
 															},
 															"transformers": schema.ListAttribute{
-																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(9),
+																},
 															},
 														},
 													},
@@ -6391,14 +6739,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "Case-insensitive HTTP header name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"check_not_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check not present.",
 													},
 													"check_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check present.",
 													},
 													"item": schema.SingleNestedBlock{
 														MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -6407,16 +6758,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																MarkdownDescription: "List of exact values to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(64),
+																},
 															},
 															"regex_values": schema.ListAttribute{
 																MarkdownDescription: "List of regular expressions to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(16),
+																},
 															},
 															"transformers": schema.ListAttribute{
-																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(9),
+																},
 															},
 														},
 													},
@@ -6434,14 +6794,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "JWT Claim Name. JWT claim name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"check_not_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check not present.",
 													},
 													"check_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check present.",
 													},
 													"item": schema.SingleNestedBlock{
 														MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -6450,16 +6813,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																MarkdownDescription: "List of exact values to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(64),
+																},
 															},
 															"regex_values": schema.ListAttribute{
 																MarkdownDescription: "List of regular expressions to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(16),
+																},
 															},
 															"transformers": schema.ListAttribute{
-																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(9),
+																},
 															},
 														},
 													},
@@ -6477,14 +6849,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"key": schema.StringAttribute{
 														MarkdownDescription: "Case-sensitive HTTP query parameter name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"check_not_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check not present.",
 													},
 													"check_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check present.",
 													},
 													"item": schema.SingleNestedBlock{
 														MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -6493,16 +6868,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																MarkdownDescription: "List of exact values to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(64),
+																},
 															},
 															"regex_values": schema.ListAttribute{
 																MarkdownDescription: "List of regular expressions to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(16),
+																},
 															},
 															"transformers": schema.ListAttribute{
-																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(9),
+																},
 															},
 														},
 													},
@@ -6526,6 +6910,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -6534,6 +6921,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -6541,6 +6931,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -6554,10 +6947,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								Attributes:          map[string]schema.Attribute{},
 								Blocks: map[string]schema.Block{
 									"fall_through_mode_allow": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for fall through mode allow.",
 									},
 									"fall_through_mode_custom": schema.SingleNestedBlock{
-										MarkdownDescription: "Custom Fall Through Mode. Define the fall through settings.",
+										MarkdownDescription: "Configuration parameter for fall through mode custom.",
 										Attributes:          map[string]schema.Attribute{},
 										Blocks: map[string]schema.Block{
 											"open_api_validation_rules": schema.ListNestedBlock{
@@ -6565,12 +6958,18 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												NestedObject: schema.NestedBlockObject{
 													Attributes: map[string]schema.Attribute{
 														"api_group": schema.StringAttribute{
-															MarkdownDescription: "The API group which this validation applies to.",
+															MarkdownDescription: "Exclusive with [api_endpoint base_path] The API group which this validation applies to.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(128),
+															},
 														},
 														"base_path": schema.StringAttribute{
-															MarkdownDescription: "The base path which this validation applies to.",
+															MarkdownDescription: "Exclusive with [api_endpoint api_group] The base path which this validation applies to.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(128),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -6590,10 +6989,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																	MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] Methods. Methods to be matched. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 																	Optional:            true,
 																	ElementType:         types.StringType,
+																	Validators: []validator.List{
+																		listvalidator.SizeAtMost(16),
+																	},
 																},
 																"path": schema.StringAttribute{
 																	MarkdownDescription: "Path. Path to be matched .",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 1024),
+																	},
 																},
 															},
 														},
@@ -6603,10 +7008,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																"description_spec": schema.StringAttribute{
 																	MarkdownDescription: "Description. Human readable description.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(256),
+																	},
 																},
 																"name": schema.StringAttribute{
 																	MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 1024),
+																	},
 																},
 															},
 														},
@@ -6628,7 +7039,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										MarkdownDescription: "Enable this option",
 									},
 									"property_validation_settings_custom": schema.SingleNestedBlock{
-										MarkdownDescription: "Validation Property Settings. Custom property validation settings.",
+										MarkdownDescription: "Configuration parameter for property validation settings custom.",
 										Attributes:          map[string]schema.Attribute{},
 										Blocks: map[string]schema.Block{
 											"query_parameters": schema.SingleNestedBlock{
@@ -6636,17 +7047,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												Attributes:          map[string]schema.Attribute{},
 												Blocks: map[string]schema.Block{
 													"allow_additional_parameters": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for allow additional parameters.",
 													},
 													"disallow_additional_parameters": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for disallow additional parameters.",
 													},
 												},
 											},
 										},
 									},
 									"property_validation_settings_default": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for property validation settings default.",
 									},
 								},
 							},
@@ -6661,6 +7072,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												MarkdownDescription: "[Enum: PROPERTY_QUERY_PARAMETERS|PROPERTY_PATH_PARAMETERS|PROPERTY_CONTENT_TYPE|PROPERTY_COOKIE_PARAMETERS|PROPERTY_HTTP_HEADERS|PROPERTY_HTTP_BODY|PROPERTY_SECURITY_SCHEMA|PROPERTY_RESPONSE_CODE] List of properties of the response to validate according to the OpenAPI specification file (a.k.a. Swagger) . Possible values are `PROPERTY_QUERY_PARAMETERS`, `PROPERTY_PATH_PARAMETERS`, `PROPERTY_CONTENT_TYPE`, `PROPERTY_COOKIE_PARAMETERS`, `PROPERTY_HTTP_HEADERS`, `PROPERTY_HTTP_BODY`, `PROPERTY_SECURITY_SCHEMA`, `PROPERTY_RESPONSE_CODE`. Defaults to `PROPERTY_QUERY_PARAMETERS`.",
 												Optional:            true,
 												ElementType:         types.StringType,
+												Validators: []validator.List{
+													listvalidator.SizeAtLeast(1),
+												},
 											},
 										},
 										Blocks: map[string]schema.Block{
@@ -6685,6 +7099,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												MarkdownDescription: "[Enum: PROPERTY_QUERY_PARAMETERS|PROPERTY_PATH_PARAMETERS|PROPERTY_CONTENT_TYPE|PROPERTY_COOKIE_PARAMETERS|PROPERTY_HTTP_HEADERS|PROPERTY_HTTP_BODY|PROPERTY_SECURITY_SCHEMA|PROPERTY_RESPONSE_CODE] List of properties of the request to validate according to the OpenAPI specification file (a.k.a. Swagger) . Possible values are `PROPERTY_QUERY_PARAMETERS`, `PROPERTY_PATH_PARAMETERS`, `PROPERTY_CONTENT_TYPE`, `PROPERTY_COOKIE_PARAMETERS`, `PROPERTY_HTTP_HEADERS`, `PROPERTY_HTTP_BODY`, `PROPERTY_SECURITY_SCHEMA`, `PROPERTY_RESPONSE_CODE`. Defaults to `PROPERTY_QUERY_PARAMETERS`.",
 												Optional:            true,
 												ElementType:         types.StringType,
+												Validators: []validator.List{
+													listvalidator.SizeAtLeast(1),
+												},
 											},
 										},
 										Blocks: map[string]schema.Block{
@@ -6709,10 +7126,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								Attributes:          map[string]schema.Attribute{},
 								Blocks: map[string]schema.Block{
 									"fall_through_mode_allow": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for fall through mode allow.",
 									},
 									"fall_through_mode_custom": schema.SingleNestedBlock{
-										MarkdownDescription: "Custom Fall Through Mode. Define the fall through settings.",
+										MarkdownDescription: "Configuration parameter for fall through mode custom.",
 										Attributes:          map[string]schema.Attribute{},
 										Blocks: map[string]schema.Block{
 											"open_api_validation_rules": schema.ListNestedBlock{
@@ -6720,12 +7137,18 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												NestedObject: schema.NestedBlockObject{
 													Attributes: map[string]schema.Attribute{
 														"api_group": schema.StringAttribute{
-															MarkdownDescription: "The API group which this validation applies to.",
+															MarkdownDescription: "Exclusive with [api_endpoint base_path] The API group which this validation applies to.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(128),
+															},
 														},
 														"base_path": schema.StringAttribute{
-															MarkdownDescription: "The base path which this validation applies to.",
+															MarkdownDescription: "Exclusive with [api_endpoint api_group] The base path which this validation applies to.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(128),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -6745,10 +7168,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																	MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] Methods. Methods to be matched. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 																	Optional:            true,
 																	ElementType:         types.StringType,
+																	Validators: []validator.List{
+																		listvalidator.SizeAtMost(16),
+																	},
 																},
 																"path": schema.StringAttribute{
 																	MarkdownDescription: "Path. Path to be matched .",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 1024),
+																	},
 																},
 															},
 														},
@@ -6758,10 +7187,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																"description_spec": schema.StringAttribute{
 																	MarkdownDescription: "Description. Human readable description.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(256),
+																	},
 																},
 																"name": schema.StringAttribute{
 																	MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 1024),
+																	},
 																},
 															},
 														},
@@ -6777,16 +7212,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"api_group": schema.StringAttribute{
-											MarkdownDescription: "The API group which this validation applies to.",
+											MarkdownDescription: "Exclusive with [api_endpoint base_path] The API group which this validation applies to.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 										"base_path": schema.StringAttribute{
-											MarkdownDescription: "The base path which this validation applies to.",
+											MarkdownDescription: "Exclusive with [api_endpoint api_group] The base path which this validation applies to.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 										"specific_domain": schema.StringAttribute{
-											MarkdownDescription: "The rule will apply for a specific domain.",
+											MarkdownDescription: "Exclusive with [any_domain] The rule will apply for a specific domain.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -6800,10 +7244,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] Methods. Methods to be matched. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(16),
+													},
 												},
 												"path": schema.StringAttribute{
 													MarkdownDescription: "Path. Path to be matched .",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+													},
 												},
 											},
 										},
@@ -6813,10 +7263,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"description_spec": schema.StringAttribute{
 													MarkdownDescription: "Description. Human readable description.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"name": schema.StringAttribute{
 													MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+													},
 												},
 											},
 										},
@@ -6831,6 +7287,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "[Enum: PROPERTY_QUERY_PARAMETERS|PROPERTY_PATH_PARAMETERS|PROPERTY_CONTENT_TYPE|PROPERTY_COOKIE_PARAMETERS|PROPERTY_HTTP_HEADERS|PROPERTY_HTTP_BODY|PROPERTY_SECURITY_SCHEMA|PROPERTY_RESPONSE_CODE] List of properties of the response to validate according to the OpenAPI specification file (a.k.a. Swagger) . Possible values are `PROPERTY_QUERY_PARAMETERS`, `PROPERTY_PATH_PARAMETERS`, `PROPERTY_CONTENT_TYPE`, `PROPERTY_COOKIE_PARAMETERS`, `PROPERTY_HTTP_HEADERS`, `PROPERTY_HTTP_BODY`, `PROPERTY_SECURITY_SCHEMA`, `PROPERTY_RESPONSE_CODE`. Defaults to `PROPERTY_QUERY_PARAMETERS`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtLeast(1),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -6855,6 +7314,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "[Enum: PROPERTY_QUERY_PARAMETERS|PROPERTY_PATH_PARAMETERS|PROPERTY_CONTENT_TYPE|PROPERTY_COOKIE_PARAMETERS|PROPERTY_HTTP_HEADERS|PROPERTY_HTTP_BODY|PROPERTY_SECURITY_SCHEMA|PROPERTY_RESPONSE_CODE] List of properties of the request to validate according to the OpenAPI specification file (a.k.a. Swagger) . Possible values are `PROPERTY_QUERY_PARAMETERS`, `PROPERTY_PATH_PARAMETERS`, `PROPERTY_CONTENT_TYPE`, `PROPERTY_COOKIE_PARAMETERS`, `PROPERTY_HTTP_HEADERS`, `PROPERTY_HTTP_BODY`, `PROPERTY_SECURITY_SCHEMA`, `PROPERTY_RESPONSE_CODE`. Defaults to `PROPERTY_QUERY_PARAMETERS`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtLeast(1),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -6882,7 +7344,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										MarkdownDescription: "Enable this option",
 									},
 									"property_validation_settings_custom": schema.SingleNestedBlock{
-										MarkdownDescription: "Validation Property Settings. Custom property validation settings.",
+										MarkdownDescription: "Configuration parameter for property validation settings custom.",
 										Attributes:          map[string]schema.Attribute{},
 										Blocks: map[string]schema.Block{
 											"query_parameters": schema.SingleNestedBlock{
@@ -6890,17 +7352,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												Attributes:          map[string]schema.Attribute{},
 												Blocks: map[string]schema.Block{
 													"allow_additional_parameters": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for allow additional parameters.",
 													},
 													"disallow_additional_parameters": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for disallow additional parameters.",
 													},
 												},
 											},
 										},
 									},
 									"property_validation_settings_default": schema.SingleNestedBlock{
-										MarkdownDescription: "Enable this option",
+										MarkdownDescription: "Configuration parameter for property validation settings default.",
 									},
 								},
 							},
@@ -6917,6 +7379,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -6925,6 +7390,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"tenant": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -6932,6 +7400,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
 						},
 					},
 				},
@@ -6944,9 +7415,12 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							MarkdownDescription: "[Enum: SKIP_PROCESSING_WAF|SKIP_PROCESSING_BOT|SKIP_PROCESSING_MUM|SKIP_PROCESSING_IP_REPUTATION|SKIP_PROCESSING_API_PROTECTION|SKIP_PROCESSING_OAS_VALIDATION|SKIP_PROCESSING_DDOS_PROTECTION|SKIP_PROCESSING_THREAT_MESH|SKIP_PROCESSING_MALWARE_PROTECTION] Actions that should be taken when client identifier matches the rule. Possible values are `SKIP_PROCESSING_WAF`, `SKIP_PROCESSING_BOT`, `SKIP_PROCESSING_MUM`, `SKIP_PROCESSING_IP_REPUTATION`, `SKIP_PROCESSING_API_PROTECTION`, `SKIP_PROCESSING_OAS_VALIDATION`, `SKIP_PROCESSING_DDOS_PROTECTION`, `SKIP_PROCESSING_THREAT_MESH`, `SKIP_PROCESSING_MALWARE_PROTECTION`. Defaults to `SKIP_PROCESSING_WAF`.",
 							Optional:            true,
 							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.SizeAtMost(10),
+							},
 						},
 						"as_number": schema.Int64Attribute{
-							MarkdownDescription: "RFC 6793 defined 4-byte AS number.",
+							MarkdownDescription: "Exclusive with [http_header ip_prefix ipv6_prefix user_identifier] RFC 6793 defined 4-byte AS number.",
 							Optional:            true,
 						},
 						"expiration_timestamp": schema.StringAttribute{
@@ -6954,16 +7428,19 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							Optional:            true,
 						},
 						"ip_prefix": schema.StringAttribute{
-							MarkdownDescription: "IPv4 prefix string.",
+							MarkdownDescription: "Exclusive with [as_number http_header ipv6_prefix user_identifier] IPv4 prefix string.",
 							Optional:            true,
 						},
 						"ipv6_prefix": schema.StringAttribute{
-							MarkdownDescription: "IPv6 prefix string.",
+							MarkdownDescription: "Exclusive with [as_number http_header ip_prefix user_identifier] IPv6 prefix string.",
 							Optional:            true,
 						},
 						"user_identifier": schema.StringAttribute{
-							MarkdownDescription: "Identify user based on user identifier. User identifier value needs to be copied from security event.",
+							MarkdownDescription: "Exclusive with [as_number http_header ip_prefix ipv6_prefix] Identify user based on user identifier. User identifier value needs to be copied from security event.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -6971,7 +7448,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							MarkdownDescription: "Enable this option",
 						},
 						"http_header": schema.SingleNestedBlock{
-							MarkdownDescription: "HTTP Header. Request header name and value pairs.",
+							MarkdownDescription: "Configuration parameter for http header.",
 							Attributes:          map[string]schema.Attribute{},
 							Blocks: map[string]schema.Block{
 								"headers": schema.ListNestedBlock{
@@ -6979,8 +7456,11 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									NestedObject: schema.NestedBlockObject{
 										Attributes: map[string]schema.Attribute{
 											"exact": schema.StringAttribute{
-												MarkdownDescription: "Header value to match exactly.",
+												MarkdownDescription: "Exclusive with [presence regex] Header value to match exactly.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(256),
+												},
 											},
 											"invert_match": schema.BoolAttribute{
 												MarkdownDescription: "Invert the result of the match to detect missing header or non-matching value.",
@@ -6989,14 +7469,20 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											"name": schema.StringAttribute{
 												MarkdownDescription: "Name. Name of the header .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 256),
+												},
 											},
 											"presence": schema.BoolAttribute{
-												MarkdownDescription: "If true, check for presence of header.",
+												MarkdownDescription: "Exclusive with [exact regex] If true, check for presence of header.",
 												Optional:            true,
 											},
 											"regex": schema.StringAttribute{
-												MarkdownDescription: "Regex match of the header value in re2 format.",
+												MarkdownDescription: "Exclusive with [exact presence] Regex match of the header value in re2 format.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 256),
+												},
 											},
 										},
 									},
@@ -7009,10 +7495,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"description_spec": schema.StringAttribute{
 									MarkdownDescription: "Description. Human readable description.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+									},
 								},
 							},
 						},
@@ -7031,6 +7523,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 					"regional_endpoint": schema.StringAttribute{
 						MarkdownDescription: "[Enum: AUTO|US|EU|ASIA] Defines a selection for Bot Defense region - AUTO: AUTO Automatic selection based on client IP address - US: US US region - EU: EU European Union region - ASIA: ASIA Asia region. Possible values are `AUTO`, `US`, `EU`, `ASIA`. Defaults to `AUTO`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("AUTO", "US", "EU", "ASIA"),
+						},
 					},
 					"timeout": schema.Int64Attribute{
 						MarkdownDescription: "The timeout for the inference check, in milliseconds.",
@@ -7050,6 +7545,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"javascript_mode": schema.StringAttribute{
 								MarkdownDescription: "[Enum: ASYNC_JS_NO_CACHING|ASYNC_JS_CACHING|SYNC_JS_NO_CACHING|SYNC_JS_CACHING] Web Client JavaScript Mode. Bot Defense JavaScript for telemetry collection is requested asynchronously, and it is non-cacheable Bot Defense JavaScript for telemetry collection is requested asynchronously, and it is cacheable Bot Defense JavaScript for telemetry collection is requested.. Possible values are `ASYNC_JS_NO_CACHING`, `ASYNC_JS_CACHING`, `SYNC_JS_NO_CACHING`, `SYNC_JS_CACHING`. Defaults to `ASYNC_JS_NO_CACHING`.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.OneOf("ASYNC_JS_NO_CACHING", "ASYNC_JS_CACHING", "SYNC_JS_NO_CACHING", "SYNC_JS_CACHING"),
+								},
 							},
 							"js_download_path": schema.StringAttribute{
 								MarkdownDescription: "Customize Bot Defense Client JavaScript path. If not specified, default",
@@ -7058,7 +7556,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						},
 						Blocks: map[string]schema.Block{
 							"disable_js_insert": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable js insert.",
 							},
 							"disable_mobile_sdk": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -7069,6 +7567,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									"javascript_location": schema.StringAttribute{
 										MarkdownDescription: "[Enum: AFTER_HEAD|AFTER_TITLE_END|BEFORE_SCRIPT] All inside networks. Insert JavaScript after <HEAD> tag Insert JavaScript after </title> tag. Insert JavaScript before first &lt;script> tag. Possible values are `AFTER_HEAD`, `AFTER_TITLE_END`, `BEFORE_SCRIPT`. Defaults to `AFTER_HEAD`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("AFTER_HEAD", "AFTER_TITLE_END", "BEFORE_SCRIPT"),
+										},
 									},
 								},
 							},
@@ -7078,6 +7579,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									"javascript_location": schema.StringAttribute{
 										MarkdownDescription: "[Enum: AFTER_HEAD|AFTER_TITLE_END|BEFORE_SCRIPT] All inside networks. Insert JavaScript after <HEAD> tag Insert JavaScript after </title> tag. Insert JavaScript before first &lt;script> tag. Possible values are `AFTER_HEAD`, `AFTER_TITLE_END`, `BEFORE_SCRIPT`. Defaults to `AFTER_HEAD`.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("AFTER_HEAD", "AFTER_TITLE_END", "BEFORE_SCRIPT"),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -7090,19 +7594,28 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Enable this option",
 												},
 												"domain": schema.SingleNestedBlock{
-													MarkdownDescription: "Domains. Domains names.",
+													MarkdownDescription: "Domain name for routing and identification.",
 													Attributes: map[string]schema.Attribute{
 														"exact_value": schema.StringAttribute{
-															MarkdownDescription: "Exact domain name.",
+															MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"regex_value": schema.StringAttribute{
-															MarkdownDescription: "Regular Expression value for the domain name.",
+															MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"suffix_value": schema.StringAttribute{
-															MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+															MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7112,10 +7625,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"description_spec": schema.StringAttribute{
 															MarkdownDescription: "Description. Human readable description.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"name": schema.StringAttribute{
 															MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+															},
 														},
 													},
 												},
@@ -7123,16 +7642,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Path match of the URI can be either be, Prefix match or exact match or regular expression match.",
 													Attributes: map[string]schema.Attribute{
 														"path": schema.StringAttribute{
-															MarkdownDescription: "Exact path value to match.",
+															MarkdownDescription: "Exclusive with [prefix regex] Exact path value to match.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"prefix": schema.StringAttribute{
-															MarkdownDescription: "Path prefix to match (e.g. The value / will match on all paths)",
+															MarkdownDescription: "Exclusive with [path regex] Path prefix to match (e.g. The value / will match on all paths)",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"regex": schema.StringAttribute{
-															MarkdownDescription: "Regular expression of path match (e.g. The value .* will match on all paths).",
+															MarkdownDescription: "Exclusive with [path prefix] Regular expression of path match (e.g. The value .* will match on all paths).",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7154,19 +7682,28 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Enable this option",
 												},
 												"domain": schema.SingleNestedBlock{
-													MarkdownDescription: "Domains. Domains names.",
+													MarkdownDescription: "Domain name for routing and identification.",
 													Attributes: map[string]schema.Attribute{
 														"exact_value": schema.StringAttribute{
-															MarkdownDescription: "Exact domain name.",
+															MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"regex_value": schema.StringAttribute{
-															MarkdownDescription: "Regular Expression value for the domain name.",
+															MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"suffix_value": schema.StringAttribute{
-															MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+															MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7176,10 +7713,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"description_spec": schema.StringAttribute{
 															MarkdownDescription: "Description. Human readable description.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"name": schema.StringAttribute{
 															MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+															},
 														},
 													},
 												},
@@ -7187,16 +7730,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Path match of the URI can be either be, Prefix match or exact match or regular expression match.",
 													Attributes: map[string]schema.Attribute{
 														"path": schema.StringAttribute{
-															MarkdownDescription: "Exact path value to match.",
+															MarkdownDescription: "Exclusive with [prefix regex] Exact path value to match.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"prefix": schema.StringAttribute{
-															MarkdownDescription: "Path prefix to match (e.g. The value / will match on all paths)",
+															MarkdownDescription: "Exclusive with [path regex] Path prefix to match (e.g. The value / will match on all paths)",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"regex": schema.StringAttribute{
-															MarkdownDescription: "Regular expression of path match (e.g. The value .* will match on all paths).",
+															MarkdownDescription: "Exclusive with [path prefix] Regular expression of path match (e.g. The value .* will match on all paths).",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7210,6 +7762,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"javascript_location": schema.StringAttribute{
 													MarkdownDescription: "[Enum: AFTER_HEAD|AFTER_TITLE_END|BEFORE_SCRIPT] All inside networks. Insert JavaScript after <HEAD> tag Insert JavaScript after </title> tag. Insert JavaScript before first &lt;script> tag. Possible values are `AFTER_HEAD`, `AFTER_TITLE_END`, `BEFORE_SCRIPT`. Defaults to `AFTER_HEAD`.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.OneOf("AFTER_HEAD", "AFTER_TITLE_END", "BEFORE_SCRIPT"),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
@@ -7217,19 +7772,28 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Enable this option",
 												},
 												"domain": schema.SingleNestedBlock{
-													MarkdownDescription: "Domains. Domains names.",
+													MarkdownDescription: "Domain name for routing and identification.",
 													Attributes: map[string]schema.Attribute{
 														"exact_value": schema.StringAttribute{
-															MarkdownDescription: "Exact domain name.",
+															MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"regex_value": schema.StringAttribute{
-															MarkdownDescription: "Regular Expression value for the domain name.",
+															MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"suffix_value": schema.StringAttribute{
-															MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+															MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7239,10 +7803,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"description_spec": schema.StringAttribute{
 															MarkdownDescription: "Description. Human readable description.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"name": schema.StringAttribute{
 															MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+															},
 														},
 													},
 												},
@@ -7250,16 +7820,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Path match of the URI can be either be, Prefix match or exact match or regular expression match.",
 													Attributes: map[string]schema.Attribute{
 														"path": schema.StringAttribute{
-															MarkdownDescription: "Exact path value to match.",
+															MarkdownDescription: "Exclusive with [prefix regex] Exact path value to match.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"prefix": schema.StringAttribute{
-															MarkdownDescription: "Path prefix to match (e.g. The value / will match on all paths)",
+															MarkdownDescription: "Exclusive with [path regex] Path prefix to match (e.g. The value / will match on all paths)",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"regex": schema.StringAttribute{
-															MarkdownDescription: "Regular expression of path match (e.g. The value .* will match on all paths).",
+															MarkdownDescription: "Exclusive with [path prefix] Regular expression of path match (e.g. The value .* will match on all paths).",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7283,14 +7862,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"name": schema.StringAttribute{
 															MarkdownDescription: "Case-insensitive HTTP header name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
 														"check_not_present": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for check not present.",
 														},
 														"check_present": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for check present.",
 														},
 														"item": schema.SingleNestedBlock{
 															MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -7299,16 +7881,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																	MarkdownDescription: "List of exact values to match the input against.",
 																	Optional:            true,
 																	ElementType:         types.StringType,
+																	Validators: []validator.List{
+																		listvalidator.SizeAtMost(64),
+																	},
 																},
 																"regex_values": schema.ListAttribute{
 																	MarkdownDescription: "List of regular expressions to match the input against.",
 																	Optional:            true,
 																	ElementType:         types.StringType,
+																	Validators: []validator.List{
+																		listvalidator.SizeAtMost(16),
+																	},
 																},
 																"transformers": schema.ListAttribute{
-																	MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																	MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																	Optional:            true,
 																	ElementType:         types.StringType,
+																	Validators: []validator.List{
+																		listvalidator.SizeAtMost(9),
+																	},
 																},
 															},
 														},
@@ -7327,33 +7918,48 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											MarkdownDescription: "[Enum: METHOD_ANY|METHOD_GET|METHOD_POST|METHOD_PUT|METHOD_PATCH|METHOD_DELETE|METHOD_GET_DOCUMENT] HTTP Methods. List of HTTP methods. Possible values are `METHOD_ANY`, `METHOD_GET`, `METHOD_POST`, `METHOD_PUT`, `METHOD_PATCH`, `METHOD_DELETE`, `METHOD_GET_DOCUMENT`. Defaults to `METHOD_ANY`.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeBetween(1, 5),
+											},
 										},
 										"protocol": schema.StringAttribute{
 											MarkdownDescription: "[Enum: BOTH|HTTP|HTTPS] SchemeType is used to indicate URL scheme. - BOTH: BOTH URL scheme for HTTPS:// or HTTP://. - HTTP: HTTP URL scheme HTTP:// only. - HTTPS: HTTPS URL scheme HTTPS:// only. Possible values are `BOTH`, `HTTP`, `HTTPS`. Defaults to `BOTH`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("BOTH", "HTTP", "HTTPS"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
 										"allow_good_bots": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for allow good bots.",
 										},
 										"any_domain": schema.SingleNestedBlock{
 											MarkdownDescription: "Enable this option",
 										},
 										"domain": schema.SingleNestedBlock{
-											MarkdownDescription: "Domains. Domains names.",
+											MarkdownDescription: "Domain name for routing and identification.",
 											Attributes: map[string]schema.Attribute{
 												"exact_value": schema.StringAttribute{
-													MarkdownDescription: "Exact domain name.",
+													MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 												"regex_value": schema.StringAttribute{
-													MarkdownDescription: "Regular Expression value for the domain name.",
+													MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 												"suffix_value": schema.StringAttribute{
-													MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+													MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 											},
 										},
@@ -7369,7 +7975,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "Enable this option",
 														},
 														"password_reset": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for password reset.",
 														},
 													},
 												},
@@ -7395,15 +8001,24 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																					"name": schema.StringAttribute{
 																						MarkdownDescription: "Header Name. A case-insensitive HTTP header name.",
 																						Optional:            true,
+																						Validators: []validator.String{
+																							stringvalidator.LengthBetween(1, 256),
+																						},
 																					},
 																					"regex_values": schema.ListAttribute{
 																						MarkdownDescription: "List of regular expressions to match the input against.",
 																						Optional:            true,
 																						ElementType:         types.StringType,
+																						Validators: []validator.List{
+																							listvalidator.SizeAtMost(16),
+																						},
 																					},
 																					"status": schema.StringAttribute{
 																						MarkdownDescription: "[Enum: EmptyStatusCode|Continue|OK|Created|Accepted|NonAuthoritativeInformation|NoContent|ResetContent|PartialContent|MultiStatus|AlreadyReported|IMUsed|MultipleChoices|MovedPermanently|Found|SeeOther|NotModified|UseProxy|TemporaryRedirect|PermanentRedirect|BadRequest|Unauthorized|PaymentRequired|Forbidden|NotFound|MethodNotAllowed|NotAcceptable|ProxyAuthenticationRequired|RequestTimeout|Conflict|Gone|LengthRequired|PreconditionFailed|PayloadTooLarge|URITooLong|UnsupportedMediaType|RangeNotSatisfiable|ExpectationFailed|MisdirectedRequest|UnprocessableEntity|Locked|FailedDependency|UpgradeRequired|PreconditionRequired|TooManyRequests|RequestHeaderFieldsTooLarge|InternalServerError|NotImplemented|BadGateway|ServiceUnavailable|GatewayTimeout|HTTPVersionNotSupported|VariantAlsoNegotiates|InsufficientStorage|LoopDetected|NotExtended|NetworkAuthenticationRequired] HTTP response status codes EmptyStatusCode response codes means it is not specified Continue status code OK status code Created status code Accepted status code Non Authoritative Information status code No Content status code Reset Content status code Partial Content status code Multi Status.. Possible values are `EmptyStatusCode`, `Continue`, `OK`, `Created`, `Accepted`, `NonAuthoritativeInformation`, `NoContent`, `ResetContent`, `PartialContent`, `MultiStatus`, `AlreadyReported`, `IMUsed`, `MultipleChoices`, `MovedPermanently`, `Found`, `SeeOther`, `NotModified`, `UseProxy`, `TemporaryRedirect`, `PermanentRedirect`, `BadRequest`, `Unauthorized`, `PaymentRequired`, `Forbidden`, `NotFound`, `MethodNotAllowed`, `NotAcceptable`, `ProxyAuthenticationRequired`, `RequestTimeout`, `Conflict`, `Gone`, `LengthRequired`, `PreconditionFailed`, `PayloadTooLarge`, `URITooLong`, `UnsupportedMediaType`, `RangeNotSatisfiable`, `ExpectationFailed`, `MisdirectedRequest`, `UnprocessableEntity`, `Locked`, `FailedDependency`, `UpgradeRequired`, `PreconditionRequired`, `TooManyRequests`, `RequestHeaderFieldsTooLarge`, `InternalServerError`, `NotImplemented`, `BadGateway`, `ServiceUnavailable`, `GatewayTimeout`, `HTTPVersionNotSupported`, `VariantAlsoNegotiates`, `InsufficientStorage`, `LoopDetected`, `NotExtended`, `NetworkAuthenticationRequired`. Defaults to `EmptyStatusCode`.",
 																						Optional:            true,
+																						Validators: []validator.String{
+																							stringvalidator.OneOf("EmptyStatusCode", "Continue", "OK", "Created", "Accepted", "NonAuthoritativeInformation", "NoContent", "ResetContent", "PartialContent", "MultiStatus", "AlreadyReported", "IMUsed", "MultipleChoices", "MovedPermanently", "Found", "SeeOther", "NotModified", "UseProxy", "TemporaryRedirect", "PermanentRedirect", "BadRequest", "Unauthorized", "PaymentRequired", "Forbidden", "NotFound", "MethodNotAllowed", "NotAcceptable", "ProxyAuthenticationRequired", "RequestTimeout", "Conflict", "Gone", "LengthRequired", "PreconditionFailed", "PayloadTooLarge", "URITooLong", "UnsupportedMediaType", "RangeNotSatisfiable", "ExpectationFailed", "MisdirectedRequest", "UnprocessableEntity", "Locked", "FailedDependency", "UpgradeRequired", "PreconditionRequired", "TooManyRequests", "RequestHeaderFieldsTooLarge", "InternalServerError", "NotImplemented", "BadGateway", "ServiceUnavailable", "GatewayTimeout", "HTTPVersionNotSupported", "VariantAlsoNegotiates", "InsufficientStorage", "LoopDetected", "NotExtended", "NetworkAuthenticationRequired"),
+																						},
 																					},
 																				},
 																			},
@@ -7415,15 +8030,24 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																					"name": schema.StringAttribute{
 																						MarkdownDescription: "Header Name. A case-insensitive HTTP header name.",
 																						Optional:            true,
+																						Validators: []validator.String{
+																							stringvalidator.LengthBetween(1, 256),
+																						},
 																					},
 																					"regex_values": schema.ListAttribute{
 																						MarkdownDescription: "List of regular expressions to match the input against.",
 																						Optional:            true,
 																						ElementType:         types.StringType,
+																						Validators: []validator.List{
+																							listvalidator.SizeAtMost(16),
+																						},
 																					},
 																					"status": schema.StringAttribute{
 																						MarkdownDescription: "[Enum: EmptyStatusCode|Continue|OK|Created|Accepted|NonAuthoritativeInformation|NoContent|ResetContent|PartialContent|MultiStatus|AlreadyReported|IMUsed|MultipleChoices|MovedPermanently|Found|SeeOther|NotModified|UseProxy|TemporaryRedirect|PermanentRedirect|BadRequest|Unauthorized|PaymentRequired|Forbidden|NotFound|MethodNotAllowed|NotAcceptable|ProxyAuthenticationRequired|RequestTimeout|Conflict|Gone|LengthRequired|PreconditionFailed|PayloadTooLarge|URITooLong|UnsupportedMediaType|RangeNotSatisfiable|ExpectationFailed|MisdirectedRequest|UnprocessableEntity|Locked|FailedDependency|UpgradeRequired|PreconditionRequired|TooManyRequests|RequestHeaderFieldsTooLarge|InternalServerError|NotImplemented|BadGateway|ServiceUnavailable|GatewayTimeout|HTTPVersionNotSupported|VariantAlsoNegotiates|InsufficientStorage|LoopDetected|NotExtended|NetworkAuthenticationRequired] HTTP response status codes EmptyStatusCode response codes means it is not specified Continue status code OK status code Created status code Accepted status code Non Authoritative Information status code No Content status code Reset Content status code Partial Content status code Multi Status.. Possible values are `EmptyStatusCode`, `Continue`, `OK`, `Created`, `Accepted`, `NonAuthoritativeInformation`, `NoContent`, `ResetContent`, `PartialContent`, `MultiStatus`, `AlreadyReported`, `IMUsed`, `MultipleChoices`, `MovedPermanently`, `Found`, `SeeOther`, `NotModified`, `UseProxy`, `TemporaryRedirect`, `PermanentRedirect`, `BadRequest`, `Unauthorized`, `PaymentRequired`, `Forbidden`, `NotFound`, `MethodNotAllowed`, `NotAcceptable`, `ProxyAuthenticationRequired`, `RequestTimeout`, `Conflict`, `Gone`, `LengthRequired`, `PreconditionFailed`, `PayloadTooLarge`, `URITooLong`, `UnsupportedMediaType`, `RangeNotSatisfiable`, `ExpectationFailed`, `MisdirectedRequest`, `UnprocessableEntity`, `Locked`, `FailedDependency`, `UpgradeRequired`, `PreconditionRequired`, `TooManyRequests`, `RequestHeaderFieldsTooLarge`, `InternalServerError`, `NotImplemented`, `BadGateway`, `ServiceUnavailable`, `GatewayTimeout`, `HTTPVersionNotSupported`, `VariantAlsoNegotiates`, `InsufficientStorage`, `LoopDetected`, `NotExtended`, `NetworkAuthenticationRequired`. Defaults to `EmptyStatusCode`.",
 																						Optional:            true,
+																						Validators: []validator.String{
+																							stringvalidator.OneOf("EmptyStatusCode", "Continue", "OK", "Created", "Accepted", "NonAuthoritativeInformation", "NoContent", "ResetContent", "PartialContent", "MultiStatus", "AlreadyReported", "IMUsed", "MultipleChoices", "MovedPermanently", "Found", "SeeOther", "NotModified", "UseProxy", "TemporaryRedirect", "PermanentRedirect", "BadRequest", "Unauthorized", "PaymentRequired", "Forbidden", "NotFound", "MethodNotAllowed", "NotAcceptable", "ProxyAuthenticationRequired", "RequestTimeout", "Conflict", "Gone", "LengthRequired", "PreconditionFailed", "PayloadTooLarge", "URITooLong", "UnsupportedMediaType", "RangeNotSatisfiable", "ExpectationFailed", "MisdirectedRequest", "UnprocessableEntity", "Locked", "FailedDependency", "UpgradeRequired", "PreconditionRequired", "TooManyRequests", "RequestHeaderFieldsTooLarge", "InternalServerError", "NotImplemented", "BadGateway", "ServiceUnavailable", "GatewayTimeout", "HTTPVersionNotSupported", "VariantAlsoNegotiates", "InsufficientStorage", "LoopDetected", "NotExtended", "NetworkAuthenticationRequired"),
+																						},
 																					},
 																				},
 																			},
@@ -7436,13 +8060,13 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "Enable this option",
 														},
 														"login_partner": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for login partner.",
 														},
 														"logout": schema.SingleNestedBlock{
 															MarkdownDescription: "Enable this option",
 														},
 														"token_refresh": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for token refresh.",
 														},
 													},
 												},
@@ -7454,7 +8078,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "Enable this option",
 														},
 														"money_transfer": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for money transfer.",
 														},
 													},
 												},
@@ -7462,7 +8086,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Bot Defense Flow Label Flight Category. Bot Defense Flow Label Flight Category.",
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
-														"checkin": schema.SingleNestedBlock{
+														"checking": schema.SingleNestedBlock{
 															MarkdownDescription: "Enable this option",
 														},
 													},
@@ -7487,16 +8111,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
 														"flight_search": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for flight search.",
 														},
 														"product_search": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for product search.",
 														},
 														"reservation_search": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for reservation search.",
 														},
 														"room_search": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for room search.",
 														},
 													},
 												},
@@ -7505,40 +8129,40 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
 														"gift_card_make_purchase_with_gift_card": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for gift card make purchase with gift card.",
 														},
 														"gift_card_validation": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for gift card validation.",
 														},
 														"shop_add_to_cart": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for shop add to cart.",
 														},
 														"shop_checkout": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for shop checkout.",
 														},
 														"shop_choose_seat": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for shop choose seat.",
 														},
 														"shop_enter_drawing_submission": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for shop enter drawing submission.",
 														},
 														"shop_make_payment": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for shop make payment.",
 														},
 														"shop_order": schema.SingleNestedBlock{
 															MarkdownDescription: "Enable this option",
 														},
 														"shop_price_inquiry": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for shop price inquiry.",
 														},
 														"shop_promo_code_validation": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for shop promo code validation.",
 														},
 														"shop_purchase_gift_card": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for shop purchase gift card.",
 														},
 														"shop_update_quantity": schema.SingleNestedBlock{
-															MarkdownDescription: "Enable this option",
+															MarkdownDescription: "Configuration parameter for shop update quantity.",
 														},
 													},
 												},
@@ -7555,14 +8179,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "Case-insensitive HTTP header name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"check_not_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check not present.",
 													},
 													"check_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check present.",
 													},
 													"item": schema.SingleNestedBlock{
 														MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -7571,16 +8198,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																MarkdownDescription: "List of exact values to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(64),
+																},
 															},
 															"regex_values": schema.ListAttribute{
 																MarkdownDescription: "List of regular expressions to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(16),
+																},
 															},
 															"transformers": schema.ListAttribute{
-																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(9),
+																},
 															},
 														},
 													},
@@ -7593,15 +8229,21 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"description_spec": schema.StringAttribute{
 													MarkdownDescription: "Description. Human readable description.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"name": schema.StringAttribute{
 													MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+													},
 												},
 											},
 										},
 										"mitigate_good_bots": schema.SingleNestedBlock{
-											MarkdownDescription: "Enable this option",
+											MarkdownDescription: "Configuration parameter for mitigate good bots.",
 										},
 										"mitigation": schema.SingleNestedBlock{
 											MarkdownDescription: "Modify Bot Defense behavior for a matching request.",
@@ -7613,10 +8255,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"body": schema.StringAttribute{
 															MarkdownDescription: "Custom body message is of type uri_ref. Currently supported URL schemes is string:///. For string:/// scheme, message needs to be encoded in Base64 format.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(4096),
+															},
 														},
 														"status": schema.StringAttribute{
 															MarkdownDescription: "[Enum: EmptyStatusCode|Continue|OK|Created|Accepted|NonAuthoritativeInformation|NoContent|ResetContent|PartialContent|MultiStatus|AlreadyReported|IMUsed|MultipleChoices|MovedPermanently|Found|SeeOther|NotModified|UseProxy|TemporaryRedirect|PermanentRedirect|BadRequest|Unauthorized|PaymentRequired|Forbidden|NotFound|MethodNotAllowed|NotAcceptable|ProxyAuthenticationRequired|RequestTimeout|Conflict|Gone|LengthRequired|PreconditionFailed|PayloadTooLarge|URITooLong|UnsupportedMediaType|RangeNotSatisfiable|ExpectationFailed|MisdirectedRequest|UnprocessableEntity|Locked|FailedDependency|UpgradeRequired|PreconditionRequired|TooManyRequests|RequestHeaderFieldsTooLarge|InternalServerError|NotImplemented|BadGateway|ServiceUnavailable|GatewayTimeout|HTTPVersionNotSupported|VariantAlsoNegotiates|InsufficientStorage|LoopDetected|NotExtended|NetworkAuthenticationRequired] HTTP response status codes EmptyStatusCode response codes means it is not specified Continue status code OK status code Created status code Accepted status code Non Authoritative Information status code No Content status code Reset Content status code Partial Content status code Multi Status.. Possible values are `EmptyStatusCode`, `Continue`, `OK`, `Created`, `Accepted`, `NonAuthoritativeInformation`, `NoContent`, `ResetContent`, `PartialContent`, `MultiStatus`, `AlreadyReported`, `IMUsed`, `MultipleChoices`, `MovedPermanently`, `Found`, `SeeOther`, `NotModified`, `UseProxy`, `TemporaryRedirect`, `PermanentRedirect`, `BadRequest`, `Unauthorized`, `PaymentRequired`, `Forbidden`, `NotFound`, `MethodNotAllowed`, `NotAcceptable`, `ProxyAuthenticationRequired`, `RequestTimeout`, `Conflict`, `Gone`, `LengthRequired`, `PreconditionFailed`, `PayloadTooLarge`, `URITooLong`, `UnsupportedMediaType`, `RangeNotSatisfiable`, `ExpectationFailed`, `MisdirectedRequest`, `UnprocessableEntity`, `Locked`, `FailedDependency`, `UpgradeRequired`, `PreconditionRequired`, `TooManyRequests`, `RequestHeaderFieldsTooLarge`, `InternalServerError`, `NotImplemented`, `BadGateway`, `ServiceUnavailable`, `GatewayTimeout`, `HTTPVersionNotSupported`, `VariantAlsoNegotiates`, `InsufficientStorage`, `LoopDetected`, `NotExtended`, `NetworkAuthenticationRequired`. Defaults to `EmptyStatusCode`.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.OneOf("EmptyStatusCode", "Continue", "OK", "Created", "Accepted", "NonAuthoritativeInformation", "NoContent", "ResetContent", "PartialContent", "MultiStatus", "AlreadyReported", "IMUsed", "MultipleChoices", "MovedPermanently", "Found", "SeeOther", "NotModified", "UseProxy", "TemporaryRedirect", "PermanentRedirect", "BadRequest", "Unauthorized", "PaymentRequired", "Forbidden", "NotFound", "MethodNotAllowed", "NotAcceptable", "ProxyAuthenticationRequired", "RequestTimeout", "Conflict", "Gone", "LengthRequired", "PreconditionFailed", "PayloadTooLarge", "URITooLong", "UnsupportedMediaType", "RangeNotSatisfiable", "ExpectationFailed", "MisdirectedRequest", "UnprocessableEntity", "Locked", "FailedDependency", "UpgradeRequired", "PreconditionRequired", "TooManyRequests", "RequestHeaderFieldsTooLarge", "InternalServerError", "NotImplemented", "BadGateway", "ServiceUnavailable", "GatewayTimeout", "HTTPVersionNotSupported", "VariantAlsoNegotiates", "InsufficientStorage", "LoopDetected", "NotExtended", "NetworkAuthenticationRequired"),
+															},
 														},
 													},
 												},
@@ -7630,10 +8278,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																"auto_type_header_name": schema.StringAttribute{
 																	MarkdownDescription: "Case-insensitive HTTP header name.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(256),
+																	},
 																},
 																"inference_header_name": schema.StringAttribute{
 																	MarkdownDescription: "Case-insensitive HTTP header name.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(256),
+																	},
 																},
 															},
 														},
@@ -7660,16 +8314,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											MarkdownDescription: "Path match of the URI can be either be, Prefix match or exact match or regular expression match.",
 											Attributes: map[string]schema.Attribute{
 												"path": schema.StringAttribute{
-													MarkdownDescription: "Exact path value to match.",
+													MarkdownDescription: "Exclusive with [prefix regex] Exact path value to match.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 												"prefix": schema.StringAttribute{
-													MarkdownDescription: "Path prefix to match (e.g. The value / will match on all paths)",
+													MarkdownDescription: "Exclusive with [path regex] Path prefix to match (e.g. The value / will match on all paths)",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"regex": schema.StringAttribute{
-													MarkdownDescription: "Regular expression of path match (e.g. The value .* will match on all paths).",
+													MarkdownDescription: "Exclusive with [path prefix] Regular expression of path match (e.g. The value .* will match on all paths).",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 											},
 										},
@@ -7684,14 +8347,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"key": schema.StringAttribute{
 														MarkdownDescription: "Case-sensitive HTTP query parameter name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"check_not_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check not present.",
 													},
 													"check_present": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for check present.",
 													},
 													"item": schema.SingleNestedBlock{
 														MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -7700,16 +8366,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																MarkdownDescription: "List of exact values to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(64),
+																},
 															},
 															"regex_values": schema.ListAttribute{
 																MarkdownDescription: "List of regular expressions to match the input against.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(16),
+																},
 															},
 															"transformers": schema.ListAttribute{
-																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																Optional:            true,
 																ElementType:         types.StringType,
+																Validators: []validator.List{
+																	listvalidator.SizeAtMost(9),
+																},
 															},
 														},
 													},
@@ -7728,6 +8403,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"mobile_identifier": schema.StringAttribute{
 													MarkdownDescription: "[Enum: HEADERS] Mobile identifier type - HEADERS: Headers Headers. The only possible value is `HEADERS`. Defaults to `HEADERS`.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.OneOf("HEADERS"),
+													},
 												},
 											},
 										},
@@ -7748,6 +8426,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 					"custom_page": schema.StringAttribute{
 						MarkdownDescription: "Custom message is of type uri_ref. Currently supported URL schemes is string:///. For string:/// scheme, message needs to be encoded in Base64 format.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(65536),
+						},
 					},
 				},
 			},
@@ -7760,10 +8441,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"disable_js_insert": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable js insert.",
 							},
 							"js_insert_all_pages": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for js insert all pages.",
 							},
 							"js_insert_all_pages_except": schema.SingleNestedBlock{
 								MarkdownDescription: "Insert Client-Side Defense JavaScript in all pages with the exceptions.",
@@ -7778,19 +8459,28 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Enable this option",
 												},
 												"domain": schema.SingleNestedBlock{
-													MarkdownDescription: "Domains. Domains names.",
+													MarkdownDescription: "Domain name for routing and identification.",
 													Attributes: map[string]schema.Attribute{
 														"exact_value": schema.StringAttribute{
-															MarkdownDescription: "Exact domain name.",
+															MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"regex_value": schema.StringAttribute{
-															MarkdownDescription: "Regular Expression value for the domain name.",
+															MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"suffix_value": schema.StringAttribute{
-															MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+															MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7800,10 +8490,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"description_spec": schema.StringAttribute{
 															MarkdownDescription: "Description. Human readable description.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"name": schema.StringAttribute{
 															MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+															},
 														},
 													},
 												},
@@ -7811,16 +8507,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Path match of the URI can be either be, Prefix match or exact match or regular expression match.",
 													Attributes: map[string]schema.Attribute{
 														"path": schema.StringAttribute{
-															MarkdownDescription: "Exact path value to match.",
+															MarkdownDescription: "Exclusive with [prefix regex] Exact path value to match.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"prefix": schema.StringAttribute{
-															MarkdownDescription: "Path prefix to match (e.g. The value / will match on all paths)",
+															MarkdownDescription: "Exclusive with [path regex] Path prefix to match (e.g. The value / will match on all paths)",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"regex": schema.StringAttribute{
-															MarkdownDescription: "Regular expression of path match (e.g. The value .* will match on all paths).",
+															MarkdownDescription: "Exclusive with [path prefix] Regular expression of path match (e.g. The value .* will match on all paths).",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7842,19 +8547,28 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Enable this option",
 												},
 												"domain": schema.SingleNestedBlock{
-													MarkdownDescription: "Domains. Domains names.",
+													MarkdownDescription: "Domain name for routing and identification.",
 													Attributes: map[string]schema.Attribute{
 														"exact_value": schema.StringAttribute{
-															MarkdownDescription: "Exact domain name.",
+															MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"regex_value": schema.StringAttribute{
-															MarkdownDescription: "Regular Expression value for the domain name.",
+															MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"suffix_value": schema.StringAttribute{
-															MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+															MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7864,10 +8578,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"description_spec": schema.StringAttribute{
 															MarkdownDescription: "Description. Human readable description.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"name": schema.StringAttribute{
 															MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+															},
 														},
 													},
 												},
@@ -7875,16 +8595,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Path match of the URI can be either be, Prefix match or exact match or regular expression match.",
 													Attributes: map[string]schema.Attribute{
 														"path": schema.StringAttribute{
-															MarkdownDescription: "Exact path value to match.",
+															MarkdownDescription: "Exclusive with [prefix regex] Exact path value to match.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"prefix": schema.StringAttribute{
-															MarkdownDescription: "Path prefix to match (e.g. The value / will match on all paths)",
+															MarkdownDescription: "Exclusive with [path regex] Path prefix to match (e.g. The value / will match on all paths)",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"regex": schema.StringAttribute{
-															MarkdownDescription: "Regular expression of path match (e.g. The value .* will match on all paths).",
+															MarkdownDescription: "Exclusive with [path prefix] Regular expression of path match (e.g. The value .* will match on all paths).",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7900,19 +8629,28 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Enable this option",
 												},
 												"domain": schema.SingleNestedBlock{
-													MarkdownDescription: "Domains. Domains names.",
+													MarkdownDescription: "Domain name for routing and identification.",
 													Attributes: map[string]schema.Attribute{
 														"exact_value": schema.StringAttribute{
-															MarkdownDescription: "Exact domain name.",
+															MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"regex_value": schema.StringAttribute{
-															MarkdownDescription: "Regular Expression value for the domain name.",
+															MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"suffix_value": schema.StringAttribute{
-															MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+															MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7922,10 +8660,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"description_spec": schema.StringAttribute{
 															MarkdownDescription: "Description. Human readable description.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"name": schema.StringAttribute{
 															MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 1024),
+															},
 														},
 													},
 												},
@@ -7933,16 +8677,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Path match of the URI can be either be, Prefix match or exact match or regular expression match.",
 													Attributes: map[string]schema.Attribute{
 														"path": schema.StringAttribute{
-															MarkdownDescription: "Exact path value to match.",
+															MarkdownDescription: "Exclusive with [prefix regex] Exact path value to match.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"prefix": schema.StringAttribute{
-															MarkdownDescription: "Path prefix to match (e.g. The value / will match on all paths)",
+															MarkdownDescription: "Exclusive with [path regex] Path prefix to match (e.g. The value / will match on all paths)",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(256),
+															},
 														},
 														"regex": schema.StringAttribute{
-															MarkdownDescription: "Regular expression of path match (e.g. The value .* will match on all paths).",
+															MarkdownDescription: "Exclusive with [path prefix] Regular expression of path match (e.g. The value .* will match on all paths).",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 												},
@@ -7974,11 +8727,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						MarkdownDescription: "Specifies the origins that will be allowed to do CORS requests. An origin is allowed if either allow_origin or allow_origin_regex match.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(128),
+						},
 					},
 					"allow_origin_regex": schema.ListAttribute{
 						MarkdownDescription: "Specifies regex patterns that match allowed origins. An origin is allowed if either allow_origin or allow_origin_regex match.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(16),
+						},
 					},
 					"disabled": schema.BoolAttribute{
 						MarkdownDescription: "Disable the CorsPolicy for a particular route. This is useful when virtual-host has CorsPolicy, but we need to disable it on a specific route. The value of this field is ignored for virtual-host.",
@@ -7995,11 +8754,11 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"csrf_policy": schema.SingleNestedBlock{
-				MarkdownDescription: "To mitigate CSRF attack , the policy checks where a request is coming from to determine if the request's origin is the same as its detination.the policy relies on two pieces of information used in determining if a request originated from the same host. 1. The origin that caused the user agent to..",
+				MarkdownDescription: "To mitigate CSRF attack , the policy checks where a request is coming from to determine if the request's origin is the same as its destination.the policy relies on two pieces of information used in determining if a request originated from the same host. 1. The origin that caused the user agent to..",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"all_load_balancer_domains": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for all load balancer domains.",
 					},
 					"custom_domain_list": schema.SingleNestedBlock{
 						MarkdownDescription: "List of domain names used for Host header matching.",
@@ -8008,6 +8767,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								MarkdownDescription: "List of domain names that will be matched to loadbalancer. These domains are not used for SNI match. Wildcard names are supported in the suffix or prefix form.",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeBetween(1, 32),
+								},
 							},
 						},
 					},
@@ -8027,6 +8789,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -8035,6 +8800,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 								"tenant": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -8042,6 +8810,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
 									},
 								},
 							},
@@ -8054,12 +8825,18 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"exact_value": schema.StringAttribute{
-							MarkdownDescription: "Exact domain name.",
+							MarkdownDescription: "Exclusive with [any_domain suffix_value] Exact domain name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"suffix_value": schema.StringAttribute{
-							MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+							MarkdownDescription: "Exclusive with [any_domain exact_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -8075,10 +8852,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"description_spec": schema.StringAttribute{
 									MarkdownDescription: "Description. Human readable description.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+									},
 								},
 							},
 						},
@@ -8086,16 +8869,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							MarkdownDescription: "Path match of the URI can be either be, Prefix match or exact match or regular expression match.",
 							Attributes: map[string]schema.Attribute{
 								"path": schema.StringAttribute{
-									MarkdownDescription: "Exact path value to match.",
+									MarkdownDescription: "Exclusive with [prefix regex] Exact path value to match.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"prefix": schema.StringAttribute{
-									MarkdownDescription: "Path prefix to match (e.g. The value / will match on all paths)",
+									MarkdownDescription: "Exclusive with [path regex] Path prefix to match (e.g. The value / will match on all paths)",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"regex": schema.StringAttribute{
-									MarkdownDescription: "Regular expression of path match (e.g. The value .* will match on all paths).",
+									MarkdownDescription: "Exclusive with [path prefix] Regular expression of path match (e.g. The value .* will match on all paths).",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 							},
 						},
@@ -8125,6 +8917,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									MarkdownDescription: "[Enum: COUNTRY_NONE|COUNTRY_AD|COUNTRY_AE|COUNTRY_AF|COUNTRY_AG|COUNTRY_AI|COUNTRY_AL|COUNTRY_AM|COUNTRY_AN|COUNTRY_AO|COUNTRY_AQ|COUNTRY_AR|COUNTRY_AS|COUNTRY_AT|COUNTRY_AU|COUNTRY_AW|COUNTRY_AX|COUNTRY_AZ|COUNTRY_BA|COUNTRY_BB|COUNTRY_BD|COUNTRY_BE|COUNTRY_BF|COUNTRY_BG|COUNTRY_BH|COUNTRY_BI|COUNTRY_BJ|COUNTRY_BL|COUNTRY_BM|COUNTRY_BN|COUNTRY_BO|COUNTRY_BQ|COUNTRY_BR|COUNTRY_BS|COUNTRY_BT|COUNTRY_BV|COUNTRY_BW|COUNTRY_BY|COUNTRY_BZ|COUNTRY_CA|COUNTRY_CC|COUNTRY_CD|COUNTRY_CF|COUNTRY_CG|COUNTRY_CH|COUNTRY_CI|COUNTRY_CK|COUNTRY_CL|COUNTRY_CM|COUNTRY_CN|COUNTRY_CO|COUNTRY_CR|COUNTRY_CS|COUNTRY_CU|COUNTRY_CV|COUNTRY_CW|COUNTRY_CX|COUNTRY_CY|COUNTRY_CZ|COUNTRY_DE|COUNTRY_DJ|COUNTRY_DK|COUNTRY_DM|COUNTRY_DO|COUNTRY_DZ|COUNTRY_EC|COUNTRY_EE|COUNTRY_EG|COUNTRY_EH|COUNTRY_ER|COUNTRY_ES|COUNTRY_ET|COUNTRY_FI|COUNTRY_FJ|COUNTRY_FK|COUNTRY_FM|COUNTRY_FO|COUNTRY_FR|COUNTRY_GA|COUNTRY_GB|COUNTRY_GD|COUNTRY_GE|COUNTRY_GF|COUNTRY_GG|COUNTRY_GH|COUNTRY_GI|COUNTRY_GL|COUNTRY_GM|COUNTRY_GN|COUNTRY_GP|COUNTRY_GQ|COUNTRY_GR|COUNTRY_GS|COUNTRY_GT|COUNTRY_GU|COUNTRY_GW|COUNTRY_GY|COUNTRY_HK|COUNTRY_HM|COUNTRY_HN|COUNTRY_HR|COUNTRY_HT|COUNTRY_HU|COUNTRY_ID|COUNTRY_IE|COUNTRY_IL|COUNTRY_IM|COUNTRY_IN|COUNTRY_IO|COUNTRY_IQ|COUNTRY_IR|COUNTRY_IS|COUNTRY_IT|COUNTRY_JE|COUNTRY_JM|COUNTRY_JO|COUNTRY_JP|COUNTRY_KE|COUNTRY_KG|COUNTRY_KH|COUNTRY_KI|COUNTRY_KM|COUNTRY_KN|COUNTRY_KP|COUNTRY_KR|COUNTRY_KW|COUNTRY_KY|COUNTRY_KZ|COUNTRY_LA|COUNTRY_LB|COUNTRY_LC|COUNTRY_LI|COUNTRY_LK|COUNTRY_LR|COUNTRY_LS|COUNTRY_LT|COUNTRY_LU|COUNTRY_LV|COUNTRY_LY|COUNTRY_MA|COUNTRY_MC|COUNTRY_MD|COUNTRY_ME|COUNTRY_MF|COUNTRY_MG|COUNTRY_MH|COUNTRY_MK|COUNTRY_ML|COUNTRY_MM|COUNTRY_MN|COUNTRY_MO|COUNTRY_MP|COUNTRY_MQ|COUNTRY_MR|COUNTRY_MS|COUNTRY_MT|COUNTRY_MU|COUNTRY_MV|COUNTRY_MW|COUNTRY_MX|COUNTRY_MY|COUNTRY_MZ|COUNTRY_NA|COUNTRY_NC|COUNTRY_NE|COUNTRY_NF|COUNTRY_NG|COUNTRY_NI|COUNTRY_NL|COUNTRY_NO|COUNTRY_NP|COUNTRY_NR|COUNTRY_NU|COUNTRY_NZ|COUNTRY_OM|COUNTRY_PA|COUNTRY_PE|COUNTRY_PF|COUNTRY_PG|COUNTRY_PH|COUNTRY_PK|COUNTRY_PL|COUNTRY_PM|COUNTRY_PN|COUNTRY_PR|COUNTRY_PS|COUNTRY_PT|COUNTRY_PW|COUNTRY_PY|COUNTRY_QA|COUNTRY_RE|COUNTRY_RO|COUNTRY_RS|COUNTRY_RU|COUNTRY_RW|COUNTRY_SA|COUNTRY_SB|COUNTRY_SC|COUNTRY_SD|COUNTRY_SE|COUNTRY_SG|COUNTRY_SH|COUNTRY_SI|COUNTRY_SJ|COUNTRY_SK|COUNTRY_SL|COUNTRY_SM|COUNTRY_SN|COUNTRY_SO|COUNTRY_SR|COUNTRY_SS|COUNTRY_ST|COUNTRY_SV|COUNTRY_SX|COUNTRY_SY|COUNTRY_SZ|COUNTRY_TC|COUNTRY_TD|COUNTRY_TF|COUNTRY_TG|COUNTRY_TH|COUNTRY_TJ|COUNTRY_TK|COUNTRY_TL|COUNTRY_TM|COUNTRY_TN|COUNTRY_TO|COUNTRY_TR|COUNTRY_TT|COUNTRY_TV|COUNTRY_TW|COUNTRY_TZ|COUNTRY_UA|COUNTRY_UG|COUNTRY_UM|COUNTRY_US|COUNTRY_UY|COUNTRY_UZ|COUNTRY_VA|COUNTRY_VC|COUNTRY_VE|COUNTRY_VG|COUNTRY_VI|COUNTRY_VN|COUNTRY_VU|COUNTRY_WF|COUNTRY_WS|COUNTRY_XK|COUNTRY_XT|COUNTRY_YE|COUNTRY_YT|COUNTRY_ZA|COUNTRY_ZM|COUNTRY_ZW] Sources that are located in one of the countries in the given list. Possible values are `COUNTRY_NONE`, `COUNTRY_AD`, `COUNTRY_AE`, `COUNTRY_AF`, `COUNTRY_AG`, `COUNTRY_AI`, `COUNTRY_AL`, `COUNTRY_AM`, `COUNTRY_AN`, `COUNTRY_AO`, `COUNTRY_AQ`, `COUNTRY_AR`, `COUNTRY_AS`, `COUNTRY_AT`, `COUNTRY_AU`, `COUNTRY_AW`, `COUNTRY_AX`, `COUNTRY_AZ`, `COUNTRY_BA`, `COUNTRY_BB`, `COUNTRY_BD`, `COUNTRY_BE`, `COUNTRY_BF`, `COUNTRY_BG`, `COUNTRY_BH`, `COUNTRY_BI`, `COUNTRY_BJ`, `COUNTRY_BL`, `COUNTRY_BM`, `COUNTRY_BN`, `COUNTRY_BO`, `COUNTRY_BQ`, `COUNTRY_BR`, `COUNTRY_BS`, `COUNTRY_BT`, `COUNTRY_BV`, `COUNTRY_BW`, `COUNTRY_BY`, `COUNTRY_BZ`, `COUNTRY_CA`, `COUNTRY_CC`, `COUNTRY_CD`, `COUNTRY_CF`, `COUNTRY_CG`, `COUNTRY_CH`, `COUNTRY_CI`, `COUNTRY_CK`, `COUNTRY_CL`, `COUNTRY_CM`, `COUNTRY_CN`, `COUNTRY_CO`, `COUNTRY_CR`, `COUNTRY_CS`, `COUNTRY_CU`, `COUNTRY_CV`, `COUNTRY_CW`, `COUNTRY_CX`, `COUNTRY_CY`, `COUNTRY_CZ`, `COUNTRY_DE`, `COUNTRY_DJ`, `COUNTRY_DK`, `COUNTRY_DM`, `COUNTRY_DO`, `COUNTRY_DZ`, `COUNTRY_EC`, `COUNTRY_EE`, `COUNTRY_EG`, `COUNTRY_EH`, `COUNTRY_ER`, `COUNTRY_ES`, `COUNTRY_ET`, `COUNTRY_FI`, `COUNTRY_FJ`, `COUNTRY_FK`, `COUNTRY_FM`, `COUNTRY_FO`, `COUNTRY_FR`, `COUNTRY_GA`, `COUNTRY_GB`, `COUNTRY_GD`, `COUNTRY_GE`, `COUNTRY_GF`, `COUNTRY_GG`, `COUNTRY_GH`, `COUNTRY_GI`, `COUNTRY_GL`, `COUNTRY_GM`, `COUNTRY_GN`, `COUNTRY_GP`, `COUNTRY_GQ`, `COUNTRY_GR`, `COUNTRY_GS`, `COUNTRY_GT`, `COUNTRY_GU`, `COUNTRY_GW`, `COUNTRY_GY`, `COUNTRY_HK`, `COUNTRY_HM`, `COUNTRY_HN`, `COUNTRY_HR`, `COUNTRY_HT`, `COUNTRY_HU`, `COUNTRY_ID`, `COUNTRY_IE`, `COUNTRY_IL`, `COUNTRY_IM`, `COUNTRY_IN`, `COUNTRY_IO`, `COUNTRY_IQ`, `COUNTRY_IR`, `COUNTRY_IS`, `COUNTRY_IT`, `COUNTRY_JE`, `COUNTRY_JM`, `COUNTRY_JO`, `COUNTRY_JP`, `COUNTRY_KE`, `COUNTRY_KG`, `COUNTRY_KH`, `COUNTRY_KI`, `COUNTRY_KM`, `COUNTRY_KN`, `COUNTRY_KP`, `COUNTRY_KR`, `COUNTRY_KW`, `COUNTRY_KY`, `COUNTRY_KZ`, `COUNTRY_LA`, `COUNTRY_LB`, `COUNTRY_LC`, `COUNTRY_LI`, `COUNTRY_LK`, `COUNTRY_LR`, `COUNTRY_LS`, `COUNTRY_LT`, `COUNTRY_LU`, `COUNTRY_LV`, `COUNTRY_LY`, `COUNTRY_MA`, `COUNTRY_MC`, `COUNTRY_MD`, `COUNTRY_ME`, `COUNTRY_MF`, `COUNTRY_MG`, `COUNTRY_MH`, `COUNTRY_MK`, `COUNTRY_ML`, `COUNTRY_MM`, `COUNTRY_MN`, `COUNTRY_MO`, `COUNTRY_MP`, `COUNTRY_MQ`, `COUNTRY_MR`, `COUNTRY_MS`, `COUNTRY_MT`, `COUNTRY_MU`, `COUNTRY_MV`, `COUNTRY_MW`, `COUNTRY_MX`, `COUNTRY_MY`, `COUNTRY_MZ`, `COUNTRY_NA`, `COUNTRY_NC`, `COUNTRY_NE`, `COUNTRY_NF`, `COUNTRY_NG`, `COUNTRY_NI`, `COUNTRY_NL`, `COUNTRY_NO`, `COUNTRY_NP`, `COUNTRY_NR`, `COUNTRY_NU`, `COUNTRY_NZ`, `COUNTRY_OM`, `COUNTRY_PA`, `COUNTRY_PE`, `COUNTRY_PF`, `COUNTRY_PG`, `COUNTRY_PH`, `COUNTRY_PK`, `COUNTRY_PL`, `COUNTRY_PM`, `COUNTRY_PN`, `COUNTRY_PR`, `COUNTRY_PS`, `COUNTRY_PT`, `COUNTRY_PW`, `COUNTRY_PY`, `COUNTRY_QA`, `COUNTRY_RE`, `COUNTRY_RO`, `COUNTRY_RS`, `COUNTRY_RU`, `COUNTRY_RW`, `COUNTRY_SA`, `COUNTRY_SB`, `COUNTRY_SC`, `COUNTRY_SD`, `COUNTRY_SE`, `COUNTRY_SG`, `COUNTRY_SH`, `COUNTRY_SI`, `COUNTRY_SJ`, `COUNTRY_SK`, `COUNTRY_SL`, `COUNTRY_SM`, `COUNTRY_SN`, `COUNTRY_SO`, `COUNTRY_SR`, `COUNTRY_SS`, `COUNTRY_ST`, `COUNTRY_SV`, `COUNTRY_SX`, `COUNTRY_SY`, `COUNTRY_SZ`, `COUNTRY_TC`, `COUNTRY_TD`, `COUNTRY_TF`, `COUNTRY_TG`, `COUNTRY_TH`, `COUNTRY_TJ`, `COUNTRY_TK`, `COUNTRY_TL`, `COUNTRY_TM`, `COUNTRY_TN`, `COUNTRY_TO`, `COUNTRY_TR`, `COUNTRY_TT`, `COUNTRY_TV`, `COUNTRY_TW`, `COUNTRY_TZ`, `COUNTRY_UA`, `COUNTRY_UG`, `COUNTRY_UM`, `COUNTRY_US`, `COUNTRY_UY`, `COUNTRY_UZ`, `COUNTRY_VA`, `COUNTRY_VC`, `COUNTRY_VE`, `COUNTRY_VG`, `COUNTRY_VI`, `COUNTRY_VN`, `COUNTRY_VU`, `COUNTRY_WF`, `COUNTRY_WS`, `COUNTRY_XK`, `COUNTRY_XT`, `COUNTRY_YE`, `COUNTRY_YT`, `COUNTRY_ZA`, `COUNTRY_ZM`, `COUNTRY_ZW`. Defaults to `COUNTRY_NONE`.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(64),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -8135,6 +8930,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer.",
 											Optional:            true,
 											ElementType:         types.Int64Type,
+											Validators: []validator.List{
+												listvalidator.SizeBetween(1, 16),
+											},
 										},
 									},
 								},
@@ -8145,26 +8943,38 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											MarkdownDescription: "List of exact JA4 TLS fingerprint to match the input JA4 TLS fingerprint against.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 									},
 								},
 								"tls_fingerprint_matcher": schema.SingleNestedBlock{
-									MarkdownDescription: "TLS fingerprint matcher specifies multiple criteria for matching a TLS fingerprint. The set of supported positve match criteria includes a list of known classes of TLS fingerprints and a list of exact values. The match is considered successful if either of these positive criteria are satisfied..",
+									MarkdownDescription: "TLS fingerprint matcher specifies multiple criteria for matching a TLS fingerprint. The set of supported positive match criteria includes a list of known classes of TLS fingerprints and a list of exact values. The match is considered successful if either of these positive criteria are satisfied..",
 									Attributes: map[string]schema.Attribute{
 										"classes": schema.ListAttribute{
 											MarkdownDescription: "[Enum: TLS_FINGERPRINT_NONE|ANY_MALICIOUS_FINGERPRINT|ADWARE|ADWIND|DRIDEX|GOOTKIT|GOZI|JBIFROST|QUAKBOT|RANSOMWARE|TROLDESH|TOFSEE|TORRENTLOCKER|TRICKBOT] List of known classes of TLS fingerprints to match the input TLS JA3 fingerprint against. Possible values are `TLS_FINGERPRINT_NONE`, `ANY_MALICIOUS_FINGERPRINT`, `ADWARE`, `ADWIND`, `DRIDEX`, `GOOTKIT`, `GOZI`, `JBIFROST`, `QUAKBOT`, `RANSOMWARE`, `TROLDESH`, `TOFSEE`, `TORRENTLOCKER`, `TRICKBOT`. Defaults to `TLS_FINGERPRINT_NONE`.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 										"exact_values": schema.ListAttribute{
 											MarkdownDescription: "List of exact TLS JA3 fingerprints to match the input TLS JA3 fingerprint against.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 										"excluded_values": schema.ListAttribute{
 											MarkdownDescription: "List of TLS JA3 fingerprints to be excluded when matching the input TLS JA3 fingerprint. This can be used to skip known false positives when using one or more known TLS fingerprint classes in the enclosing matcher.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(32),
+											},
 										},
 									},
 								},
@@ -8181,6 +8991,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									MarkdownDescription: "IPv4 Prefix List. List of IPv4 prefix strings.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(128),
+									},
 								},
 							},
 						},
@@ -8190,10 +9003,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"description_spec": schema.StringAttribute{
 									MarkdownDescription: "Description. Human readable description.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+									},
 								},
 							},
 						},
@@ -8204,11 +9023,11 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				MarkdownDescription: "Default Cache Behaviour. This defines a Default Cache Action.",
 				Attributes: map[string]schema.Attribute{
 					"cache_ttl_default": schema.StringAttribute{
-						MarkdownDescription: "Use Cache TTL Provided by Origin, and set a contigency TTL value in case one is not provided.",
+						MarkdownDescription: "Exclusive with [cache_disabled cache_ttl_override] Use Cache TTL Provided by Origin, and set a contigency TTL value in case one is not provided.",
 						Optional:            true,
 					},
 					"cache_ttl_override": schema.StringAttribute{
-						MarkdownDescription: "Always override the Cahce TTL provided by Origin.",
+						MarkdownDescription: "Exclusive with [cache_disabled cache_ttl_default] Always override the Cache TTL provided by Origin.",
 						Optional:            true,
 					},
 				},
@@ -8219,7 +9038,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"default_sensitive_data_policy": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: default_sensitive_data_policy, sensitive_data_policy; Default: default_sensitive_data_policy] Enable this option",
+				MarkdownDescription: "[OneOf: default_sensitive_data_policy, sensitive_data_policy; Default: default_sensitive_data_policy] Policy configuration for this feature.",
 			},
 			"disable_api_definition": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
@@ -8234,16 +9053,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				MarkdownDescription: "[OneOf: disable_ip_reputation, enable_ip_reputation; Default: disable_ip_reputation] Enable this option",
 			},
 			"disable_malicious_user_detection": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: disable_malicious_user_detection, enable_malicious_user_detection; Default: disable_malicious_user_detection] Enable this option",
+				MarkdownDescription: "[OneOf: disable_malicious_user_detection, enable_malicious_user_detection; Default: disable_malicious_user_detection] Configuration parameter for disable malicious user detection.",
 			},
 			"disable_rate_limit": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for disable rate limit.",
 			},
 			"disable_threat_mesh": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: disable_threat_mesh, enable_threat_mesh; Default: disable_threat_mesh] Enable this option",
 			},
 			"disable_waf": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for disable waf.",
 			},
 			"enable_api_discovery": schema.SingleNestedBlock{
 				MarkdownDescription: "Specifies the settings used for API discovery.",
@@ -8264,15 +9083,21 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"domain": schema.StringAttribute{
 													MarkdownDescription: "Select the domain to execute API Crawling with given credentials.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
 												"simple_login": schema.SingleNestedBlock{
-													MarkdownDescription: "Simple Login.",
+													MarkdownDescription: "Configuration parameter for simple login.",
 													Attributes: map[string]schema.Attribute{
 														"user": schema.StringAttribute{
 															MarkdownDescription: "Enter the username to assign credentials for the selected domain to crawl.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 64),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -8290,6 +9115,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		"location": schema.StringAttribute{
 																			MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																			Optional:            true,
+																			Validators: []validator.String{
+																				stringvalidator.LengthAtMost(1024),
+																			},
 																		},
 																		"store_provider": schema.StringAttribute{
 																			MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -8307,6 +9135,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		"url": schema.StringAttribute{
 																			MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																			Optional:            true,
+																			Validators: []validator.String{
+																				stringvalidator.LengthBetween(1, 131072),
+																			},
 																		},
 																	},
 																},
@@ -8342,6 +9173,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -8350,6 +9184,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -8357,6 +9194,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -8386,6 +9226,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -8394,6 +9237,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
 										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
+										},
 									},
 									"tenant": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -8401,6 +9247,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
 										},
 									},
 								},
@@ -8411,7 +9260,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						MarkdownDescription: "Enable this option",
 					},
 					"disable_learn_from_redirect_traffic": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable learn from redirect traffic.",
 					},
 					"discovered_api_settings": schema.SingleNestedBlock{
 						MarkdownDescription: "Discovered API Settings. Configure Discovered API Settings.",
@@ -8423,7 +9272,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						},
 					},
 					"enable_learn_from_redirect_traffic": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for enable learn from redirect traffic.",
 					},
 				},
 			},
@@ -8441,14 +9290,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"custom_page": schema.StringAttribute{
 								MarkdownDescription: "Custom message is of type uri_ref. Currently supported URL schemes is string:///. For string:/// scheme, message needs to be encoded in Base64 format.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(65536),
+								},
 							},
 						},
 					},
 					"default_captcha_challenge_parameters": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for default captcha challenge parameters.",
 					},
 					"default_js_challenge_parameters": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for default js challenge parameters.",
 					},
 					"default_mitigation_settings": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
@@ -8463,6 +9315,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"custom_page": schema.StringAttribute{
 								MarkdownDescription: "Custom message is of type uri_ref. Currently supported URL schemes is string:///. For string:/// scheme, message needs to be encoded in Base64 format.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(65536),
+								},
 							},
 							"js_script_delay": schema.Int64Attribute{
 								MarkdownDescription: "Delay introduced by Javascript, in milliseconds.",
@@ -8476,6 +9331,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -8484,6 +9342,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -8491,6 +9352,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -8504,11 +9368,14 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						MarkdownDescription: "[Enum: SPAM_SOURCES|WINDOWS_EXPLOITS|WEB_ATTACKS|BOTNETS|SCANNERS|REPUTATION|PHISHING|PROXY|MOBILE_THREATS|TOR_PROXY|DENIAL_OF_SERVICE|NETWORK] If the source IP matches on atleast one of the enabled IP threat categories, the request will be denied. Possible values are `SPAM_SOURCES`, `WINDOWS_EXPLOITS`, `WEB_ATTACKS`, `BOTNETS`, `SCANNERS`, `REPUTATION`, `PHISHING`, `PROXY`, `MOBILE_THREATS`, `TOR_PROXY`, `DENIAL_OF_SERVICE`, `NETWORK`. Defaults to `SPAM_SOURCES`.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(32),
+						},
 					},
 				},
 			},
 			"enable_malicious_user_detection": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for enable malicious user detection.",
 			},
 			"enable_threat_mesh": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
@@ -8520,14 +9387,23 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						"exact_path": schema.StringAttribute{
 							MarkdownDescription: "Specifies the exact path to GraphQL endpoint. Defaults to `/graphql`.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(256),
+							},
 						},
 						"exact_value": schema.StringAttribute{
-							MarkdownDescription: "Exact domain name.",
+							MarkdownDescription: "Exclusive with [any_domain suffix_value] Exact domain name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"suffix_value": schema.StringAttribute{
-							MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+							MarkdownDescription: "Exclusive with [any_domain exact_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -8535,7 +9411,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							MarkdownDescription: "Enable this option",
 						},
 						"graphql_settings": schema.SingleNestedBlock{
-							MarkdownDescription: "GraphQL Settings. GraphQL configuration.",
+							MarkdownDescription: "Configuration parameter for graphql settings.",
 							Attributes: map[string]schema.Attribute{
 								"max_batched_queries": schema.Int64Attribute{
 									MarkdownDescription: "Specify maximum number of queries in a single batched request.",
@@ -8565,10 +9441,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"description_spec": schema.StringAttribute{
 									MarkdownDescription: "Description. Human readable description.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+									},
 								},
 							},
 						},
@@ -8576,7 +9458,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							MarkdownDescription: "Enable this option",
 						},
 						"method_post": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for method post.",
 						},
 					},
 				},
@@ -8589,12 +9471,15 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:            true,
 					},
 					"port": schema.Int64Attribute{
-						MarkdownDescription: "HTTP port to Listen.",
+						MarkdownDescription: "Exclusive with [port_ranges] HTTP port to Listen.",
 						Optional:            true,
 					},
 					"port_ranges": schema.StringAttribute{
-						MarkdownDescription: "A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
+						MarkdownDescription: "Exclusive with [port] A string containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 512),
+						},
 					},
 				},
 			},
@@ -8612,11 +9497,11 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				},
 				Blocks: map[string]schema.Block{
 					"tls_cert_options": schema.SingleNestedBlock{
-						MarkdownDescription: "TLS OPTIONS. TLS Certificate OPTIONS.",
+						MarkdownDescription: "Configuration parameter for tls cert options.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"tls_cert_params": schema.SingleNestedBlock{
-								MarkdownDescription: "TLS Parameters. Select TLS Parameters and Certificates.",
+								MarkdownDescription: "Configuration parameter for tls cert params.",
 								Attributes:          map[string]schema.Attribute{},
 								Blocks: map[string]schema.Block{
 									"certificates": schema.ListNestedBlock{
@@ -8626,6 +9511,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -8634,6 +9522,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
+													},
 												},
 												"tenant": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -8641,6 +9532,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
 													},
 												},
 											},
@@ -8664,10 +9558,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"max_version": schema.StringAttribute{
 														MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+														},
 													},
 													"min_version": schema.StringAttribute{
 														MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+														},
 													},
 												},
 											},
@@ -8690,8 +9590,11 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												Optional:            true,
 											},
 											"trusted_ca_url": schema.StringAttribute{
-												MarkdownDescription: "Upload a Root CA Certificate specifically for this Load Balancer.",
+												MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Load Balancer.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 										Blocks: map[string]schema.Block{
@@ -8701,6 +9604,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 128),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -8709,6 +9615,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
 														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 64),
+														},
 													},
 													"tenant": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -8716,6 +9625,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(64),
 														},
 													},
 												},
@@ -8729,6 +9641,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 128),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -8737,6 +9652,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
 														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 64),
+														},
 													},
 													"tenant": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -8744,6 +9662,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(64),
 														},
 													},
 												},
@@ -8766,7 +9687,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								},
 							},
 							"tls_inline_params": schema.SingleNestedBlock{
-								MarkdownDescription: "Inline TLS Parameters. Inline TLS parameters.",
+								MarkdownDescription: "Configuration parameter for tls inline params.",
 								Attributes:          map[string]schema.Attribute{},
 								Blocks: map[string]schema.Block{
 									"no_mtls": schema.SingleNestedBlock{
@@ -8779,6 +9700,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"certificate_url": schema.StringAttribute{
 													MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 131072),
+													},
 												},
 												"description_spec": schema.StringAttribute{
 													MarkdownDescription: "Description. Description for the certificate.",
@@ -8793,11 +9717,14 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeBetween(1, 4),
+															},
 														},
 													},
 												},
 												"disable_ocsp_stapling": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 												},
 												"private_key": schema.SingleNestedBlock{
 													MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -8813,6 +9740,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																"location": schema.StringAttribute{
 																	MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(1024),
+																	},
 																},
 																"store_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -8830,13 +9760,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																"url": schema.StringAttribute{
 																	MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 131072),
+																	},
 																},
 															},
 														},
 													},
 												},
 												"use_system_defaults": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for use system defaults.",
 												},
 											},
 										},
@@ -8856,10 +9789,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"max_version": schema.StringAttribute{
 														MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+														},
 													},
 													"min_version": schema.StringAttribute{
 														MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+														},
 													},
 												},
 											},
@@ -8882,8 +9821,11 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												Optional:            true,
 											},
 											"trusted_ca_url": schema.StringAttribute{
-												MarkdownDescription: "Upload a Root CA Certificate specifically for this Load Balancer.",
+												MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Load Balancer.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 131072),
+												},
 											},
 										},
 										Blocks: map[string]schema.Block{
@@ -8893,6 +9835,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 128),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -8901,6 +9846,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
 														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 64),
+														},
 													},
 													"tenant": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -8908,6 +9856,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(64),
 														},
 													},
 												},
@@ -8921,6 +9872,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 128),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -8929,6 +9883,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
 														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 64),
+														},
 													},
 													"tenant": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -8936,6 +9893,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(64),
 														},
 													},
 												},
@@ -8979,10 +9939,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"tls_11_plus": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for tls 11 plus.",
 							},
 							"tls_12_plus": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for tls 12 plus.",
 							},
 						},
 					},
@@ -8998,6 +9958,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 					"custom_page": schema.StringAttribute{
 						MarkdownDescription: "Custom message is of type uri_ref. Currently supported URL schemes is string:///. For string:/// scheme, message needs to be encoded in Base64 format.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(65536),
+						},
 					},
 					"js_script_delay": schema.Int64Attribute{
 						MarkdownDescription: "Delay introduced by Javascript, in milliseconds.",
@@ -9021,6 +9984,48 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							},
 						},
 					},
+					"authorization_server": schema.SingleNestedBlock{
+						MarkdownDescription: "Reference to Authorization Server object.",
+						Attributes:          map[string]schema.Attribute{},
+						Blocks: map[string]schema.Block{
+							"authorization_servers": schema.ListNestedBlock{
+								MarkdownDescription: "Authorization Servers are configured separately in the 'Shared Objects' section of the Web App & API Protection workspace and used to fetch JWKS for JWT validation.",
+								NestedObject: schema.NestedBlockObject{
+									Attributes: map[string]schema.Attribute{
+										"name": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
+											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
+										},
+										"namespace": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
+										},
+										"tenant": schema.StringAttribute{
+											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
 					"jwks_config": schema.SingleNestedBlock{
 						MarkdownDescription: "The JSON Web Key Set (JWKS) is a set of keys used to verify JSON Web Token (JWT) issued by the Authorization Server. See RFC 7517 for more details.",
 						Attributes: map[string]schema.Attribute{
@@ -9037,6 +10042,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								MarkdownDescription: "Claim Names. Human-readable name for the resource",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(16),
+								},
 							},
 						},
 					},
@@ -9044,7 +10052,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						MarkdownDescription: "Configurable Validation of reserved Claims.",
 						Attributes: map[string]schema.Attribute{
 							"issuer": schema.StringAttribute{
-								MarkdownDescription: "Exact Match.",
+								MarkdownDescription: "Exact Match. Exclusive with [issuer_disable]",
 								Optional:            true,
 							},
 						},
@@ -9056,20 +10064,23 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										MarkdownDescription: "Values.",
 										Optional:            true,
 										ElementType:         types.StringType,
+										Validators: []validator.List{
+											listvalidator.SizeBetween(1, 16),
+										},
 									},
 								},
 							},
 							"audience_disable": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for audience disable.",
 							},
 							"issuer_disable": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for issuer disable.",
 							},
 							"validate_period_disable": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for validate period disable.",
 							},
 							"validate_period_enable": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for validate period enable.",
 							},
 						},
 					},
@@ -9087,6 +10098,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										MarkdownDescription: "API Groups. .",
 										Optional:            true,
 										ElementType:         types.StringType,
+										Validators: []validator.List{
+											listvalidator.SizeAtMost(32),
+										},
 									},
 								},
 							},
@@ -9097,17 +10111,20 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										MarkdownDescription: "Prefix Values. .",
 										Optional:            true,
 										ElementType:         types.StringType,
+										Validators: []validator.List{
+											listvalidator.SizeAtMost(16),
+										},
 									},
 								},
 							},
 						},
 					},
 					"token_location": schema.SingleNestedBlock{
-						MarkdownDescription: "Token Location. Location of JWT in HTTP request.",
+						MarkdownDescription: "Configuration parameter for token location.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"bearer_token": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for bearer token.",
 							},
 						},
 					},
@@ -9129,6 +10146,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 					"custom_page": schema.StringAttribute{
 						MarkdownDescription: "Custom message is of type uri_ref. Currently supported URL schemes is string:///. For string:/// scheme, message needs to be encoded in Base64 format.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(65536),
+						},
 					},
 					"js_script_delay": schema.Int64Attribute{
 						MarkdownDescription: "Delay introduced by Javascript, in milliseconds.",
@@ -9137,13 +10157,13 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"no_challenge": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for no challenge.",
 			},
 			"no_service_policies": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for no service policies.",
 			},
 			"origin_pool": schema.SingleNestedBlock{
-				MarkdownDescription: "CDN Origin Pool. Origin Pool for the CDN distribution.",
+				MarkdownDescription: "Configuration parameter for origin pool.",
 				Attributes: map[string]schema.Attribute{
 					"origin_request_timeout": schema.StringAttribute{
 						MarkdownDescription: "Configures the time after which a request to the origin will time out waiting for a response.",
@@ -9152,7 +10172,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				},
 				Blocks: map[string]schema.Block{
 					"more_origin_options": schema.SingleNestedBlock{
-						MarkdownDescription: "Origin Byte Range Request Config.",
+						MarkdownDescription: "Configuration parameter for more origin options.",
 						Attributes: map[string]schema.Attribute{
 							"enable_byte_range_request": schema.BoolAttribute{
 								MarkdownDescription: "Choice to enable/disable byte range requests towards origin.",
@@ -9181,8 +10201,11 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									MarkdownDescription: "Specify origin server with public IP address.",
 									Attributes: map[string]schema.Attribute{
 										"ip": schema.StringAttribute{
-											MarkdownDescription: "Public IPv4. Public IPv4 address.",
+											MarkdownDescription: "Public IPv4. Exclusive with [] Public IPv4 address.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 									},
 								},
@@ -9192,6 +10215,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"dns_name": schema.StringAttribute{
 											MarkdownDescription: "DNS Name. DNS Name .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 256),
+											},
 										},
 										"refresh_interval": schema.Int64Attribute{
 											MarkdownDescription: "Interval for DNS refresh in seconds. Max value is 7 days as per https://datatracker.ietf.org/doc/HTML/rfc8767.",
@@ -9208,6 +10234,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"dns_name": schema.StringAttribute{
 								MarkdownDescription: "DNS Name. DNS Name .",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 256),
+								},
 							},
 							"refresh_interval": schema.Int64Attribute{
 								MarkdownDescription: "Interval for DNS refresh in seconds. Max value is 7 days as per https://datatracker.ietf.org/doc/HTML/rfc8767.",
@@ -9219,23 +10248,26 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						MarkdownDescription: "TLS Parameters for Origin Servers. Upstream TLS Parameters.",
 						Attributes: map[string]schema.Attribute{
 							"max_session_keys": schema.Int64Attribute{
-								MarkdownDescription: "Number of session keys that are cached.",
+								MarkdownDescription: "Exclusive with [default_session_key_caching disable_session_key_caching] Number of session keys that are cached.",
 								Optional:            true,
 							},
 							"sni": schema.StringAttribute{
-								MarkdownDescription: "SNI value to be used.",
+								MarkdownDescription: "Exclusive with [disable_sni use_host_header_as_sni] SNI value to be used.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(256),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
 							"default_session_key_caching": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for default session key caching.",
 							},
 							"disable_session_key_caching": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable session key caching.",
 							},
 							"disable_sni": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable sni.",
 							},
 							"no_mtls": schema.SingleNestedBlock{
 								MarkdownDescription: "Enable this option",
@@ -9258,10 +10290,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											"max_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 											"min_version": schema.StringAttribute{
 												MarkdownDescription: "[Enum: TLS_AUTO|TLSv1_0|TLSv1_1|TLSv1_2|TLSv1_3] TlsProtocol is enumeration of supported TLS versions F5 Distributed Cloud will choose the optimal TLS version. Possible values are `TLS_AUTO`, `TLSv1_0`, `TLSv1_1`, `TLSv1_2`, `TLSv1_3`. Defaults to `TLS_AUTO`.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.OneOf("TLS_AUTO", "TLSv1_0", "TLSv1_1", "TLSv1_2", "TLSv1_3"),
+												},
 											},
 										},
 									},
@@ -9290,6 +10328,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"certificate_url": schema.StringAttribute{
 													MarkdownDescription: "TLS certificate. Certificate or certificate chain in PEM format including the PEM headers.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 131072),
+													},
 												},
 												"description_spec": schema.StringAttribute{
 													MarkdownDescription: "Description. Description for the certificate.",
@@ -9304,11 +10345,14 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "[Enum: INVALID_HASH_ALGORITHM|SHA256|SHA1] Ordered list of hash algorithms to be used. Possible values are `INVALID_HASH_ALGORITHM`, `SHA256`, `SHA1`. Defaults to `INVALID_HASH_ALGORITHM`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeBetween(1, 4),
+															},
 														},
 													},
 												},
 												"disable_ocsp_stapling": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for disable ocsp stapling.",
 												},
 												"private_key": schema.SingleNestedBlock{
 													MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
@@ -9324,6 +10368,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																"location": schema.StringAttribute{
 																	MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(1024),
+																	},
 																},
 																"store_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -9341,13 +10388,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																"url": schema.StringAttribute{
 																	MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 131072),
+																	},
 																},
 															},
 														},
 													},
 												},
 												"use_system_defaults": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for use system defaults.",
 												},
 											},
 										},
@@ -9360,6 +10410,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									"name": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 128),
+										},
 									},
 									"namespace": schema.StringAttribute{
 										MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -9367,6 +10420,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
+										},
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 64),
 										},
 									},
 									"tenant": schema.StringAttribute{
@@ -9376,15 +10432,21 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										PlanModifiers: []planmodifier.String{
 											stringplanmodifier.UseStateForUnknown(),
 										},
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
+										},
 									},
 								},
 							},
 							"use_server_verification": schema.SingleNestedBlock{
-								MarkdownDescription: "TLS Validation Context for Origin Servers. Upstream TLS Validation Context.",
+								MarkdownDescription: "Configuration parameter for use server verification.",
 								Attributes: map[string]schema.Attribute{
 									"trusted_ca_url": schema.StringAttribute{
-										MarkdownDescription: "Upload a Root CA Certificate specifically for this Origin Pool for verification of server's certificate.",
+										MarkdownDescription: "Exclusive with [trusted_ca] Upload a Root CA Certificate specifically for this Origin Pool for verification of server's certificate.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
 									},
 								},
 								Blocks: map[string]schema.Block{
@@ -9394,6 +10456,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											"name": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 128),
+												},
 											},
 											"namespace": schema.StringAttribute{
 												MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -9401,6 +10466,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												Computed:            true,
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
+												},
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 64),
 												},
 											},
 											"tenant": schema.StringAttribute{
@@ -9410,20 +10478,23 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												PlanModifiers: []planmodifier.String{
 													stringplanmodifier.UseStateForUnknown(),
 												},
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(64),
+												},
 											},
 										},
 									},
 								},
 							},
 							"volterra_trusted_ca": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for volterra trusted ca.",
 							},
 						},
 					},
 				},
 			},
 			"other_settings": schema.SingleNestedBlock{
-				MarkdownDescription: "Other Settings. Other Settings.",
+				MarkdownDescription: "Configuration parameter for other settings.",
 				Attributes: map[string]schema.Attribute{
 					"add_location": schema.BoolAttribute{
 						MarkdownDescription: "Add Location. X-example: true Appends header x-F5 Distributed Cloud-location = <RE-site-name> in responses.",
@@ -9438,11 +10509,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								MarkdownDescription: "List of keys of Headers to be removed from the HTTP request being sent towards upstream.",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(32),
+								},
 							},
 							"response_headers_to_remove": schema.ListAttribute{
 								MarkdownDescription: "List of keys of Headers to be removed from the HTTP response being sent towards downstream.",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(32),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -9457,10 +10534,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"name": schema.StringAttribute{
 											MarkdownDescription: "Name. Name of the HTTP header.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 256),
+											},
 										},
 										"value": schema.StringAttribute{
-											MarkdownDescription: "Value of the HTTP header.",
+											MarkdownDescription: "Exclusive with [secret_value] Value of the HTTP header.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(8096),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -9478,6 +10561,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -9495,6 +10581,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
@@ -9514,10 +10603,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"name": schema.StringAttribute{
 											MarkdownDescription: "Name. Name of the HTTP header.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 256),
+											},
 										},
 										"value": schema.StringAttribute{
-											MarkdownDescription: "Value of the HTTP header.",
+											MarkdownDescription: "Exclusive with [secret_value] Value of the HTTP header.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(8096),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -9535,6 +10630,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -9552,6 +10650,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
@@ -9573,16 +10674,22 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										MarkdownDescription: "Headers. List of headers.",
 										Optional:            true,
 										ElementType:         types.StringType,
+										Validators: []validator.List{
+											listvalidator.SizeAtMost(64),
+										},
 									},
 								},
 							},
 							"origin_log_options": schema.SingleNestedBlock{
-								MarkdownDescription: "Headers to Log. List of headers to Log.",
+								MarkdownDescription: "Configuration parameter for origin log options.",
 								Attributes: map[string]schema.Attribute{
 									"header_list": schema.ListAttribute{
 										MarkdownDescription: "Headers. List of headers.",
 										Optional:            true,
 										ElementType:         types.StringType,
+										Validators: []validator.List{
+											listvalidator.SizeAtMost(64),
+										},
 									},
 								},
 							},
@@ -9595,10 +10702,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"always_enable_captcha_challenge": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for always enable captcha challenge.",
 					},
 					"always_enable_js_challenge": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for always enable js challenge.",
 					},
 					"captcha_challenge_parameters": schema.SingleNestedBlock{
 						MarkdownDescription: "Enables loadbalancer to perform captcha challenge Captcha challenge will be based on Google Recaptcha. With this feature enabled, only clients that pass the captcha challenge will be allowed to complete the HTTP request. When loadbalancer is configured to do Captcha Challenge, it will redirect..",
@@ -9610,14 +10717,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"custom_page": schema.StringAttribute{
 								MarkdownDescription: "Custom message is of type uri_ref. Currently supported URL schemes is string:///. For string:/// scheme, message needs to be encoded in Base64 format.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(65536),
+								},
 							},
 						},
 					},
 					"default_captcha_challenge_parameters": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for default captcha challenge parameters.",
 					},
 					"default_js_challenge_parameters": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for default js challenge parameters.",
 					},
 					"default_mitigation_settings": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
@@ -9635,6 +10745,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"custom_page": schema.StringAttribute{
 								MarkdownDescription: "Custom message is of type uri_ref. Currently supported URL schemes is string:///. For string:/// scheme, message needs to be encoded in Base64 format.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(65536),
+								},
 							},
 							"js_script_delay": schema.Int64Attribute{
 								MarkdownDescription: "Delay introduced by Javascript, in milliseconds.",
@@ -9648,6 +10761,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -9655,6 +10771,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
 								},
 							},
 							"tenant": schema.StringAttribute{
@@ -9664,11 +10783,14 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 						},
 					},
 					"no_challenge": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for no challenge.",
 					},
 					"rule_list": schema.SingleNestedBlock{
 						MarkdownDescription: "List of challenge rules to be used in policy based challenge.",
@@ -9685,10 +10807,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"description_spec": schema.StringAttribute{
 													MarkdownDescription: "Description. Human readable description.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"name": schema.StringAttribute{
 													MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+													},
 												},
 											},
 										},
@@ -9721,14 +10849,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"name": schema.StringAttribute{
 																MarkdownDescription: "Case-sensitive JSON path in the HTTP request body.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 256),
+																},
 															},
 														},
 														Blocks: map[string]schema.Block{
 															"check_not_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check not present.",
 															},
 															"check_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check present.",
 															},
 															"item": schema.SingleNestedBlock{
 																MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -9737,16 +10868,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		MarkdownDescription: "List of exact values to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(64),
+																		},
 																	},
 																	"regex_values": schema.ListAttribute{
 																		MarkdownDescription: "List of regular expressions to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(16),
+																		},
 																	},
 																	"transformers": schema.ListAttribute{
-																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(9),
+																		},
 																	},
 																},
 															},
@@ -9760,6 +10900,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer.",
 															Optional:            true,
 															ElementType:         types.Int64Type,
+															Validators: []validator.List{
+																listvalidator.SizeBetween(1, 16),
+															},
 														},
 													},
 												},
@@ -9782,6 +10925,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																	"name": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																		},
 																	},
 																	"namespace": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -9789,6 +10936,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		Computed:            true,
 																		PlanModifiers: []planmodifier.String{
 																			stringplanmodifier.UseStateForUnknown(),
+																		},
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																		},
 																	},
 																	"tenant": schema.StringAttribute{
@@ -9819,26 +10970,38 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "List of exact values to match the input against.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(64),
+															},
 														},
 														"regex_values": schema.ListAttribute{
 															MarkdownDescription: "List of regular expressions to match the input against.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(16),
+															},
 														},
 														"transformers": schema.ListAttribute{
-															MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+															MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(9),
+															},
 														},
 													},
 												},
 												"client_selector": schema.SingleNestedBlock{
-													MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+													MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 													Attributes: map[string]schema.Attribute{
 														"expressions": schema.ListAttribute{
 															MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(1),
+															},
 														},
 													},
 												},
@@ -9853,14 +11016,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"name": schema.StringAttribute{
 																MarkdownDescription: "Case-sensitive cookie name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 256),
+																},
 															},
 														},
 														Blocks: map[string]schema.Block{
 															"check_not_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check not present.",
 															},
 															"check_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check present.",
 															},
 															"item": schema.SingleNestedBlock{
 																MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -9869,16 +11035,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		MarkdownDescription: "List of exact values to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(64),
+																		},
 																	},
 																	"regex_values": schema.ListAttribute{
 																		MarkdownDescription: "List of regular expressions to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(16),
+																		},
 																	},
 																	"transformers": schema.ListAttribute{
-																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(9),
+																		},
 																	},
 																},
 															},
@@ -9886,7 +11061,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													},
 												},
 												"disable_challenge": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for disable challenge.",
 												},
 												"domain_matcher": schema.SingleNestedBlock{
 													MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -9895,16 +11070,22 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "List of exact values to match the input against.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(64),
+															},
 														},
 														"regex_values": schema.ListAttribute{
 															MarkdownDescription: "List of regular expressions to match the input against.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(16),
+															},
 														},
 													},
 												},
 												"enable_captcha_challenge": schema.SingleNestedBlock{
-													MarkdownDescription: "Enable this option",
+													MarkdownDescription: "Configuration parameter for enable captcha challenge.",
 												},
 												"enable_javascript_challenge": schema.SingleNestedBlock{
 													MarkdownDescription: "Enable this option",
@@ -9920,14 +11101,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"name": schema.StringAttribute{
 																MarkdownDescription: "Case-insensitive HTTP header name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthBetween(1, 256),
+																},
 															},
 														},
 														Blocks: map[string]schema.Block{
 															"check_not_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check not present.",
 															},
 															"check_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check present.",
 															},
 															"item": schema.SingleNestedBlock{
 																MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -9936,16 +11120,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		MarkdownDescription: "List of exact values to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(64),
+																		},
 																	},
 																	"regex_values": schema.ListAttribute{
 																		MarkdownDescription: "List of regular expressions to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(16),
+																		},
 																	},
 																	"transformers": schema.ListAttribute{
-																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(9),
+																		},
 																	},
 																},
 															},
@@ -9963,6 +11156,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] List of methods values to match against. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(16),
+															},
 														},
 													},
 												},
@@ -9990,6 +11186,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																	"name": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																		},
 																	},
 																	"namespace": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -9997,6 +11197,10 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		Computed:            true,
 																		PlanModifiers: []planmodifier.String{
 																			stringplanmodifier.UseStateForUnknown(),
+																		},
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																		},
 																	},
 																	"tenant": schema.StringAttribute{
@@ -10031,6 +11235,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "IPv4 Prefix List. List of IPv4 prefix strings.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(128),
+															},
 														},
 													},
 												},
@@ -10041,6 +11248,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "List of exact path values to match the input HTTP path against.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(16),
+															},
 														},
 														"invert_matcher": schema.BoolAttribute{
 															MarkdownDescription: "Invert Path Matcher. Invert the match result.",
@@ -10050,21 +11260,33 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "List of path prefix values to match the input HTTP path against.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(16),
+															},
 														},
 														"regex_values": schema.ListAttribute{
 															MarkdownDescription: "List of regular expressions to match the input HTTP path against.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(16),
+															},
 														},
 														"suffix_values": schema.ListAttribute{
 															MarkdownDescription: "List of path suffix values to match the input HTTP path against.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(64),
+															},
 														},
 														"transformers": schema.ListAttribute{
-															MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+															MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(9),
+															},
 														},
 													},
 												},
@@ -10079,14 +11301,17 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"key": schema.StringAttribute{
 																MarkdownDescription: "Case-sensitive HTTP query parameter name.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(256),
+																},
 															},
 														},
 														Blocks: map[string]schema.Block{
 															"check_not_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check not present.",
 															},
 															"check_present": schema.SingleNestedBlock{
-																MarkdownDescription: "Enable this option",
+																MarkdownDescription: "Configuration parameter for check present.",
 															},
 															"item": schema.SingleNestedBlock{
 																MarkdownDescription: "Matcher specifies multiple criteria for matching an input string. The match is considered successful if any of the criteria are satisfied. The set of supported match criteria includes a list of exact values and a list of regular expressions.",
@@ -10095,16 +11320,25 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																		MarkdownDescription: "List of exact values to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(64),
+																		},
 																	},
 																	"regex_values": schema.ListAttribute{
 																		MarkdownDescription: "List of regular expressions to match the input against.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(16),
+																		},
 																	},
 																	"transformers": schema.ListAttribute{
-																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`. Defaults to `TRANSFORMER_NONE`.",
+																		MarkdownDescription: "[Enum: LOWER_CASE|UPPER_CASE|BASE64_DECODE|NORMALIZE_PATH|REMOVE_WHITESPACE|URL_DECODE|TRIM_LEFT|TRIM_RIGHT|TRIM] Ordered list of transformers (starting from index 0) to be applied to the path before matching. Possible values are `LOWER_CASE`, `UPPER_CASE`, `BASE64_DECODE`, `NORMALIZE_PATH`, `REMOVE_WHITESPACE`, `URL_DECODE`, `TRIM_LEFT`, `TRIM_RIGHT`, `TRIM`.",
 																		Optional:            true,
 																		ElementType:         types.StringType,
+																		Validators: []validator.List{
+																			listvalidator.SizeAtMost(9),
+																		},
 																	},
 																},
 															},
@@ -10112,22 +11346,31 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													},
 												},
 												"tls_fingerprint_matcher": schema.SingleNestedBlock{
-													MarkdownDescription: "TLS fingerprint matcher specifies multiple criteria for matching a TLS fingerprint. The set of supported positve match criteria includes a list of known classes of TLS fingerprints and a list of exact values. The match is considered successful if either of these positive criteria are satisfied..",
+													MarkdownDescription: "TLS fingerprint matcher specifies multiple criteria for matching a TLS fingerprint. The set of supported positive match criteria includes a list of known classes of TLS fingerprints and a list of exact values. The match is considered successful if either of these positive criteria are satisfied..",
 													Attributes: map[string]schema.Attribute{
 														"classes": schema.ListAttribute{
 															MarkdownDescription: "[Enum: TLS_FINGERPRINT_NONE|ANY_MALICIOUS_FINGERPRINT|ADWARE|ADWIND|DRIDEX|GOOTKIT|GOZI|JBIFROST|QUAKBOT|RANSOMWARE|TROLDESH|TOFSEE|TORRENTLOCKER|TRICKBOT] List of known classes of TLS fingerprints to match the input TLS JA3 fingerprint against. Possible values are `TLS_FINGERPRINT_NONE`, `ANY_MALICIOUS_FINGERPRINT`, `ADWARE`, `ADWIND`, `DRIDEX`, `GOOTKIT`, `GOZI`, `JBIFROST`, `QUAKBOT`, `RANSOMWARE`, `TROLDESH`, `TOFSEE`, `TORRENTLOCKER`, `TRICKBOT`. Defaults to `TLS_FINGERPRINT_NONE`.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(16),
+															},
 														},
 														"exact_values": schema.ListAttribute{
 															MarkdownDescription: "List of exact TLS JA3 fingerprints to match the input TLS JA3 fingerprint against.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(16),
+															},
 														},
 														"excluded_values": schema.ListAttribute{
 															MarkdownDescription: "List of TLS JA3 fingerprints to be excluded when matching the input TLS JA3 fingerprint. This can be used to skip known false positives when using one or more known TLS fingerprint classes in the enclosing matcher.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(32),
+															},
 														},
 													},
 												},
@@ -10144,6 +11387,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"custom_page": schema.StringAttribute{
 								MarkdownDescription: "Custom message is of type . Currently supported URL schemes is . For scheme, message needs to be encoded in Base64 format. You can specify this message as base64 encoded plain text message e.g. 'Blocked.' or it can be HTML paragraph or a body string encoded as base64 string E.g. '<p> Blocked..",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(65536),
+								},
 							},
 						},
 					},
@@ -10154,32 +11400,35 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"max_age_value": schema.Int64Attribute{
-							MarkdownDescription: "Add max age attribute.",
+							MarkdownDescription: "Exclusive with [ignore_max_age] Add max age attribute.",
 							Optional:            true,
 						},
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Cookie Name. Name of the Cookie .",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
 						"add_httponly": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for add httponly.",
 						},
 						"add_secure": schema.SingleNestedBlock{
 							MarkdownDescription: "Enable this option",
 						},
 						"disable_tampering_protection": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for disable tampering protection.",
 						},
 						"enable_tampering_protection": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for enable tampering protection.",
 						},
 						"ignore_httponly": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for ignore httponly.",
 						},
 						"ignore_max_age": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for ignore max age.",
 						},
 						"ignore_samesite": schema.SingleNestedBlock{
 							MarkdownDescription: "Enable this option",
@@ -10214,6 +11463,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -10222,6 +11474,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -10229,6 +11484,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -10243,6 +11501,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 								Optional:            true,
 								ElementType:         types.StringType,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(128),
+								},
 							},
 						},
 					},
@@ -10250,7 +11511,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						MarkdownDescription: "Enable this option",
 					},
 					"no_policies": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for no policies.",
 					},
 					"policies": schema.SingleNestedBlock{
 						MarkdownDescription: "List of rate limiter policies to be applied.",
@@ -10263,6 +11524,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -10271,6 +11535,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -10278,6 +11545,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -10303,6 +11573,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"unit": schema.StringAttribute{
 								MarkdownDescription: "[Enum: SECOND|MINUTE|HOUR] Unit for the period per which the rate limit is applied. - SECOND: Second Rate limit period unit is seconds - MINUTE: Minute Rate limit period unit is minutes - HOUR: Hour Rate limit period unit is hours - DAY: Day Rate limit period unit is days. Possible values are `SECOND`, `MINUTE`, `HOUR`. Defaults to `SECOND`.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.OneOf("SECOND", "MINUTE", "HOUR"),
+								},
 							},
 						},
 						Blocks: map[string]schema.Block{
@@ -10353,7 +11626,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"sensitive_data_policy": schema.SingleNestedBlock{
-				MarkdownDescription: "Sensitive Data Discovery. Settings for data type policy.",
+				MarkdownDescription: "Policy configuration for this feature.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"sensitive_data_policy_ref": schema.SingleNestedBlock{
@@ -10362,6 +11635,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -10370,6 +11646,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -10377,6 +11656,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -10394,18 +11676,18 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:            true,
 					},
 					"request_timeout": schema.Int64Attribute{
-						MarkdownDescription: ".",
+						MarkdownDescription: "Exclusive with [disable_request_timeout].",
 						Optional:            true,
 					},
 				},
 				Blocks: map[string]schema.Block{
 					"disable_request_timeout": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable request timeout.",
 					},
 				},
 			},
 			"system_default_timeouts": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for system default timeouts.",
 			},
 			"trusted_clients": schema.ListNestedBlock{
 				MarkdownDescription: "Define rules to skip processing of one or more features such as WAF, Bot Defense etc.",
@@ -10415,9 +11697,12 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							MarkdownDescription: "[Enum: SKIP_PROCESSING_WAF|SKIP_PROCESSING_BOT|SKIP_PROCESSING_MUM|SKIP_PROCESSING_IP_REPUTATION|SKIP_PROCESSING_API_PROTECTION|SKIP_PROCESSING_OAS_VALIDATION|SKIP_PROCESSING_DDOS_PROTECTION|SKIP_PROCESSING_THREAT_MESH|SKIP_PROCESSING_MALWARE_PROTECTION] Actions that should be taken when client identifier matches the rule. Possible values are `SKIP_PROCESSING_WAF`, `SKIP_PROCESSING_BOT`, `SKIP_PROCESSING_MUM`, `SKIP_PROCESSING_IP_REPUTATION`, `SKIP_PROCESSING_API_PROTECTION`, `SKIP_PROCESSING_OAS_VALIDATION`, `SKIP_PROCESSING_DDOS_PROTECTION`, `SKIP_PROCESSING_THREAT_MESH`, `SKIP_PROCESSING_MALWARE_PROTECTION`. Defaults to `SKIP_PROCESSING_WAF`.",
 							Optional:            true,
 							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.SizeAtMost(10),
+							},
 						},
 						"as_number": schema.Int64Attribute{
-							MarkdownDescription: "RFC 6793 defined 4-byte AS number.",
+							MarkdownDescription: "Exclusive with [http_header ip_prefix ipv6_prefix user_identifier] RFC 6793 defined 4-byte AS number.",
 							Optional:            true,
 						},
 						"expiration_timestamp": schema.StringAttribute{
@@ -10425,16 +11710,19 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							Optional:            true,
 						},
 						"ip_prefix": schema.StringAttribute{
-							MarkdownDescription: "IPv4 prefix string.",
+							MarkdownDescription: "Exclusive with [as_number http_header ipv6_prefix user_identifier] IPv4 prefix string.",
 							Optional:            true,
 						},
 						"ipv6_prefix": schema.StringAttribute{
-							MarkdownDescription: "IPv6 prefix string.",
+							MarkdownDescription: "Exclusive with [as_number http_header ip_prefix user_identifier] IPv6 prefix string.",
 							Optional:            true,
 						},
 						"user_identifier": schema.StringAttribute{
-							MarkdownDescription: "Identify user based on user identifier. User identifier value needs to be copied from security event.",
+							MarkdownDescription: "Exclusive with [as_number http_header ip_prefix ipv6_prefix] Identify user based on user identifier. User identifier value needs to be copied from security event.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthAtMost(256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -10442,7 +11730,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							MarkdownDescription: "Enable this option",
 						},
 						"http_header": schema.SingleNestedBlock{
-							MarkdownDescription: "HTTP Header. Request header name and value pairs.",
+							MarkdownDescription: "Configuration parameter for http header.",
 							Attributes:          map[string]schema.Attribute{},
 							Blocks: map[string]schema.Block{
 								"headers": schema.ListNestedBlock{
@@ -10450,8 +11738,11 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 									NestedObject: schema.NestedBlockObject{
 										Attributes: map[string]schema.Attribute{
 											"exact": schema.StringAttribute{
-												MarkdownDescription: "Header value to match exactly.",
+												MarkdownDescription: "Exclusive with [presence regex] Header value to match exactly.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthAtMost(256),
+												},
 											},
 											"invert_match": schema.BoolAttribute{
 												MarkdownDescription: "Invert the result of the match to detect missing header or non-matching value.",
@@ -10460,14 +11751,20 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											"name": schema.StringAttribute{
 												MarkdownDescription: "Name. Name of the header .",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 256),
+												},
 											},
 											"presence": schema.BoolAttribute{
-												MarkdownDescription: "If true, check for presence of header.",
+												MarkdownDescription: "Exclusive with [exact regex] If true, check for presence of header.",
 												Optional:            true,
 											},
 											"regex": schema.StringAttribute{
-												MarkdownDescription: "Regex match of the header value in re2 format.",
+												MarkdownDescription: "Exclusive with [exact presence] Regex match of the header value in re2 format.",
 												Optional:            true,
+												Validators: []validator.String{
+													stringvalidator.LengthBetween(1, 256),
+												},
 											},
 										},
 									},
@@ -10480,10 +11777,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								"description_spec": schema.StringAttribute{
 									MarkdownDescription: "Description. Human readable description.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+									},
 								},
 							},
 						},
@@ -10505,6 +11808,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -10512,6 +11818,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
 						},
 					},
 					"tenant": schema.StringAttribute{
@@ -10521,11 +11830,14 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 				},
 			},
 			"waf_exclusion": schema.SingleNestedBlock{
-				MarkdownDescription: "WAF Exclusion.",
+				MarkdownDescription: "Configuration parameter for waf exclusion.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"waf_exclusion_inline_rules": schema.SingleNestedBlock{
@@ -10537,8 +11849,11 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"exact_value": schema.StringAttribute{
-											MarkdownDescription: "Exact domain name.",
+											MarkdownDescription: "Exclusive with [any_domain suffix_value] Exact domain name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 256),
+											},
 										},
 										"expiration_timestamp": schema.StringAttribute{
 											MarkdownDescription: "Specifies expiration_timestamp the RFC 3339 format timestamp at which the containing rule is considered to be logically expired. The rule continues to exist in the configuration but is not applied anymore.",
@@ -10548,18 +11863,30 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] Methods. Methods to be matched. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 										"path_prefix": schema.StringAttribute{
-											MarkdownDescription: "Path prefix to match (e.g. The value / will match on all paths).",
+											MarkdownDescription: "Exclusive with [any_path path_regex] Path prefix to match (e.g. The value / will match on all paths).",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"path_regex": schema.StringAttribute{
-											MarkdownDescription: "Define the regex for the path. For example, the regex ^/.*$ will match on all paths.",
+											MarkdownDescription: "Exclusive with [any_path path_prefix] Define the regex for the path. For example, the regex ^/.*$ will match on all paths.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"suffix_value": schema.StringAttribute{
-											MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+											MarkdownDescription: "Exclusive with [any_domain exact_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 256),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -10580,14 +11907,23 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"context": schema.StringAttribute{
 																MarkdownDescription: "[Enum: CONTEXT_ANY|CONTEXT_BODY|CONTEXT_REQUEST|CONTEXT_RESPONSE|CONTEXT_PARAMETER|CONTEXT_HEADER|CONTEXT_COOKIE|CONTEXT_URL|CONTEXT_URI] The available contexts for Exclusion rules. - CONTEXT_ANY: CONTEXT_ANY Detection will be excluded for all contexts. - CONTEXT_BODY: CONTEXT_BODY Detection will be excluded for the request body. - CONTEXT_REQUEST: CONTEXT_REQUEST Detection will be excluded for the request. - CONTEXT_RESPONSE.. Possible values are `CONTEXT_ANY`, `CONTEXT_BODY`, `CONTEXT_REQUEST`, `CONTEXT_RESPONSE`, `CONTEXT_PARAMETER`, `CONTEXT_HEADER`, `CONTEXT_COOKIE`, `CONTEXT_URL`, `CONTEXT_URI`. Defaults to `CONTEXT_ANY`.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.OneOf("CONTEXT_ANY", "CONTEXT_BODY", "CONTEXT_REQUEST", "CONTEXT_RESPONSE", "CONTEXT_PARAMETER", "CONTEXT_HEADER", "CONTEXT_COOKIE", "CONTEXT_URL", "CONTEXT_URI"),
+																},
 															},
 															"context_name": schema.StringAttribute{
 																MarkdownDescription: "Relevant only for contexts: Header, Cookie and Parameter. Name of the Context that the WAF Exclusion Rules will check. Wildcard matching can be used by prefixing or suffixing the context name with an wildcard asterisk (*).",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(128),
+																},
 															},
 															"exclude_attack_type": schema.StringAttribute{
 																MarkdownDescription: "[Enum: ATTACK_TYPE_NONE|ATTACK_TYPE_NON_BROWSER_CLIENT|ATTACK_TYPE_OTHER_APPLICATION_ATTACKS|ATTACK_TYPE_TROJAN_BACKDOOR_SPYWARE|ATTACK_TYPE_DETECTION_EVASION|ATTACK_TYPE_VULNERABILITY_SCAN|ATTACK_TYPE_ABUSE_OF_FUNCTIONALITY|ATTACK_TYPE_AUTHENTICATION_AUTHORIZATION_ATTACKS|ATTACK_TYPE_BUFFER_OVERFLOW|ATTACK_TYPE_PREDICTABLE_RESOURCE_LOCATION|ATTACK_TYPE_INFORMATION_LEAKAGE|ATTACK_TYPE_DIRECTORY_INDEXING|ATTACK_TYPE_PATH_TRAVERSAL|ATTACK_TYPE_XPATH_INJECTION|ATTACK_TYPE_LDAP_INJECTION|ATTACK_TYPE_SERVER_SIDE_CODE_INJECTION|ATTACK_TYPE_COMMAND_EXECUTION|ATTACK_TYPE_SQL_INJECTION|ATTACK_TYPE_CROSS_SITE_SCRIPTING|ATTACK_TYPE_DENIAL_OF_SERVICE|ATTACK_TYPE_HTTP_PARSER_ATTACK|ATTACK_TYPE_SESSION_HIJACKING|ATTACK_TYPE_HTTP_RESPONSE_SPLITTING|ATTACK_TYPE_FORCEFUL_BROWSING|ATTACK_TYPE_REMOTE_FILE_INCLUDE|ATTACK_TYPE_MALICIOUS_FILE_UPLOAD|ATTACK_TYPE_GRAPHQL_PARSER_ATTACK] List of all Attack Types ATTACK_TYPE_NONE ATTACK_TYPE_NON_BROWSER_CLIENT ATTACK_TYPE_OTHER_APPLICATION_ATTACKS ATTACK_TYPE_TROJAN_BACKDOOR_SPYWARE ATTACK_TYPE_DETECTION_EVASION ATTACK_TYPE_VULNERABILITY_SCAN ATTACK_TYPE_ABUSE_OF_FUNCTIONALITY ATTACK_TYPE_AUTHENTICATION_AUTHORIZATION_ATTACKS.. Possible values are `ATTACK_TYPE_NONE`, `ATTACK_TYPE_NON_BROWSER_CLIENT`, `ATTACK_TYPE_OTHER_APPLICATION_ATTACKS`, `ATTACK_TYPE_TROJAN_BACKDOOR_SPYWARE`, `ATTACK_TYPE_DETECTION_EVASION`, `ATTACK_TYPE_VULNERABILITY_SCAN`, `ATTACK_TYPE_ABUSE_OF_FUNCTIONALITY`, `ATTACK_TYPE_AUTHENTICATION_AUTHORIZATION_ATTACKS`, `ATTACK_TYPE_BUFFER_OVERFLOW`, `ATTACK_TYPE_PREDICTABLE_RESOURCE_LOCATION`, `ATTACK_TYPE_INFORMATION_LEAKAGE`, `ATTACK_TYPE_DIRECTORY_INDEXING`, `ATTACK_TYPE_PATH_TRAVERSAL`, `ATTACK_TYPE_XPATH_INJECTION`, `ATTACK_TYPE_LDAP_INJECTION`, `ATTACK_TYPE_SERVER_SIDE_CODE_INJECTION`, `ATTACK_TYPE_COMMAND_EXECUTION`, `ATTACK_TYPE_SQL_INJECTION`, `ATTACK_TYPE_CROSS_SITE_SCRIPTING`, `ATTACK_TYPE_DENIAL_OF_SERVICE`, `ATTACK_TYPE_HTTP_PARSER_ATTACK`, `ATTACK_TYPE_SESSION_HIJACKING`, `ATTACK_TYPE_HTTP_RESPONSE_SPLITTING`, `ATTACK_TYPE_FORCEFUL_BROWSING`, `ATTACK_TYPE_REMOTE_FILE_INCLUDE`, `ATTACK_TYPE_MALICIOUS_FILE_UPLOAD`, `ATTACK_TYPE_GRAPHQL_PARSER_ATTACK`. Defaults to `ATTACK_TYPE_NONE`.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.OneOf("ATTACK_TYPE_NONE", "ATTACK_TYPE_NON_BROWSER_CLIENT", "ATTACK_TYPE_OTHER_APPLICATION_ATTACKS", "ATTACK_TYPE_TROJAN_BACKDOOR_SPYWARE", "ATTACK_TYPE_DETECTION_EVASION", "ATTACK_TYPE_VULNERABILITY_SCAN", "ATTACK_TYPE_ABUSE_OF_FUNCTIONALITY", "ATTACK_TYPE_AUTHENTICATION_AUTHORIZATION_ATTACKS", "ATTACK_TYPE_BUFFER_OVERFLOW", "ATTACK_TYPE_PREDICTABLE_RESOURCE_LOCATION", "ATTACK_TYPE_INFORMATION_LEAKAGE", "ATTACK_TYPE_DIRECTORY_INDEXING", "ATTACK_TYPE_PATH_TRAVERSAL", "ATTACK_TYPE_XPATH_INJECTION", "ATTACK_TYPE_LDAP_INJECTION", "ATTACK_TYPE_SERVER_SIDE_CODE_INJECTION", "ATTACK_TYPE_COMMAND_EXECUTION", "ATTACK_TYPE_SQL_INJECTION", "ATTACK_TYPE_CROSS_SITE_SCRIPTING", "ATTACK_TYPE_DENIAL_OF_SERVICE", "ATTACK_TYPE_HTTP_PARSER_ATTACK", "ATTACK_TYPE_SESSION_HIJACKING", "ATTACK_TYPE_HTTP_RESPONSE_SPLITTING", "ATTACK_TYPE_FORCEFUL_BROWSING", "ATTACK_TYPE_REMOTE_FILE_INCLUDE", "ATTACK_TYPE_MALICIOUS_FILE_UPLOAD", "ATTACK_TYPE_GRAPHQL_PARSER_ATTACK"),
+																},
 															},
 														},
 													},
@@ -10610,10 +11946,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"context": schema.StringAttribute{
 																MarkdownDescription: "[Enum: CONTEXT_ANY|CONTEXT_BODY|CONTEXT_REQUEST|CONTEXT_RESPONSE|CONTEXT_PARAMETER|CONTEXT_HEADER|CONTEXT_COOKIE|CONTEXT_URL|CONTEXT_URI] The available contexts for Exclusion rules. - CONTEXT_ANY: CONTEXT_ANY Detection will be excluded for all contexts. - CONTEXT_BODY: CONTEXT_BODY Detection will be excluded for the request body. - CONTEXT_REQUEST: CONTEXT_REQUEST Detection will be excluded for the request. - CONTEXT_RESPONSE.. Possible values are `CONTEXT_ANY`, `CONTEXT_BODY`, `CONTEXT_REQUEST`, `CONTEXT_RESPONSE`, `CONTEXT_PARAMETER`, `CONTEXT_HEADER`, `CONTEXT_COOKIE`, `CONTEXT_URL`, `CONTEXT_URI`. Defaults to `CONTEXT_ANY`.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.OneOf("CONTEXT_ANY", "CONTEXT_BODY", "CONTEXT_REQUEST", "CONTEXT_RESPONSE", "CONTEXT_PARAMETER", "CONTEXT_HEADER", "CONTEXT_COOKIE", "CONTEXT_URL", "CONTEXT_URI"),
+																},
 															},
 															"context_name": schema.StringAttribute{
 																MarkdownDescription: "Relevant only for contexts: Header, Cookie and Parameter. Name of the Context that the WAF Exclusion Rules will check. Wildcard matching can be used by prefixing or suffixing the context name with an wildcard asterisk (*).",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(128),
+																},
 															},
 															"signature_id": schema.Int64Attribute{
 																MarkdownDescription: "The allowed values for signature ID are 0 and in the range of 200000001-299999999. 0 implies that all signatures will be excluded for the specified context.",
@@ -10629,14 +11971,23 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															"context": schema.StringAttribute{
 																MarkdownDescription: "[Enum: CONTEXT_ANY|CONTEXT_BODY|CONTEXT_REQUEST|CONTEXT_RESPONSE|CONTEXT_PARAMETER|CONTEXT_HEADER|CONTEXT_COOKIE|CONTEXT_URL|CONTEXT_URI] The available contexts for Exclusion rules. - CONTEXT_ANY: CONTEXT_ANY Detection will be excluded for all contexts. - CONTEXT_BODY: CONTEXT_BODY Detection will be excluded for the request body. - CONTEXT_REQUEST: CONTEXT_REQUEST Detection will be excluded for the request. - CONTEXT_RESPONSE.. Possible values are `CONTEXT_ANY`, `CONTEXT_BODY`, `CONTEXT_REQUEST`, `CONTEXT_RESPONSE`, `CONTEXT_PARAMETER`, `CONTEXT_HEADER`, `CONTEXT_COOKIE`, `CONTEXT_URL`, `CONTEXT_URI`. Defaults to `CONTEXT_ANY`.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.OneOf("CONTEXT_ANY", "CONTEXT_BODY", "CONTEXT_REQUEST", "CONTEXT_RESPONSE", "CONTEXT_PARAMETER", "CONTEXT_HEADER", "CONTEXT_COOKIE", "CONTEXT_URL", "CONTEXT_URI"),
+																},
 															},
 															"context_name": schema.StringAttribute{
 																MarkdownDescription: "Relevant only for contexts: Header, Cookie and Parameter. Name of the Context that the WAF Exclusion Rules will check. Wildcard matching can be used by prefixing or suffixing the context name with an wildcard asterisk (*).",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.LengthAtMost(128),
+																},
 															},
 															"exclude_violation": schema.StringAttribute{
 																MarkdownDescription: "[Enum: VIOL_NONE|VIOL_FILETYPE|VIOL_METHOD|VIOL_MANDATORY_HEADER|VIOL_HTTP_RESPONSE_STATUS|VIOL_REQUEST_MAX_LENGTH|VIOL_FILE_UPLOAD|VIOL_FILE_UPLOAD_IN_BODY|VIOL_XML_MALFORMED|VIOL_JSON_MALFORMED|VIOL_ASM_COOKIE_MODIFIED|VIOL_HTTP_PROTOCOL_MULTIPLE_HOST_HEADERS|VIOL_HTTP_PROTOCOL_BAD_HOST_HEADER_VALUE|VIOL_HTTP_PROTOCOL_UNPARSABLE_REQUEST_CONTENT|VIOL_HTTP_PROTOCOL_NULL_IN_REQUEST|VIOL_HTTP_PROTOCOL_BAD_HTTP_VERSION|VIOL_HTTP_PROTOCOL_SEVERAL_CONTENT_LENGTH_HEADERS|VIOL_EVASION_DIRECTORY_TRAVERSALS|VIOL_MALFORMED_REQUEST|VIOL_EVASION_MULTIPLE_DECODING|VIOL_DATA_GUARD|VIOL_EVASION_APACHE_WHITESPACE|VIOL_COOKIE_MODIFIED|VIOL_EVASION_IIS_UNICODE_CODEPOINTS|VIOL_EVASION_IIS_BACKSLASHES|VIOL_EVASION_PERCENT_U_DECODING|VIOL_EVASION_BARE_BYTE_DECODING|VIOL_EVASION_BAD_UNESCAPE|VIOL_HTTP_PROTOCOL_BODY_IN_GET_OR_HEAD_REQUEST|VIOL_ENCODING|VIOL_COOKIE_MALFORMED|VIOL_GRAPHQL_FORMAT|VIOL_GRAPHQL_MALFORMED|VIOL_GRAPHQL_INTROSPECTION_QUERY] List of all supported Violation Types VIOL_NONE VIOL_FILETYPE VIOL_METHOD VIOL_MANDATORY_HEADER VIOL_HTTP_RESPONSE_STATUS VIOL_REQUEST_MAX_LENGTH VIOL_FILE_UPLOAD VIOL_FILE_UPLOAD_IN_BODY VIOL_XML_MALFORMED VIOL_JSON_MALFORMED VIOL_ASM_COOKIE_MODIFIED VIOL_HTTP_PROTOCOL_MULTIPLE_HOST_HEADERS.. Possible values are `VIOL_NONE`, `VIOL_FILETYPE`, `VIOL_METHOD`, `VIOL_MANDATORY_HEADER`, `VIOL_HTTP_RESPONSE_STATUS`, `VIOL_REQUEST_MAX_LENGTH`, `VIOL_FILE_UPLOAD`, `VIOL_FILE_UPLOAD_IN_BODY`, `VIOL_XML_MALFORMED`, `VIOL_JSON_MALFORMED`, `VIOL_ASM_COOKIE_MODIFIED`, `VIOL_HTTP_PROTOCOL_MULTIPLE_HOST_HEADERS`, `VIOL_HTTP_PROTOCOL_BAD_HOST_HEADER_VALUE`, `VIOL_HTTP_PROTOCOL_UNPARSABLE_REQUEST_CONTENT`, `VIOL_HTTP_PROTOCOL_NULL_IN_REQUEST`, `VIOL_HTTP_PROTOCOL_BAD_HTTP_VERSION`, `VIOL_HTTP_PROTOCOL_SEVERAL_CONTENT_LENGTH_HEADERS`, `VIOL_EVASION_DIRECTORY_TRAVERSALS`, `VIOL_MALFORMED_REQUEST`, `VIOL_EVASION_MULTIPLE_DECODING`, `VIOL_DATA_GUARD`, `VIOL_EVASION_APACHE_WHITESPACE`, `VIOL_COOKIE_MODIFIED`, `VIOL_EVASION_IIS_UNICODE_CODEPOINTS`, `VIOL_EVASION_IIS_BACKSLASHES`, `VIOL_EVASION_PERCENT_U_DECODING`, `VIOL_EVASION_BARE_BYTE_DECODING`, `VIOL_EVASION_BAD_UNESCAPE`, `VIOL_HTTP_PROTOCOL_BODY_IN_GET_OR_HEAD_REQUEST`, `VIOL_ENCODING`, `VIOL_COOKIE_MALFORMED`, `VIOL_GRAPHQL_FORMAT`, `VIOL_GRAPHQL_MALFORMED`, `VIOL_GRAPHQL_INTROSPECTION_QUERY`. Defaults to `VIOL_NONE`.",
 																Optional:            true,
+																Validators: []validator.String{
+																	stringvalidator.OneOf("VIOL_NONE", "VIOL_FILETYPE", "VIOL_METHOD", "VIOL_MANDATORY_HEADER", "VIOL_HTTP_RESPONSE_STATUS", "VIOL_REQUEST_MAX_LENGTH", "VIOL_FILE_UPLOAD", "VIOL_FILE_UPLOAD_IN_BODY", "VIOL_XML_MALFORMED", "VIOL_JSON_MALFORMED", "VIOL_ASM_COOKIE_MODIFIED", "VIOL_HTTP_PROTOCOL_MULTIPLE_HOST_HEADERS", "VIOL_HTTP_PROTOCOL_BAD_HOST_HEADER_VALUE", "VIOL_HTTP_PROTOCOL_UNPARSABLE_REQUEST_CONTENT", "VIOL_HTTP_PROTOCOL_NULL_IN_REQUEST", "VIOL_HTTP_PROTOCOL_BAD_HTTP_VERSION", "VIOL_HTTP_PROTOCOL_SEVERAL_CONTENT_LENGTH_HEADERS", "VIOL_EVASION_DIRECTORY_TRAVERSALS", "VIOL_MALFORMED_REQUEST", "VIOL_EVASION_MULTIPLE_DECODING", "VIOL_DATA_GUARD", "VIOL_EVASION_APACHE_WHITESPACE", "VIOL_COOKIE_MODIFIED", "VIOL_EVASION_IIS_UNICODE_CODEPOINTS", "VIOL_EVASION_IIS_BACKSLASHES", "VIOL_EVASION_PERCENT_U_DECODING", "VIOL_EVASION_BARE_BYTE_DECODING", "VIOL_EVASION_BAD_UNESCAPE", "VIOL_HTTP_PROTOCOL_BODY_IN_GET_OR_HEAD_REQUEST", "VIOL_ENCODING", "VIOL_COOKIE_MALFORMED", "VIOL_GRAPHQL_FORMAT", "VIOL_GRAPHQL_MALFORMED", "VIOL_GRAPHQL_INTROSPECTION_QUERY"),
+																},
 															},
 														},
 													},
@@ -10649,10 +12000,16 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 												"description_spec": schema.StringAttribute{
 													MarkdownDescription: "Description. Human readable description.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"name": schema.StringAttribute{
 													MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 1024),
+													},
 												},
 											},
 										},
@@ -10670,6 +12027,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -10678,6 +12038,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -10685,6 +12048,9 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -10797,6 +12163,13 @@ func (r *CDNLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Domains.IsNull() && !data.Domains.IsUnknown() {
+		var domainsList []string
+		resp.Diagnostics.Append(data.Domains.ElementsAs(ctx, &domainsList, false)...)
+		if !resp.Diagnostics.HasError() {
+			createReq.Spec["domains"] = domainsList
+		}
+	}
 	if data.ActiveServicePolicies != nil {
 		active_service_policiesMap := make(map[string]interface{})
 		if len(data.ActiveServicePolicies.Policies) > 0 {
@@ -11385,13 +12758,6 @@ func (r *CDNLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 		disable_wafMap := make(map[string]interface{})
 		createReq.Spec["disable_waf"] = disable_wafMap
 	}
-	if !data.Domains.IsNull() && !data.Domains.IsUnknown() {
-		var domainsList []string
-		resp.Diagnostics.Append(data.Domains.ElementsAs(ctx, &domainsList, false)...)
-		if !resp.Diagnostics.HasError() {
-			createReq.Spec["domains"] = domainsList
-		}
-	}
 	if data.EnableAPIDiscovery != nil {
 		enable_api_discoveryMap := make(map[string]interface{})
 		if data.EnableAPIDiscovery.APICrawler != nil {
@@ -11611,6 +12977,10 @@ func (r *CDNLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 		if data.JWTValidation.Action != nil {
 			actionNestedMap := make(map[string]interface{})
 			jwt_validationMap["action"] = actionNestedMap
+		}
+		if data.JWTValidation.AuthorizationServer != nil {
+			authorization_serverNestedMap := make(map[string]interface{})
+			jwt_validationMap["authorization_server"] = authorization_serverNestedMap
 		}
 		if data.JWTValidation.JwksConfig != nil {
 			jwks_configNestedMap := make(map[string]interface{})
@@ -12077,6 +13447,21 @@ func (r *CDNLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["domains"].([]interface{}); ok && len(v) > 0 {
+		var domainsList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				domainsList = append(domainsList, s)
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, domainsList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Domains = listVal
+		}
+	} else {
+		data.Domains = types.ListNull(types.StringType)
+	}
 	if blockData, ok := apiResource.Spec["active_service_policies"].(map[string]interface{}); ok && (isImport || data.ActiveServicePolicies != nil) {
 		data.ActiveServicePolicies = &CDNLoadBalancerActiveServicePoliciesModel{
 			Policies: func() []CDNLoadBalancerActiveServicePoliciesPoliciesModel {
@@ -13050,21 +14435,6 @@ func (r *CDNLoadBalancerResource) Create(ctx context.Context, req resource.Creat
 		data.DisableWAF = &CDNLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["domains"].([]interface{}); ok && len(v) > 0 {
-		var domainsList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				domainsList = append(domainsList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, domainsList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Domains = listVal
-		}
-	} else {
-		data.Domains = types.ListNull(types.StringType)
-	}
 	if _, ok := apiResource.Spec["enable_api_discovery"].(map[string]interface{}); ok && isImport && data.EnableAPIDiscovery == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.EnableAPIDiscovery = &CDNLoadBalancerEnableAPIDiscoveryModel{}
@@ -14068,6 +15438,21 @@ func (r *CDNLoadBalancerResource) Read(ctx context.Context, req resource.ReadReq
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["domains"].([]interface{}); ok && len(v) > 0 {
+		var domainsList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				domainsList = append(domainsList, s)
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, domainsList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Domains = listVal
+		}
+	} else {
+		data.Domains = types.ListNull(types.StringType)
+	}
 	if blockData, ok := apiResource.Spec["active_service_policies"].(map[string]interface{}); ok && (isImport || data.ActiveServicePolicies != nil) {
 		data.ActiveServicePolicies = &CDNLoadBalancerActiveServicePoliciesModel{
 			Policies: func() []CDNLoadBalancerActiveServicePoliciesPoliciesModel {
@@ -15041,21 +16426,6 @@ func (r *CDNLoadBalancerResource) Read(ctx context.Context, req resource.ReadReq
 		data.DisableWAF = &CDNLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["domains"].([]interface{}); ok && len(v) > 0 {
-		var domainsList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				domainsList = append(domainsList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, domainsList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Domains = listVal
-		}
-	} else {
-		data.Domains = types.ListNull(types.StringType)
-	}
 	if _, ok := apiResource.Spec["enable_api_discovery"].(map[string]interface{}); ok && isImport && data.EnableAPIDiscovery == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.EnableAPIDiscovery = &CDNLoadBalancerEnableAPIDiscoveryModel{}
@@ -16030,6 +17400,13 @@ func (r *CDNLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Domains.IsNull() && !data.Domains.IsUnknown() {
+		var domainsList []string
+		resp.Diagnostics.Append(data.Domains.ElementsAs(ctx, &domainsList, false)...)
+		if !resp.Diagnostics.HasError() {
+			apiResource.Spec["domains"] = domainsList
+		}
+	}
 	if data.ActiveServicePolicies != nil {
 		active_service_policiesMap := make(map[string]interface{})
 		if len(data.ActiveServicePolicies.Policies) > 0 {
@@ -16618,13 +17995,6 @@ func (r *CDNLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 		disable_wafMap := make(map[string]interface{})
 		apiResource.Spec["disable_waf"] = disable_wafMap
 	}
-	if !data.Domains.IsNull() && !data.Domains.IsUnknown() {
-		var domainsList []string
-		resp.Diagnostics.Append(data.Domains.ElementsAs(ctx, &domainsList, false)...)
-		if !resp.Diagnostics.HasError() {
-			apiResource.Spec["domains"] = domainsList
-		}
-	}
 	if data.EnableAPIDiscovery != nil {
 		enable_api_discoveryMap := make(map[string]interface{})
 		if data.EnableAPIDiscovery.APICrawler != nil {
@@ -16844,6 +18214,10 @@ func (r *CDNLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 		if data.JWTValidation.Action != nil {
 			actionNestedMap := make(map[string]interface{})
 			jwt_validationMap["action"] = actionNestedMap
+		}
+		if data.JWTValidation.AuthorizationServer != nil {
+			authorization_serverNestedMap := make(map[string]interface{})
+			jwt_validationMap["authorization_server"] = authorization_serverNestedMap
 		}
 		if data.JWTValidation.JwksConfig != nil {
 			jwks_configNestedMap := make(map[string]interface{})
@@ -17321,6 +18695,21 @@ func (r *CDNLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["domains"].([]interface{}); ok && len(v) > 0 {
+		var domainsList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				domainsList = append(domainsList, s)
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, domainsList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Domains = listVal
+		}
+	} else {
+		data.Domains = types.ListNull(types.StringType)
+	}
 	if blockData, ok := apiResource.Spec["active_service_policies"].(map[string]interface{}); ok && (isImport || data.ActiveServicePolicies != nil) {
 		data.ActiveServicePolicies = &CDNLoadBalancerActiveServicePoliciesModel{
 			Policies: func() []CDNLoadBalancerActiveServicePoliciesPoliciesModel {
@@ -18294,21 +19683,6 @@ func (r *CDNLoadBalancerResource) Update(ctx context.Context, req resource.Updat
 		data.DisableWAF = &CDNLoadBalancerEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if v, ok := apiResource.Spec["domains"].([]interface{}); ok && len(v) > 0 {
-		var domainsList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				domainsList = append(domainsList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, domainsList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Domains = listVal
-		}
-	} else {
-		data.Domains = types.ListNull(types.StringType)
-	}
 	if _, ok := apiResource.Spec["enable_api_discovery"].(map[string]interface{}); ok && isImport && data.EnableAPIDiscovery == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.EnableAPIDiscovery = &CDNLoadBalancerEnableAPIDiscoveryModel{}

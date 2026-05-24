@@ -2,6 +2,18 @@
 # Manages child_tenant config instance. Name of the object is the name of the child tenant to be created. in F5 Distributed Cloud.
 
 # Basic Child Tenant configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_child_tenant" "example" {
   name      = "example-child-tenant"
   namespace = "staging"
@@ -16,7 +28,7 @@ resource "f5xc_child_tenant" "example" {
   }
 
   # Resource-specific configuration
-  # Object reference. This type establishes a direct referenc...
+  # Object reference. This type establishes a direct reference...
   child_tenant_manager {
     # Configure child_tenant_manager settings
   }

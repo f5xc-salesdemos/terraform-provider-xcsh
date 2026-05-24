@@ -2,6 +2,18 @@
 # Manages a Registration resource in F5 Distributed Cloud for vpm creates registration using this message, never used by users. configuration.
 
 # Basic Registration configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_registration" "example" {
   name      = "example-registration"
   namespace = "staging"

@@ -1,6 +1,17 @@
 # Endpoint Resource Example
 # Manages endpoint will create the object in the storage backend for namespace metadata.namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Endpoint configuration
 resource "f5xc_endpoint" "example" {
   name      = "example-endpoint"

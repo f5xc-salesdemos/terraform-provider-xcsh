@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -360,13 +364,13 @@ type EnhancedFirewallPolicyResourceModel struct {
 	Labels              types.Map                                       `tfsdk:"labels"`
 	ID                  types.String                                    `tfsdk:"id"`
 	Timeouts            timeouts.Value                                  `tfsdk:"timeouts"`
-	AllowAll            *EnhancedFirewallPolicyEmptyModel               `tfsdk:"allow_all"`
 	AllowedDestinations *EnhancedFirewallPolicyAllowedDestinationsModel `tfsdk:"allowed_destinations"`
 	AllowedSources      *EnhancedFirewallPolicyAllowedSourcesModel      `tfsdk:"allowed_sources"`
 	DeniedDestinations  *EnhancedFirewallPolicyDeniedDestinationsModel  `tfsdk:"denied_destinations"`
 	DeniedSources       *EnhancedFirewallPolicyDeniedSourcesModel       `tfsdk:"denied_sources"`
 	DenyAll             *EnhancedFirewallPolicyEmptyModel               `tfsdk:"deny_all"`
 	RuleList            *EnhancedFirewallPolicyRuleListModel            `tfsdk:"rule_list"`
+	AllowAll            *EnhancedFirewallPolicyEmptyModel               `tfsdk:"allow_all"`
 }
 
 func (r *EnhancedFirewallPolicyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -430,9 +434,6 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 				Update: true,
 				Delete: true,
 			}),
-			"allow_all": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: allow_all, allowed_destinations, allowed_sources, denied_destinations, denied_sources, deny_all, rule_list] Enable this option",
-			},
 			"allowed_destinations": schema.SingleNestedBlock{
 				MarkdownDescription: "List of IP Address prefixes. Prefix must contain both prefix and prefix-length The list can contain mix of both IPv4 and IPv6 prefixes.",
 				Attributes: map[string]schema.Attribute{
@@ -440,6 +441,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 						MarkdownDescription: "IP Address prefix in string format. String must contain both prefix and prefix-length.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(256),
+						},
 					},
 				},
 			},
@@ -450,6 +454,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 						MarkdownDescription: "IP Address prefix in string format. String must contain both prefix and prefix-length.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(256),
+						},
 					},
 				},
 			},
@@ -460,6 +467,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 						MarkdownDescription: "IP Address prefix in string format. String must contain both prefix and prefix-length.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(256),
+						},
 					},
 				},
 			},
@@ -470,6 +480,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 						MarkdownDescription: "IP Address prefix in string format. String must contain both prefix and prefix-length.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(256),
+						},
 					},
 				},
 			},
@@ -491,11 +504,14 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 										"action": schema.StringAttribute{
 											MarkdownDescription: "[Enum: NOLOG|LOG] Choice to choose logging or no logging This works together with option selected via NetworkPolicyRuleAction or any other action specified x-. Possible values are `NOLOG`, `LOG`. Defaults to `NOLOG`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("NOLOG", "LOG"),
+											},
 										},
 									},
 								},
 								"all_destinations": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all destinations.",
 								},
 								"all_sli_vips": schema.SingleNestedBlock{
 									MarkdownDescription: "Enable this option",
@@ -504,22 +520,22 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 									MarkdownDescription: "Enable this option",
 								},
 								"all_sources": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all sources.",
 								},
 								"all_tcp_traffic": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all tcp traffic.",
 								},
 								"all_traffic": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all traffic.",
 								},
 								"all_udp_traffic": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all udp traffic.",
 								},
 								"allow": schema.SingleNestedBlock{
 									MarkdownDescription: "Enable this option",
 								},
 								"applications": schema.SingleNestedBlock{
-									MarkdownDescription: "Applications. Application protocols like HTTP, SNMP.",
+									MarkdownDescription: "Configuration parameter for applications.",
 									Attributes: map[string]schema.Attribute{
 										"applications": schema.ListAttribute{
 											MarkdownDescription: "[Enum: APPLICATION_HTTP|APPLICATION_HTTPS|APPLICATION_SNMP|APPLICATION_DNS] Application Protocols. Application protocols like HTTP, SNMP. Possible values are `APPLICATION_HTTP`, `APPLICATION_HTTPS`, `APPLICATION_SNMP`, `APPLICATION_DNS`. Defaults to `APPLICATION_HTTP`.",
@@ -532,12 +548,15 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 									MarkdownDescription: "Enable this option",
 								},
 								"destination_aws_vpc_ids": schema.SingleNestedBlock{
-									MarkdownDescription: "AWS VPC List. List of VPC Identifiers in AWS.",
+									MarkdownDescription: "Configuration parameter for destination aws vpc ids.",
 									Attributes: map[string]schema.Attribute{
 										"vpc_id": schema.ListAttribute{
 											MarkdownDescription: "List of VPC Identifiers in AWS .",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(256),
+											},
 										},
 									},
 								},
@@ -560,6 +579,10 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -567,6 +590,10 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -591,12 +618,15 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 									},
 								},
 								"destination_label_selector": schema.SingleNestedBlock{
-									MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+									MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 									Attributes: map[string]schema.Attribute{
 										"expressions": schema.ListAttribute{
 											MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(1),
+											},
 										},
 									},
 								},
@@ -607,6 +637,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 									},
 								},
@@ -620,6 +653,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 												"name": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 128),
+													},
 												},
 												"namespace": schema.StringAttribute{
 													MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -627,6 +663,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 													Computed:            true,
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
+													},
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 64),
 													},
 												},
 												"tenant": schema.StringAttribute{
@@ -636,16 +675,19 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 													PlanModifiers: []planmodifier.String{
 														stringplanmodifier.UseStateForUnknown(),
 													},
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(64),
+													},
 												},
 											},
 										},
 									},
 								},
 								"inside_destinations": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for inside destinations.",
 								},
 								"inside_sources": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for inside sources.",
 								},
 								"label_matcher": schema.SingleNestedBlock{
 									MarkdownDescription: "Label matcher specifies a list of label keys whose values need to match for source/client and destination/server. Note that the actual label values are not specified and do not matter. This allows an ability to scope grouping by the label key name.",
@@ -654,6 +696,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 											MarkdownDescription: "The list of label key names that have to match.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 									},
 								},
@@ -663,18 +708,24 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Human readable description.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"name": schema.StringAttribute{
 											MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+											},
 										},
 									},
 								},
 								"outside_destinations": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for outside destinations.",
 								},
 								"outside_sources": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for outside sources.",
 								},
 								"protocol_port_range": schema.SingleNestedBlock{
 									MarkdownDescription: "Protocol and Port. Protocol and Port ranges.",
@@ -683,6 +734,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 											MarkdownDescription: "List of port ranges. Each range is a single port or a pair of start and end ports e.g. 8080-8192.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 										"protocol": schema.StringAttribute{
 											MarkdownDescription: "Protocol in IP packet to be used as match criteria Values are TCP, UDP, and icmp.",
@@ -691,12 +745,15 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 									},
 								},
 								"source_aws_vpc_ids": schema.SingleNestedBlock{
-									MarkdownDescription: "AWS VPC List. List of VPC Identifiers in AWS.",
+									MarkdownDescription: "Configuration parameter for source aws vpc ids.",
 									Attributes: map[string]schema.Attribute{
 										"vpc_id": schema.ListAttribute{
 											MarkdownDescription: "List of VPC Identifiers in AWS .",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(256),
+											},
 										},
 									},
 								},
@@ -719,6 +776,10 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -726,6 +787,10 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -750,12 +815,15 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 									},
 								},
 								"source_label_selector": schema.SingleNestedBlock{
-									MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+									MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 									Attributes: map[string]schema.Attribute{
 										"expressions": schema.ListAttribute{
 											MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(1),
+											},
 										},
 									},
 								},
@@ -766,6 +834,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 									},
 								},
@@ -773,6 +844,9 @@ func (r *EnhancedFirewallPolicyResource) Schema(ctx context.Context, req resourc
 						},
 					},
 				},
+			},
+			"allow_all": schema.SingleNestedBlock{
+				MarkdownDescription: "[OneOf: allow_all, allowed_destinations, allowed_sources, denied_destinations, denied_sources, deny_all, rule_list] Enable this option. Defaults to `map[]`. Server applies default when omitted.",
 			},
 		},
 	}
@@ -880,10 +954,6 @@ func (r *EnhancedFirewallPolicyResource) Create(ctx context.Context, req resourc
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.AllowAll != nil {
-		allow_allMap := make(map[string]interface{})
-		createReq.Spec["allow_all"] = allow_allMap
-	}
 	if data.AllowedDestinations != nil {
 		allowed_destinationsMap := make(map[string]interface{})
 		if !data.AllowedDestinations.Prefix.IsNull() && !data.AllowedDestinations.Prefix.IsUnknown() {
@@ -1051,6 +1121,10 @@ func (r *EnhancedFirewallPolicyResource) Create(ctx context.Context, req resourc
 		}
 		createReq.Spec["rule_list"] = rule_listMap
 	}
+	if data.AllowAll != nil {
+		allow_allMap := make(map[string]interface{})
+		createReq.Spec["allow_all"] = allow_allMap
+	}
 
 	apiResource, err := r.client.CreateEnhancedFirewallPolicy(ctx, createReq)
 	if err != nil {
@@ -1064,11 +1138,6 @@ func (r *EnhancedFirewallPolicyResource) Create(ctx context.Context, req resourc
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["allow_all"].(map[string]interface{}); ok && isImport && data.AllowAll == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.AllowAll = &EnhancedFirewallPolicyEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["allowed_destinations"].(map[string]interface{}); ok && (isImport || data.AllowedDestinations != nil) {
 		data.AllowedDestinations = &EnhancedFirewallPolicyAllowedDestinationsModel{
 			Prefix: func() types.List {
@@ -1348,6 +1417,11 @@ func (r *EnhancedFirewallPolicyResource) Create(ctx context.Context, req resourc
 			}(),
 		}
 	}
+	if _, ok := apiResource.Spec["allow_all"].(map[string]interface{}); ok && isImport && data.AllowAll == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.AllowAll = &EnhancedFirewallPolicyEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	tflog.Trace(ctx, "created EnhancedFirewallPolicy resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -1428,11 +1502,6 @@ func (r *EnhancedFirewallPolicyResource) Read(ctx context.Context, req resource.
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["allow_all"].(map[string]interface{}); ok && isImport && data.AllowAll == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.AllowAll = &EnhancedFirewallPolicyEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["allowed_destinations"].(map[string]interface{}); ok && (isImport || data.AllowedDestinations != nil) {
 		data.AllowedDestinations = &EnhancedFirewallPolicyAllowedDestinationsModel{
 			Prefix: func() types.List {
@@ -1712,6 +1781,11 @@ func (r *EnhancedFirewallPolicyResource) Read(ctx context.Context, req resource.
 			}(),
 		}
 	}
+	if _, ok := apiResource.Spec["allow_all"].(map[string]interface{}); ok && isImport && data.AllowAll == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.AllowAll = &EnhancedFirewallPolicyEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -1763,10 +1837,6 @@ func (r *EnhancedFirewallPolicyResource) Update(ctx context.Context, req resourc
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if data.AllowAll != nil {
-		allow_allMap := make(map[string]interface{})
-		apiResource.Spec["allow_all"] = allow_allMap
-	}
 	if data.AllowedDestinations != nil {
 		allowed_destinationsMap := make(map[string]interface{})
 		if !data.AllowedDestinations.Prefix.IsNull() && !data.AllowedDestinations.Prefix.IsUnknown() {
@@ -1934,6 +2004,10 @@ func (r *EnhancedFirewallPolicyResource) Update(ctx context.Context, req resourc
 		}
 		apiResource.Spec["rule_list"] = rule_listMap
 	}
+	if data.AllowAll != nil {
+		allow_allMap := make(map[string]interface{})
+		apiResource.Spec["allow_all"] = allow_allMap
+	}
 
 	_, err := r.client.UpdateEnhancedFirewallPolicy(ctx, apiResource)
 	if err != nil {
@@ -1958,11 +2032,6 @@ func (r *EnhancedFirewallPolicyResource) Update(ctx context.Context, req resourc
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["allow_all"].(map[string]interface{}); ok && isImport && data.AllowAll == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.AllowAll = &EnhancedFirewallPolicyEmptyModel{}
-	}
-	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["allowed_destinations"].(map[string]interface{}); ok && (isImport || data.AllowedDestinations != nil) {
 		data.AllowedDestinations = &EnhancedFirewallPolicyAllowedDestinationsModel{
 			Prefix: func() types.List {
@@ -2242,6 +2311,11 @@ func (r *EnhancedFirewallPolicyResource) Update(ctx context.Context, req resourc
 			}(),
 		}
 	}
+	if _, ok := apiResource.Spec["allow_all"].(map[string]interface{}); ok && isImport && data.AllowAll == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.AllowAll = &EnhancedFirewallPolicyEmptyModel{}
+	}
+	// Normal Read: preserve existing state value
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

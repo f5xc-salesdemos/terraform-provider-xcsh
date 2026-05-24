@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -221,15 +223,15 @@ func (r *BGPRoutingPolicyResource) Schema(ctx context.Context, req resource.Sche
 							MarkdownDescription: "Action to be enforced if the BGP route matches the rule.",
 							Attributes: map[string]schema.Attribute{
 								"as_path": schema.StringAttribute{
-									MarkdownDescription: "AS-Path Prepending is generally used to influence incoming traffic.",
+									MarkdownDescription: "Exclusive with [aggregate allow community deny local_preference metric] AS-Path Prepending is generally used to influence incoming traffic.",
 									Optional:            true,
 								},
 								"local_preference": schema.Int64Attribute{
-									MarkdownDescription: "BGP Local Preference is generally used to influence outgoing traffic.",
+									MarkdownDescription: "Exclusive with [aggregate allow as_path community deny metric] BGP Local Preference is generally used to influence outgoing traffic.",
 									Optional:            true,
 								},
 								"metric": schema.Int64Attribute{
-									MarkdownDescription: "The Multi-Exit Discriminator metric to indicate the preferred path to AS.",
+									MarkdownDescription: "Exclusive with [aggregate allow as_path community deny local_preference] The Multi-Exit Discriminator metric to indicate the preferred path to AS.",
 									Optional:            true,
 								},
 							},
@@ -247,6 +249,9 @@ func (r *BGPRoutingPolicyResource) Schema(ctx context.Context, req resource.Sche
 											MarkdownDescription: "Unordered set of RFC 1997 defined 4-byte community, first 16 bits being ASN and lower 16 bits being value .",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeBetween(1, 8),
+											},
 										},
 									},
 								},
@@ -259,7 +264,7 @@ func (r *BGPRoutingPolicyResource) Schema(ctx context.Context, req resource.Sche
 							MarkdownDescription: "Predicates which have to match information in route for action to be applied.",
 							Attributes: map[string]schema.Attribute{
 								"as_path": schema.StringAttribute{
-									MarkdownDescription: "AS path can also be a regex, which will be matched against route information.",
+									MarkdownDescription: "Exclusive with [community ip_prefixes] AS path can also be a regex, which will be matched against route information.",
 									Optional:            true,
 								},
 							},
@@ -271,6 +276,9 @@ func (r *BGPRoutingPolicyResource) Schema(ctx context.Context, req resource.Sche
 											MarkdownDescription: "Unordered set of RFC 1997 defined 4-byte community, first 16 bits being ASN and lower 16 bits being value .",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeBetween(1, 8),
+											},
 										},
 									},
 								},
@@ -285,17 +293,20 @@ func (r *BGPRoutingPolicyResource) Schema(ctx context.Context, req resource.Sche
 													"ip_prefixes": schema.StringAttribute{
 														MarkdownDescription: "IP Prefix. IP prefix to match on BGP route.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
 													"equal_or_longer_than": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for equal or longer than.",
 													},
 													"exact_match": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for exact match.",
 													},
 													"longer_than": schema.SingleNestedBlock{
-														MarkdownDescription: "Enable this option",
+														MarkdownDescription: "Configuration parameter for longer than.",
 													},
 												},
 											},

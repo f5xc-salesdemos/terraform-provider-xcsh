@@ -2,12 +2,12 @@
 page_title: "f5xc_namespace Data Source - terraform-provider-f5xc"
 subcategory: "Organization"
 description: |-
-  Manages new namespace. Name of the object is name of the name space. in F5 Distributed Cloud.
+  Manages new namespace. Name of the object is name of the namespace. in F5 Distributed Cloud.
 ---
 
 # f5xc_namespace (Data Source)
 
-Manages new namespace. Name of the object is name of the name space. in F5 Distributed Cloud.
+Manages new namespace. Name of the object is name of the namespace. in F5 Distributed Cloud.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
@@ -17,16 +17,26 @@ Manages new namespace. Name of the object is name of the name space. in F5 Distr
 # Namespace Data Source Example
 # Retrieves information about an existing Namespace
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Look up an existing Namespace by name
 data "f5xc_namespace" "example" {
   name      = "example-namespace"
   namespace = "system"
 }
 
-# Example: Use the data source in another resource
-# output "namespace_id" {
-#   value = data.f5xc_namespace.example.id
-# }
+output "namespace_id" {
+  value = data.f5xc_namespace.example.id
+}
 
 # Example: Create resources in a namespace discovered via data source
 # resource "f5xc_origin_pool" "example" {
@@ -81,7 +91,7 @@ Transformers apply transformations to input values before matching. Multiple tra
 | ----- | ----------- |
 | `LOWER_CASE` | Convert to lowercase |
 | `UPPER_CASE` | Convert to uppercase |
-| `BASE64_DECODE` | Decode base64 content |
+| `BASE64_DECODE` | Decodebase64 content |
 | `NORMALIZE_PATH` | Normalize URL path |
 | `REMOVE_WHITESPACE` | Remove whitespace characters |
 | `URL_DECODE` | Decode URL-encoded characters |

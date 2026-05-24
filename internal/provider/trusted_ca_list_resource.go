@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -107,10 +108,9 @@ func (r *TrustedCAListResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"trusted_ca_url": schema.StringAttribute{
 				MarkdownDescription: "Trusted CA certificates for validating certificates.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(512000),
 				},
 			},
 		},
@@ -406,13 +406,6 @@ func (r *TrustedCAListResource) Update(ctx context.Context, req resource.UpdateR
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["trusted_ca_url"].(string); ok && v != "" {
-		data.TrustedCAURL = types.StringValue(v)
-	} else if data.TrustedCAURL.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.TrustedCAURL = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields

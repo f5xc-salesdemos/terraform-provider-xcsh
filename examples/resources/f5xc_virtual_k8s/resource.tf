@@ -2,6 +2,18 @@
 # Manages virtual_k8s will create the object in the storage backend for namespace metadata.namespace in F5 Distributed Cloud.
 
 # Basic Virtual K8S configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_virtual_k8s" "example" {
   name      = "example-virtual-k8s"
   namespace = "staging"

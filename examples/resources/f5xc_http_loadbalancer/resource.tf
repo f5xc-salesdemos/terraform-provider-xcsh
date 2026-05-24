@@ -1,6 +1,17 @@
 # HTTP Loadbalancer Resource Example
 # Manages a HTTP Load Balancer resource in F5 Distributed Cloud for load balancing HTTP/HTTPS traffic with advanced routing and security.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic HTTP Loadbalancer configuration
 resource "f5xc_http_loadbalancer" "example" {
   name      = "example-http-loadbalancer"
@@ -161,15 +172,21 @@ resource "f5xc_http_loadbalancer" "example" {
 }
 
 # The following optional fields have server-applied defaults and can be omitted:
+# - add_location
 # - endpoint_selection
 # - loadbalancer_algorithm
-# - auto_http_config
-# - default_circuit_breaker
-# - disable_lb_source_ip_persistance
-# - disable_outlier_detection
-# - disable_proxy_protocol
-# - disable_subsets
-# - no_panic_threshold
 # - healthcheck
 # - no_tls
 # - same_as_endpoint_port
+# - default_sensitive_data_policy
+# - disable_api_definition
+# - disable_api_discovery
+# - disable_api_testing
+# - disable_malware_protection
+# - disable_rate_limit
+# - disable_threat_mesh
+# - disable_trust_client_ip_headers
+# - l7_ddos_protection
+# - round_robin
+# - service_policies_from_namespace
+# - user_id_client_ip

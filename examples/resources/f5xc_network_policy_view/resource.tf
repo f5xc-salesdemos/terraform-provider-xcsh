@@ -1,6 +1,17 @@
 # Network Policy View Resource Example
 # Manages a Network Policy View resource in F5 Distributed Cloud for network policy view specification. configuration.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Network Policy View configuration
 resource "f5xc_network_policy_view" "example" {
   name      = "example-network-policy-view"
@@ -24,7 +35,7 @@ resource "f5xc_network_policy_view" "example" {
   adv_action {
     # Configure adv_action settings
   }
-  # Enable this option
+  # Configuration parameter for all tcp traffic.
   all_tcp_traffic {
     # Configure all_tcp_traffic settings
   }

@@ -14,7 +14,7 @@ This example demonstrates how to use F5XC Blindfold functions to securely encryp
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/robinmordasiewicz/terraform-provider-f5xc.git
+   git clone https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc.git
    cd terraform-provider-f5xc/examples/guides/blindfold
    ```
 

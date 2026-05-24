@@ -1,6 +1,17 @@
 # Network Interface Resource Example
 # Manages a Network Interface resource in F5 Distributed Cloud for network interface represents configuration of a network device. it is created by users in system namespace. configuration.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Network Interface configuration
 resource "f5xc_network_interface" "example" {
   name      = "example-network-interface"

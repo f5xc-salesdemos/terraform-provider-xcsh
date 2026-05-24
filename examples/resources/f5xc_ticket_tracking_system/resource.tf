@@ -2,6 +2,18 @@
 # Manages Ticket Tracking System in F5 Distributed Cloud.
 
 # Basic Ticket Tracking System configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_ticket_tracking_system" "example" {
   name      = "example-ticket-tracking-system"
   namespace = "staging"

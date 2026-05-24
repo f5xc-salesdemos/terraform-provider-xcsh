@@ -2,12 +2,23 @@
 # Retrieves information about an existing Tpm Category
 
 # Look up an existing Tpm Category by name
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 data "f5xc_tpm_category" "example" {
   name      = "example-tpm-category"
   namespace = "system"
 }
 
-# Example: Use the data source in another resource
-# output "tpm_category_id" {
-#   value = data.f5xc_tpm_category.example.id
-# }
+output "tpm_category_id" {
+  value = data.f5xc_tpm_category.example.id
+}

@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -537,7 +539,7 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 						MarkdownDescription: "Enable this option",
 					},
 					"default_action_next_policy": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Policy configuration for this feature.",
 					},
 					"dest_list": schema.ListNestedBlock{
 						MarkdownDescription: "L4 destinations for non-HTTP and non-TLS connections and TLS connections without SNI.",
@@ -547,15 +549,24 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 									MarkdownDescription: "IPv6 Prefixes. Destination IPv6 prefixes.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(32),
+									},
 								},
 								"port_ranges": schema.StringAttribute{
 									MarkdownDescription: "String containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 512),
+									},
 								},
 								"prefixes": schema.ListAttribute{
 									MarkdownDescription: "IPv4 Prefixes. Destination IPv4 prefixes.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(32),
+									},
 								},
 							},
 						},
@@ -565,28 +576,46 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"exact_value": schema.StringAttribute{
-									MarkdownDescription: "Exact domain name.",
+									MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"path_exact_value": schema.StringAttribute{
-									MarkdownDescription: "Exact Path to match.",
+									MarkdownDescription: "Exclusive with [any_path path_prefix_value path_regex_value] Exact Path to match.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"path_prefix_value": schema.StringAttribute{
-									MarkdownDescription: "Prefix of Path e.g '/abc/xyz' will match '/abc/xyz/.*'.",
+									MarkdownDescription: "Exclusive with [any_path path_exact_value path_regex_value] Prefix of Path e.g '/abc/xyz' will match '/abc/xyz/.*'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"path_regex_value": schema.StringAttribute{
-									MarkdownDescription: "Regular Expression value for the Path to match.",
+									MarkdownDescription: "Exclusive with [any_path path_exact_value path_prefix_value] Regular Expression value for the Path to match.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"regex_value": schema.StringAttribute{
-									MarkdownDescription: "Regular Expression value for the domain name.",
+									MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"suffix_value": schema.StringAttribute{
-									MarkdownDescription: "Suffix of domain names e.g 'xyz.com' will match '*.xyz.com'.",
+									MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain names e.g 'xyz.com' will match '*.xyz.com'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -601,16 +630,25 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"exact_value": schema.StringAttribute{
-									MarkdownDescription: "Exact domain name.",
+									MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"regex_value": schema.StringAttribute{
-									MarkdownDescription: "Regular Expression value for the domain name.",
+									MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"suffix_value": schema.StringAttribute{
-									MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+									MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 							},
 						},
@@ -631,7 +669,7 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 						MarkdownDescription: "Enable this option",
 					},
 					"default_action_next_policy": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Policy configuration for this feature.",
 					},
 					"dest_list": schema.ListNestedBlock{
 						MarkdownDescription: "L4 destinations for non-HTTP and non-TLS connections and TLS connections without SNI.",
@@ -641,15 +679,24 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 									MarkdownDescription: "IPv6 Prefixes. Destination IPv6 prefixes.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(32),
+									},
 								},
 								"port_ranges": schema.StringAttribute{
 									MarkdownDescription: "String containing a comma separated list of port ranges. Each port range consists of a single port or two ports separated by '-'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 512),
+									},
 								},
 								"prefixes": schema.ListAttribute{
 									MarkdownDescription: "IPv4 Prefixes. Destination IPv4 prefixes.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(32),
+									},
 								},
 							},
 						},
@@ -659,28 +706,46 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"exact_value": schema.StringAttribute{
-									MarkdownDescription: "Exact domain name.",
+									MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"path_exact_value": schema.StringAttribute{
-									MarkdownDescription: "Exact Path to match.",
+									MarkdownDescription: "Exclusive with [any_path path_prefix_value path_regex_value] Exact Path to match.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"path_prefix_value": schema.StringAttribute{
-									MarkdownDescription: "Prefix of Path e.g '/abc/xyz' will match '/abc/xyz/.*'.",
+									MarkdownDescription: "Exclusive with [any_path path_exact_value path_regex_value] Prefix of Path e.g '/abc/xyz' will match '/abc/xyz/.*'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"path_regex_value": schema.StringAttribute{
-									MarkdownDescription: "Regular Expression value for the Path to match.",
+									MarkdownDescription: "Exclusive with [any_path path_exact_value path_prefix_value] Regular Expression value for the Path to match.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"regex_value": schema.StringAttribute{
-									MarkdownDescription: "Regular Expression value for the domain name.",
+									MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"suffix_value": schema.StringAttribute{
-									MarkdownDescription: "Suffix of domain names e.g 'xyz.com' will match '*.xyz.com'.",
+									MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain names e.g 'xyz.com' will match '*.xyz.com'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -695,16 +760,25 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"exact_value": schema.StringAttribute{
-									MarkdownDescription: "Exact domain name.",
+									MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"regex_value": schema.StringAttribute{
-									MarkdownDescription: "Regular Expression value for the domain name.",
+									MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 								"suffix_value": schema.StringAttribute{
-									MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+									MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 256),
+									},
 								},
 							},
 						},
@@ -712,7 +786,7 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 				},
 			},
 			"drp_http_connect": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for drp http connect.",
 			},
 			"network_connector": schema.SingleNestedBlock{
 				MarkdownDescription: "Type establishes a direct reference from one object(the referrer) to another(the referred). Such a reference is in form of tenant/namespace/name.",
@@ -720,6 +794,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -727,6 +804,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
 						},
 					},
 					"tenant": schema.StringAttribute{
@@ -736,16 +816,22 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 				},
 			},
 			"proxy_label_selector": schema.SingleNestedBlock{
-				MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+				MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 				Attributes: map[string]schema.Attribute{
 					"expressions": schema.ListAttribute{
 						MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 						Optional:            true,
 						ElementType:         types.StringType,
+						Validators: []validator.List{
+							listvalidator.SizeAtMost(1),
+						},
 					},
 				},
 			},
@@ -760,14 +846,17 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 								"action": schema.StringAttribute{
 									MarkdownDescription: "[Enum: DENY|ALLOW|NEXT_POLICY] The rule action determines the disposition of the input request API. If a policy matches a rule with an ALLOW action, the processing of the request proceeds forward. If it matches a rule with a DENY action, the processing of the request is terminated and an appropriate message/code returned to.. Possible values are `DENY`, `ALLOW`, `NEXT_POLICY`. Defaults to `DENY`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("DENY", "ALLOW", "NEXT_POLICY"),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
 								"all_destinations": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all destinations.",
 								},
 								"all_sources": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for all sources.",
 								},
 								"dst_asn_list": schema.SingleNestedBlock{
 									MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer.",
@@ -776,6 +865,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											MarkdownDescription: "Unordered set of RFC 6793 defined 4-byte AS numbers that can be used to create allow or deny lists for use in network policy or service policy. It can be used to create the allow list only for DNS Load Balancer.",
 											Optional:            true,
 											ElementType:         types.Int64Type,
+											Validators: []validator.List{
+												listvalidator.SizeBetween(1, 16),
+											},
 										},
 									},
 								},
@@ -785,6 +877,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -793,6 +888,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -800,6 +898,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -810,6 +911,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -817,6 +921,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -826,16 +933,22 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 									},
 								},
 								"dst_label_selector": schema.SingleNestedBlock{
-									MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+									MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 									Attributes: map[string]schema.Attribute{
 										"expressions": schema.ListAttribute{
 											MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(1),
+											},
 										},
 									},
 								},
@@ -846,6 +959,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 									},
 								},
@@ -858,28 +974,46 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											NestedObject: schema.NestedBlockObject{
 												Attributes: map[string]schema.Attribute{
 													"exact_value": schema.StringAttribute{
-														MarkdownDescription: "Exact domain name.",
+														MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"path_exact_value": schema.StringAttribute{
-														MarkdownDescription: "Exact Path to match.",
+														MarkdownDescription: "Exclusive with [any_path path_prefix_value path_regex_value] Exact Path to match.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"path_prefix_value": schema.StringAttribute{
-														MarkdownDescription: "Prefix of Path e.g '/abc/xyz' will match '/abc/xyz/.*'.",
+														MarkdownDescription: "Exclusive with [any_path path_exact_value path_regex_value] Prefix of Path e.g '/abc/xyz' will match '/abc/xyz/.*'.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"path_regex_value": schema.StringAttribute{
-														MarkdownDescription: "Regular Expression value for the Path to match.",
+														MarkdownDescription: "Exclusive with [any_path path_exact_value path_prefix_value] Regular Expression value for the Path to match.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"regex_value": schema.StringAttribute{
-														MarkdownDescription: "Regular Expression value for the domain name.",
+														MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"suffix_value": schema.StringAttribute{
-														MarkdownDescription: "Suffix of domain names e.g 'xyz.com' will match '*.xyz.com'.",
+														MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain names e.g 'xyz.com' will match '*.xyz.com'.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 												Blocks: map[string]schema.Block{
@@ -897,6 +1031,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -904,6 +1041,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -913,16 +1053,22 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 									},
 								},
 								"label_selector": schema.SingleNestedBlock{
-									MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expresssions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
+									MarkdownDescription: "Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches all objects.",
 									Attributes: map[string]schema.Attribute{
 										"expressions": schema.ListAttribute{
 											MarkdownDescription: "Expressions contains the Kubernetes style label expression for selections.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(1),
+											},
 										},
 									},
 								},
@@ -932,10 +1078,16 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "Description. Human readable description.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"name": schema.StringAttribute{
 											MarkdownDescription: "Name of the message. The value of name has to follow DNS-1035 format.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 1024),
+											},
 										},
 									},
 								},
@@ -953,6 +1105,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											MarkdownDescription: "List of strings, each of which is a single port value or a tuple of start and end port values separated by '-'. The start and end values are considered to be part of the range.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(16),
+											},
 										},
 									},
 								},
@@ -963,6 +1118,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 									},
 								},
@@ -975,16 +1133,25 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											NestedObject: schema.NestedBlockObject{
 												Attributes: map[string]schema.Attribute{
 													"exact_value": schema.StringAttribute{
-														MarkdownDescription: "Exact domain name.",
+														MarkdownDescription: "Exclusive with [regex_value suffix_value] Exact domain name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"regex_value": schema.StringAttribute{
-														MarkdownDescription: "Regular Expression value for the domain name.",
+														MarkdownDescription: "Exclusive with [exact_value suffix_value] Regular Expression value for the domain name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 													"suffix_value": schema.StringAttribute{
-														MarkdownDescription: "Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
+														MarkdownDescription: "Exclusive with [exact_value regex_value] Suffix of domain name e.g 'xyz.com' will match '*.xyz.com' and 'xyz.com'.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 256),
+														},
 													},
 												},
 											},
@@ -998,6 +1165,9 @@ func (r *ForwardProxyPolicyResource) Schema(ctx context.Context, req resource.Sc
 											MarkdownDescription: "[Enum: UNCATEGORIZED|REAL_ESTATE|COMPUTER_AND_INTERNET_SECURITY|FINANCIAL_SERVICES|BUSINESS_AND_ECONOMY|COMPUTER_AND_INTERNET_INFO|AUCTIONS|SHOPPING|CULT_AND_OCCULT|TRAVEL|ABUSED_DRUGS|ADULT_AND_PORNOGRAPHY|HOME_AND_GARDEN|MILITARY|SOCIAL_NETWORKING|DEAD_SITES|INDIVIDUAL_STOCK_ADVICE_AND_TOOLS|TRAINING_AND_TOOLS|DATING|SEX_EDUCATION|RELIGION|ENTERTAINMENT_AND_ARTS|PERSONAL_SITES_AND_BLOGS|LEGAL|LOCAL_INFORMATION|STREAMING_MEDIA|JOB_SEARCH|GAMBLING|TRANSLATION|REFERENCE_AND_RESEARCH|SHAREWARE_AND_FREEWARE|PEER_TO_PEER|MARIJUANA|HACKING|GAMES|PHILOSOPHY_AND_POLITICAL_ADVOCACY|WEAPONS|PAY_TO_SURF|HUNTING_AND_FISHING|SOCIETY|EDUCATIONAL_INSTITUTIONS|ONLINE_GREETING_CARDS|SPORTS|SWIMSUITS_AND_INTIMATE_APPAREL|QUESTIONABLE|KIDS|HATE_AND_RACISM|PERSONAL_STORAGE|VIOLENCE|KEYLOGGERS_AND_MONITORING|SEARCH_ENGINES|INTERNET_PORTALS|WEB_ADVERTISEMENTS|CHEATING|GROSS|WEB_BASED_EMAIL|MALWARE_SITES|PHISHING_AND_OTHER_FRAUDS|PROXY_AVOIDANCE_AND_ANONYMIZERS|SPYWARE_AND_ADWARE|MUSIC|GOVERNMENT|NUDITY|NEWS_AND_MEDIA|ILLEGAL|CONTENT_DELIVERY_NETWORKS|INTERNET_COMMUNICATIONS|BOT_NETS|ABORTION|HEALTH_AND_MEDICINE|CONFIRMED_SPAM_SOURCES|SPAM_URLS|UNCONFIRMED_SPAM_SOURCES|OPEN_HTTP_PROXIES|DYNAMICALLY_GENERATED_CONTENT|PARKED_DOMAINS|ALCOHOL_AND_TOBACCO|PRIVATE_IP_ADDRESSES|IMAGE_AND_VIDEO_SEARCH|FASHION_AND_BEAUTY|RECREATION_AND_HOBBIES|MOTOR_VEHICLES|WEB_HOSTING] List of URL categories to be selected . Possible values are `UNCATEGORIZED`, `REAL_ESTATE`, `COMPUTER_AND_INTERNET_SECURITY`, `FINANCIAL_SERVICES`, `BUSINESS_AND_ECONOMY`, `COMPUTER_AND_INTERNET_INFO`, `AUCTIONS`, `SHOPPING`, `CULT_AND_OCCULT`, `TRAVEL`, `ABUSED_DRUGS`, `ADULT_AND_PORNOGRAPHY`, `HOME_AND_GARDEN`, `MILITARY`, `SOCIAL_NETWORKING`, `DEAD_SITES`, `INDIVIDUAL_STOCK_ADVICE_AND_TOOLS`, `TRAINING_AND_TOOLS`, `DATING`, `SEX_EDUCATION`, `RELIGION`, `ENTERTAINMENT_AND_ARTS`, `PERSONAL_SITES_AND_BLOGS`, `LEGAL`, `LOCAL_INFORMATION`, `STREAMING_MEDIA`, `JOB_SEARCH`, `GAMBLING`, `TRANSLATION`, `REFERENCE_AND_RESEARCH`, `SHAREWARE_AND_FREEWARE`, `PEER_TO_PEER`, `MARIJUANA`, `HACKING`, `GAMES`, `PHILOSOPHY_AND_POLITICAL_ADVOCACY`, `WEAPONS`, `PAY_TO_SURF`, `HUNTING_AND_FISHING`, `SOCIETY`, `EDUCATIONAL_INSTITUTIONS`, `ONLINE_GREETING_CARDS`, `SPORTS`, `SWIMSUITS_AND_INTIMATE_APPAREL`, `QUESTIONABLE`, `KIDS`, `HATE_AND_RACISM`, `PERSONAL_STORAGE`, `VIOLENCE`, `KEYLOGGERS_AND_MONITORING`, `SEARCH_ENGINES`, `INTERNET_PORTALS`, `WEB_ADVERTISEMENTS`, `CHEATING`, `GROSS`, `WEB_BASED_EMAIL`, `MALWARE_SITES`, `PHISHING_AND_OTHER_FRAUDS`, `PROXY_AVOIDANCE_AND_ANONYMIZERS`, `SPYWARE_AND_ADWARE`, `MUSIC`, `GOVERNMENT`, `NUDITY`, `NEWS_AND_MEDIA`, `ILLEGAL`, `CONTENT_DELIVERY_NETWORKS`, `INTERNET_COMMUNICATIONS`, `BOT_NETS`, `ABORTION`, `HEALTH_AND_MEDICINE`, `CONFIRMED_SPAM_SOURCES`, `SPAM_URLS`, `UNCONFIRMED_SPAM_SOURCES`, `OPEN_HTTP_PROXIES`, `DYNAMICALLY_GENERATED_CONTENT`, `PARKED_DOMAINS`, `ALCOHOL_AND_TOBACCO`, `PRIVATE_IP_ADDRESSES`, `IMAGE_AND_VIDEO_SEARCH`, `FASHION_AND_BEAUTY`, `RECREATION_AND_HOBBIES`, `MOTOR_VEHICLES`, `WEB_HOSTING`. Defaults to `UNCATEGORIZED`.",
 											Optional:            true,
 											ElementType:         types.StringType,
+											Validators: []validator.List{
+												listvalidator.SizeAtMost(128),
+											},
 										},
 									},
 								},

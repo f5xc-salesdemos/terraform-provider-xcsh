@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -161,24 +162,39 @@ func (r *UserIdentificationResource) Schema(ctx context.Context, req resource.Sc
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"cookie_name": schema.StringAttribute{
-							MarkdownDescription: "Use the HTTP cookie value for the given name as user..",
+							MarkdownDescription: "Exclusive with [client_asn client_city client_country client_ip client_region http_header_name ip_and_http_header_name ip_and_ja4_tls_fingerprint ip_and_tls_fingerprint ja4_tls_fingerprint jwt_claim_name none query_param_key tls_fingerprint] Use the HTTP cookie value for the given name as user..",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"http_header_name": schema.StringAttribute{
-							MarkdownDescription: "Use the HTTP header value for the given name as user..",
+							MarkdownDescription: "Exclusive with [client_asn client_city client_country client_ip client_region cookie_name ip_and_http_header_name ip_and_ja4_tls_fingerprint ip_and_tls_fingerprint ja4_tls_fingerprint jwt_claim_name none query_param_key tls_fingerprint] Use the HTTP header value for the given name as user..",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"ip_and_http_header_name": schema.StringAttribute{
-							MarkdownDescription: "Name of HTTP header from which the value should be extracted.",
+							MarkdownDescription: "Exclusive with [client_asn client_city client_country client_ip client_region cookie_name http_header_name ip_and_ja4_tls_fingerprint ip_and_tls_fingerprint ja4_tls_fingerprint jwt_claim_name none query_param_key tls_fingerprint] Name of HTTP header from which the value should be extracted.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"jwt_claim_name": schema.StringAttribute{
-							MarkdownDescription: "Use the JWT claim value as user identifier.",
+							MarkdownDescription: "Exclusive with [client_asn client_city client_country client_ip client_region cookie_name http_header_name ip_and_http_header_name ip_and_ja4_tls_fingerprint ip_and_tls_fingerprint ja4_tls_fingerprint none query_param_key tls_fingerprint] Use the JWT claim value as user identifier.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 						"query_param_key": schema.StringAttribute{
-							MarkdownDescription: "Use the query parameter value for the given key as user..",
+							MarkdownDescription: "Exclusive with [client_asn client_city client_country client_ip client_region cookie_name http_header_name ip_and_http_header_name ip_and_ja4_tls_fingerprint ip_and_tls_fingerprint ja4_tls_fingerprint jwt_claim_name none tls_fingerprint] Use the query parameter value for the given key as user..",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 256),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -204,13 +220,13 @@ func (r *UserIdentificationResource) Schema(ctx context.Context, req resource.Sc
 							MarkdownDescription: "Enable this option",
 						},
 						"ja4_tls_fingerprint": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for ja4 tls fingerprint.",
 						},
 						"none": schema.SingleNestedBlock{
 							MarkdownDescription: "Enable this option",
 						},
 						"tls_fingerprint": schema.SingleNestedBlock{
-							MarkdownDescription: "Enable this option",
+							MarkdownDescription: "Configuration parameter for tls fingerprint.",
 						},
 					},
 				},

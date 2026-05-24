@@ -1,6 +1,17 @@
 # Cminstance Resource Example
 # Manages App type will create the configuration in namespace metadata.namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Cminstance configuration
 resource "f5xc_cminstance" "example" {
   name      = "example-cminstance"

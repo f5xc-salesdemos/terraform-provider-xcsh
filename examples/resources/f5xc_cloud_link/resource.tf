@@ -1,6 +1,17 @@
 # Cloud Link Resource Example
 # Manages new CloudLink with configured parameters. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Cloud Link configuration
 resource "f5xc_cloud_link" "example" {
   name      = "example-cloud-link"

@@ -2,12 +2,23 @@
 # Retrieves information about an existing Infraprotect Tunnel
 
 # Look up an existing Infraprotect Tunnel by name
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 data "f5xc_infraprotect_tunnel" "example" {
   name      = "example-infraprotect-tunnel"
   namespace = "system"
 }
 
-# Example: Use the data source in another resource
-# output "infraprotect_tunnel_id" {
-#   value = data.f5xc_infraprotect_tunnel.example.id
-# }
+output "infraprotect_tunnel_id" {
+  value = data.f5xc_infraprotect_tunnel.example.id
+}

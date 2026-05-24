@@ -1,6 +1,17 @@
 # Cloud Credentials Resource Example
 # Manages a Cloud Credentials resource in F5 Distributed Cloud for api to create cloud_credentials object. configuration.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Cloud Credentials configuration
 resource "f5xc_cloud_credentials" "example" {
   name      = "example-cloud-credentials"

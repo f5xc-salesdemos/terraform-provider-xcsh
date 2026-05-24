@@ -1,13 +1,23 @@
 # Authentication Data Source Example
 # Retrieves information about an existing Authentication
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Look up an existing Authentication by name
 data "f5xc_authentication" "example" {
   name      = "example-authentication"
-  namespace = "system"
+  namespace = "staging"
 }
 
-# Example: Use the data source in another resource
-# output "authentication_id" {
-#   value = data.f5xc_authentication.example.id
-# }
+output "authentication_id" {
+  value = data.f5xc_authentication.example.id
+}

@@ -1,6 +1,17 @@
 # Data Type Resource Example
 # Manages data_type creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Data Type configuration
 resource "f5xc_data_type" "example" {
   name      = "example-data-type"
@@ -20,11 +31,11 @@ resource "f5xc_data_type" "example" {
   rules {
     # Configure rules settings
   }
-  # Rule Pattern Type. Test
+  # Configuration parameter for key pattern.
   key_pattern {
     # Configure key_pattern settings
   }
-  # Exact Values. List of exact values to match.
+  # Configuration parameter for exact values.
   exact_values {
     # Configure exact_values settings
   }

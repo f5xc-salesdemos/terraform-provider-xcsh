@@ -1,6 +1,17 @@
 # Nfv Service Resource Example
 # Manages new NFV service with configured parameters. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Nfv Service configuration
 resource "f5xc_nfv_service" "example" {
   name      = "example-nfv-service"
@@ -24,7 +35,7 @@ resource "f5xc_nfv_service" "example" {
   disable_ssh_access {
     # Configure disable_ssh_access settings
   }
-  # SSH based management. SSH based configuration.
+  # Configuration parameter for enabled ssh access.
   enabled_ssh_access {
     # Configure enabled_ssh_access settings
   }

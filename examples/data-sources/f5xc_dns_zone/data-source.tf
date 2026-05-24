@@ -2,15 +2,23 @@
 # Retrieves information about an existing DNS Zone
 
 # Look up an existing DNS Zone by name
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 data "f5xc_dns_zone" "example" {
   name      = "example-dns-zone"
   namespace = "system"
 }
 
-# Example: Use the data source in another resource
-# output "dns_zone_id" {
-#   value = data.f5xc_dns_zone.example.id
-# }
 
 # Example: Reference DNS zone in DNS load balancer
 # resource "f5xc_dns_load_balancer" "example" {
@@ -22,3 +30,7 @@ data "f5xc_dns_zone" "example" {
 #     namespace = data.f5xc_dns_zone.example.namespace
 #   }
 # }
+
+output "dns_zone_id" {
+  value = data.f5xc_dns_zone.example.id
+}

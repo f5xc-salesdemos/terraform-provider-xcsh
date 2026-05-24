@@ -1,13 +1,23 @@
 # App Type Data Source Example
 # Retrieves information about an existing App Type
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Look up an existing App Type by name
 data "f5xc_app_type" "example" {
   name      = "example-app-type"
-  namespace = "system"
+  namespace = "staging"
 }
 
-# Example: Use the data source in another resource
-# output "app_type_id" {
-#   value = data.f5xc_app_type.example.id
-# }
+output "app_type_id" {
+  value = data.f5xc_app_type.example.id
+}

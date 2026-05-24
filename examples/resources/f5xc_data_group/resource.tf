@@ -1,6 +1,17 @@
 # Data Group Resource Example
 # Manages data group in a given namespace. If one already exists it will give an error. in F5 Distributed Cloud.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic Data Group configuration
 resource "f5xc_data_group" "example" {
   name      = "example-data-group"
@@ -24,7 +35,7 @@ resource "f5xc_data_group" "example" {
   records {
     # Configure records settings
   }
-  # Integer record List. Data group with integer record List.
+  # Configuration parameter for integer records.
   integer_records {
     # Configure integer_records settings
   }

@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -103,8 +105,11 @@ func (r *AddressAllocatorResource) Schema(ctx context.Context, req resource.Sche
 			},
 			"address_pool": schema.ListAttribute{
 				MarkdownDescription: "Address pool from which the allocator carves out subnets or addresses to its clients.",
-				Optional:            true,
+				Required:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeBetween(1, 32),
+				},
 			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
@@ -133,10 +138,9 @@ func (r *AddressAllocatorResource) Schema(ctx context.Context, req resource.Sche
 			},
 			"mode": schema.StringAttribute{
 				MarkdownDescription: "[Enum: LOCAL|GLOBAL_PER_SITE_NODE] Mode of the address allocator Address allocator is for VERs within the local cluster or site Allocation is per site and then per node. Possible values are `LOCAL`, `GLOBAL_PER_SITE_NODE`. Defaults to `LOCAL`.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("LOCAL", "GLOBAL_PER_SITE_NODE"),
 				},
 			},
 		},
@@ -161,6 +165,9 @@ func (r *AddressAllocatorResource) Schema(ctx context.Context, req resource.Sche
 					"local_interface_address_type": schema.StringAttribute{
 						MarkdownDescription: "[Enum: LOCAL_INTERFACE_ADDRESS_OFFSET_FROM_SUBNET_BEGIN|LOCAL_INTERFACE_ADDRESS_OFFSET_FROM_SUBNET_END|LOCAL_INTERFACE_ADDRESS_FROM_PREFIX] Dictates how local interface address is derived from the allocated subnet Use Nth address of the allocated subnet as the local interface address, N being the Local Interface Address Offset. For example, if the allocated subnet is 169.254.0.0/30, Local Interface Address Offset is set to 2 and.. Possible values are `LOCAL_INTERFACE_ADDRESS_OFFSET_FROM_SUBNET_BEGIN`, `LOCAL_INTERFACE_ADDRESS_OFFSET_FROM_SUBNET_END`, `LOCAL_INTERFACE_ADDRESS_FROM_PREFIX`. Defaults to `LOCAL_INTERFACE_ADDRESS_OFFSET_FROM_SUBNET_BEGIN`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("LOCAL_INTERFACE_ADDRESS_OFFSET_FROM_SUBNET_BEGIN", "LOCAL_INTERFACE_ADDRESS_OFFSET_FROM_SUBNET_END", "LOCAL_INTERFACE_ADDRESS_FROM_PREFIX"),
+						},
 					},
 				},
 			},
@@ -270,6 +277,13 @@ func (r *AddressAllocatorResource) Create(ctx context.Context, req resource.Crea
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.AddressPool.IsNull() && !data.AddressPool.IsUnknown() {
+		var address_poolList []string
+		resp.Diagnostics.Append(data.AddressPool.ElementsAs(ctx, &address_poolList, false)...)
+		if !resp.Diagnostics.HasError() {
+			createReq.Spec["address_pool"] = address_poolList
+		}
+	}
 	if data.AddressAllocationScheme != nil {
 		address_allocation_schemeMap := make(map[string]interface{})
 		if !data.AddressAllocationScheme.AllocationUnit.IsNull() && !data.AddressAllocationScheme.AllocationUnit.IsUnknown() {
@@ -282,13 +296,6 @@ func (r *AddressAllocatorResource) Create(ctx context.Context, req resource.Crea
 			address_allocation_schemeMap["local_interface_address_type"] = data.AddressAllocationScheme.LocalInterfaceAddressType.ValueString()
 		}
 		createReq.Spec["address_allocation_scheme"] = address_allocation_schemeMap
-	}
-	if !data.AddressPool.IsNull() && !data.AddressPool.IsUnknown() {
-		var address_poolList []string
-		resp.Diagnostics.Append(data.AddressPool.ElementsAs(ctx, &address_poolList, false)...)
-		if !resp.Diagnostics.HasError() {
-			createReq.Spec["address_pool"] = address_poolList
-		}
 	}
 	if !data.Mode.IsNull() && !data.Mode.IsUnknown() {
 		createReq.Spec["mode"] = data.Mode.ValueString()
@@ -306,6 +313,21 @@ func (r *AddressAllocatorResource) Create(ctx context.Context, req resource.Crea
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["address_pool"].([]interface{}); ok && len(v) > 0 {
+		var address_poolList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				address_poolList = append(address_poolList, s)
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, address_poolList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.AddressPool = listVal
+		}
+	} else {
+		data.AddressPool = types.ListNull(types.StringType)
+	}
 	if blockData, ok := apiResource.Spec["address_allocation_scheme"].(map[string]interface{}); ok && (isImport || data.AddressAllocationScheme != nil) {
 		data.AddressAllocationScheme = &AddressAllocatorAddressAllocationSchemeModel{
 			AllocationUnit: func() types.Int64 {
@@ -347,21 +369,6 @@ func (r *AddressAllocatorResource) Create(ctx context.Context, req resource.Crea
 				return types.StringNull()
 			}(),
 		}
-	}
-	if v, ok := apiResource.Spec["address_pool"].([]interface{}); ok && len(v) > 0 {
-		var address_poolList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				address_poolList = append(address_poolList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, address_poolList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.AddressPool = listVal
-		}
-	} else {
-		data.AddressPool = types.ListNull(types.StringType)
 	}
 	if v, ok := apiResource.Spec["mode"].(string); ok && v != "" {
 		data.Mode = types.StringValue(v)
@@ -448,6 +455,21 @@ func (r *AddressAllocatorResource) Read(ctx context.Context, req resource.ReadRe
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["address_pool"].([]interface{}); ok && len(v) > 0 {
+		var address_poolList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				address_poolList = append(address_poolList, s)
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, address_poolList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.AddressPool = listVal
+		}
+	} else {
+		data.AddressPool = types.ListNull(types.StringType)
+	}
 	if blockData, ok := apiResource.Spec["address_allocation_scheme"].(map[string]interface{}); ok && (isImport || data.AddressAllocationScheme != nil) {
 		data.AddressAllocationScheme = &AddressAllocatorAddressAllocationSchemeModel{
 			AllocationUnit: func() types.Int64 {
@@ -489,21 +511,6 @@ func (r *AddressAllocatorResource) Read(ctx context.Context, req resource.ReadRe
 				return types.StringNull()
 			}(),
 		}
-	}
-	if v, ok := apiResource.Spec["address_pool"].([]interface{}); ok && len(v) > 0 {
-		var address_poolList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				address_poolList = append(address_poolList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, address_poolList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.AddressPool = listVal
-		}
-	} else {
-		data.AddressPool = types.ListNull(types.StringType)
 	}
 	if v, ok := apiResource.Spec["mode"].(string); ok && v != "" {
 		data.Mode = types.StringValue(v)
@@ -561,6 +568,13 @@ func (r *AddressAllocatorResource) Update(ctx context.Context, req resource.Upda
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.AddressPool.IsNull() && !data.AddressPool.IsUnknown() {
+		var address_poolList []string
+		resp.Diagnostics.Append(data.AddressPool.ElementsAs(ctx, &address_poolList, false)...)
+		if !resp.Diagnostics.HasError() {
+			apiResource.Spec["address_pool"] = address_poolList
+		}
+	}
 	if data.AddressAllocationScheme != nil {
 		address_allocation_schemeMap := make(map[string]interface{})
 		if !data.AddressAllocationScheme.AllocationUnit.IsNull() && !data.AddressAllocationScheme.AllocationUnit.IsUnknown() {
@@ -573,13 +587,6 @@ func (r *AddressAllocatorResource) Update(ctx context.Context, req resource.Upda
 			address_allocation_schemeMap["local_interface_address_type"] = data.AddressAllocationScheme.LocalInterfaceAddressType.ValueString()
 		}
 		apiResource.Spec["address_allocation_scheme"] = address_allocation_schemeMap
-	}
-	if !data.AddressPool.IsNull() && !data.AddressPool.IsUnknown() {
-		var address_poolList []string
-		resp.Diagnostics.Append(data.AddressPool.ElementsAs(ctx, &address_poolList, false)...)
-		if !resp.Diagnostics.HasError() {
-			apiResource.Spec["address_pool"] = address_poolList
-		}
 	}
 	if !data.Mode.IsNull() && !data.Mode.IsUnknown() {
 		apiResource.Spec["mode"] = data.Mode.ValueString()
@@ -603,18 +610,26 @@ func (r *AddressAllocatorResource) Update(ctx context.Context, req resource.Upda
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["mode"].(string); ok && v != "" {
-		data.Mode = types.StringValue(v)
-	} else if data.Mode.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.Mode = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["address_pool"].([]interface{}); ok && len(v) > 0 {
+		var address_poolList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				address_poolList = append(address_poolList, s)
+			}
+		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, address_poolList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.AddressPool = listVal
+		}
+	} else {
+		data.AddressPool = types.ListNull(types.StringType)
+	}
 	if blockData, ok := apiResource.Spec["address_allocation_scheme"].(map[string]interface{}); ok && (isImport || data.AddressAllocationScheme != nil) {
 		data.AddressAllocationScheme = &AddressAllocatorAddressAllocationSchemeModel{
 			AllocationUnit: func() types.Int64 {
@@ -656,21 +671,6 @@ func (r *AddressAllocatorResource) Update(ctx context.Context, req resource.Upda
 				return types.StringNull()
 			}(),
 		}
-	}
-	if v, ok := apiResource.Spec["address_pool"].([]interface{}); ok && len(v) > 0 {
-		var address_poolList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				address_poolList = append(address_poolList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, address_poolList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.AddressPool = listVal
-		}
-	} else {
-		data.AddressPool = types.ListNull(types.StringType)
 	}
 	if v, ok := apiResource.Spec["mode"].(string); ok && v != "" {
 		data.Mode = types.StringValue(v)

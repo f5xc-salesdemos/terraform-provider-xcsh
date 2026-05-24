@@ -9,11 +9,12 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -218,8 +219,11 @@ func (r *DataTypeResource) Schema(ctx context.Context, req resource.SchemaReques
 			},
 			"compliances": schema.ListAttribute{
 				MarkdownDescription: "[Enum: GDPR|CCPA|PIPEDA|LGPD|DPA_UK|PDPA_SG|APPI|HIPAA|CPRA_2023|CPA_CO|SOC2|PCI_DSS|ISO_IEC_27001|ISO_IEC_27701|EPRIVACY_DIRECTIVE|GLBA|SOX] Choose applicable compliance frameworks such as GDPR, PCI/DSS, or CCPA to ensure the platform identifies whether vulnerabilities in API endpoints handling this data type may cause a compliance breach. Possible values are `GDPR`, `CCPA`, `PIPEDA`, `LGPD`, `DPA_UK`, `PDPA_SG`, `APPI`, `HIPAA`, `CPRA_2023`, `CPA_CO`, `SOC2`, `PCI_DSS`, `ISO_IEC_27001`, `ISO_IEC_27701`, `EPRIVACY_DIRECTIVE`, `GLBA`, `SOX`.",
-				Optional:            true,
+				Required:            true,
 				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(17),
+				},
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Human readable description for the object.",
@@ -243,19 +247,11 @@ func (r *DataTypeResource) Schema(ctx context.Context, req resource.SchemaReques
 			},
 			"is_pii": schema.BoolAttribute{
 				MarkdownDescription: "Select this option to classify the custom data type as personally identifiable information (PII).",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"is_sensitive_data": schema.BoolAttribute{
 				MarkdownDescription: "Select this option to classify the custom data type as sensitive, enabling detection of API vulnerabilities related to this data type.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 		},
 		Blocks: map[string]schema.Block{
@@ -271,20 +267,26 @@ func (r *DataTypeResource) Schema(ctx context.Context, req resource.SchemaReques
 					Attributes: map[string]schema.Attribute{},
 					Blocks: map[string]schema.Block{
 						"key_pattern": schema.SingleNestedBlock{
-							MarkdownDescription: "Rule Pattern Type. Test",
+							MarkdownDescription: "Configuration parameter for key pattern.",
 							Attributes: map[string]schema.Attribute{
 								"regex_value": schema.StringAttribute{
-									MarkdownDescription: "Search for values matching this regular expression.",
+									MarkdownDescription: "Exclusive with [exact_values substring_value] Search for values matching this regular expression.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
 								},
 								"substring_value": schema.StringAttribute{
-									MarkdownDescription: "Search for values that include this substring.",
+									MarkdownDescription: "Exclusive with [exact_values regex_value] Search for values that include this substring.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
 								"exact_values": schema.SingleNestedBlock{
-									MarkdownDescription: "Exact Values. List of exact values to match.",
+									MarkdownDescription: "Configuration parameter for exact values.",
 									Attributes: map[string]schema.Attribute{
 										"exact_values": schema.ListAttribute{
 											MarkdownDescription: "List of exact values to match.",
@@ -300,20 +302,26 @@ func (r *DataTypeResource) Schema(ctx context.Context, req resource.SchemaReques
 							Attributes:          map[string]schema.Attribute{},
 							Blocks: map[string]schema.Block{
 								"key_pattern": schema.SingleNestedBlock{
-									MarkdownDescription: "Rule Pattern Type. Test",
+									MarkdownDescription: "Configuration parameter for key pattern.",
 									Attributes: map[string]schema.Attribute{
 										"regex_value": schema.StringAttribute{
-											MarkdownDescription: "Search for values matching this regular expression.",
+											MarkdownDescription: "Exclusive with [exact_values substring_value] Search for values matching this regular expression.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"substring_value": schema.StringAttribute{
-											MarkdownDescription: "Search for values that include this substring.",
+											MarkdownDescription: "Exclusive with [exact_values regex_value] Search for values that include this substring.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
 										"exact_values": schema.SingleNestedBlock{
-											MarkdownDescription: "Exact Values. List of exact values to match.",
+											MarkdownDescription: "Configuration parameter for exact values.",
 											Attributes: map[string]schema.Attribute{
 												"exact_values": schema.ListAttribute{
 													MarkdownDescription: "List of exact values to match.",
@@ -325,20 +333,26 @@ func (r *DataTypeResource) Schema(ctx context.Context, req resource.SchemaReques
 									},
 								},
 								"value_pattern": schema.SingleNestedBlock{
-									MarkdownDescription: "Rule Pattern Type. Test",
+									MarkdownDescription: "Configuration parameter for value pattern.",
 									Attributes: map[string]schema.Attribute{
 										"regex_value": schema.StringAttribute{
-											MarkdownDescription: "Search for values matching this regular expression.",
+											MarkdownDescription: "Exclusive with [exact_values substring_value] Search for values matching this regular expression.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"substring_value": schema.StringAttribute{
-											MarkdownDescription: "Search for values that include this substring.",
+											MarkdownDescription: "Exclusive with [exact_values regex_value] Search for values that include this substring.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
 										"exact_values": schema.SingleNestedBlock{
-											MarkdownDescription: "Exact Values. List of exact values to match.",
+											MarkdownDescription: "Configuration parameter for exact values.",
 											Attributes: map[string]schema.Attribute{
 												"exact_values": schema.ListAttribute{
 													MarkdownDescription: "List of exact values to match.",
@@ -352,20 +366,26 @@ func (r *DataTypeResource) Schema(ctx context.Context, req resource.SchemaReques
 							},
 						},
 						"value_pattern": schema.SingleNestedBlock{
-							MarkdownDescription: "Rule Pattern Type. Test",
+							MarkdownDescription: "Configuration parameter for value pattern.",
 							Attributes: map[string]schema.Attribute{
 								"regex_value": schema.StringAttribute{
-									MarkdownDescription: "Search for values matching this regular expression.",
+									MarkdownDescription: "Exclusive with [exact_values substring_value] Search for values matching this regular expression.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
 								},
 								"substring_value": schema.StringAttribute{
-									MarkdownDescription: "Search for values that include this substring.",
+									MarkdownDescription: "Exclusive with [exact_values regex_value] Search for values that include this substring.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(1024),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
 								"exact_values": schema.SingleNestedBlock{
-									MarkdownDescription: "Exact Values. List of exact values to match.",
+									MarkdownDescription: "Configuration parameter for exact values.",
 									Attributes: map[string]schema.Attribute{
 										"exact_values": schema.ListAttribute{
 											MarkdownDescription: "List of exact values to match.",
@@ -485,13 +505,6 @@ func (r *DataTypeResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if !data.Compliances.IsNull() && !data.Compliances.IsUnknown() {
-		var compliancesList []string
-		resp.Diagnostics.Append(data.Compliances.ElementsAs(ctx, &compliancesList, false)...)
-		if !resp.Diagnostics.HasError() {
-			createReq.Spec["compliances"] = compliancesList
-		}
-	}
 	if !data.Rules.IsNull() && !data.Rules.IsUnknown() {
 		var rulesItems []DataTypeRulesModel
 		diags := data.Rules.ElementsAs(ctx, &rulesItems, false)
@@ -571,6 +584,13 @@ func (r *DataTypeResource) Create(ctx context.Context, req resource.CreateReques
 			createReq.Spec["rules"] = rulesList
 		}
 	}
+	if !data.Compliances.IsNull() && !data.Compliances.IsUnknown() {
+		var compliancesList []string
+		resp.Diagnostics.Append(data.Compliances.ElementsAs(ctx, &compliancesList, false)...)
+		if !resp.Diagnostics.HasError() {
+			createReq.Spec["compliances"] = compliancesList
+		}
+	}
 	if !data.IsPII.IsNull() && !data.IsPII.IsUnknown() {
 		createReq.Spec["is_pii"] = data.IsPII.ValueBool()
 	}
@@ -590,21 +610,6 @@ func (r *DataTypeResource) Create(ctx context.Context, req resource.CreateReques
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
-	if v, ok := apiResource.Spec["compliances"].([]interface{}); ok && len(v) > 0 {
-		var compliancesList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				compliancesList = append(compliancesList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, compliancesList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Compliances = listVal
-		}
-	} else {
-		data.Compliances = types.ListNull(types.StringType)
-	}
 	if listData, ok := apiResource.Spec["rules"].([]interface{}); ok && len(listData) > 0 {
 		var rulesList []DataTypeRulesModel
 		var existingRulesItems []DataTypeRulesModel
@@ -671,27 +676,30 @@ func (r *DataTypeResource) Create(ctx context.Context, req resource.CreateReques
 		// No data from API - set to null list
 		data.Rules = types.ListNull(types.ObjectType{AttrTypes: DataTypeRulesModelAttrTypes})
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.IsPII.IsNull() && !data.IsPII.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
-	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["is_pii"].(bool); ok {
-			data.IsPII = types.BoolValue(v)
-		} else {
-			data.IsPII = types.BoolNull()
+	if v, ok := apiResource.Spec["compliances"].([]interface{}); ok && len(v) > 0 {
+		var compliancesList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				compliancesList = append(compliancesList, s)
+			}
 		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, compliancesList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Compliances = listVal
+		}
+	} else {
+		data.Compliances = types.ListNull(types.StringType)
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.IsSensitiveData.IsNull() && !data.IsSensitiveData.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["is_pii"].(bool); ok {
+		data.IsPII = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["is_sensitive_data"].(bool); ok {
-			data.IsSensitiveData = types.BoolValue(v)
-		} else {
-			data.IsSensitiveData = types.BoolNull()
-		}
+		data.IsPII = types.BoolNull()
+	}
+	if v, ok := apiResource.Spec["is_sensitive_data"].(bool); ok {
+		data.IsSensitiveData = types.BoolValue(v)
+	} else {
+		data.IsSensitiveData = types.BoolNull()
 	}
 
 	tflog.Trace(ctx, "created DataType resource")
@@ -773,21 +781,6 @@ func (r *DataTypeResource) Read(ctx context.Context, req resource.ReadRequest, r
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
-	if v, ok := apiResource.Spec["compliances"].([]interface{}); ok && len(v) > 0 {
-		var compliancesList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				compliancesList = append(compliancesList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, compliancesList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Compliances = listVal
-		}
-	} else {
-		data.Compliances = types.ListNull(types.StringType)
-	}
 	if listData, ok := apiResource.Spec["rules"].([]interface{}); ok && len(listData) > 0 {
 		var rulesList []DataTypeRulesModel
 		var existingRulesItems []DataTypeRulesModel
@@ -854,27 +847,30 @@ func (r *DataTypeResource) Read(ctx context.Context, req resource.ReadRequest, r
 		// No data from API - set to null list
 		data.Rules = types.ListNull(types.ObjectType{AttrTypes: DataTypeRulesModelAttrTypes})
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.IsPII.IsNull() && !data.IsPII.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
-	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["is_pii"].(bool); ok {
-			data.IsPII = types.BoolValue(v)
-		} else {
-			data.IsPII = types.BoolNull()
+	if v, ok := apiResource.Spec["compliances"].([]interface{}); ok && len(v) > 0 {
+		var compliancesList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				compliancesList = append(compliancesList, s)
+			}
 		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, compliancesList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Compliances = listVal
+		}
+	} else {
+		data.Compliances = types.ListNull(types.StringType)
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.IsSensitiveData.IsNull() && !data.IsSensitiveData.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["is_pii"].(bool); ok {
+		data.IsPII = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["is_sensitive_data"].(bool); ok {
-			data.IsSensitiveData = types.BoolValue(v)
-		} else {
-			data.IsSensitiveData = types.BoolNull()
-		}
+		data.IsPII = types.BoolNull()
+	}
+	if v, ok := apiResource.Spec["is_sensitive_data"].(bool); ok {
+		data.IsSensitiveData = types.BoolValue(v)
+	} else {
+		data.IsSensitiveData = types.BoolNull()
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -927,13 +923,6 @@ func (r *DataTypeResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 
 	// Marshal spec fields from Terraform state to API struct
-	if !data.Compliances.IsNull() && !data.Compliances.IsUnknown() {
-		var compliancesList []string
-		resp.Diagnostics.Append(data.Compliances.ElementsAs(ctx, &compliancesList, false)...)
-		if !resp.Diagnostics.HasError() {
-			apiResource.Spec["compliances"] = compliancesList
-		}
-	}
 	if !data.Rules.IsNull() && !data.Rules.IsUnknown() {
 		var rulesItems []DataTypeRulesModel
 		diags := data.Rules.ElementsAs(ctx, &rulesItems, false)
@@ -1013,6 +1002,13 @@ func (r *DataTypeResource) Update(ctx context.Context, req resource.UpdateReques
 			apiResource.Spec["rules"] = rulesList
 		}
 	}
+	if !data.Compliances.IsNull() && !data.Compliances.IsUnknown() {
+		var compliancesList []string
+		resp.Diagnostics.Append(data.Compliances.ElementsAs(ctx, &compliancesList, false)...)
+		if !resp.Diagnostics.HasError() {
+			apiResource.Spec["compliances"] = compliancesList
+		}
+	}
 	if !data.IsPII.IsNull() && !data.IsPII.IsUnknown() {
 		apiResource.Spec["is_pii"] = data.IsPII.ValueBool()
 	}
@@ -1038,40 +1034,11 @@ func (r *DataTypeResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["is_pii"].(bool); ok {
-		data.IsPII = types.BoolValue(v)
-	} else if data.IsPII.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.IsPII = types.BoolNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["is_sensitive_data"].(bool); ok {
-		data.IsSensitiveData = types.BoolValue(v)
-	} else if data.IsSensitiveData.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.IsSensitiveData = types.BoolNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
-	if v, ok := apiResource.Spec["compliances"].([]interface{}); ok && len(v) > 0 {
-		var compliancesList []string
-		for _, item := range v {
-			if s, ok := item.(string); ok {
-				compliancesList = append(compliancesList, s)
-			}
-		}
-		listVal, diags := types.ListValueFrom(ctx, types.StringType, compliancesList)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() {
-			data.Compliances = listVal
-		}
-	} else {
-		data.Compliances = types.ListNull(types.StringType)
-	}
 	if listData, ok := apiResource.Spec["rules"].([]interface{}); ok && len(listData) > 0 {
 		var rulesList []DataTypeRulesModel
 		var existingRulesItems []DataTypeRulesModel
@@ -1138,27 +1105,30 @@ func (r *DataTypeResource) Update(ctx context.Context, req resource.UpdateReques
 		// No data from API - set to null list
 		data.Rules = types.ListNull(types.ObjectType{AttrTypes: DataTypeRulesModelAttrTypes})
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.IsPII.IsNull() && !data.IsPII.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
-	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["is_pii"].(bool); ok {
-			data.IsPII = types.BoolValue(v)
-		} else {
-			data.IsPII = types.BoolNull()
+	if v, ok := apiResource.Spec["compliances"].([]interface{}); ok && len(v) > 0 {
+		var compliancesList []string
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				compliancesList = append(compliancesList, s)
+			}
 		}
+		listVal, diags := types.ListValueFrom(ctx, types.StringType, compliancesList)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() {
+			data.Compliances = listVal
+		}
+	} else {
+		data.Compliances = types.ListNull(types.StringType)
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.IsSensitiveData.IsNull() && !data.IsSensitiveData.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["is_pii"].(bool); ok {
+		data.IsPII = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["is_sensitive_data"].(bool); ok {
-			data.IsSensitiveData = types.BoolValue(v)
-		} else {
-			data.IsSensitiveData = types.BoolNull()
-		}
+		data.IsPII = types.BoolNull()
+	}
+	if v, ok := apiResource.Spec["is_sensitive_data"].(bool); ok {
+		data.IsSensitiveData = types.BoolValue(v)
+	} else {
+		data.IsSensitiveData = types.BoolNull()
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -43,6 +45,18 @@ type AppAPIGroupResource struct {
 
 // AppAPIGroupEmptyModel represents empty nested blocks
 type AppAPIGroupEmptyModel struct {
+}
+
+// AppAPIGroupElementsModel represents elements block
+type AppAPIGroupElementsModel struct {
+	Methods   types.List   `tfsdk:"methods"`
+	PathRegex types.String `tfsdk:"path_regex"`
+}
+
+// AppAPIGroupElementsModelAttrTypes defines the attribute types for AppAPIGroupElementsModel
+var AppAPIGroupElementsModelAttrTypes = map[string]attr.Type{
+	"methods":    types.ListType{ElemType: types.StringType},
+	"path_regex": types.StringType,
 }
 
 // AppAPIGroupBigIPVirtualServerModel represents bigip_virtual_server block
@@ -93,18 +107,6 @@ var AppAPIGroupCDNLoadBalancerCDNLoadBalancerModelAttrTypes = map[string]attr.Ty
 	"tenant":    types.StringType,
 }
 
-// AppAPIGroupElementsModel represents elements block
-type AppAPIGroupElementsModel struct {
-	Methods   types.List   `tfsdk:"methods"`
-	PathRegex types.String `tfsdk:"path_regex"`
-}
-
-// AppAPIGroupElementsModelAttrTypes defines the attribute types for AppAPIGroupElementsModel
-var AppAPIGroupElementsModelAttrTypes = map[string]attr.Type{
-	"methods":    types.ListType{ElemType: types.StringType},
-	"path_regex": types.StringType,
-}
-
 // AppAPIGroupHTTPLoadBalancerModel represents http_loadbalancer block
 type AppAPIGroupHTTPLoadBalancerModel struct {
 	HTTPLoadBalancer *AppAPIGroupHTTPLoadBalancerHTTPLoadBalancerModel `tfsdk:"http_loadbalancer"`
@@ -138,9 +140,9 @@ type AppAPIGroupResourceModel struct {
 	Labels             types.Map                           `tfsdk:"labels"`
 	ID                 types.String                        `tfsdk:"id"`
 	Timeouts           timeouts.Value                      `tfsdk:"timeouts"`
+	Elements           types.List                          `tfsdk:"elements"`
 	BigIPVirtualServer *AppAPIGroupBigIPVirtualServerModel `tfsdk:"bigip_virtual_server"`
 	CDNLoadBalancer    *AppAPIGroupCDNLoadBalancerModel    `tfsdk:"cdn_loadbalancer"`
-	Elements           types.List                          `tfsdk:"elements"`
 	HTTPLoadBalancer   *AppAPIGroupHTTPLoadBalancerModel   `tfsdk:"http_loadbalancer"`
 }
 
@@ -205,6 +207,28 @@ func (r *AppAPIGroupResource) Schema(ctx context.Context, req resource.SchemaReq
 				Update: true,
 				Delete: true,
 			}),
+			"elements": schema.ListNestedBlock{
+				MarkdownDescription: "List of API group elements with methods and path regex for matching requests.",
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"methods": schema.ListAttribute{
+							MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] List of method values to match the input request API method against. The match is considered to succeed if the input request API method is a member of the list. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
+							Optional:            true,
+							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.SizeAtLeast(1),
+							},
+						},
+						"path_regex": schema.StringAttribute{
+							MarkdownDescription: "Regular expression to match the input request API path against. The match is considered to succeed if the input request API path matches the specified path regex.",
+							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+							},
+						},
+					},
+				},
+			},
 			"bigip_virtual_server": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: bigip_virtual_server, cdn_loadbalancer, http_loadbalancer] Set the scope of the API Group to a specific BIG-IP Virtual Server.",
 				Attributes:          map[string]schema.Attribute{},
@@ -215,6 +239,9 @@ func (r *AppAPIGroupResource) Schema(ctx context.Context, req resource.SchemaReq
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -223,6 +250,9 @@ func (r *AppAPIGroupResource) Schema(ctx context.Context, req resource.SchemaReq
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -230,6 +260,9 @@ func (r *AppAPIGroupResource) Schema(ctx context.Context, req resource.SchemaReq
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -246,6 +279,9 @@ func (r *AppAPIGroupResource) Schema(ctx context.Context, req resource.SchemaReq
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -253,6 +289,9 @@ func (r *AppAPIGroupResource) Schema(ctx context.Context, req resource.SchemaReq
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
 								},
 							},
 							"tenant": schema.StringAttribute{
@@ -262,23 +301,10 @@ func (r *AppAPIGroupResource) Schema(ctx context.Context, req resource.SchemaReq
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
-						},
-					},
-				},
-			},
-			"elements": schema.ListNestedBlock{
-				MarkdownDescription: "List of API group elements with methods and path regex for matching requests.",
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"methods": schema.ListAttribute{
-							MarkdownDescription: "[Enum: ANY|GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH|COPY] List of method values to match the input request API method against. The match is considered to succeed if the input request API method is a member of the list. Possible values are `ANY`, `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, `PATCH`, `COPY`. Defaults to `ANY`.",
-							Optional:            true,
-							ElementType:         types.StringType,
-						},
-						"path_regex": schema.StringAttribute{
-							MarkdownDescription: "Regular expression to match the input request API path against. The match is considered to succeed if the input request API path matches the specified path regex.",
-							Optional:            true,
 						},
 					},
 				},
@@ -293,6 +319,9 @@ func (r *AppAPIGroupResource) Schema(ctx context.Context, req resource.SchemaReq
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -301,6 +330,9 @@ func (r *AppAPIGroupResource) Schema(ctx context.Context, req resource.SchemaReq
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -308,6 +340,9 @@ func (r *AppAPIGroupResource) Schema(ctx context.Context, req resource.SchemaReq
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -420,6 +455,22 @@ func (r *AppAPIGroupResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Elements.IsNull() && !data.Elements.IsUnknown() {
+		var elementsItems []AppAPIGroupElementsModel
+		diags := data.Elements.ElementsAs(ctx, &elementsItems, false)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() && len(elementsItems) > 0 {
+			var elementsList []map[string]interface{}
+			for _, item := range elementsItems {
+				itemMap := make(map[string]interface{})
+				if !item.PathRegex.IsNull() && !item.PathRegex.IsUnknown() {
+					itemMap["path_regex"] = item.PathRegex.ValueString()
+				}
+				elementsList = append(elementsList, itemMap)
+			}
+			createReq.Spec["elements"] = elementsList
+		}
+	}
 	if data.BigIPVirtualServer != nil {
 		bigip_virtual_serverMap := make(map[string]interface{})
 		if data.BigIPVirtualServer.BigIPVirtualServer != nil {
@@ -454,22 +505,6 @@ func (r *AppAPIGroupResource) Create(ctx context.Context, req resource.CreateReq
 		}
 		createReq.Spec["cdn_loadbalancer"] = cdn_loadbalancerMap
 	}
-	if !data.Elements.IsNull() && !data.Elements.IsUnknown() {
-		var elementsItems []AppAPIGroupElementsModel
-		diags := data.Elements.ElementsAs(ctx, &elementsItems, false)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() && len(elementsItems) > 0 {
-			var elementsList []map[string]interface{}
-			for _, item := range elementsItems {
-				itemMap := make(map[string]interface{})
-				if !item.PathRegex.IsNull() && !item.PathRegex.IsUnknown() {
-					itemMap["path_regex"] = item.PathRegex.ValueString()
-				}
-				elementsList = append(elementsList, itemMap)
-			}
-			createReq.Spec["elements"] = elementsList
-		}
-	}
 	if data.HTTPLoadBalancer != nil {
 		http_loadbalancerMap := make(map[string]interface{})
 		if data.HTTPLoadBalancer.HTTPLoadBalancer != nil {
@@ -500,16 +535,6 @@ func (r *AppAPIGroupResource) Create(ctx context.Context, req resource.CreateReq
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["bigip_virtual_server"].(map[string]interface{}); ok && isImport && data.BigIPVirtualServer == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.BigIPVirtualServer = &AppAPIGroupBigIPVirtualServerModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["cdn_loadbalancer"].(map[string]interface{}); ok && isImport && data.CDNLoadBalancer == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.CDNLoadBalancer = &AppAPIGroupCDNLoadBalancerModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["elements"].([]interface{}); ok && len(listData) > 0 {
 		var elementsList []AppAPIGroupElementsModel
 		var existingElementsItems []AppAPIGroupElementsModel
@@ -551,6 +576,16 @@ func (r *AppAPIGroupResource) Create(ctx context.Context, req resource.CreateReq
 		// No data from API - set to null list
 		data.Elements = types.ListNull(types.ObjectType{AttrTypes: AppAPIGroupElementsModelAttrTypes})
 	}
+	if _, ok := apiResource.Spec["bigip_virtual_server"].(map[string]interface{}); ok && isImport && data.BigIPVirtualServer == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.BigIPVirtualServer = &AppAPIGroupBigIPVirtualServerModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["cdn_loadbalancer"].(map[string]interface{}); ok && isImport && data.CDNLoadBalancer == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.CDNLoadBalancer = &AppAPIGroupCDNLoadBalancerModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["http_loadbalancer"].(map[string]interface{}); ok && isImport && data.HTTPLoadBalancer == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.HTTPLoadBalancer = &AppAPIGroupHTTPLoadBalancerModel{}
@@ -636,16 +671,6 @@ func (r *AppAPIGroupResource) Read(ctx context.Context, req resource.ReadRequest
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["bigip_virtual_server"].(map[string]interface{}); ok && isImport && data.BigIPVirtualServer == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.BigIPVirtualServer = &AppAPIGroupBigIPVirtualServerModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["cdn_loadbalancer"].(map[string]interface{}); ok && isImport && data.CDNLoadBalancer == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.CDNLoadBalancer = &AppAPIGroupCDNLoadBalancerModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["elements"].([]interface{}); ok && len(listData) > 0 {
 		var elementsList []AppAPIGroupElementsModel
 		var existingElementsItems []AppAPIGroupElementsModel
@@ -687,6 +712,16 @@ func (r *AppAPIGroupResource) Read(ctx context.Context, req resource.ReadRequest
 		// No data from API - set to null list
 		data.Elements = types.ListNull(types.ObjectType{AttrTypes: AppAPIGroupElementsModelAttrTypes})
 	}
+	if _, ok := apiResource.Spec["bigip_virtual_server"].(map[string]interface{}); ok && isImport && data.BigIPVirtualServer == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.BigIPVirtualServer = &AppAPIGroupBigIPVirtualServerModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["cdn_loadbalancer"].(map[string]interface{}); ok && isImport && data.CDNLoadBalancer == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.CDNLoadBalancer = &AppAPIGroupCDNLoadBalancerModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["http_loadbalancer"].(map[string]interface{}); ok && isImport && data.HTTPLoadBalancer == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.HTTPLoadBalancer = &AppAPIGroupHTTPLoadBalancerModel{}
@@ -743,6 +778,22 @@ func (r *AppAPIGroupResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.Elements.IsNull() && !data.Elements.IsUnknown() {
+		var elementsItems []AppAPIGroupElementsModel
+		diags := data.Elements.ElementsAs(ctx, &elementsItems, false)
+		resp.Diagnostics.Append(diags...)
+		if !resp.Diagnostics.HasError() && len(elementsItems) > 0 {
+			var elementsList []map[string]interface{}
+			for _, item := range elementsItems {
+				itemMap := make(map[string]interface{})
+				if !item.PathRegex.IsNull() && !item.PathRegex.IsUnknown() {
+					itemMap["path_regex"] = item.PathRegex.ValueString()
+				}
+				elementsList = append(elementsList, itemMap)
+			}
+			apiResource.Spec["elements"] = elementsList
+		}
+	}
 	if data.BigIPVirtualServer != nil {
 		bigip_virtual_serverMap := make(map[string]interface{})
 		if data.BigIPVirtualServer.BigIPVirtualServer != nil {
@@ -776,22 +827,6 @@ func (r *AppAPIGroupResource) Update(ctx context.Context, req resource.UpdateReq
 			cdn_loadbalancerMap["cdn_loadbalancer"] = cdn_loadbalancerNestedMap
 		}
 		apiResource.Spec["cdn_loadbalancer"] = cdn_loadbalancerMap
-	}
-	if !data.Elements.IsNull() && !data.Elements.IsUnknown() {
-		var elementsItems []AppAPIGroupElementsModel
-		diags := data.Elements.ElementsAs(ctx, &elementsItems, false)
-		resp.Diagnostics.Append(diags...)
-		if !resp.Diagnostics.HasError() && len(elementsItems) > 0 {
-			var elementsList []map[string]interface{}
-			for _, item := range elementsItems {
-				itemMap := make(map[string]interface{})
-				if !item.PathRegex.IsNull() && !item.PathRegex.IsUnknown() {
-					itemMap["path_regex"] = item.PathRegex.ValueString()
-				}
-				elementsList = append(elementsList, itemMap)
-			}
-			apiResource.Spec["elements"] = elementsList
-		}
 	}
 	if data.HTTPLoadBalancer != nil {
 		http_loadbalancerMap := make(map[string]interface{})
@@ -834,16 +869,6 @@ func (r *AppAPIGroupResource) Update(ctx context.Context, req resource.UpdateReq
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
-	if _, ok := apiResource.Spec["bigip_virtual_server"].(map[string]interface{}); ok && isImport && data.BigIPVirtualServer == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.BigIPVirtualServer = &AppAPIGroupBigIPVirtualServerModel{}
-	}
-	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["cdn_loadbalancer"].(map[string]interface{}); ok && isImport && data.CDNLoadBalancer == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.CDNLoadBalancer = &AppAPIGroupCDNLoadBalancerModel{}
-	}
-	// Normal Read: preserve existing state value
 	if listData, ok := apiResource.Spec["elements"].([]interface{}); ok && len(listData) > 0 {
 		var elementsList []AppAPIGroupElementsModel
 		var existingElementsItems []AppAPIGroupElementsModel
@@ -885,6 +910,16 @@ func (r *AppAPIGroupResource) Update(ctx context.Context, req resource.UpdateReq
 		// No data from API - set to null list
 		data.Elements = types.ListNull(types.ObjectType{AttrTypes: AppAPIGroupElementsModelAttrTypes})
 	}
+	if _, ok := apiResource.Spec["bigip_virtual_server"].(map[string]interface{}); ok && isImport && data.BigIPVirtualServer == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.BigIPVirtualServer = &AppAPIGroupBigIPVirtualServerModel{}
+	}
+	// Normal Read: preserve existing state value
+	if _, ok := apiResource.Spec["cdn_loadbalancer"].(map[string]interface{}); ok && isImport && data.CDNLoadBalancer == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.CDNLoadBalancer = &AppAPIGroupCDNLoadBalancerModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["http_loadbalancer"].(map[string]interface{}); ok && isImport && data.HTTPLoadBalancer == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.HTTPLoadBalancer = &AppAPIGroupHTTPLoadBalancerModel{}

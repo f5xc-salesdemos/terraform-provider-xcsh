@@ -2,6 +2,18 @@
 # Manages a Ike1 resource in F5 Distributed Cloud for ike phase1 profile configuration.
 
 # Basic Ike1 configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_ike1" "example" {
   name      = "example-ike1"
   namespace = "staging"

@@ -1,6 +1,17 @@
 # CDN Loadbalancer Resource Example
 # Manages a CDN Load Balancer resource in F5 Distributed Cloud for content delivery and edge caching with load balancing.
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Basic CDN Loadbalancer configuration
 resource "f5xc_cdn_loadbalancer" "example" {
   name      = "example-cdn-loadbalancer"

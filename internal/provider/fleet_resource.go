@@ -8,12 +8,15 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -44,6 +47,30 @@ type FleetResource struct {
 
 // FleetEmptyModel represents empty nested blocks
 type FleetEmptyModel struct {
+}
+
+// FleetPerformanceEnhancementModeModel represents performance_enhancement_mode block
+type FleetPerformanceEnhancementModeModel struct {
+	PerfModeL3Enhanced *FleetPerformanceEnhancementModePerfModeL3EnhancedModel `tfsdk:"perf_mode_l3_enhanced"`
+	PerfModeL7Enhanced *FleetEmptyModel                                        `tfsdk:"perf_mode_l7_enhanced"`
+}
+
+// FleetPerformanceEnhancementModeModelAttrTypes defines the attribute types for FleetPerformanceEnhancementModeModel
+var FleetPerformanceEnhancementModeModelAttrTypes = map[string]attr.Type{
+	"perf_mode_l3_enhanced": types.ObjectType{AttrTypes: FleetPerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes},
+	"perf_mode_l7_enhanced": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+}
+
+// FleetPerformanceEnhancementModePerfModeL3EnhancedModel represents perf_mode_l3_enhanced block
+type FleetPerformanceEnhancementModePerfModeL3EnhancedModel struct {
+	Jumbo   *FleetEmptyModel `tfsdk:"jumbo"`
+	NoJumbo *FleetEmptyModel `tfsdk:"no_jumbo"`
+}
+
+// FleetPerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes defines the attribute types for FleetPerformanceEnhancementModePerfModeL3EnhancedModel
+var FleetPerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes = map[string]attr.Type{
+	"jumbo":    types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"no_jumbo": types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // FleetBlockedServicesModel represents blocked_services block
@@ -334,30 +361,6 @@ var FleetOutsideVirtualNetworkModelAttrTypes = map[string]attr.Type{
 	"namespace": types.StringType,
 	"tenant":    types.StringType,
 	"uid":       types.StringType,
-}
-
-// FleetPerformanceEnhancementModeModel represents performance_enhancement_mode block
-type FleetPerformanceEnhancementModeModel struct {
-	PerfModeL3Enhanced *FleetPerformanceEnhancementModePerfModeL3EnhancedModel `tfsdk:"perf_mode_l3_enhanced"`
-	PerfModeL7Enhanced *FleetEmptyModel                                        `tfsdk:"perf_mode_l7_enhanced"`
-}
-
-// FleetPerformanceEnhancementModeModelAttrTypes defines the attribute types for FleetPerformanceEnhancementModeModel
-var FleetPerformanceEnhancementModeModelAttrTypes = map[string]attr.Type{
-	"perf_mode_l3_enhanced": types.ObjectType{AttrTypes: FleetPerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes},
-	"perf_mode_l7_enhanced": types.ObjectType{AttrTypes: map[string]attr.Type{}},
-}
-
-// FleetPerformanceEnhancementModePerfModeL3EnhancedModel represents perf_mode_l3_enhanced block
-type FleetPerformanceEnhancementModePerfModeL3EnhancedModel struct {
-	Jumbo   *FleetEmptyModel `tfsdk:"jumbo"`
-	NoJumbo *FleetEmptyModel `tfsdk:"no_jumbo"`
-}
-
-// FleetPerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes defines the attribute types for FleetPerformanceEnhancementModePerfModeL3EnhancedModel
-var FleetPerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes = map[string]attr.Type{
-	"jumbo":    types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"no_jumbo": types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // FleetSriovInterfacesModel represents sriov_interfaces block
@@ -1503,16 +1506,17 @@ var FleetUsbPolicyModelAttrTypes = map[string]attr.Type{
 type FleetResourceModel struct {
 	Name                             types.String                          `tfsdk:"name"`
 	Namespace                        types.String                          `tfsdk:"namespace"`
+	FleetLabel                       types.String                          `tfsdk:"fleet_label"`
 	Annotations                      types.Map                             `tfsdk:"annotations"`
 	Description                      types.String                          `tfsdk:"description"`
 	Disable                          types.Bool                            `tfsdk:"disable"`
 	Labels                           types.Map                             `tfsdk:"labels"`
 	ID                               types.String                          `tfsdk:"id"`
 	EnableDefaultFleetConfigDownload types.Bool                            `tfsdk:"enable_default_fleet_config_download"`
-	FleetLabel                       types.String                          `tfsdk:"fleet_label"`
 	OperatingSystemVersion           types.String                          `tfsdk:"operating_system_version"`
 	VolterraSoftwareVersion          types.String                          `tfsdk:"volterra_software_version"`
 	Timeouts                         timeouts.Value                        `tfsdk:"timeouts"`
+	PerformanceEnhancementMode       *FleetPerformanceEnhancementModeModel `tfsdk:"performance_enhancement_mode"`
 	AllowAllUsb                      *FleetEmptyModel                      `tfsdk:"allow_all_usb"`
 	BlockedServices                  types.List                            `tfsdk:"blocked_services"`
 	BondDeviceList                   *FleetBondDeviceListModel             `tfsdk:"bond_device_list"`
@@ -1541,7 +1545,6 @@ type FleetResourceModel struct {
 	NoStorageInterfaces              *FleetEmptyModel                      `tfsdk:"no_storage_interfaces"`
 	NoStorageStaticRoutes            *FleetEmptyModel                      `tfsdk:"no_storage_static_routes"`
 	OutsideVirtualNetwork            types.List                            `tfsdk:"outside_virtual_network"`
-	PerformanceEnhancementMode       *FleetPerformanceEnhancementModeModel `tfsdk:"performance_enhancement_mode"`
 	SriovInterfaces                  *FleetSriovInterfacesModel            `tfsdk:"sriov_interfaces"`
 	StorageClassList                 *FleetStorageClassListModel           `tfsdk:"storage_class_list"`
 	StorageDeviceList                *FleetStorageDeviceListModel          `tfsdk:"storage_device_list"`
@@ -1578,6 +1581,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					validators.NamespaceValidator(),
 				},
 			},
+			"fleet_label": schema.StringAttribute{
+				MarkdownDescription: "Fleet_label value is used to create known_label 'F5 XC/fleet=<fleet_label>' The known_label is created in the 'shared' namespace for the tenant. A virtual_site object with name <fleet_label> is also created in 'shared' namespace for tenant. The virtual_site object will select all sites..",
+				Required:            true,
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -1605,34 +1612,20 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			},
 			"enable_default_fleet_config_download": schema.BoolAttribute{
 				MarkdownDescription: "Enable default fleet config, It must be set for storage config and GPU config.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"fleet_label": schema.StringAttribute{
-				MarkdownDescription: "Fleet_label value is used to create known_label 'F5 XC/fleet=<fleet_label>' The known_label is created in the 'shared' namespace for the tenant. A virtual_site object with name <fleet_label> is also created in 'shared' namespace for tenant. The virtual_site object will select all sites..",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
+				Required:            true,
 			},
 			"operating_system_version": schema.StringAttribute{
 				MarkdownDescription: "Desired Operating System version that is applied to all sites that are member of the fleet. Current Operating System version can be overridden via site config.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(256),
 				},
 			},
 			"volterra_software_version": schema.StringAttribute{
 				MarkdownDescription: "F5XC software version is human readable string matching released set of version components. The given software version is applied to all sites that are member of the fleet. Current software installed can be overridden via site config.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(256),
 				},
 			},
 		},
@@ -1643,16 +1636,40 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Update: true,
 				Delete: true,
 			}),
+			"performance_enhancement_mode": schema.SingleNestedBlock{
+				MarkdownDescription: "Optimize the site for L3 or L7 traffic processing. L7 optimized is the default.",
+				Attributes:          map[string]schema.Attribute{},
+				Blocks: map[string]schema.Block{
+					"perf_mode_l3_enhanced": schema.SingleNestedBlock{
+						MarkdownDescription: "Configuration parameter for perf mode l3 enhanced.",
+						Attributes:          map[string]schema.Attribute{},
+						Blocks: map[string]schema.Block{
+							"jumbo": schema.SingleNestedBlock{
+								MarkdownDescription: "Enable this option",
+							},
+							"no_jumbo": schema.SingleNestedBlock{
+								MarkdownDescription: "Enable this option",
+							},
+						},
+					},
+					"perf_mode_l7_enhanced": schema.SingleNestedBlock{
+						MarkdownDescription: "Configuration parameter for perf mode l7 enhanced.",
+					},
+				},
+			},
 			"allow_all_usb": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: allow_all_usb, deny_all_usb, usb_policy] Enable this option",
+				MarkdownDescription: "[OneOf: allow_all_usb, deny_all_usb, usb_policy] Configuration parameter for allow all usb.",
 			},
 			"blocked_services": schema.ListNestedBlock{
 				MarkdownDescription: "Disable node local services on this site.",
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"network_type": schema.StringAttribute{
-							MarkdownDescription: "[Enum: VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT] Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to.. Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`. Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`.",
+							MarkdownDescription: "[Enum: VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT|VIRTUAL_NETWORK_MANAGEMENT] Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to.. Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`, `VIRTUAL_NETWORK_MANAGEMENT`. Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf("VIRTUAL_NETWORK_SITE_LOCAL", "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE", "VIRTUAL_NETWORK_PER_SITE", "VIRTUAL_NETWORK_PUBLIC", "VIRTUAL_NETWORK_GLOBAL", "VIRTUAL_NETWORK_SITE_SERVICE", "VIRTUAL_NETWORK_VER_INTERNAL", "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE", "VIRTUAL_NETWORK_IP_AUTO", "VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK", "VIRTUAL_NETWORK_SRV6_NETWORK", "VIRTUAL_NETWORK_IP_FABRIC", "VIRTUAL_NETWORK_SEGMENT", "VIRTUAL_NETWORK_MANAGEMENT"),
+							},
 						},
 					},
 					Blocks: map[string]schema.Block{
@@ -1680,6 +1697,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									MarkdownDescription: "Ethernet devices that will make up this bond .",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeBetween(1, 8),
+									},
 								},
 								"link_polling_interval": schema.Int64Attribute{
 									MarkdownDescription: "Link polling interval in milliseconds .",
@@ -1692,11 +1712,14 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Name for the Bond. Ex 'bond0' .",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
 								"active_backup": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for active backup.",
 								},
 								"lacp": schema.SingleNestedBlock{
 									MarkdownDescription: "LACP parameters. LACP parameters for the bond device.",
@@ -1718,6 +1741,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1726,6 +1752,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"tenant": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1733,6 +1762,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
 						},
 					},
 				},
@@ -1743,6 +1775,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1750,6 +1785,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
 						},
 					},
 					"tenant": schema.StringAttribute{
@@ -1759,6 +1797,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 				},
 			},
@@ -1766,13 +1807,13 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				MarkdownDescription: "[OneOf: default_config, device_list, interface_list; Default: default_config] Enable this option",
 			},
 			"default_sriov_interface": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: default_sriov_interface, sriov_interfaces; Default: default_sriov_interface] Enable this option",
+				MarkdownDescription: "[OneOf: default_sriov_interface, sriov_interfaces; Default: default_sriov_interface] Configuration parameter for default sriov interface.",
 			},
 			"default_storage_class": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: default_storage_class, storage_class_list; Default: default_storage_class] Enable this option",
+				MarkdownDescription: "[OneOf: default_storage_class, storage_class_list; Default: default_storage_class] Configuration parameter for default storage class.",
 			},
 			"deny_all_usb": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for deny all usb.",
 			},
 			"device_list": schema.SingleNestedBlock{
 				MarkdownDescription: "Add device for all interfaces belonging to this fleet.",
@@ -1785,10 +1826,17 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Name of the device including the unit number (e.g. Eth0 or disk1). The name must match name of device in host-OS of node.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 1024),
+										stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+									},
 								},
 								"owner": schema.StringAttribute{
 									MarkdownDescription: "[Enum: DEVICE_OWNER_INVALID|DEVICE_OWNER_VER|DEVICE_OWNER_VK8S_WORK_LOAD|DEVICE_OWNER_HOST] Defines ownership for a device. Device owner is invalid Device is owned by VER pod. Usually it will be network interface device or accelerator like crypto engine. Possible values are `DEVICE_OWNER_INVALID`, `DEVICE_OWNER_VER`, `DEVICE_OWNER_VK8S_WORK_LOAD`, `DEVICE_OWNER_HOST`. Defaults to `DEVICE_OWNER_INVALID`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("DEVICE_OWNER_INVALID", "DEVICE_OWNER_VER", "DEVICE_OWNER_VK8S_WORK_LOAD", "DEVICE_OWNER_HOST"),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -1798,6 +1846,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"use": schema.StringAttribute{
 											MarkdownDescription: "[Enum: NETWORK_INTERFACE_USE_REGULAR|NETWORK_INTERFACE_USE_OUTSIDE|NETWORK_INTERFACE_USE_INSIDE] Defines how the device is used If networking device is owned by VER, it is available for users to configure as required If networking device is owned by VER, it is included in bootstrap config and member of outside network. If networking device is owned by VER, it is included in bootstrap config.. Possible values are `NETWORK_INTERFACE_USE_REGULAR`, `NETWORK_INTERFACE_USE_OUTSIDE`, `NETWORK_INTERFACE_USE_INSIDE`. Defaults to `NETWORK_INTERFACE_USE_REGULAR`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("NETWORK_INTERFACE_USE_REGULAR", "NETWORK_INTERFACE_USE_OUTSIDE", "NETWORK_INTERFACE_USE_INSIDE"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -1816,6 +1867,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1823,6 +1878,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -1852,7 +1911,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				},
 			},
 			"disable_gpu": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: disable_gpu, enable_gpu, enable_vgpu; Default: disable_gpu] Enable this option",
+				MarkdownDescription: "[OneOf: disable_gpu, enable_gpu, enable_vgpu; Default: disable_gpu] Configuration parameter for disable gpu.",
 			},
 			"disable_vm": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: disable_vm, enable_vm; Default: disable_vm] Enable this option",
@@ -1866,6 +1925,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"feature_type": schema.StringAttribute{
 						MarkdownDescription: "[Enum: UNLICENSED|VGPU|VWS|VCS] Set feature to be enabled Operate with a degraded vGPU performance Enable NVIDIA vGPU Enable NVIDIA RTX Virtual Workstation Enable NVIDIA Virtual Compute Server. Possible values are `UNLICENSED`, `VGPU`, `VWS`, `VCS`. Defaults to `UNLICENSED`.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf("UNLICENSED", "VGPU", "VWS", "VCS"),
+						},
 					},
 					"server_address": schema.StringAttribute{
 						MarkdownDescription: "License Server Address. Set License Server Address.",
@@ -1895,6 +1957,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1902,6 +1968,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -1934,6 +2004,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1942,6 +2015,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 								"tenant": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1949,6 +2025,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
 									},
 								},
 							},
@@ -1961,13 +2040,13 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"disable_upgrade_drain": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable upgrade drain.",
 					},
 					"enable_upgrade_drain": schema.SingleNestedBlock{
 						MarkdownDescription: "Specify batch upgrade settings for worker nodes within a site.",
 						Attributes: map[string]schema.Attribute{
 							"drain_max_unavailable_node_count": schema.Int64Attribute{
-								MarkdownDescription: "Node Batch Size Count.",
+								MarkdownDescription: "Node Batch Size Count. Exclusive with []",
 								Optional:            true,
 							},
 							"drain_node_timeout": schema.Int64Attribute{
@@ -1977,10 +2056,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						},
 						Blocks: map[string]schema.Block{
 							"disable_vega_upgrade_mode": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable vega upgrade mode.",
 							},
 							"enable_vega_upgrade_mode": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for enable vega upgrade mode.",
 							},
 						},
 					},
@@ -1992,6 +2071,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2000,6 +2082,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"tenant": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2007,6 +2092,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
 						},
 					},
 				},
@@ -2029,6 +2117,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2036,6 +2128,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -2072,6 +2168,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2079,6 +2179,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -2101,19 +2205,19 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				},
 			},
 			"no_bond_devices": schema.SingleNestedBlock{
-				MarkdownDescription: "Enable this option",
+				MarkdownDescription: "Configuration parameter for no bond devices.",
 			},
 			"no_dc_cluster_group": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
 			},
 			"no_storage_device": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: no_storage_device, storage_device_list; Default: no_storage_device] Enable this option",
+				MarkdownDescription: "[OneOf: no_storage_device, storage_device_list; Default: no_storage_device] Configuration parameter for no storage device.",
 			},
 			"no_storage_interfaces": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: no_storage_interfaces, storage_interface_list; Default: no_storage_interfaces] Enable this option",
+				MarkdownDescription: "[OneOf: no_storage_interfaces, storage_interface_list; Default: no_storage_interfaces] Configuration parameter for no storage interfaces.",
 			},
 			"no_storage_static_routes": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: no_storage_static_routes, storage_static_routes; Default: no_storage_static_routes] Enable this option",
+				MarkdownDescription: "[OneOf: no_storage_static_routes, storage_static_routes; Default: no_storage_static_routes] Configuration parameter for no storage static routes.",
 			},
 			"outside_virtual_network": schema.ListNestedBlock{
 				MarkdownDescription: "Default outside (site local) virtual network for the fleet.",
@@ -2130,6 +2234,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						"name": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 							Optional:            true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+							},
 						},
 						"namespace": schema.StringAttribute{
 							MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2137,6 +2245,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							Computed:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.UseStateForUnknown(),
+							},
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1, 1024),
+								stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 							},
 						},
 						"tenant": schema.StringAttribute{
@@ -2155,27 +2267,6 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								stringplanmodifier.UseStateForUnknown(),
 							},
 						},
-					},
-				},
-			},
-			"performance_enhancement_mode": schema.SingleNestedBlock{
-				MarkdownDescription: "Optimize the site for L3 or L7 traffic processing. L7 optimized is the default.",
-				Attributes:          map[string]schema.Attribute{},
-				Blocks: map[string]schema.Block{
-					"perf_mode_l3_enhanced": schema.SingleNestedBlock{
-						MarkdownDescription: "L3 Mode Enhanced Performance. L3 enhanced performance mode OPTIONS.",
-						Attributes:          map[string]schema.Attribute{},
-						Blocks: map[string]schema.Block{
-							"jumbo": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
-							},
-							"no_jumbo": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
-							},
-						},
-					},
-					"perf_mode_l7_enhanced": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
 					},
 				},
 			},
@@ -2223,10 +2314,16 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								"description_spec": schema.StringAttribute{
 									MarkdownDescription: "Storage Class Description. Description for this storage class.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(256),
+									},
 								},
 								"reclaim_policy": schema.StringAttribute{
 									MarkdownDescription: "Policy configuration for this feature.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(16),
+									},
 								},
 								"storage_class_name": schema.StringAttribute{
 									MarkdownDescription: "Name of the storage class as it will appear in K8s.",
@@ -2235,6 +2332,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								"storage_device": schema.StringAttribute{
 									MarkdownDescription: "Storage device that this class will use. The Device name defined at previous step.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -2247,6 +2347,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"yaml": schema.StringAttribute{
 											MarkdownDescription: "Storage Class YAML. K8s YAML for StorageClass.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 4096),
+											},
 										},
 									},
 								},
@@ -2256,10 +2359,16 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"allow_mutations": schema.StringAttribute{
 											MarkdownDescription: "Mutation can override specified parameters.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"allow_overrides": schema.StringAttribute{
 											MarkdownDescription: "AllowOverrides. PVC can override specified parameters.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"dedupe_enabled": schema.BoolAttribute{
 											MarkdownDescription: "Indicates that the volume should enable deduplication.",
@@ -2268,6 +2377,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"description_spec": schema.StringAttribute{
 											MarkdownDescription: "The SecretName parameter is used to identify name of secret to identify backend storage's auth information.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(512),
+											},
 										},
 										"destroy_on_delete": schema.BoolAttribute{
 											MarkdownDescription: "Indicates the backing Nimble volume (including snapshots) should be destroyed when the PVC is deleted.",
@@ -2280,6 +2392,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"folder": schema.StringAttribute{
 											MarkdownDescription: "The name of the folder in which to place the volume.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 										"limit_iops": schema.StringAttribute{
 											MarkdownDescription: "LimitIops. The IOPS limit of the volume.",
@@ -2292,22 +2407,37 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"performance_policy": schema.StringAttribute{
 											MarkdownDescription: "Policy configuration for this feature.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 										"pool": schema.StringAttribute{
 											MarkdownDescription: "The name of the pool in which to place the volume.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 										"protection_template": schema.StringAttribute{
 											MarkdownDescription: "The name of the performance policy to assign to the volume.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(128),
+											},
 										},
 										"secret_name": schema.StringAttribute{
 											MarkdownDescription: "The SecretName parameter is used to identify name of secret to identify backend storage's auth information.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"secret_namespace": schema.StringAttribute{
 											MarkdownDescription: "The SecretNamespace parameter is used to identify name of namespace where secret resides.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"sync_on_detach": schema.BoolAttribute{
 											MarkdownDescription: "Indicates that a snapshot of the volume should be synced to the replication partner each time it is detached from a node.",
@@ -2325,6 +2455,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"storage_pools": schema.StringAttribute{
 											MarkdownDescription: "The storagePools parameter is used to further restrict the set of pools that match any specified attributes.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(512),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -2343,6 +2476,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"bandwidth_limit": schema.StringAttribute{
 											MarkdownDescription: "It must be between 1 MB/s and 512 GB/s. Enter the size as a number (bytes must be multiple of 512) or number with a single character unit symbol. Valid unit symbols are K, M, G, representing KiB, MiB, and GiB.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(12),
+											},
 										},
 										"iops_limit": schema.Int64Attribute{
 											MarkdownDescription: "Enable IOPS limitation. It must be between 100 and 100 million. If value is 0, IOPS limit is not defined.",
@@ -2366,6 +2502,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								"storage_device": schema.StringAttribute{
 									MarkdownDescription: "Storage device and device unit .",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -2373,10 +2512,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									MarkdownDescription: "Advanced Parameters. Map of parameter name and string value.",
 								},
 								"custom_storage": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for custom storage.",
 								},
 								"hpe_storage": schema.SingleNestedBlock{
-									MarkdownDescription: "HPE Storage. Device configuration for HPE Storage.",
+									MarkdownDescription: "Configuration parameter for hpe storage.",
 									Attributes: map[string]schema.Attribute{
 										"api_server_port": schema.Int64Attribute{
 											MarkdownDescription: "Storage server Port. Enter Storage Server Port.",
@@ -2385,18 +2524,30 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"iscsi_chap_user": schema.StringAttribute{
 											MarkdownDescription: "Chap Username to connect to the HPE storage.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(256),
+											},
 										},
 										"storage_server_ip_address": schema.StringAttribute{
 											MarkdownDescription: "Storage Server IP address. Enter storage server IP address.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"storage_server_name": schema.StringAttribute{
 											MarkdownDescription: "Storage Server Name. Enter storage server Name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 										"username": schema.StringAttribute{
 											MarkdownDescription: "Username to connect to the HPE storage management IP .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 256),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -2414,6 +2565,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2431,6 +2585,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
@@ -2450,6 +2607,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"location": schema.StringAttribute{
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 														"store_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2467,6 +2627,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"url": schema.StringAttribute{
 															MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 131072),
+															},
 														},
 													},
 												},
@@ -2488,18 +2651,30 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 												"backend_name": schema.StringAttribute{
 													MarkdownDescription: "Configuration of Backend Name. Driver is name + '_' + dataLIF.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 50),
+													},
 												},
 												"client_certificate": schema.StringAttribute{
 													MarkdownDescription: "Please Enter Base64-encoded value of client certificate. Used for certificate-based auth.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(8192),
+													},
 												},
 												"data_lif_dns_name": schema.StringAttribute{
-													MarkdownDescription: "Backend Data LIF IP Address's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
+													MarkdownDescription: "Exclusive with [data_lif_ip] Backend Data LIF IP Address's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"data_lif_ip": schema.StringAttribute{
-													MarkdownDescription: "Backend Data LIF IP Address is reachable at the given IP address.",
+													MarkdownDescription: "Exclusive with [data_lif_dns_name] Backend Data LIF IP Address is reachable at the given IP address.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(1024),
+													},
 												},
 												"limit_aggregate_usage": schema.StringAttribute{
 													MarkdownDescription: "Fail provisioning if usage is above this percentage. Not enforced by default.",
@@ -2510,12 +2685,18 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													Optional:            true,
 												},
 												"management_lif_dns_name": schema.StringAttribute{
-													MarkdownDescription: "Backend Management LIF IP Address's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
+													MarkdownDescription: "Exclusive with [management_lif_ip] Backend Management LIF IP Address's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"management_lif_ip": schema.StringAttribute{
-													MarkdownDescription: "Backend Management LIF IP Address is reachable at the given IP address.",
+													MarkdownDescription: "Exclusive with [management_lif_dns_name] Backend Management LIF IP Address is reachable at the given IP address.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(1024),
+													},
 												},
 												"nfs_mount_options": schema.StringAttribute{
 													MarkdownDescription: "Comma-separated list of NFS mount OPTIONS. Not enforced by default.",
@@ -2536,14 +2717,23 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 												"svm": schema.StringAttribute{
 													MarkdownDescription: "Storage virtual machine to use. Derived if an SVM managementLIF is specified.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 												"trusted_ca_certificate": schema.StringAttribute{
 													MarkdownDescription: "Please Enter Base64-encoded value of trusted CA certificate. Optional. Used for certificate-based auth.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(8192),
+													},
 												},
 												"username": schema.StringAttribute{
 													MarkdownDescription: "Username to connect to the cluster/SVM .",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
@@ -2554,6 +2744,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 															MarkdownDescription: "List of IPv4 prefixes that represent an endpoint.",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(128),
+															},
 														},
 													},
 												},
@@ -2571,6 +2764,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																"location": schema.StringAttribute{
 																	MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(1024),
+																	},
 																},
 																"store_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2588,6 +2784,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																"url": schema.StringAttribute{
 																	MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 131072),
+																	},
 																},
 															},
 														},
@@ -2610,6 +2809,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																"location": schema.StringAttribute{
 																	MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(1024),
+																	},
 																},
 																"store_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2627,6 +2829,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																"url": schema.StringAttribute{
 																	MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 131072),
+																	},
 																},
 															},
 														},
@@ -2651,6 +2856,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																	"adaptive_qos_policy": schema.StringAttribute{
 																		MarkdownDescription: "Policy configuration for this feature.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 128),
+																		},
 																	},
 																	"encryption": schema.BoolAttribute{
 																		MarkdownDescription: "Enable Encryption. Enable NetApp volume encryption.",
@@ -2663,6 +2871,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																	"qos_policy": schema.StringAttribute{
 																		MarkdownDescription: "Policy configuration for this feature.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 128),
+																		},
 																	},
 																	"security_style": schema.StringAttribute{
 																		MarkdownDescription: "Security Style. Security style for new volumes.",
@@ -2712,6 +2923,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"adaptive_qos_policy": schema.StringAttribute{
 															MarkdownDescription: "Policy configuration for this feature.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 128),
+															},
 														},
 														"encryption": schema.BoolAttribute{
 															MarkdownDescription: "Enable Encryption. Enable NetApp volume encryption.",
@@ -2724,6 +2938,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"qos_policy": schema.StringAttribute{
 															MarkdownDescription: "Policy configuration for this feature.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 128),
+															},
 														},
 														"security_style": schema.StringAttribute{
 															MarkdownDescription: "Security Style. Security style for new volumes.",
@@ -2772,18 +2989,30 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 												"client_certificate": schema.StringAttribute{
 													MarkdownDescription: "Please Enter Base64-encoded value of client certificate. Used for certificate-based auth.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(8192),
+													},
 												},
 												"data_lif_dns_name": schema.StringAttribute{
-													MarkdownDescription: "Backend Data LIF IP Address's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
+													MarkdownDescription: "Exclusive with [data_lif_ip] Backend Data LIF IP Address's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"data_lif_ip": schema.StringAttribute{
-													MarkdownDescription: "Backend Data LIF IP Address is reachable at the given IP address.",
+													MarkdownDescription: "Exclusive with [data_lif_dns_name] Backend Data LIF IP Address is reachable at the given IP address.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(1024),
+													},
 												},
 												"igroup_name": schema.StringAttribute{
 													MarkdownDescription: "Name of the igroup for SAN volumes to use.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 												"limit_aggregate_usage": schema.Int64Attribute{
 													MarkdownDescription: "Fail provisioning if usage is above this percentage. Not enforced by default.",
@@ -2794,12 +3023,18 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													Optional:            true,
 												},
 												"management_lif_dns_name": schema.StringAttribute{
-													MarkdownDescription: "Backend Management LIF IP Address's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
+													MarkdownDescription: "Exclusive with [management_lif_ip] Backend Management LIF IP Address's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(256),
+													},
 												},
 												"management_lif_ip": schema.StringAttribute{
-													MarkdownDescription: "Backend Management LIF IP Address is reachable at the given IP address.",
+													MarkdownDescription: "Exclusive with [management_lif_dns_name] Backend Management LIF IP Address is reachable at the given IP address.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(1024),
+													},
 												},
 												"region": schema.StringAttribute{
 													MarkdownDescription: "Backend Region. Virtual Pool Region.",
@@ -2812,18 +3047,30 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 												"storage_prefix": schema.StringAttribute{
 													MarkdownDescription: "Prefix used when provisioning new volumes in the SVM. Once set this cannot be updated.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 80),
+													},
 												},
 												"svm": schema.StringAttribute{
 													MarkdownDescription: "Storage virtual machine to use. Derived if an SVM managementLIF is specified.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 												"trusted_ca_certificate": schema.StringAttribute{
 													MarkdownDescription: "Please Enter Base64-encoded value of trusted CA certificate. Optional. Used for certificate-based auth.",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthAtMost(8192),
+													},
 												},
 												"username": schema.StringAttribute{
 													MarkdownDescription: "Username to connect to the cluster/SVM .",
 													Optional:            true,
+													Validators: []validator.String{
+														stringvalidator.LengthBetween(1, 256),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
@@ -2841,6 +3088,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																"location": schema.StringAttribute{
 																	MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(1024),
+																	},
 																},
 																"store_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2858,6 +3108,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																"url": schema.StringAttribute{
 																	MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 131072),
+																	},
 																},
 															},
 														},
@@ -2883,6 +3136,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																"location": schema.StringAttribute{
 																	MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthAtMost(1024),
+																	},
 																},
 																"store_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -2900,6 +3156,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																"url": schema.StringAttribute{
 																	MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																	Optional:            true,
+																	Validators: []validator.String{
+																		stringvalidator.LengthBetween(1, 131072),
+																	},
 																},
 															},
 														},
@@ -2924,6 +3183,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																	"adaptive_qos_policy": schema.StringAttribute{
 																		MarkdownDescription: "Policy configuration for this feature.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 128),
+																		},
 																	},
 																	"encryption": schema.BoolAttribute{
 																		MarkdownDescription: "Enable Encryption. Enable NetApp volume encryption.",
@@ -2936,6 +3198,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																	"qos_policy": schema.StringAttribute{
 																		MarkdownDescription: "Policy configuration for this feature.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 128),
+																		},
 																	},
 																	"security_style": schema.StringAttribute{
 																		MarkdownDescription: "Security Style. Security style for new volumes.",
@@ -2985,10 +3250,16 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"chap_target_username": schema.StringAttribute{
 															MarkdownDescription: "Target username. Required if useCHAP=true.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 														"chap_username": schema.StringAttribute{
 															MarkdownDescription: "Inbound username. Required if useCHAP=true.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 256),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -3006,6 +3277,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																		"location": schema.StringAttribute{
 																			MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																			Optional:            true,
+																			Validators: []validator.String{
+																				stringvalidator.LengthAtMost(1024),
+																			},
 																		},
 																		"store_provider": schema.StringAttribute{
 																			MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -3023,6 +3297,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																		"url": schema.StringAttribute{
 																			MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																			Optional:            true,
+																			Validators: []validator.String{
+																				stringvalidator.LengthBetween(1, 131072),
+																			},
 																		},
 																	},
 																},
@@ -3042,6 +3319,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																		"location": schema.StringAttribute{
 																			MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																			Optional:            true,
+																			Validators: []validator.String{
+																				stringvalidator.LengthAtMost(1024),
+																			},
 																		},
 																		"store_provider": schema.StringAttribute{
 																			MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -3059,6 +3339,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																		"url": schema.StringAttribute{
 																			MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																			Optional:            true,
+																			Validators: []validator.String{
+																				stringvalidator.LengthBetween(1, 131072),
+																			},
 																		},
 																	},
 																},
@@ -3072,6 +3355,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"adaptive_qos_policy": schema.StringAttribute{
 															MarkdownDescription: "Policy configuration for this feature.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 128),
+															},
 														},
 														"encryption": schema.BoolAttribute{
 															MarkdownDescription: "Enable Encryption. Enable NetApp volume encryption.",
@@ -3084,6 +3370,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"qos_policy": schema.StringAttribute{
 															MarkdownDescription: "Policy configuration for this feature.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 128),
+															},
 														},
 														"security_style": schema.StringAttribute{
 															MarkdownDescription: "Security Style. Security style for new volumes.",
@@ -3134,6 +3423,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"cluster_id": schema.StringAttribute{
 											MarkdownDescription: "ClusterID is added as a prefix for all volumes created by this PSO installation. ClusterID is also used to identify the volumes used by the datastore, pso-db. ClusterID MUST BE UNIQUE for multiple K8s clusters running on top of the same storage arrays.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 22),
+											},
 										},
 										"enable_storage_topology": schema.BoolAttribute{
 											MarkdownDescription: "Option is to enable/disable the csi topology feature for pso-csi.",
@@ -3155,6 +3447,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"default_fs_opt": schema.StringAttribute{
 															MarkdownDescription: "Block volume default mkfs OPTIONS. Not recommended to change!",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 128),
+															},
 														},
 														"default_fs_type": schema.StringAttribute{
 															MarkdownDescription: "Block volume default filesystem type. Not recommended to change!",
@@ -3164,6 +3459,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 															MarkdownDescription: "Block volume default filesystem mount OPTIONS. Not recommended to change!",
 															Optional:            true,
 															ElementType:         types.StringType,
+															Validators: []validator.List{
+																listvalidator.SizeAtMost(4),
+															},
 														},
 														"disable_preempt_attachments": schema.BoolAttribute{
 															MarkdownDescription: "Disable Preempt Attachments. Enable/Disable attachment preemption!",
@@ -3184,12 +3482,18 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 															NestedObject: schema.NestedBlockObject{
 																Attributes: map[string]schema.Attribute{
 																	"mgmt_dns_name": schema.StringAttribute{
-																		MarkdownDescription: "Management Endpoint's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
+																		MarkdownDescription: "Exclusive with [mgmt_ip] Management Endpoint's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(256),
+																		},
 																	},
 																	"mgmt_ip": schema.StringAttribute{
-																		MarkdownDescription: "Management Endpoint is reachable at the given IP address.",
+																		MarkdownDescription: "Exclusive with [mgmt_dns_name] Management Endpoint is reachable at the given IP address.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(1024),
+																		},
 																	},
 																},
 																Blocks: map[string]schema.Block{
@@ -3207,6 +3511,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																					"location": schema.StringAttribute{
 																						MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																						Optional:            true,
+																						Validators: []validator.String{
+																							stringvalidator.LengthAtMost(1024),
+																						},
 																					},
 																					"store_provider": schema.StringAttribute{
 																						MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -3224,6 +3531,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																					"url": schema.StringAttribute{
 																						MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																						Optional:            true,
+																						Validators: []validator.String{
+																							stringvalidator.LengthBetween(1, 131072),
+																						},
 																					},
 																				},
 																			},
@@ -3247,6 +3557,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"export_rules": schema.StringAttribute{
 															MarkdownDescription: "NFS Export Rules. NFS Export rules.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 250),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -3255,20 +3568,32 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 															NestedObject: schema.NestedBlockObject{
 																Attributes: map[string]schema.Attribute{
 																	"mgmt_dns_name": schema.StringAttribute{
-																		MarkdownDescription: "Management Endpoint's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
+																		MarkdownDescription: "Exclusive with [mgmt_ip] Management Endpoint's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(256),
+																		},
 																	},
 																	"mgmt_ip": schema.StringAttribute{
-																		MarkdownDescription: "Management Endpoint is reachable at the given IP address.",
+																		MarkdownDescription: "Exclusive with [mgmt_dns_name] Management Endpoint is reachable at the given IP address.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(1024),
+																		},
 																	},
 																	"nfs_endpoint_dns_name": schema.StringAttribute{
-																		MarkdownDescription: "Endpoint's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
+																		MarkdownDescription: "Exclusive with [nfs_endpoint_ip] Endpoint's IP address is discovered using DNS name resolution. The name given here is fully qualified domain name.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(256),
+																		},
 																	},
 																	"nfs_endpoint_ip": schema.StringAttribute{
-																		MarkdownDescription: "Endpoint is reachable at the given IP address.",
+																		MarkdownDescription: "Exclusive with [nfs_endpoint_dns_name] Endpoint is reachable at the given IP address.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(1024),
+																		},
 																	},
 																},
 																Blocks: map[string]schema.Block{
@@ -3286,6 +3611,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																					"location": schema.StringAttribute{
 																						MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																						Optional:            true,
+																						Validators: []validator.String{
+																							stringvalidator.LengthAtMost(1024),
+																						},
 																					},
 																					"store_provider": schema.StringAttribute{
 																						MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -3303,6 +3631,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																					"url": schema.StringAttribute{
 																						MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 																						Optional:            true,
+																						Validators: []validator.String{
+																							stringvalidator.LengthBetween(1, 131072),
+																						},
 																					},
 																				},
 																			},
@@ -3336,6 +3667,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 								"name": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 128),
+									},
 								},
 								"namespace": schema.StringAttribute{
 									MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -3343,6 +3677,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									Computed:            true,
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
+									},
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 64),
 									},
 								},
 								"tenant": schema.StringAttribute{
@@ -3352,6 +3689,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									PlanModifiers: []planmodifier.String{
 										stringplanmodifier.UseStateForUnknown(),
 									},
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
+									},
 								},
 							},
 						},
@@ -3359,7 +3699,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				},
 			},
 			"storage_static_routes": schema.SingleNestedBlock{
-				MarkdownDescription: "Storage Static Routes List. List of storage static routes.",
+				MarkdownDescription: "Configuration parameter for storage static routes.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"storage_routes": schema.ListNestedBlock{
@@ -3370,6 +3710,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									MarkdownDescription: "[Enum: ROUTE_ATTR_NO_OP|ROUTE_ATTR_ADVERTISE|ROUTE_ATTR_INSTALL_HOST|ROUTE_ATTR_INSTALL_FORWARDING|ROUTE_ATTR_MERGE_ONLY] List of route attributes associated with the static route. Possible values are `ROUTE_ATTR_NO_OP`, `ROUTE_ATTR_ADVERTISE`, `ROUTE_ATTR_INSTALL_HOST`, `ROUTE_ATTR_INSTALL_FORWARDING`, `ROUTE_ATTR_MERGE_ONLY`. Defaults to `ROUTE_ATTR_NO_OP`.",
 									Optional:            true,
 									ElementType:         types.StringType,
+									Validators: []validator.List{
+										listvalidator.SizeAtMost(4),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -3382,6 +3725,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 										"type": schema.StringAttribute{
 											MarkdownDescription: "[Enum: NEXT_HOP_DEFAULT_GATEWAY|NEXT_HOP_USE_CONFIGURED|NEXT_HOP_NETWORK_INTERFACE] Defines types of next-hop Use default gateway on the local interface as gateway for route. Assumes there is only one local interface on the virtual network. Use the specified address as nexthop Use the network interface as nexthop Discard nexthop, used when attr type is Advertise Used in VoltADN.. Possible values are `NEXT_HOP_DEFAULT_GATEWAY`, `NEXT_HOP_USE_CONFIGURED`, `NEXT_HOP_NETWORK_INTERFACE`. Defaults to `NEXT_HOP_DEFAULT_GATEWAY`.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf("NEXT_HOP_DEFAULT_GATEWAY", "NEXT_HOP_USE_CONFIGURED", "NEXT_HOP_NETWORK_INTERFACE"),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -3400,6 +3746,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"name": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+														},
 													},
 													"namespace": schema.StringAttribute{
 														MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -3407,6 +3757,10 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														Computed:            true,
 														PlanModifiers: []planmodifier.String{
 															stringplanmodifier.UseStateForUnknown(),
+														},
+														Validators: []validator.String{
+															stringvalidator.LengthBetween(1, 1024),
+															stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 														},
 													},
 													"tenant": schema.StringAttribute{
@@ -3433,11 +3787,14 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 											Attributes:          map[string]schema.Attribute{},
 											Blocks: map[string]schema.Block{
 												"ipv4": schema.SingleNestedBlock{
-													MarkdownDescription: "IPv4 Address. IPv4 Address in dot-decimal notation.",
+													MarkdownDescription: "IPv4 address in dotted decimal notation (e.g., 192.0.2.1).",
 													Attributes: map[string]schema.Attribute{
 														"addr": schema.StringAttribute{
 															MarkdownDescription: "IPv4 Address in string form with dot-decimal notation.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 													},
 												},
@@ -3447,6 +3804,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 														"addr": schema.StringAttribute{
 															MarkdownDescription: "IPv6 Address in form of string. IPv6 address must be specified as hexadecimal numbers separated by ':' The address can be compacted by suppressing zeros e.g. '2001:db8:0:0:0:0:2:1' becomes '2001:db8::2:1' or '2001:db8:0:0:0:2:0:0' becomes '2001:db8::2::'.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(1024),
+															},
 														},
 													},
 												},
@@ -3469,6 +3829,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"prefix": schema.StringAttribute{
 														MarkdownDescription: "Prefix part of the IPv4 subnet in string form with dot-decimal notation.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 												},
 											},
@@ -3482,6 +3845,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													"prefix": schema.StringAttribute{
 														MarkdownDescription: "Prefix part of the IPv6 subnet given in form of string. IPv6 address must be specified as hexadecimal numbers separated by ':' e.g. '2001:db8:0:0:0:2:0:0' The address can be compacted by suppressing zeros e.g. '2001:db8::2::'.",
 														Optional:            true,
+														Validators: []validator.String{
+															stringvalidator.LengthAtMost(1024),
+														},
 													},
 												},
 											},
@@ -3499,6 +3865,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -3507,6 +3876,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"tenant": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -3514,6 +3886,9 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
 						},
 					},
 				},
@@ -3624,6 +3999,20 @@ func (r *FleetResource) Create(ctx context.Context, req resource.CreateRequest, 
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.FleetLabel.IsNull() && !data.FleetLabel.IsUnknown() {
+		createReq.Spec["fleet_label"] = data.FleetLabel.ValueString()
+	}
+	if data.PerformanceEnhancementMode != nil {
+		performance_enhancement_modeMap := make(map[string]interface{})
+		if data.PerformanceEnhancementMode.PerfModeL3Enhanced != nil {
+			perf_mode_l3_enhancedNestedMap := make(map[string]interface{})
+			performance_enhancement_modeMap["perf_mode_l3_enhanced"] = perf_mode_l3_enhancedNestedMap
+		}
+		if data.PerformanceEnhancementMode.PerfModeL7Enhanced != nil {
+			performance_enhancement_modeMap["perf_mode_l7_enhanced"] = map[string]interface{}{}
+		}
+		createReq.Spec["performance_enhancement_mode"] = performance_enhancement_modeMap
+	}
 	if data.AllowAllUsb != nil {
 		allow_all_usbMap := make(map[string]interface{})
 		createReq.Spec["allow_all_usb"] = allow_all_usbMap
@@ -3967,17 +4356,6 @@ func (r *FleetResource) Create(ctx context.Context, req resource.CreateRequest, 
 			createReq.Spec["outside_virtual_network"] = outside_virtual_networkList
 		}
 	}
-	if data.PerformanceEnhancementMode != nil {
-		performance_enhancement_modeMap := make(map[string]interface{})
-		if data.PerformanceEnhancementMode.PerfModeL3Enhanced != nil {
-			perf_mode_l3_enhancedNestedMap := make(map[string]interface{})
-			performance_enhancement_modeMap["perf_mode_l3_enhanced"] = perf_mode_l3_enhancedNestedMap
-		}
-		if data.PerformanceEnhancementMode.PerfModeL7Enhanced != nil {
-			performance_enhancement_modeMap["perf_mode_l7_enhanced"] = map[string]interface{}{}
-		}
-		createReq.Spec["performance_enhancement_mode"] = performance_enhancement_modeMap
-	}
 	if data.SriovInterfaces != nil {
 		sriov_interfacesMap := make(map[string]interface{})
 		if len(data.SriovInterfaces.SriovInterface) > 0 {
@@ -4230,9 +4608,6 @@ func (r *FleetResource) Create(ctx context.Context, req resource.CreateRequest, 
 	if !data.EnableDefaultFleetConfigDownload.IsNull() && !data.EnableDefaultFleetConfigDownload.IsUnknown() {
 		createReq.Spec["enable_default_fleet_config_download"] = data.EnableDefaultFleetConfigDownload.ValueBool()
 	}
-	if !data.FleetLabel.IsNull() && !data.FleetLabel.IsUnknown() {
-		createReq.Spec["fleet_label"] = data.FleetLabel.ValueString()
-	}
 	if !data.OperatingSystemVersion.IsNull() && !data.OperatingSystemVersion.IsUnknown() {
 		createReq.Spec["operating_system_version"] = data.OperatingSystemVersion.ValueString()
 	}
@@ -4252,6 +4627,16 @@ func (r *FleetResource) Create(ctx context.Context, req resource.CreateRequest, 
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["fleet_label"].(string); ok && v != "" {
+		data.FleetLabel = types.StringValue(v)
+	} else {
+		data.FleetLabel = types.StringNull()
+	}
+	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.PerformanceEnhancementMode = &FleetPerformanceEnhancementModeModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["allow_all_usb"].(map[string]interface{}); ok && isImport && data.AllowAllUsb == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.AllowAllUsb = &FleetEmptyModel{}
@@ -4815,11 +5200,6 @@ func (r *FleetResource) Create(ctx context.Context, req resource.CreateRequest, 
 		// No data from API - set to null list
 		data.OutsideVirtualNetwork = types.ListNull(types.ObjectType{AttrTypes: FleetOutsideVirtualNetworkModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.PerformanceEnhancementMode = &FleetPerformanceEnhancementModeModel{}
-	}
-	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["sriov_interfaces"].(map[string]interface{}); ok && (isImport || data.SriovInterfaces != nil) {
 		data.SriovInterfaces = &FleetSriovInterfacesModel{
 			SriovInterface: func() []FleetSriovInterfacesSriovInterfaceModel {
@@ -5270,21 +5650,10 @@ func (r *FleetResource) Create(ctx context.Context, req resource.CreateRequest, 
 			}(),
 		}
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.EnableDefaultFleetConfigDownload.IsNull() && !data.EnableDefaultFleetConfigDownload.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["enable_default_fleet_config_download"].(bool); ok {
+		data.EnableDefaultFleetConfigDownload = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["enable_default_fleet_config_download"].(bool); ok {
-			data.EnableDefaultFleetConfigDownload = types.BoolValue(v)
-		} else {
-			data.EnableDefaultFleetConfigDownload = types.BoolNull()
-		}
-	}
-	if v, ok := apiResource.Spec["fleet_label"].(string); ok && v != "" {
-		data.FleetLabel = types.StringValue(v)
-	} else {
-		data.FleetLabel = types.StringNull()
+		data.EnableDefaultFleetConfigDownload = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["operating_system_version"].(string); ok && v != "" {
 		data.OperatingSystemVersion = types.StringValue(v)
@@ -5376,6 +5745,16 @@ func (r *FleetResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["fleet_label"].(string); ok && v != "" {
+		data.FleetLabel = types.StringValue(v)
+	} else {
+		data.FleetLabel = types.StringNull()
+	}
+	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.PerformanceEnhancementMode = &FleetPerformanceEnhancementModeModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["allow_all_usb"].(map[string]interface{}); ok && isImport && data.AllowAllUsb == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.AllowAllUsb = &FleetEmptyModel{}
@@ -5939,11 +6318,6 @@ func (r *FleetResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		// No data from API - set to null list
 		data.OutsideVirtualNetwork = types.ListNull(types.ObjectType{AttrTypes: FleetOutsideVirtualNetworkModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.PerformanceEnhancementMode = &FleetPerformanceEnhancementModeModel{}
-	}
-	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["sriov_interfaces"].(map[string]interface{}); ok && (isImport || data.SriovInterfaces != nil) {
 		data.SriovInterfaces = &FleetSriovInterfacesModel{
 			SriovInterface: func() []FleetSriovInterfacesSriovInterfaceModel {
@@ -6394,21 +6768,10 @@ func (r *FleetResource) Read(ctx context.Context, req resource.ReadRequest, resp
 			}(),
 		}
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.EnableDefaultFleetConfigDownload.IsNull() && !data.EnableDefaultFleetConfigDownload.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["enable_default_fleet_config_download"].(bool); ok {
+		data.EnableDefaultFleetConfigDownload = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["enable_default_fleet_config_download"].(bool); ok {
-			data.EnableDefaultFleetConfigDownload = types.BoolValue(v)
-		} else {
-			data.EnableDefaultFleetConfigDownload = types.BoolNull()
-		}
-	}
-	if v, ok := apiResource.Spec["fleet_label"].(string); ok && v != "" {
-		data.FleetLabel = types.StringValue(v)
-	} else {
-		data.FleetLabel = types.StringNull()
+		data.EnableDefaultFleetConfigDownload = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["operating_system_version"].(string); ok && v != "" {
 		data.OperatingSystemVersion = types.StringValue(v)
@@ -6471,6 +6834,20 @@ func (r *FleetResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if !data.FleetLabel.IsNull() && !data.FleetLabel.IsUnknown() {
+		apiResource.Spec["fleet_label"] = data.FleetLabel.ValueString()
+	}
+	if data.PerformanceEnhancementMode != nil {
+		performance_enhancement_modeMap := make(map[string]interface{})
+		if data.PerformanceEnhancementMode.PerfModeL3Enhanced != nil {
+			perf_mode_l3_enhancedNestedMap := make(map[string]interface{})
+			performance_enhancement_modeMap["perf_mode_l3_enhanced"] = perf_mode_l3_enhancedNestedMap
+		}
+		if data.PerformanceEnhancementMode.PerfModeL7Enhanced != nil {
+			performance_enhancement_modeMap["perf_mode_l7_enhanced"] = map[string]interface{}{}
+		}
+		apiResource.Spec["performance_enhancement_mode"] = performance_enhancement_modeMap
+	}
 	if data.AllowAllUsb != nil {
 		allow_all_usbMap := make(map[string]interface{})
 		apiResource.Spec["allow_all_usb"] = allow_all_usbMap
@@ -6814,17 +7191,6 @@ func (r *FleetResource) Update(ctx context.Context, req resource.UpdateRequest, 
 			apiResource.Spec["outside_virtual_network"] = outside_virtual_networkList
 		}
 	}
-	if data.PerformanceEnhancementMode != nil {
-		performance_enhancement_modeMap := make(map[string]interface{})
-		if data.PerformanceEnhancementMode.PerfModeL3Enhanced != nil {
-			perf_mode_l3_enhancedNestedMap := make(map[string]interface{})
-			performance_enhancement_modeMap["perf_mode_l3_enhanced"] = perf_mode_l3_enhancedNestedMap
-		}
-		if data.PerformanceEnhancementMode.PerfModeL7Enhanced != nil {
-			performance_enhancement_modeMap["perf_mode_l7_enhanced"] = map[string]interface{}{}
-		}
-		apiResource.Spec["performance_enhancement_mode"] = performance_enhancement_modeMap
-	}
 	if data.SriovInterfaces != nil {
 		sriov_interfacesMap := make(map[string]interface{})
 		if len(data.SriovInterfaces.SriovInterface) > 0 {
@@ -7077,9 +7443,6 @@ func (r *FleetResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	if !data.EnableDefaultFleetConfigDownload.IsNull() && !data.EnableDefaultFleetConfigDownload.IsUnknown() {
 		apiResource.Spec["enable_default_fleet_config_download"] = data.EnableDefaultFleetConfigDownload.ValueBool()
 	}
-	if !data.FleetLabel.IsNull() && !data.FleetLabel.IsUnknown() {
-		apiResource.Spec["fleet_label"] = data.FleetLabel.ValueString()
-	}
 	if !data.OperatingSystemVersion.IsNull() && !data.OperatingSystemVersion.IsUnknown() {
 		apiResource.Spec["operating_system_version"] = data.OperatingSystemVersion.ValueString()
 	}
@@ -7105,39 +7468,21 @@ func (r *FleetResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["enable_default_fleet_config_download"].(bool); ok {
-		data.EnableDefaultFleetConfigDownload = types.BoolValue(v)
-	} else if data.EnableDefaultFleetConfigDownload.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.EnableDefaultFleetConfigDownload = types.BoolNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["fleet_label"].(string); ok && v != "" {
-		data.FleetLabel = types.StringValue(v)
-	} else if data.FleetLabel.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.FleetLabel = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["operating_system_version"].(string); ok && v != "" {
-		data.OperatingSystemVersion = types.StringValue(v)
-	} else if data.OperatingSystemVersion.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.OperatingSystemVersion = types.StringNull()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["volterra_software_version"].(string); ok && v != "" {
-		data.VolterraSoftwareVersion = types.StringValue(v)
-	} else if data.VolterraSoftwareVersion.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.VolterraSoftwareVersion = types.StringNull()
-	}
-	// If plan had a value, preserve it
 
 	// Unmarshal spec fields from fetched resource to Terraform state
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if v, ok := apiResource.Spec["fleet_label"].(string); ok && v != "" {
+		data.FleetLabel = types.StringValue(v)
+	} else {
+		data.FleetLabel = types.StringNull()
+	}
+	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.PerformanceEnhancementMode = &FleetPerformanceEnhancementModeModel{}
+	}
+	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["allow_all_usb"].(map[string]interface{}); ok && isImport && data.AllowAllUsb == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.AllowAllUsb = &FleetEmptyModel{}
@@ -7701,11 +8046,6 @@ func (r *FleetResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		// No data from API - set to null list
 		data.OutsideVirtualNetwork = types.ListNull(types.ObjectType{AttrTypes: FleetOutsideVirtualNetworkModelAttrTypes})
 	}
-	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.PerformanceEnhancementMode = &FleetPerformanceEnhancementModeModel{}
-	}
-	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["sriov_interfaces"].(map[string]interface{}); ok && (isImport || data.SriovInterfaces != nil) {
 		data.SriovInterfaces = &FleetSriovInterfacesModel{
 			SriovInterface: func() []FleetSriovInterfacesSriovInterfaceModel {
@@ -8156,21 +8496,10 @@ func (r *FleetResource) Update(ctx context.Context, req resource.UpdateRequest, 
 			}(),
 		}
 	}
-	// Top-level Optional bool: preserve prior state to avoid API default drift
-	if !isImport && !data.EnableDefaultFleetConfigDownload.IsNull() && !data.EnableDefaultFleetConfigDownload.IsUnknown() {
-		// Normal Read: preserve existing state value (do nothing)
+	if v, ok := apiResource.Spec["enable_default_fleet_config_download"].(bool); ok {
+		data.EnableDefaultFleetConfigDownload = types.BoolValue(v)
 	} else {
-		// Import case, null state, or unknown (after Create): read from API
-		if v, ok := apiResource.Spec["enable_default_fleet_config_download"].(bool); ok {
-			data.EnableDefaultFleetConfigDownload = types.BoolValue(v)
-		} else {
-			data.EnableDefaultFleetConfigDownload = types.BoolNull()
-		}
-	}
-	if v, ok := apiResource.Spec["fleet_label"].(string); ok && v != "" {
-		data.FleetLabel = types.StringValue(v)
-	} else {
-		data.FleetLabel = types.StringNull()
+		data.EnableDefaultFleetConfigDownload = types.BoolNull()
 	}
 	if v, ok := apiResource.Spec["operating_system_version"].(string); ok && v != "" {
 		data.OperatingSystemVersion = types.StringValue(v)

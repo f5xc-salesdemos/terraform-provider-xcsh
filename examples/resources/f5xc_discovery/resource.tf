@@ -1,5 +1,16 @@
 # Discovery Resource Example
-# Manages API discovery creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
+# Manages a Discovery resource in F5 Distributed Cloud for api to create discovery object for a site or virtual site in system namespace. configuration.
+
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
 
 # Basic Discovery configuration
 resource "f5xc_discovery" "example" {

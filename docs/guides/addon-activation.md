@@ -3,7 +3,7 @@ page_title: "Guide: Addon Service Activation"
 subcategory: "Guides"
 description: |-
   Learn how to activate F5XC addon services using Terraform.
-  Covers Bot Defense, Client Side Defense, WAAP, and more.
+  Covers Bot Defense, client-side Defense, WAAP, and more.
 ---
 
 # Addon Service Activation
@@ -11,7 +11,7 @@ description: |-
 This guide walks you through activating F5 Distributed Cloud addon services using Terraform. By the end, you'll understand how to:
 
 - **Check activation eligibility** - Determine if an addon can be activated
-- **Activate self-service addons** - Bot Defense, Client Side Defense, etc.
+- **Activate self-service addons** - Bot Defense, client-side Defense, etc.
 - **Handle managed activation** - Services requiring sales contact
 - **Monitor activation status** - Track subscription state changes
 
@@ -100,7 +100,7 @@ export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/robinmordasiewicz/terraform-provider-f5xc.git
+git clone https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc.git
 cd terraform-provider-f5xc/examples/guides/addon-activation
 ```
 
@@ -116,7 +116,7 @@ Edit `terraform.tfvars` to enable the addon services you want to activate:
 # Enable Bot Defense activation
 enable_bot_defense = true
 
-# Enable Client Side Defense
+# Enable client-side Defense
 enable_client_side_defense = false
 ```
 
@@ -128,7 +128,7 @@ terraform plan
 terraform apply
 ```
 
-## Checking Activation Eligibility
+## Checkingg Activation Eligibility
 
 Before attempting to activate an addon service, check if it's available for your tenant.
 
@@ -388,7 +388,7 @@ resource "f5xc_http_loadbalancer" "with_bot_defense" {
 }
 ```
 
-### Client Side Defense
+### client-side Defense
 
 ```hcl
 resource "f5xc_http_loadbalancer" "with_csd" {
@@ -399,7 +399,7 @@ resource "f5xc_http_loadbalancer" "with_csd" {
 
   domains = ["app.example.com"]
 
-  # Enable Client Side Defense
+  # Enable client-side Defense
   enable_client_side_defense = true
 
   # ... rest of configuration
@@ -449,7 +449,7 @@ output "debug_addon_status" {
 
 ## Complete Example
 
-See the [addon-activation example](https://github.com/robinmordasiewicz/terraform-provider-f5xc/tree/main/examples/guides/addon-activation) for a complete, working Terraform configuration.
+See the [addon-activation example](https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc/tree/main/examples/guides/addon-activation) for a complete, working Terraform configuration.
 
 ## Related Resources
 

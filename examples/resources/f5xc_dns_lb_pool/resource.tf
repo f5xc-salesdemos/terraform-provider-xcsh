@@ -2,6 +2,18 @@
 # Manages DNS Load Balancer Pool in a given namespace. If one already exist it will give a error. in F5 Distributed Cloud.
 
 # Basic DNS LB Pool configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_dns_lb_pool" "example" {
   name      = "example-dns-lb-pool"
   namespace = "staging"
@@ -24,7 +36,7 @@ resource "f5xc_dns_lb_pool" "example" {
   disable_health_check {
     # Configure disable_health_check settings
   }
-  # Object reference. This type establishes a direct referenc...
+  # Object reference. This type establishes a direct reference...
   health_check {
     # Configure health_check settings
   }

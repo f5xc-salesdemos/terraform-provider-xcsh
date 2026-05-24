@@ -2,6 +2,18 @@
 # Manages new customer support ticket in our customer support provider system. in F5 Distributed Cloud.
 
 # Basic Customer Support configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_customer_support" "example" {
   name      = "example-customer-support"
   namespace = "staging"

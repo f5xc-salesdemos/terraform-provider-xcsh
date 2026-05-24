@@ -8,7 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -45,6 +49,30 @@ type AWSTGWSiteResource struct {
 type AWSTGWSiteEmptyModel struct {
 }
 
+// AWSTGWSitePerformanceEnhancementModeModel represents performance_enhancement_mode block
+type AWSTGWSitePerformanceEnhancementModeModel struct {
+	PerfModeL3Enhanced *AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModel `tfsdk:"perf_mode_l3_enhanced"`
+	PerfModeL7Enhanced *AWSTGWSiteEmptyModel                                        `tfsdk:"perf_mode_l7_enhanced"`
+}
+
+// AWSTGWSitePerformanceEnhancementModeModelAttrTypes defines the attribute types for AWSTGWSitePerformanceEnhancementModeModel
+var AWSTGWSitePerformanceEnhancementModeModelAttrTypes = map[string]attr.Type{
+	"perf_mode_l3_enhanced": types.ObjectType{AttrTypes: AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes},
+	"perf_mode_l7_enhanced": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+}
+
+// AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModel represents perf_mode_l3_enhanced block
+type AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModel struct {
+	Jumbo   *AWSTGWSiteEmptyModel `tfsdk:"jumbo"`
+	NoJumbo *AWSTGWSiteEmptyModel `tfsdk:"no_jumbo"`
+}
+
+// AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes defines the attribute types for AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModel
+var AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes = map[string]attr.Type{
+	"jumbo":    types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"no_jumbo": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+}
+
 // AWSTGWSiteAWSParametersModel represents aws_parameters block
 type AWSTGWSiteAWSParametersModel struct {
 	AWSRegion           types.String                                     `tfsdk:"aws_region"`
@@ -58,7 +86,9 @@ type AWSTGWSiteAWSParametersModel struct {
 	AWSCred             *AWSTGWSiteAWSParametersAWSCredModel             `tfsdk:"aws_cred"`
 	AzNodes             []AWSTGWSiteAWSParametersAzNodesModel            `tfsdk:"az_nodes"`
 	CustomSecurityGroup *AWSTGWSiteAWSParametersCustomSecurityGroupModel `tfsdk:"custom_security_group"`
+	DisableEncryption   *AWSTGWSiteEmptyModel                            `tfsdk:"disable_encryption"`
 	DisableInternetVIP  *AWSTGWSiteEmptyModel                            `tfsdk:"disable_internet_vip"`
+	EnableEncryption    *AWSTGWSiteAWSParametersEnableEncryptionModel    `tfsdk:"enable_encryption"`
 	EnableInternetVIP   *AWSTGWSiteEmptyModel                            `tfsdk:"enable_internet_vip"`
 	ExistingTGW         *AWSTGWSiteAWSParametersExistingTGWModel         `tfsdk:"existing_tgw"`
 	F5xcSecurityGroup   *AWSTGWSiteEmptyModel                            `tfsdk:"f5xc_security_group"`
@@ -82,7 +112,9 @@ var AWSTGWSiteAWSParametersModelAttrTypes = map[string]attr.Type{
 	"aws_cred":              types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersAWSCredModelAttrTypes},
 	"az_nodes":              types.ListType{ElemType: types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersAzNodesModelAttrTypes}},
 	"custom_security_group": types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersCustomSecurityGroupModelAttrTypes},
+	"disable_encryption":    types.ObjectType{AttrTypes: map[string]attr.Type{}},
 	"disable_internet_vip":  types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"enable_encryption":     types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersEnableEncryptionModelAttrTypes},
 	"enable_internet_vip":   types.ObjectType{AttrTypes: map[string]attr.Type{}},
 	"existing_tgw":          types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersExistingTGWModelAttrTypes},
 	"f5xc_security_group":   types.ObjectType{AttrTypes: map[string]attr.Type{}},
@@ -95,14 +127,22 @@ var AWSTGWSiteAWSParametersModelAttrTypes = map[string]attr.Type{
 
 // AWSTGWSiteAWSParametersAdminPasswordModel represents admin_password block
 type AWSTGWSiteAWSParametersAdminPasswordModel struct {
-	BlindfoldSecretInfo *AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoModel `tfsdk:"blindfold_secret_info"`
-	ClearSecretInfo     *AWSTGWSiteAWSParametersAdminPasswordClearSecretInfoModel     `tfsdk:"clear_secret_info"`
+	SecretEncodingType          types.String                                                          `tfsdk:"secret_encoding_type"`
+	BlindfoldSecretInfo         *AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoModel         `tfsdk:"blindfold_secret_info"`
+	BlindfoldSecretInfoInternal *AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoInternalModel `tfsdk:"blindfold_secret_info_internal"`
+	ClearSecretInfo             *AWSTGWSiteAWSParametersAdminPasswordClearSecretInfoModel             `tfsdk:"clear_secret_info"`
+	VaultSecretInfo             *AWSTGWSiteAWSParametersAdminPasswordVaultSecretInfoModel             `tfsdk:"vault_secret_info"`
+	WingmanSecretInfo           *AWSTGWSiteAWSParametersAdminPasswordWingmanSecretInfoModel           `tfsdk:"wingman_secret_info"`
 }
 
 // AWSTGWSiteAWSParametersAdminPasswordModelAttrTypes defines the attribute types for AWSTGWSiteAWSParametersAdminPasswordModel
 var AWSTGWSiteAWSParametersAdminPasswordModelAttrTypes = map[string]attr.Type{
-	"blindfold_secret_info": types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoModelAttrTypes},
-	"clear_secret_info":     types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersAdminPasswordClearSecretInfoModelAttrTypes},
+	"secret_encoding_type":           types.StringType,
+	"blindfold_secret_info":          types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoModelAttrTypes},
+	"blindfold_secret_info_internal": types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoInternalModelAttrTypes},
+	"clear_secret_info":              types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersAdminPasswordClearSecretInfoModelAttrTypes},
+	"vault_secret_info":              types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersAdminPasswordVaultSecretInfoModelAttrTypes},
+	"wingman_secret_info":            types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersAdminPasswordWingmanSecretInfoModelAttrTypes},
 }
 
 // AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoModel represents blindfold_secret_info block
@@ -119,6 +159,20 @@ var AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoModelAttrTypes = map[
 	"store_provider":      types.StringType,
 }
 
+// AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoInternalModel represents blindfold_secret_info_internal block
+type AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoInternalModel struct {
+	DecryptionProvider types.String `tfsdk:"decryption_provider"`
+	Location           types.String `tfsdk:"location"`
+	StoreProvider      types.String `tfsdk:"store_provider"`
+}
+
+// AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoInternalModelAttrTypes defines the attribute types for AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoInternalModel
+var AWSTGWSiteAWSParametersAdminPasswordBlindfoldSecretInfoInternalModelAttrTypes = map[string]attr.Type{
+	"decryption_provider": types.StringType,
+	"location":            types.StringType,
+	"store_provider":      types.StringType,
+}
+
 // AWSTGWSiteAWSParametersAdminPasswordClearSecretInfoModel represents clear_secret_info block
 type AWSTGWSiteAWSParametersAdminPasswordClearSecretInfoModel struct {
 	Provider types.String `tfsdk:"provider_ref"`
@@ -129,6 +183,34 @@ type AWSTGWSiteAWSParametersAdminPasswordClearSecretInfoModel struct {
 var AWSTGWSiteAWSParametersAdminPasswordClearSecretInfoModelAttrTypes = map[string]attr.Type{
 	"provider_ref": types.StringType,
 	"url":          types.StringType,
+}
+
+// AWSTGWSiteAWSParametersAdminPasswordVaultSecretInfoModel represents vault_secret_info block
+type AWSTGWSiteAWSParametersAdminPasswordVaultSecretInfoModel struct {
+	Key            types.String `tfsdk:"key"`
+	Location       types.String `tfsdk:"location"`
+	Provider       types.String `tfsdk:"provider_ref"`
+	SecretEncoding types.String `tfsdk:"secret_encoding"`
+	Version        types.Int64  `tfsdk:"version"`
+}
+
+// AWSTGWSiteAWSParametersAdminPasswordVaultSecretInfoModelAttrTypes defines the attribute types for AWSTGWSiteAWSParametersAdminPasswordVaultSecretInfoModel
+var AWSTGWSiteAWSParametersAdminPasswordVaultSecretInfoModelAttrTypes = map[string]attr.Type{
+	"key":             types.StringType,
+	"location":        types.StringType,
+	"provider_ref":    types.StringType,
+	"secret_encoding": types.StringType,
+	"version":         types.Int64Type,
+}
+
+// AWSTGWSiteAWSParametersAdminPasswordWingmanSecretInfoModel represents wingman_secret_info block
+type AWSTGWSiteAWSParametersAdminPasswordWingmanSecretInfoModel struct {
+	Name types.String `tfsdk:"name"`
+}
+
+// AWSTGWSiteAWSParametersAdminPasswordWingmanSecretInfoModelAttrTypes defines the attribute types for AWSTGWSiteAWSParametersAdminPasswordWingmanSecretInfoModel
+var AWSTGWSiteAWSParametersAdminPasswordWingmanSecretInfoModelAttrTypes = map[string]attr.Type{
+	"name": types.StringType,
 }
 
 // AWSTGWSiteAWSParametersAWSCredModel represents aws_cred block
@@ -241,6 +323,16 @@ var AWSTGWSiteAWSParametersCustomSecurityGroupModelAttrTypes = map[string]attr.T
 	"outside_security_group_id": types.StringType,
 }
 
+// AWSTGWSiteAWSParametersEnableEncryptionModel represents enable_encryption block
+type AWSTGWSiteAWSParametersEnableEncryptionModel struct {
+	KmsKeyID types.String `tfsdk:"kms_key_id"`
+}
+
+// AWSTGWSiteAWSParametersEnableEncryptionModelAttrTypes defines the attribute types for AWSTGWSiteAWSParametersEnableEncryptionModel
+var AWSTGWSiteAWSParametersEnableEncryptionModelAttrTypes = map[string]attr.Type{
+	"kms_key_id": types.StringType,
+}
+
 // AWSTGWSiteAWSParametersExistingTGWModel represents existing_tgw block
 type AWSTGWSiteAWSParametersExistingTGWModel struct {
 	TGWAsn          types.Int64  `tfsdk:"tgw_asn"`
@@ -281,6 +373,7 @@ var AWSTGWSiteAWSParametersNewTGWUserAssignedModelAttrTypes = map[string]attr.Ty
 
 // AWSTGWSiteAWSParametersNewVPCModel represents new_vpc block
 type AWSTGWSiteAWSParametersNewVPCModel struct {
+	AllocateIpv6 types.Bool            `tfsdk:"allocate_ipv6"`
 	NameTag      types.String          `tfsdk:"name_tag"`
 	PrimaryIpv4  types.String          `tfsdk:"primary_ipv4"`
 	Autogenerate *AWSTGWSiteEmptyModel `tfsdk:"autogenerate"`
@@ -288,9 +381,10 @@ type AWSTGWSiteAWSParametersNewVPCModel struct {
 
 // AWSTGWSiteAWSParametersNewVPCModelAttrTypes defines the attribute types for AWSTGWSiteAWSParametersNewVPCModel
 var AWSTGWSiteAWSParametersNewVPCModelAttrTypes = map[string]attr.Type{
-	"name_tag":     types.StringType,
-	"primary_ipv4": types.StringType,
-	"autogenerate": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"allocate_ipv6": types.BoolType,
+	"name_tag":      types.StringType,
+	"primary_ipv4":  types.StringType,
+	"autogenerate":  types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // AWSTGWSiteAWSParametersTGWCIDRModel represents tgw_cidr block
@@ -305,24 +399,24 @@ var AWSTGWSiteAWSParametersTGWCIDRModelAttrTypes = map[string]attr.Type{
 
 // AWSTGWSiteBlockedServicesModel represents blocked_services block
 type AWSTGWSiteBlockedServicesModel struct {
-	BlockedSevice []AWSTGWSiteBlockedServicesBlockedSeviceModel `tfsdk:"blocked_sevice"`
+	BlockedService []AWSTGWSiteBlockedServicesBlockedServiceModel `tfsdk:"blocked_service"`
 }
 
 // AWSTGWSiteBlockedServicesModelAttrTypes defines the attribute types for AWSTGWSiteBlockedServicesModel
 var AWSTGWSiteBlockedServicesModelAttrTypes = map[string]attr.Type{
-	"blocked_sevice": types.ListType{ElemType: types.ObjectType{AttrTypes: AWSTGWSiteBlockedServicesBlockedSeviceModelAttrTypes}},
+	"blocked_service": types.ListType{ElemType: types.ObjectType{AttrTypes: AWSTGWSiteBlockedServicesBlockedServiceModelAttrTypes}},
 }
 
-// AWSTGWSiteBlockedServicesBlockedSeviceModel represents blocked_sevice block
-type AWSTGWSiteBlockedServicesBlockedSeviceModel struct {
+// AWSTGWSiteBlockedServicesBlockedServiceModel represents blocked_service block
+type AWSTGWSiteBlockedServicesBlockedServiceModel struct {
 	NetworkType      types.String          `tfsdk:"network_type"`
 	DNS              *AWSTGWSiteEmptyModel `tfsdk:"dns"`
 	SSH              *AWSTGWSiteEmptyModel `tfsdk:"ssh"`
 	WebUserInterface *AWSTGWSiteEmptyModel `tfsdk:"web_user_interface"`
 }
 
-// AWSTGWSiteBlockedServicesBlockedSeviceModelAttrTypes defines the attribute types for AWSTGWSiteBlockedServicesBlockedSeviceModel
-var AWSTGWSiteBlockedServicesBlockedSeviceModelAttrTypes = map[string]attr.Type{
+// AWSTGWSiteBlockedServicesBlockedServiceModelAttrTypes defines the attribute types for AWSTGWSiteBlockedServicesBlockedServiceModel
+var AWSTGWSiteBlockedServicesBlockedServiceModelAttrTypes = map[string]attr.Type{
 	"network_type":       types.StringType,
 	"dns":                types.ObjectType{AttrTypes: map[string]attr.Type{}},
 	"ssh":                types.ObjectType{AttrTypes: map[string]attr.Type{}},
@@ -471,30 +565,6 @@ type AWSTGWSiteOSModel struct {
 var AWSTGWSiteOSModelAttrTypes = map[string]attr.Type{
 	"operating_system_version": types.StringType,
 	"default_os_version":       types.ObjectType{AttrTypes: map[string]attr.Type{}},
-}
-
-// AWSTGWSitePerformanceEnhancementModeModel represents performance_enhancement_mode block
-type AWSTGWSitePerformanceEnhancementModeModel struct {
-	PerfModeL3Enhanced *AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModel `tfsdk:"perf_mode_l3_enhanced"`
-	PerfModeL7Enhanced *AWSTGWSiteEmptyModel                                        `tfsdk:"perf_mode_l7_enhanced"`
-}
-
-// AWSTGWSitePerformanceEnhancementModeModelAttrTypes defines the attribute types for AWSTGWSitePerformanceEnhancementModeModel
-var AWSTGWSitePerformanceEnhancementModeModelAttrTypes = map[string]attr.Type{
-	"perf_mode_l3_enhanced": types.ObjectType{AttrTypes: AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes},
-	"perf_mode_l7_enhanced": types.ObjectType{AttrTypes: map[string]attr.Type{}},
-}
-
-// AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModel represents perf_mode_l3_enhanced block
-type AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModel struct {
-	Jumbo   *AWSTGWSiteEmptyModel `tfsdk:"jumbo"`
-	NoJumbo *AWSTGWSiteEmptyModel `tfsdk:"no_jumbo"`
-}
-
-// AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes defines the attribute types for AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModel
-var AWSTGWSitePerformanceEnhancementModePerfModeL3EnhancedModelAttrTypes = map[string]attr.Type{
-	"jumbo":    types.ObjectType{AttrTypes: map[string]attr.Type{}},
-	"no_jumbo": types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // AWSTGWSitePrivateConnectivityModel represents private_connectivity block
@@ -1154,6 +1224,7 @@ type AWSTGWSiteResourceModel struct {
 	Labels                     types.Map                                  `tfsdk:"labels"`
 	ID                         types.String                               `tfsdk:"id"`
 	Timeouts                   timeouts.Value                             `tfsdk:"timeouts"`
+	PerformanceEnhancementMode *AWSTGWSitePerformanceEnhancementModeModel `tfsdk:"performance_enhancement_mode"`
 	AWSParameters              *AWSTGWSiteAWSParametersModel              `tfsdk:"aws_parameters"`
 	BlockAllServices           *AWSTGWSiteEmptyModel                      `tfsdk:"block_all_services"`
 	BlockedServices            *AWSTGWSiteBlockedServicesModel            `tfsdk:"blocked_services"`
@@ -1167,7 +1238,6 @@ type AWSTGWSiteResourceModel struct {
 	LogsStreamingDisabled      *AWSTGWSiteEmptyModel                      `tfsdk:"logs_streaming_disabled"`
 	OfflineSurvivabilityMode   *AWSTGWSiteOfflineSurvivabilityModeModel   `tfsdk:"offline_survivability_mode"`
 	OS                         *AWSTGWSiteOSModel                         `tfsdk:"os"`
-	PerformanceEnhancementMode *AWSTGWSitePerformanceEnhancementModeModel `tfsdk:"performance_enhancement_mode"`
 	PrivateConnectivity        *AWSTGWSitePrivateConnectivityModel        `tfsdk:"private_connectivity"`
 	Sw                         *AWSTGWSiteSwModel                         `tfsdk:"sw"`
 	Tags                       *AWSTGWSiteEmptyModel                      `tfsdk:"tags"`
@@ -1237,6 +1307,27 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Update: true,
 				Delete: true,
 			}),
+			"performance_enhancement_mode": schema.SingleNestedBlock{
+				MarkdownDescription: "Optimize the site for L3 or L7 traffic processing. L7 optimized is the default.",
+				Attributes:          map[string]schema.Attribute{},
+				Blocks: map[string]schema.Block{
+					"perf_mode_l3_enhanced": schema.SingleNestedBlock{
+						MarkdownDescription: "Configuration parameter for perf mode l3 enhanced.",
+						Attributes:          map[string]schema.Attribute{},
+						Blocks: map[string]schema.Block{
+							"jumbo": schema.SingleNestedBlock{
+								MarkdownDescription: "Enable this option",
+							},
+							"no_jumbo": schema.SingleNestedBlock{
+								MarkdownDescription: "Enable this option",
+							},
+						},
+					},
+					"perf_mode_l7_enhanced": schema.SingleNestedBlock{
+						MarkdownDescription: "Configuration parameter for perf mode l7 enhanced.",
+					},
+				},
+			},
 			"aws_parameters": schema.SingleNestedBlock{
 				MarkdownDescription: "Setup AWS services VPC, transit gateway and site.",
 				Attributes: map[string]schema.Attribute{
@@ -1251,31 +1342,48 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"instance_type": schema.StringAttribute{
 						MarkdownDescription: "Instance size based on the performance.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 					"nodes_per_az": schema.Int64Attribute{
-						MarkdownDescription: "Desired Worker Nodes Per AZ. Max limit is up to 21.",
+						MarkdownDescription: "Exclusive with [no_worker_nodes total_nodes] Desired Worker Nodes Per AZ. Max limit is up to 21.",
 						Optional:            true,
 					},
 					"ssh_key": schema.StringAttribute{
 						MarkdownDescription: "Public SSH key for accessing nodes of the site.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 8192),
+						},
 					},
 					"total_nodes": schema.Int64Attribute{
-						MarkdownDescription: "Total number of worker nodes to be deployed across all AZ's used in the Site.",
+						MarkdownDescription: "Exclusive with [no_worker_nodes nodes_per_az] Total number of worker nodes to be deployed across all AZ's used in the Site.",
 						Optional:            true,
 					},
 					"vpc_id": schema.StringAttribute{
-						MarkdownDescription: "Existing VPC ID.",
+						MarkdownDescription: "Exclusive with [new_vpc] Existing VPC ID.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
 					"admin_password": schema.SingleNestedBlock{
 						MarkdownDescription: "SecretType is used in an object to indicate a sensitive/confidential field.",
-						Attributes:          map[string]schema.Attribute{},
+						Attributes: map[string]schema.Attribute{
+							"secret_encoding_type": schema.StringAttribute{
+								MarkdownDescription: "[Enum: EncodingNone|EncodingBase64] X-displayName: 'Secret Encoding' SecretEncodingType defines the encoding type of the secret before handled by the Secret Management Service. - EncodingNone: x-displayName: 'None' No Encoding - EncodingBase64: Base64 x-displayName: 'Base64' Base64 encoding. Possible values are `EncodingNone`, `EncodingBase64`. Defaults to `EncodingNone`.",
+								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.OneOf("EncodingNone", "EncodingBase64"),
+								},
+							},
+						},
 						Blocks: map[string]schema.Block{
 							"blindfold_secret_info": schema.SingleNestedBlock{
-								MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -1284,6 +1392,29 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 									"location": schema.StringAttribute{
 										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
+									},
+									"store_provider": schema.StringAttribute{
+										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
+										Optional:            true,
+									},
+								},
+							},
+							"blindfold_secret_info_internal": schema.SingleNestedBlock{
+								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								Attributes: map[string]schema.Attribute{
+									"decryption_provider": schema.StringAttribute{
+										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
+										Optional:            true,
+									},
+									"location": schema.StringAttribute{
+										MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
+										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(1024),
+										},
 									},
 									"store_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1292,7 +1423,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								},
 							},
 							"clear_secret_info": schema.SingleNestedBlock{
-								MarkdownDescription: "ClearSecretInfoType specifies information about the Secret that is not encrypted.",
+								MarkdownDescription: "X-displayName: 'In-Clear Secret' ClearSecretInfoType specifies information about the Secret that is not encrypted.",
 								Attributes: map[string]schema.Attribute{
 									"provider_ref": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the store to GET encrypted bytes This field needs to be provided only if the URL scheme is not string:///.",
@@ -1301,6 +1432,50 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 									"url": schema.StringAttribute{
 										MarkdownDescription: "URL of the secret. Currently supported URL schemes is string:///. For string:/// scheme, Secret needs to be encoded Base64 format. When asked for this secret, caller will GET Secret bytes after Base64 decoding.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 131072),
+										},
+									},
+								},
+							},
+							"vault_secret_info": schema.SingleNestedBlock{
+								MarkdownDescription: "X-displayName: 'Vault Secret' VaultSecretInfoType specifies information about the Secret managed by Hashicorp Vault.",
+								Attributes: map[string]schema.Attribute{
+									"key": schema.StringAttribute{
+										MarkdownDescription: "X-displayName: 'Key' Key of the individual secret. Vault Secrets are stored as key-value pair. If user is only interested in one value from the map, this field should be set to the corresponding key.",
+										Optional:            true,
+									},
+									"location": schema.StringAttribute{
+										MarkdownDescription: "X-displayName: 'Location'Path to secret in Vault.",
+										Optional:            true,
+									},
+									"provider_ref": schema.StringAttribute{
+										MarkdownDescription: "X-displayName: 'Provider'Name of the Secret Management Access object that contains information about the backend Vault.",
+										Optional:            true,
+									},
+									"secret_encoding": schema.StringAttribute{
+										MarkdownDescription: "[Enum: EncodingNone|EncodingBase64] X-displayName: 'Secret Encoding' SecretEncodingType defines the encoding type of the secret before handled by the Secret Management Service. - EncodingNone: x-displayName: 'None' No Encoding - EncodingBase64: Base64 x-displayName: 'Base64' Base64 encoding. Possible values are `EncodingNone`, `EncodingBase64`. Defaults to `EncodingNone`.",
+										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf("EncodingNone", "EncodingBase64"),
+										},
+									},
+									"version": schema.Int64Attribute{
+										MarkdownDescription: "X-displayName: 'Version' Version of the secret to be fetched. As vault secrets are versioned, user can specify this field to fetch specific version. If not provided latest version will be returned.",
+										Optional:            true,
+									},
+								},
+							},
+							"wingman_secret_info": schema.SingleNestedBlock{
+								MarkdownDescription: "X-displayName: 'Wingman Secret' WingmanSecretInfoType specifies the handle to the wingman secret.",
+								Attributes: map[string]schema.Attribute{
+									"name": schema.StringAttribute{
+										MarkdownDescription: "X-displayName: 'Name'Name of the secret.",
+										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 1024),
+											stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+										},
 									},
 								},
 							},
@@ -1312,6 +1487,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1320,6 +1498,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1327,6 +1508,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -1342,11 +1526,14 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 							},
 							Blocks: map[string]schema.Block{
 								"inside_subnet": schema.SingleNestedBlock{
-									MarkdownDescription: "AWS Subnet. Parameters for AWS subnet.",
+									MarkdownDescription: "Configuration parameter for inside subnet.",
 									Attributes: map[string]schema.Attribute{
 										"existing_subnet_id": schema.StringAttribute{
-											MarkdownDescription: "Information about existing subnet ID.",
+											MarkdownDescription: "Exclusive with [subnet_param] Information about existing subnet ID.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -1362,11 +1549,14 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 									},
 								},
 								"outside_subnet": schema.SingleNestedBlock{
-									MarkdownDescription: "AWS Subnet. Parameters for AWS subnet.",
+									MarkdownDescription: "Configuration parameter for outside subnet.",
 									Attributes: map[string]schema.Attribute{
 										"existing_subnet_id": schema.StringAttribute{
-											MarkdownDescription: "Information about existing subnet ID.",
+											MarkdownDescription: "Exclusive with [subnet_param] Information about existing subnet ID.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -1382,14 +1572,17 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 									},
 								},
 								"reserved_inside_subnet": schema.SingleNestedBlock{
-									MarkdownDescription: "Enable this option",
+									MarkdownDescription: "Configuration parameter for reserved inside subnet.",
 								},
 								"workload_subnet": schema.SingleNestedBlock{
-									MarkdownDescription: "AWS Subnet. Parameters for AWS subnet.",
+									MarkdownDescription: "Configuration parameter for workload subnet.",
 									Attributes: map[string]schema.Attribute{
 										"existing_subnet_id": schema.StringAttribute{
-											MarkdownDescription: "Information about existing subnet ID.",
+											MarkdownDescription: "Exclusive with [subnet_param] Information about existing subnet ID.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -1411,34 +1604,55 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						MarkdownDescription: "Enter pre created security groups for slo(Site Local Outside) and sli(Site Local Inside) interface. Supported only for sites deployed on existing VPC.",
 						Attributes: map[string]schema.Attribute{
 							"inside_security_group_id": schema.StringAttribute{
-								MarkdownDescription: "Security Group ID to be attached to SLI(Site Local Inside) Interface.",
+								MarkdownDescription: "X-displayName: 'Inside Security Group ID' Security Group ID to be attached to SLI(Site Local Inside) Interface.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(20),
+								},
 							},
 							"outside_security_group_id": schema.StringAttribute{
-								MarkdownDescription: "Security Group ID to be attached to SLO(Site Local Outside) Interface.",
+								MarkdownDescription: "X-displayName: 'Outside Security Group ID' Security Group ID to be attached to SLO(Site Local Outside) Interface.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(20),
+								},
 							},
 						},
 					},
+					"disable_encryption": schema.SingleNestedBlock{
+						MarkdownDescription: "Configuration parameter for disable encryption.",
+					},
 					"disable_internet_vip": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
+					},
+					"enable_encryption": schema.SingleNestedBlock{
+						MarkdownDescription: "Configuration parameter for enable encryption.",
+						Attributes: map[string]schema.Attribute{
+							"kms_key_id": schema.StringAttribute{
+								MarkdownDescription: "AWS KMS Key to be used to encrypt the disk attached to the VM .",
+								Optional:            true,
+							},
+						},
 					},
 					"enable_internet_vip": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
 					},
 					"existing_tgw": schema.SingleNestedBlock{
-						MarkdownDescription: "Existing TGW Type. Information needed for existing TGW.",
+						MarkdownDescription: "X-displayName: 'Existing TGW Type' Information needed for existing TGW.",
 						Attributes: map[string]schema.Attribute{
 							"tgw_asn": schema.Int64Attribute{
 								MarkdownDescription: "Enter TGW ASN. TGW ASN.",
 								Optional:            true,
 							},
 							"tgw_id": schema.StringAttribute{
-								MarkdownDescription: "Existing TGW ID. Existing TGW ID.",
+								MarkdownDescription: "X-displayName: 'Existing TGW ID' Existing TGW ID.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 							"volterra_site_asn": schema.Int64Attribute{
-								MarkdownDescription: "Enter F5XC Site ASN. F5XC Site ASN.",
+								MarkdownDescription: "X-displayName: 'Enter F5XC Site ASN' F5XC Site ASN.",
 								Optional:            true,
 							},
 						},
@@ -1447,21 +1661,21 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						MarkdownDescription: "Enable this option",
 					},
 					"new_tgw": schema.SingleNestedBlock{
-						MarkdownDescription: "TGWParamsType.",
+						MarkdownDescription: "TGWParamsType. X-displayName: 'TGWParamsType'",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"system_generated": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for system generated.",
 							},
 							"user_assigned": schema.SingleNestedBlock{
 								MarkdownDescription: "Information needed when ASNs are assigned by the user.",
 								Attributes: map[string]schema.Attribute{
 									"tgw_asn": schema.Int64Attribute{
-										MarkdownDescription: "TGW ASN. Allowed range for 16-bit private ASNs include 64512 to 65534.",
+										MarkdownDescription: "X-displayName: 'Enter TGW ASN' TGW ASN. Allowed range for 16-bit private ASNs include 64512 to 65534.",
 										Optional:            true,
 									},
 									"volterra_site_asn": schema.Int64Attribute{
-										MarkdownDescription: "Enter F5XC Site ASN. F5XC Site ASN.",
+										MarkdownDescription: "X-displayName: 'Enter F5XC Site ASN' F5XC Site ASN.",
 										Optional:            true,
 									},
 								},
@@ -1469,11 +1683,18 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"new_vpc": schema.SingleNestedBlock{
-						MarkdownDescription: "AWS VPC Parameters. Parameters to create new AWS VPC.",
+						MarkdownDescription: "X-displayName: 'AWS VPC Parameters' Parameters to create new AWS VPC.",
 						Attributes: map[string]schema.Attribute{
-							"name_tag": schema.StringAttribute{
-								MarkdownDescription: "Specify the VPC Name.",
+							"allocate_ipv6": schema.BoolAttribute{
+								MarkdownDescription: "X-displayName: 'Allocate IPv6 CIDR block from AWS' Allocate IPv6 CIDR block from AWS.",
 								Optional:            true,
+							},
+							"name_tag": schema.StringAttribute{
+								MarkdownDescription: "Exclusive with [autogenerate] Specify the VPC Name.",
+								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
+								},
 							},
 							"primary_ipv4": schema.StringAttribute{
 								MarkdownDescription: "IPv4 CIDR block for this VPC. It has to be private address space. The Primary IPv4 block cannot be modified. All subnets prefixes in this VPC must be part of this CIDR block.",
@@ -1482,15 +1703,15 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 						Blocks: map[string]schema.Block{
 							"autogenerate": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for autogenerate.",
 							},
 						},
 					},
 					"no_worker_nodes": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for no worker nodes.",
 					},
 					"reserved_tgw_cidr": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for reserved tgw cidr.",
 					},
 					"tgw_cidr": schema.SingleNestedBlock{
 						MarkdownDescription: "Parameters for creating a new cloud subnet.",
@@ -1510,13 +1731,16 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				MarkdownDescription: "Disable node local services on this site.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
-					"blocked_sevice": schema.ListNestedBlock{
+					"blocked_service": schema.ListNestedBlock{
 						MarkdownDescription: "Disable Node Local Services. Blocking or denial configuration",
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"network_type": schema.StringAttribute{
-									MarkdownDescription: "[Enum: VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT] Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to.. Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`. Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`.",
+									MarkdownDescription: "[Enum: VIRTUAL_NETWORK_SITE_LOCAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE|VIRTUAL_NETWORK_PER_SITE|VIRTUAL_NETWORK_PUBLIC|VIRTUAL_NETWORK_GLOBAL|VIRTUAL_NETWORK_SITE_SERVICE|VIRTUAL_NETWORK_VER_INTERNAL|VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE|VIRTUAL_NETWORK_IP_AUTO|VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK|VIRTUAL_NETWORK_SRV6_NETWORK|VIRTUAL_NETWORK_IP_FABRIC|VIRTUAL_NETWORK_SEGMENT|VIRTUAL_NETWORK_MANAGEMENT] Different types of virtual networks understood by the system Virtual-network of type VIRTUAL_NETWORK_SITE_LOCAL provides connectivity to public (outside) network. This is an insecure network and is connected to public internet via NAT Gateways/firwalls Virtual-network of this type is local to.. Possible values are `VIRTUAL_NETWORK_SITE_LOCAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE`, `VIRTUAL_NETWORK_PER_SITE`, `VIRTUAL_NETWORK_PUBLIC`, `VIRTUAL_NETWORK_GLOBAL`, `VIRTUAL_NETWORK_SITE_SERVICE`, `VIRTUAL_NETWORK_VER_INTERNAL`, `VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE`, `VIRTUAL_NETWORK_IP_AUTO`, `VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK`, `VIRTUAL_NETWORK_SRV6_NETWORK`, `VIRTUAL_NETWORK_IP_FABRIC`, `VIRTUAL_NETWORK_SEGMENT`, `VIRTUAL_NETWORK_MANAGEMENT`. Defaults to `VIRTUAL_NETWORK_SITE_LOCAL`.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf("VIRTUAL_NETWORK_SITE_LOCAL", "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE", "VIRTUAL_NETWORK_PER_SITE", "VIRTUAL_NETWORK_PUBLIC", "VIRTUAL_NETWORK_GLOBAL", "VIRTUAL_NETWORK_SITE_SERVICE", "VIRTUAL_NETWORK_VER_INTERNAL", "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE_OUTSIDE", "VIRTUAL_NETWORK_IP_AUTO", "VIRTUAL_NETWORK_VOLTADN_PRIVATE_NETWORK", "VIRTUAL_NETWORK_SRV6_NETWORK", "VIRTUAL_NETWORK_IP_FABRIC", "VIRTUAL_NETWORK_SEGMENT", "VIRTUAL_NETWORK_MANAGEMENT"),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -1553,10 +1777,16 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"inside_nameserver": schema.StringAttribute{
 						MarkdownDescription: "Optional DNS server IP to be used for name resolution in inside network.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(1024),
+						},
 					},
 					"outside_nameserver": schema.StringAttribute{
 						MarkdownDescription: "Optional DNS server IP to be used for name resolution in outside network.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(1024),
+						},
 					},
 				},
 			},
@@ -1570,7 +1800,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				MarkdownDescription: "Direct Connect Configuration. Direct Connect Configuration.",
 				Attributes: map[string]schema.Attribute{
 					"custom_asn": schema.Int64Attribute{
-						MarkdownDescription: "Custom Autonomous System Number.",
+						MarkdownDescription: "Exclusive with [auto_asn] Custom Autonomous System Number.",
 						Optional:            true,
 					},
 				},
@@ -1583,11 +1813,14 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"site_registration_over_direct_connect": schema.SingleNestedBlock{
-								MarkdownDescription: "CloudLink ADN Network Config.",
+								MarkdownDescription: "CloudLink AND Network Config.",
 								Attributes: map[string]schema.Attribute{
 									"cloudlink_network_name": schema.StringAttribute{
-										MarkdownDescription: "Establish private connectivity with the F5 Distributed Cloud Global Network using a Private ADN network. To provision a Private ADN network, please contact F5 Distributed Cloud support.",
+										MarkdownDescription: "Establish private connectivity with the F5 Distributed Cloud Global Network using a Private AND network. To provision a Private AND network, please contact F5 Distributed Cloud support.",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthAtMost(64),
+										},
 									},
 								},
 							},
@@ -1599,12 +1832,15 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"other_region": schema.StringAttribute{
-											MarkdownDescription: "Other Region.",
+											MarkdownDescription: "Exclusive with [same_as_site_region] Other Region.",
 											Optional:            true,
 										},
 										"vif_id": schema.StringAttribute{
 											MarkdownDescription: "AWS Direct Connect VIF ID that needs to be connected to the site .",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(1024),
+											},
 										},
 									},
 									Blocks: map[string]schema.Block{
@@ -1617,7 +1853,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"standard_vifs": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for standard vifs.",
 					},
 				},
 			},
@@ -1626,13 +1862,13 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"disable_upgrade_drain": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for disable upgrade drain.",
 					},
 					"enable_upgrade_drain": schema.SingleNestedBlock{
 						MarkdownDescription: "Specify batch upgrade settings for worker nodes within a site.",
 						Attributes: map[string]schema.Attribute{
 							"drain_max_unavailable_node_count": schema.Int64Attribute{
-								MarkdownDescription: "Node Batch Size Count.",
+								MarkdownDescription: "Node Batch Size Count. Exclusive with []",
 								Optional:            true,
 							},
 							"drain_node_timeout": schema.Int64Attribute{
@@ -1642,10 +1878,10 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 						Blocks: map[string]schema.Block{
 							"disable_vega_upgrade_mode": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for disable vega upgrade mode.",
 							},
 							"enable_vega_upgrade_mode": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
+								MarkdownDescription: "Configuration parameter for enable vega upgrade mode.",
 							},
 						},
 					},
@@ -1657,6 +1893,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"name": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 128),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1665,6 +1904,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1, 64),
+						},
 					},
 					"tenant": schema.StringAttribute{
 						MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1672,6 +1914,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(64),
 						},
 					},
 				},
@@ -1684,10 +1929,10 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"enable_offline_survivability_mode": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for enable offline survivability mode.",
 					},
 					"no_offline_survivability_mode": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for no offline survivability mode.",
 					},
 				},
 			},
@@ -1695,8 +1940,11 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				MarkdownDescription: "Select the F5XC Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions.",
 				Attributes: map[string]schema.Attribute{
 					"operating_system_version": schema.StringAttribute{
-						MarkdownDescription: "Specify a OS version to be used e.g. 9.2024.6.",
+						MarkdownDescription: "Exclusive with [default_os_version] Specify a OS version to be used e.g. 9.2024.6.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(20),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -1705,29 +1953,8 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 					},
 				},
 			},
-			"performance_enhancement_mode": schema.SingleNestedBlock{
-				MarkdownDescription: "Optimize the site for L3 or L7 traffic processing. L7 optimized is the default.",
-				Attributes:          map[string]schema.Attribute{},
-				Blocks: map[string]schema.Block{
-					"perf_mode_l3_enhanced": schema.SingleNestedBlock{
-						MarkdownDescription: "L3 Mode Enhanced Performance. L3 enhanced performance mode OPTIONS.",
-						Attributes:          map[string]schema.Attribute{},
-						Blocks: map[string]schema.Block{
-							"jumbo": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
-							},
-							"no_jumbo": schema.SingleNestedBlock{
-								MarkdownDescription: "Enable this option",
-							},
-						},
-					},
-					"perf_mode_l7_enhanced": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
-					},
-				},
-			},
 			"private_connectivity": schema.SingleNestedBlock{
-				MarkdownDescription: "Private Connect Configuration. Private Connect Configuration.",
+				MarkdownDescription: "X-displayName: 'Private Connect Configuration' Private Connect Configuration.",
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"cloud_link": schema.SingleNestedBlock{
@@ -1736,6 +1963,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1744,6 +1974,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1751,6 +1984,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -1767,8 +2003,11 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				MarkdownDescription: "Select the F5XC Software Version for the site. By default, latest available F5XC Software Version will be used. Refer to release notes to find required released SW versions.",
 				Attributes: map[string]schema.Attribute{
 					"volterra_software_version": schema.StringAttribute{
-						MarkdownDescription: "Specify a F5XC Software Version to be used e.g. Crt-20210329-1002.",
+						MarkdownDescription: "Exclusive with [default_sw_version] Specify a F5XC Software Version to be used e.g. Crt-20210329-1002.",
 						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.LengthAtMost(20),
+						},
 					},
 				},
 				Blocks: map[string]schema.Block{
@@ -1795,6 +2034,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1803,6 +2045,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1810,6 +2055,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -1828,6 +2076,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1836,6 +2087,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
+											},
 										},
 										"tenant": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -1843,6 +2097,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
 											},
 										},
 									},
@@ -1861,6 +2118,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1868,6 +2128,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -1877,6 +2140,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 									},
 								},
@@ -1884,7 +2150,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"active_network_policies": schema.SingleNestedBlock{
-						MarkdownDescription: "Active Firewall Policies Type. List of firewall policy views.",
+						MarkdownDescription: "Configuration parameter for active network policies.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"network_policies": schema.ListNestedBlock{
@@ -1894,6 +2160,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 										"name": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 128),
+											},
 										},
 										"namespace": schema.StringAttribute{
 											MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -1901,6 +2170,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
+											},
+											Validators: []validator.String{
+												stringvalidator.LengthBetween(1, 64),
 											},
 										},
 										"tenant": schema.StringAttribute{
@@ -1910,6 +2182,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 											PlanModifiers: []planmodifier.String{
 												stringplanmodifier.UseStateForUnknown(),
 											},
+											Validators: []validator.String{
+												stringvalidator.LengthAtMost(64),
+											},
 										},
 									},
 								},
@@ -1917,19 +2192,19 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"east_west_service_policy_allow_all": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for east west service policy allow all.",
 					},
 					"forward_proxy_allow_all": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for forward proxy allow all.",
 					},
 					"no_east_west_policy": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Policy configuration for this feature.",
 					},
 					"no_forward_proxy": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for no forward proxy.",
 					},
 					"no_network_policy": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Policy configuration for this feature.",
 					},
 				},
 			},
@@ -1947,6 +2222,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 									"port_ranges": schema.StringAttribute{
 										MarkdownDescription: "Port Ranges. Port Ranges .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 512),
+										},
 									},
 								},
 							},
@@ -1974,6 +2252,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 									"port_ranges": schema.StringAttribute{
 										MarkdownDescription: "Port Ranges. Port Ranges .",
 										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 512),
+										},
 									},
 								},
 							},
@@ -1997,6 +2278,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2005,6 +2289,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2012,6 +2299,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -2022,6 +2312,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"name": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 								Optional:            true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 128),
+								},
 							},
 							"namespace": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2030,6 +2323,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 64),
+								},
 							},
 							"tenant": schema.StringAttribute{
 								MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2037,6 +2333,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.LengthAtMost(64),
 								},
 							},
 						},
@@ -2060,6 +2359,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 														"name": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 128),
+															},
 														},
 														"namespace": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2068,6 +2370,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 															PlanModifiers: []planmodifier.String{
 																stringplanmodifier.UseStateForUnknown(),
 															},
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 64),
+															},
 														},
 														"tenant": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2075,6 +2380,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 															Computed:            true,
 															PlanModifiers: []planmodifier.String{
 																stringplanmodifier.UseStateForUnknown(),
+															},
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(64),
 															},
 														},
 													},
@@ -2091,6 +2399,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 														"name": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 128),
+															},
 														},
 														"namespace": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2099,6 +2410,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 															PlanModifiers: []planmodifier.String{
 																stringplanmodifier.UseStateForUnknown(),
 															},
+															Validators: []validator.String{
+																stringvalidator.LengthBetween(1, 64),
+															},
 														},
 														"tenant": schema.StringAttribute{
 															MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then tenant will hold the referred object's(e.g. Route's) tenant.",
@@ -2106,6 +2420,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 															Computed:            true,
 															PlanModifiers: []planmodifier.String{
 																stringplanmodifier.UseStateForUnknown(),
+															},
+															Validators: []validator.String{
+																stringvalidator.LengthAtMost(64),
 															},
 														},
 													},
@@ -2118,7 +2435,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"inside_static_routes": schema.SingleNestedBlock{
-						MarkdownDescription: "Static Route List Type. List of static routes.",
+						MarkdownDescription: "Configuration parameter for inside static routes.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"static_route_list": schema.ListNestedBlock{
@@ -2126,7 +2443,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"simple_static_route": schema.StringAttribute{
-											MarkdownDescription: "Use simple static route for prefix pointing to single interface in the network.",
+											MarkdownDescription: "Exclusive with [custom_static_route] Use simple static route for prefix pointing to single interface in the network.",
 											Optional:            true,
 										},
 									},
@@ -2138,6 +2455,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 													MarkdownDescription: "[Enum: ROUTE_ATTR_NO_OP|ROUTE_ATTR_ADVERTISE|ROUTE_ATTR_INSTALL_HOST|ROUTE_ATTR_INSTALL_FORWARDING|ROUTE_ATTR_MERGE_ONLY] List of route attributes associated with the static route. Possible values are `ROUTE_ATTR_NO_OP`, `ROUTE_ATTR_ADVERTISE`, `ROUTE_ATTR_INSTALL_HOST`, `ROUTE_ATTR_INSTALL_FORWARDING`, `ROUTE_ATTR_MERGE_ONLY`. Defaults to `ROUTE_ATTR_NO_OP`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(4),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
@@ -2150,6 +2470,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 														"type": schema.StringAttribute{
 															MarkdownDescription: "[Enum: NEXT_HOP_DEFAULT_GATEWAY|NEXT_HOP_USE_CONFIGURED|NEXT_HOP_NETWORK_INTERFACE] Defines types of next-hop Use default gateway on the local interface as gateway for route. Assumes there is only one local interface on the virtual network. Use the specified address as nexthop Use the network interface as nexthop Discard nexthop, used when attr type is Advertise Used in VoltADN.. Possible values are `NEXT_HOP_DEFAULT_GATEWAY`, `NEXT_HOP_USE_CONFIGURED`, `NEXT_HOP_NETWORK_INTERFACE`. Defaults to `NEXT_HOP_DEFAULT_GATEWAY`.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.OneOf("NEXT_HOP_DEFAULT_GATEWAY", "NEXT_HOP_USE_CONFIGURED", "NEXT_HOP_NETWORK_INTERFACE"),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -2168,6 +2491,10 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 																	"name": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																		},
 																	},
 																	"namespace": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2175,6 +2502,10 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 																		Computed:            true,
 																		PlanModifiers: []planmodifier.String{
 																			stringplanmodifier.UseStateForUnknown(),
+																		},
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																		},
 																	},
 																	"tenant": schema.StringAttribute{
@@ -2201,11 +2532,14 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 															Attributes:          map[string]schema.Attribute{},
 															Blocks: map[string]schema.Block{
 																"ipv4": schema.SingleNestedBlock{
-																	MarkdownDescription: "IPv4 Address. IPv4 Address in dot-decimal notation.",
+																	MarkdownDescription: "IPv4 address in dotted decimal notation (e.g., 192.0.2.1).",
 																	Attributes: map[string]schema.Attribute{
 																		"addr": schema.StringAttribute{
 																			MarkdownDescription: "IPv4 Address in string form with dot-decimal notation.",
 																			Optional:            true,
+																			Validators: []validator.String{
+																				stringvalidator.LengthAtMost(1024),
+																			},
 																		},
 																	},
 																},
@@ -2215,6 +2549,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 																		"addr": schema.StringAttribute{
 																			MarkdownDescription: "IPv6 Address in form of string. IPv6 address must be specified as hexadecimal numbers separated by ':' The address can be compacted by suppressing zeros e.g. '2001:db8:0:0:0:0:2:1' becomes '2001:db8::2:1' or '2001:db8:0:0:0:2:0:0' becomes '2001:db8::2::'.",
 																			Optional:            true,
+																			Validators: []validator.String{
+																				stringvalidator.LengthAtMost(1024),
+																			},
 																		},
 																	},
 																},
@@ -2237,6 +2574,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 																	"prefix": schema.StringAttribute{
 																		MarkdownDescription: "Prefix part of the IPv4 subnet in string form with dot-decimal notation.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(1024),
+																		},
 																	},
 																},
 															},
@@ -2250,6 +2590,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 																	"prefix": schema.StringAttribute{
 																		MarkdownDescription: "Prefix part of the IPv6 subnet given in form of string. IPv6 address must be specified as hexadecimal numbers separated by ':' e.g. '2001:db8:0:0:0:2:0:0' The address can be compacted by suppressing zeros e.g. '2001:db8::2::'.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(1024),
+																		},
 																	},
 																},
 															},
@@ -2267,16 +2610,16 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						MarkdownDescription: "Enable this option",
 					},
 					"no_global_network": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for no global network.",
 					},
 					"no_inside_static_routes": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for no inside static routes.",
 					},
 					"no_outside_static_routes": schema.SingleNestedBlock{
-						MarkdownDescription: "Enable this option",
+						MarkdownDescription: "Configuration parameter for no outside static routes.",
 					},
 					"outside_static_routes": schema.SingleNestedBlock{
-						MarkdownDescription: "Static Route List Type. List of static routes.",
+						MarkdownDescription: "Configuration parameter for outside static routes.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"static_route_list": schema.ListNestedBlock{
@@ -2284,7 +2627,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"simple_static_route": schema.StringAttribute{
-											MarkdownDescription: "Use simple static route for prefix pointing to single interface in the network.",
+											MarkdownDescription: "Exclusive with [custom_static_route] Use simple static route for prefix pointing to single interface in the network.",
 											Optional:            true,
 										},
 									},
@@ -2296,6 +2639,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 													MarkdownDescription: "[Enum: ROUTE_ATTR_NO_OP|ROUTE_ATTR_ADVERTISE|ROUTE_ATTR_INSTALL_HOST|ROUTE_ATTR_INSTALL_FORWARDING|ROUTE_ATTR_MERGE_ONLY] List of route attributes associated with the static route. Possible values are `ROUTE_ATTR_NO_OP`, `ROUTE_ATTR_ADVERTISE`, `ROUTE_ATTR_INSTALL_HOST`, `ROUTE_ATTR_INSTALL_FORWARDING`, `ROUTE_ATTR_MERGE_ONLY`. Defaults to `ROUTE_ATTR_NO_OP`.",
 													Optional:            true,
 													ElementType:         types.StringType,
+													Validators: []validator.List{
+														listvalidator.SizeAtMost(4),
+													},
 												},
 											},
 											Blocks: map[string]schema.Block{
@@ -2308,6 +2654,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 														"type": schema.StringAttribute{
 															MarkdownDescription: "[Enum: NEXT_HOP_DEFAULT_GATEWAY|NEXT_HOP_USE_CONFIGURED|NEXT_HOP_NETWORK_INTERFACE] Defines types of next-hop Use default gateway on the local interface as gateway for route. Assumes there is only one local interface on the virtual network. Use the specified address as nexthop Use the network interface as nexthop Discard nexthop, used when attr type is Advertise Used in VoltADN.. Possible values are `NEXT_HOP_DEFAULT_GATEWAY`, `NEXT_HOP_USE_CONFIGURED`, `NEXT_HOP_NETWORK_INTERFACE`. Defaults to `NEXT_HOP_DEFAULT_GATEWAY`.",
 															Optional:            true,
+															Validators: []validator.String{
+																stringvalidator.OneOf("NEXT_HOP_DEFAULT_GATEWAY", "NEXT_HOP_USE_CONFIGURED", "NEXT_HOP_NETWORK_INTERFACE"),
+															},
 														},
 													},
 													Blocks: map[string]schema.Block{
@@ -2326,6 +2675,10 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 																	"name": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then name will hold the referred object's(e.g. Route's) name.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
+																		},
 																	},
 																	"namespace": schema.StringAttribute{
 																		MarkdownDescription: "When a configuration object(e.g. Virtual_host) refers to another(e.g route) then namespace will hold the referred object's(e.g. Route's) namespace.",
@@ -2333,6 +2686,10 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 																		Computed:            true,
 																		PlanModifiers: []planmodifier.String{
 																			stringplanmodifier.UseStateForUnknown(),
+																		},
+																		Validators: []validator.String{
+																			stringvalidator.LengthBetween(1, 1024),
+																			stringvalidator.RegexMatches(regexp.MustCompile(`^[a-z]([-a-z0-9]*[a-z0-9])?$`), ""),
 																		},
 																	},
 																	"tenant": schema.StringAttribute{
@@ -2359,11 +2716,14 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 															Attributes:          map[string]schema.Attribute{},
 															Blocks: map[string]schema.Block{
 																"ipv4": schema.SingleNestedBlock{
-																	MarkdownDescription: "IPv4 Address. IPv4 Address in dot-decimal notation.",
+																	MarkdownDescription: "IPv4 address in dotted decimal notation (e.g., 192.0.2.1).",
 																	Attributes: map[string]schema.Attribute{
 																		"addr": schema.StringAttribute{
 																			MarkdownDescription: "IPv4 Address in string form with dot-decimal notation.",
 																			Optional:            true,
+																			Validators: []validator.String{
+																				stringvalidator.LengthAtMost(1024),
+																			},
 																		},
 																	},
 																},
@@ -2373,6 +2733,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 																		"addr": schema.StringAttribute{
 																			MarkdownDescription: "IPv6 Address in form of string. IPv6 address must be specified as hexadecimal numbers separated by ':' The address can be compacted by suppressing zeros e.g. '2001:db8:0:0:0:0:2:1' becomes '2001:db8::2:1' or '2001:db8:0:0:0:2:0:0' becomes '2001:db8::2::'.",
 																			Optional:            true,
+																			Validators: []validator.String{
+																				stringvalidator.LengthAtMost(1024),
+																			},
 																		},
 																	},
 																},
@@ -2395,6 +2758,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 																	"prefix": schema.StringAttribute{
 																		MarkdownDescription: "Prefix part of the IPv4 subnet in string form with dot-decimal notation.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(1024),
+																		},
 																	},
 																},
 															},
@@ -2408,6 +2774,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 																	"prefix": schema.StringAttribute{
 																		MarkdownDescription: "Prefix part of the IPv6 subnet given in form of string. IPv6 address must be specified as hexadecimal numbers separated by ':' e.g. '2001:db8:0:0:0:2:0:0' The address can be compacted by suppressing zeros e.g. '2001:db8::2::'.",
 																		Optional:            true,
+																		Validators: []validator.String{
+																			stringvalidator.LengthAtMost(1024),
+																		},
 																	},
 																},
 															},
@@ -2440,6 +2809,9 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								"vpc_id": schema.StringAttribute{
 									MarkdownDescription: "VPC ID. Information about existing VPC.",
 									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthAtMost(64),
+									},
 								},
 							},
 							Blocks: map[string]schema.Block{
@@ -2557,10 +2929,24 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if data.PerformanceEnhancementMode != nil {
+		performance_enhancement_modeMap := make(map[string]interface{})
+		if data.PerformanceEnhancementMode.PerfModeL3Enhanced != nil {
+			perf_mode_l3_enhancedNestedMap := make(map[string]interface{})
+			performance_enhancement_modeMap["perf_mode_l3_enhanced"] = perf_mode_l3_enhancedNestedMap
+		}
+		if data.PerformanceEnhancementMode.PerfModeL7Enhanced != nil {
+			performance_enhancement_modeMap["perf_mode_l7_enhanced"] = map[string]interface{}{}
+		}
+		createReq.Spec["performance_enhancement_mode"] = performance_enhancement_modeMap
+	}
 	if data.AWSParameters != nil {
 		aws_parametersMap := make(map[string]interface{})
 		if data.AWSParameters.AdminPassword != nil {
 			admin_passwordNestedMap := make(map[string]interface{})
+			if !data.AWSParameters.AdminPassword.SecretEncodingType.IsNull() && !data.AWSParameters.AdminPassword.SecretEncodingType.IsUnknown() {
+				admin_passwordNestedMap["secret_encoding_type"] = data.AWSParameters.AdminPassword.SecretEncodingType.ValueString()
+			}
 			aws_parametersMap["admin_password"] = admin_passwordNestedMap
 		}
 		if data.AWSParameters.AWSCred != nil {
@@ -2624,11 +3010,21 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 			}
 			aws_parametersMap["custom_security_group"] = custom_security_groupNestedMap
 		}
+		if data.AWSParameters.DisableEncryption != nil {
+			aws_parametersMap["disable_encryption"] = map[string]interface{}{}
+		}
 		if data.AWSParameters.DisableInternetVIP != nil {
 			aws_parametersMap["disable_internet_vip"] = map[string]interface{}{}
 		}
 		if !data.AWSParameters.DiskSize.IsNull() && !data.AWSParameters.DiskSize.IsUnknown() {
 			aws_parametersMap["disk_size"] = data.AWSParameters.DiskSize.ValueInt64()
+		}
+		if data.AWSParameters.EnableEncryption != nil {
+			enable_encryptionNestedMap := make(map[string]interface{})
+			if !data.AWSParameters.EnableEncryption.KmsKeyID.IsNull() && !data.AWSParameters.EnableEncryption.KmsKeyID.IsUnknown() {
+				enable_encryptionNestedMap["kms_key_id"] = data.AWSParameters.EnableEncryption.KmsKeyID.ValueString()
+			}
+			aws_parametersMap["enable_encryption"] = enable_encryptionNestedMap
 		}
 		if data.AWSParameters.EnableInternetVIP != nil {
 			aws_parametersMap["enable_internet_vip"] = map[string]interface{}{}
@@ -2658,6 +3054,9 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 		}
 		if data.AWSParameters.NewVPC != nil {
 			new_vpcNestedMap := make(map[string]interface{})
+			if !data.AWSParameters.NewVPC.AllocateIpv6.IsNull() && !data.AWSParameters.NewVPC.AllocateIpv6.IsUnknown() {
+				new_vpcNestedMap["allocate_ipv6"] = data.AWSParameters.NewVPC.AllocateIpv6.ValueBool()
+			}
 			if !data.AWSParameters.NewVPC.NameTag.IsNull() && !data.AWSParameters.NewVPC.NameTag.IsUnknown() {
 				new_vpcNestedMap["name_tag"] = data.AWSParameters.NewVPC.NameTag.ValueString()
 			}
@@ -2699,9 +3098,9 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 	if data.BlockedServices != nil {
 		blocked_servicesMap := make(map[string]interface{})
-		if len(data.BlockedServices.BlockedSevice) > 0 {
-			var blocked_seviceList []map[string]interface{}
-			for _, listItem := range data.BlockedServices.BlockedSevice {
+		if len(data.BlockedServices.BlockedService) > 0 {
+			var blocked_serviceList []map[string]interface{}
+			for _, listItem := range data.BlockedServices.BlockedService {
 				listItemMap := make(map[string]interface{})
 				if listItem.DNS != nil {
 					listItemMap["dns"] = map[string]interface{}{}
@@ -2715,9 +3114,9 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 				if listItem.WebUserInterface != nil {
 					listItemMap["web_user_interface"] = map[string]interface{}{}
 				}
-				blocked_seviceList = append(blocked_seviceList, listItemMap)
+				blocked_serviceList = append(blocked_serviceList, listItemMap)
 			}
-			blocked_servicesMap["blocked_sevice"] = blocked_seviceList
+			blocked_servicesMap["blocked_service"] = blocked_serviceList
 		}
 		createReq.Spec["blocked_services"] = blocked_servicesMap
 	}
@@ -2819,17 +3218,6 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 			osMap["operating_system_version"] = data.OS.OperatingSystemVersion.ValueString()
 		}
 		createReq.Spec["os"] = osMap
-	}
-	if data.PerformanceEnhancementMode != nil {
-		performance_enhancement_modeMap := make(map[string]interface{})
-		if data.PerformanceEnhancementMode.PerfModeL3Enhanced != nil {
-			perf_mode_l3_enhancedNestedMap := make(map[string]interface{})
-			performance_enhancement_modeMap["perf_mode_l3_enhanced"] = perf_mode_l3_enhancedNestedMap
-		}
-		if data.PerformanceEnhancementMode.PerfModeL7Enhanced != nil {
-			performance_enhancement_modeMap["perf_mode_l7_enhanced"] = map[string]interface{}{}
-		}
-		createReq.Spec["performance_enhancement_mode"] = performance_enhancement_modeMap
 	}
 	if data.PrivateConnectivity != nil {
 		private_connectivityMap := make(map[string]interface{})
@@ -3002,6 +3390,11 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 	// This ensures computed nested fields (like tenant in Object Reference blocks) have known values
 	isImport := false // Create is never an import
 	_ = isImport      // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.PerformanceEnhancementMode = &AWSTGWSitePerformanceEnhancementModeModel{}
+	}
+	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["aws_parameters"].(map[string]interface{}); ok && (isImport || data.AWSParameters != nil) {
 		data.AWSParameters = &AWSTGWSiteAWSParametersModel{
 			AdminPassword: func() *AWSTGWSiteAWSParametersAdminPasswordModel {
@@ -3010,8 +3403,15 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 					return data.AWSParameters.AdminPassword
 				}
 				// Import case: read from API
-				if _, ok := blockData["admin_password"].(map[string]interface{}); ok {
-					return &AWSTGWSiteAWSParametersAdminPasswordModel{}
+				if nestedBlockData, ok := blockData["admin_password"].(map[string]interface{}); ok {
+					return &AWSTGWSiteAWSParametersAdminPasswordModel{
+						SecretEncodingType: func() types.String {
+							if v, ok := nestedBlockData["secret_encoding_type"].(string); ok && v != "" {
+								return types.StringValue(v)
+							}
+							return types.StringNull()
+						}(),
+					}
 				}
 				return nil
 			}(),
@@ -3139,6 +3539,18 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 				}
 				return nil
 			}(),
+			DisableEncryption: func() *AWSTGWSiteEmptyModel {
+				if !isImport && data.AWSParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AWSParameters.DisableEncryption
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_encryption"].(map[string]interface{}); ok {
+					return &AWSTGWSiteEmptyModel{}
+				}
+				return nil
+			}(),
 			DisableInternetVIP: func() *AWSTGWSiteEmptyModel {
 				if !isImport && data.AWSParameters != nil {
 					// Normal Read: preserve existing state value (even if nil)
@@ -3166,6 +3578,24 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 					return types.Int64Value(int64(v))
 				}
 				return types.Int64Null()
+			}(),
+			EnableEncryption: func() *AWSTGWSiteAWSParametersEnableEncryptionModel {
+				if !isImport && data.AWSParameters != nil && data.AWSParameters.EnableEncryption != nil {
+					// Normal Read: preserve existing state value
+					return data.AWSParameters.EnableEncryption
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["enable_encryption"].(map[string]interface{}); ok {
+					return &AWSTGWSiteAWSParametersEnableEncryptionModel{
+						KmsKeyID: func() types.String {
+							if v, ok := nestedBlockData["kms_key_id"].(string); ok && v != "" {
+								return types.StringValue(v)
+							}
+							return types.StringNull()
+						}(),
+					}
+				}
+				return nil
 			}(),
 			EnableInternetVIP: func() *AWSTGWSiteEmptyModel {
 				if !isImport && data.AWSParameters != nil {
@@ -3246,6 +3676,12 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 				// Import case: read from API
 				if nestedBlockData, ok := blockData["new_vpc"].(map[string]interface{}); ok {
 					return &AWSTGWSiteAWSParametersNewVPCModel{
+						AllocateIpv6: func() types.Bool {
+							if v, ok := nestedBlockData["allocate_ipv6"].(bool); ok {
+								return types.BoolValue(v)
+							}
+							return types.BoolNull()
+						}(),
 						NameTag: func() types.String {
 							if v, ok := nestedBlockData["name_tag"].(string); ok && v != "" {
 								return types.StringValue(v)
@@ -3357,12 +3793,12 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["blocked_services"].(map[string]interface{}); ok && (isImport || data.BlockedServices != nil) {
 		data.BlockedServices = &AWSTGWSiteBlockedServicesModel{
-			BlockedSevice: func() []AWSTGWSiteBlockedServicesBlockedSeviceModel {
-				if listData, ok := blockData["blocked_sevice"].([]interface{}); ok && len(listData) > 0 {
-					var result []AWSTGWSiteBlockedServicesBlockedSeviceModel
+			BlockedService: func() []AWSTGWSiteBlockedServicesBlockedServiceModel {
+				if listData, ok := blockData["blocked_service"].([]interface{}); ok && len(listData) > 0 {
+					var result []AWSTGWSiteBlockedServicesBlockedServiceModel
 					for _, item := range listData {
 						if itemMap, ok := item.(map[string]interface{}); ok {
-							result = append(result, AWSTGWSiteBlockedServicesBlockedSeviceModel{
+							result = append(result, AWSTGWSiteBlockedServicesBlockedServiceModel{
 								DNS: func() *AWSTGWSiteEmptyModel {
 									if _, ok := itemMap["dns"].(map[string]interface{}); ok {
 										return &AWSTGWSiteEmptyModel{}
@@ -3572,11 +4008,6 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 			}(),
 		}
 	}
-	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.PerformanceEnhancementMode = &AWSTGWSitePerformanceEnhancementModeModel{}
-	}
-	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["private_connectivity"].(map[string]interface{}); ok && isImport && data.PrivateConnectivity == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.PrivateConnectivity = &AWSTGWSitePrivateConnectivityModel{}
@@ -3728,6 +4159,11 @@ func (r *AWSTGWSiteResource) Read(ctx context.Context, req resource.ReadRequest,
 		isImport = true
 	}
 	_ = isImport // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.PerformanceEnhancementMode = &AWSTGWSitePerformanceEnhancementModeModel{}
+	}
+	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["aws_parameters"].(map[string]interface{}); ok && (isImport || data.AWSParameters != nil) {
 		data.AWSParameters = &AWSTGWSiteAWSParametersModel{
 			AdminPassword: func() *AWSTGWSiteAWSParametersAdminPasswordModel {
@@ -3736,8 +4172,15 @@ func (r *AWSTGWSiteResource) Read(ctx context.Context, req resource.ReadRequest,
 					return data.AWSParameters.AdminPassword
 				}
 				// Import case: read from API
-				if _, ok := blockData["admin_password"].(map[string]interface{}); ok {
-					return &AWSTGWSiteAWSParametersAdminPasswordModel{}
+				if nestedBlockData, ok := blockData["admin_password"].(map[string]interface{}); ok {
+					return &AWSTGWSiteAWSParametersAdminPasswordModel{
+						SecretEncodingType: func() types.String {
+							if v, ok := nestedBlockData["secret_encoding_type"].(string); ok && v != "" {
+								return types.StringValue(v)
+							}
+							return types.StringNull()
+						}(),
+					}
 				}
 				return nil
 			}(),
@@ -3865,6 +4308,18 @@ func (r *AWSTGWSiteResource) Read(ctx context.Context, req resource.ReadRequest,
 				}
 				return nil
 			}(),
+			DisableEncryption: func() *AWSTGWSiteEmptyModel {
+				if !isImport && data.AWSParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AWSParameters.DisableEncryption
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_encryption"].(map[string]interface{}); ok {
+					return &AWSTGWSiteEmptyModel{}
+				}
+				return nil
+			}(),
 			DisableInternetVIP: func() *AWSTGWSiteEmptyModel {
 				if !isImport && data.AWSParameters != nil {
 					// Normal Read: preserve existing state value (even if nil)
@@ -3892,6 +4347,24 @@ func (r *AWSTGWSiteResource) Read(ctx context.Context, req resource.ReadRequest,
 					return types.Int64Value(int64(v))
 				}
 				return types.Int64Null()
+			}(),
+			EnableEncryption: func() *AWSTGWSiteAWSParametersEnableEncryptionModel {
+				if !isImport && data.AWSParameters != nil && data.AWSParameters.EnableEncryption != nil {
+					// Normal Read: preserve existing state value
+					return data.AWSParameters.EnableEncryption
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["enable_encryption"].(map[string]interface{}); ok {
+					return &AWSTGWSiteAWSParametersEnableEncryptionModel{
+						KmsKeyID: func() types.String {
+							if v, ok := nestedBlockData["kms_key_id"].(string); ok && v != "" {
+								return types.StringValue(v)
+							}
+							return types.StringNull()
+						}(),
+					}
+				}
+				return nil
 			}(),
 			EnableInternetVIP: func() *AWSTGWSiteEmptyModel {
 				if !isImport && data.AWSParameters != nil {
@@ -3972,6 +4445,12 @@ func (r *AWSTGWSiteResource) Read(ctx context.Context, req resource.ReadRequest,
 				// Import case: read from API
 				if nestedBlockData, ok := blockData["new_vpc"].(map[string]interface{}); ok {
 					return &AWSTGWSiteAWSParametersNewVPCModel{
+						AllocateIpv6: func() types.Bool {
+							if v, ok := nestedBlockData["allocate_ipv6"].(bool); ok {
+								return types.BoolValue(v)
+							}
+							return types.BoolNull()
+						}(),
 						NameTag: func() types.String {
 							if v, ok := nestedBlockData["name_tag"].(string); ok && v != "" {
 								return types.StringValue(v)
@@ -4083,12 +4562,12 @@ func (r *AWSTGWSiteResource) Read(ctx context.Context, req resource.ReadRequest,
 	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["blocked_services"].(map[string]interface{}); ok && (isImport || data.BlockedServices != nil) {
 		data.BlockedServices = &AWSTGWSiteBlockedServicesModel{
-			BlockedSevice: func() []AWSTGWSiteBlockedServicesBlockedSeviceModel {
-				if listData, ok := blockData["blocked_sevice"].([]interface{}); ok && len(listData) > 0 {
-					var result []AWSTGWSiteBlockedServicesBlockedSeviceModel
+			BlockedService: func() []AWSTGWSiteBlockedServicesBlockedServiceModel {
+				if listData, ok := blockData["blocked_service"].([]interface{}); ok && len(listData) > 0 {
+					var result []AWSTGWSiteBlockedServicesBlockedServiceModel
 					for _, item := range listData {
 						if itemMap, ok := item.(map[string]interface{}); ok {
-							result = append(result, AWSTGWSiteBlockedServicesBlockedSeviceModel{
+							result = append(result, AWSTGWSiteBlockedServicesBlockedServiceModel{
 								DNS: func() *AWSTGWSiteEmptyModel {
 									if _, ok := itemMap["dns"].(map[string]interface{}); ok {
 										return &AWSTGWSiteEmptyModel{}
@@ -4298,11 +4777,6 @@ func (r *AWSTGWSiteResource) Read(ctx context.Context, req resource.ReadRequest,
 			}(),
 		}
 	}
-	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.PerformanceEnhancementMode = &AWSTGWSitePerformanceEnhancementModeModel{}
-	}
-	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["private_connectivity"].(map[string]interface{}); ok && isImport && data.PrivateConnectivity == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.PrivateConnectivity = &AWSTGWSitePrivateConnectivityModel{}
@@ -4425,10 +4899,24 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	// Marshal spec fields from Terraform state to API struct
+	if data.PerformanceEnhancementMode != nil {
+		performance_enhancement_modeMap := make(map[string]interface{})
+		if data.PerformanceEnhancementMode.PerfModeL3Enhanced != nil {
+			perf_mode_l3_enhancedNestedMap := make(map[string]interface{})
+			performance_enhancement_modeMap["perf_mode_l3_enhanced"] = perf_mode_l3_enhancedNestedMap
+		}
+		if data.PerformanceEnhancementMode.PerfModeL7Enhanced != nil {
+			performance_enhancement_modeMap["perf_mode_l7_enhanced"] = map[string]interface{}{}
+		}
+		apiResource.Spec["performance_enhancement_mode"] = performance_enhancement_modeMap
+	}
 	if data.AWSParameters != nil {
 		aws_parametersMap := make(map[string]interface{})
 		if data.AWSParameters.AdminPassword != nil {
 			admin_passwordNestedMap := make(map[string]interface{})
+			if !data.AWSParameters.AdminPassword.SecretEncodingType.IsNull() && !data.AWSParameters.AdminPassword.SecretEncodingType.IsUnknown() {
+				admin_passwordNestedMap["secret_encoding_type"] = data.AWSParameters.AdminPassword.SecretEncodingType.ValueString()
+			}
 			aws_parametersMap["admin_password"] = admin_passwordNestedMap
 		}
 		if data.AWSParameters.AWSCred != nil {
@@ -4492,11 +4980,21 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 			}
 			aws_parametersMap["custom_security_group"] = custom_security_groupNestedMap
 		}
+		if data.AWSParameters.DisableEncryption != nil {
+			aws_parametersMap["disable_encryption"] = map[string]interface{}{}
+		}
 		if data.AWSParameters.DisableInternetVIP != nil {
 			aws_parametersMap["disable_internet_vip"] = map[string]interface{}{}
 		}
 		if !data.AWSParameters.DiskSize.IsNull() && !data.AWSParameters.DiskSize.IsUnknown() {
 			aws_parametersMap["disk_size"] = data.AWSParameters.DiskSize.ValueInt64()
+		}
+		if data.AWSParameters.EnableEncryption != nil {
+			enable_encryptionNestedMap := make(map[string]interface{})
+			if !data.AWSParameters.EnableEncryption.KmsKeyID.IsNull() && !data.AWSParameters.EnableEncryption.KmsKeyID.IsUnknown() {
+				enable_encryptionNestedMap["kms_key_id"] = data.AWSParameters.EnableEncryption.KmsKeyID.ValueString()
+			}
+			aws_parametersMap["enable_encryption"] = enable_encryptionNestedMap
 		}
 		if data.AWSParameters.EnableInternetVIP != nil {
 			aws_parametersMap["enable_internet_vip"] = map[string]interface{}{}
@@ -4526,6 +5024,9 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 		}
 		if data.AWSParameters.NewVPC != nil {
 			new_vpcNestedMap := make(map[string]interface{})
+			if !data.AWSParameters.NewVPC.AllocateIpv6.IsNull() && !data.AWSParameters.NewVPC.AllocateIpv6.IsUnknown() {
+				new_vpcNestedMap["allocate_ipv6"] = data.AWSParameters.NewVPC.AllocateIpv6.ValueBool()
+			}
 			if !data.AWSParameters.NewVPC.NameTag.IsNull() && !data.AWSParameters.NewVPC.NameTag.IsUnknown() {
 				new_vpcNestedMap["name_tag"] = data.AWSParameters.NewVPC.NameTag.ValueString()
 			}
@@ -4567,9 +5068,9 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 	if data.BlockedServices != nil {
 		blocked_servicesMap := make(map[string]interface{})
-		if len(data.BlockedServices.BlockedSevice) > 0 {
-			var blocked_seviceList []map[string]interface{}
-			for _, listItem := range data.BlockedServices.BlockedSevice {
+		if len(data.BlockedServices.BlockedService) > 0 {
+			var blocked_serviceList []map[string]interface{}
+			for _, listItem := range data.BlockedServices.BlockedService {
 				listItemMap := make(map[string]interface{})
 				if listItem.DNS != nil {
 					listItemMap["dns"] = map[string]interface{}{}
@@ -4583,9 +5084,9 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 				if listItem.WebUserInterface != nil {
 					listItemMap["web_user_interface"] = map[string]interface{}{}
 				}
-				blocked_seviceList = append(blocked_seviceList, listItemMap)
+				blocked_serviceList = append(blocked_serviceList, listItemMap)
 			}
-			blocked_servicesMap["blocked_sevice"] = blocked_seviceList
+			blocked_servicesMap["blocked_service"] = blocked_serviceList
 		}
 		apiResource.Spec["blocked_services"] = blocked_servicesMap
 	}
@@ -4687,17 +5188,6 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 			osMap["operating_system_version"] = data.OS.OperatingSystemVersion.ValueString()
 		}
 		apiResource.Spec["os"] = osMap
-	}
-	if data.PerformanceEnhancementMode != nil {
-		performance_enhancement_modeMap := make(map[string]interface{})
-		if data.PerformanceEnhancementMode.PerfModeL3Enhanced != nil {
-			perf_mode_l3_enhancedNestedMap := make(map[string]interface{})
-			performance_enhancement_modeMap["perf_mode_l3_enhanced"] = perf_mode_l3_enhancedNestedMap
-		}
-		if data.PerformanceEnhancementMode.PerfModeL7Enhanced != nil {
-			performance_enhancement_modeMap["perf_mode_l7_enhanced"] = map[string]interface{}{}
-		}
-		apiResource.Spec["performance_enhancement_mode"] = performance_enhancement_modeMap
 	}
 	if data.PrivateConnectivity != nil {
 		private_connectivityMap := make(map[string]interface{})
@@ -4881,6 +5371,11 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 	apiResource = fetched // Use GET response which includes all computed fields
 	isImport := false     // Update is never an import
 	_ = isImport          // May be unused if resource has no blocks needing import detection
+	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
+		// Import case: populate from API since state is nil and psd is empty
+		data.PerformanceEnhancementMode = &AWSTGWSitePerformanceEnhancementModeModel{}
+	}
+	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["aws_parameters"].(map[string]interface{}); ok && (isImport || data.AWSParameters != nil) {
 		data.AWSParameters = &AWSTGWSiteAWSParametersModel{
 			AdminPassword: func() *AWSTGWSiteAWSParametersAdminPasswordModel {
@@ -4889,8 +5384,15 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 					return data.AWSParameters.AdminPassword
 				}
 				// Import case: read from API
-				if _, ok := blockData["admin_password"].(map[string]interface{}); ok {
-					return &AWSTGWSiteAWSParametersAdminPasswordModel{}
+				if nestedBlockData, ok := blockData["admin_password"].(map[string]interface{}); ok {
+					return &AWSTGWSiteAWSParametersAdminPasswordModel{
+						SecretEncodingType: func() types.String {
+							if v, ok := nestedBlockData["secret_encoding_type"].(string); ok && v != "" {
+								return types.StringValue(v)
+							}
+							return types.StringNull()
+						}(),
+					}
 				}
 				return nil
 			}(),
@@ -5018,6 +5520,18 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 				}
 				return nil
 			}(),
+			DisableEncryption: func() *AWSTGWSiteEmptyModel {
+				if !isImport && data.AWSParameters != nil {
+					// Normal Read: preserve existing state value (even if nil)
+					// This prevents API returning empty objects from overwriting user's 'not configured' intent
+					return data.AWSParameters.DisableEncryption
+				}
+				// Import case: read from API
+				if _, ok := blockData["disable_encryption"].(map[string]interface{}); ok {
+					return &AWSTGWSiteEmptyModel{}
+				}
+				return nil
+			}(),
 			DisableInternetVIP: func() *AWSTGWSiteEmptyModel {
 				if !isImport && data.AWSParameters != nil {
 					// Normal Read: preserve existing state value (even if nil)
@@ -5045,6 +5559,24 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 					return types.Int64Value(int64(v))
 				}
 				return types.Int64Null()
+			}(),
+			EnableEncryption: func() *AWSTGWSiteAWSParametersEnableEncryptionModel {
+				if !isImport && data.AWSParameters != nil && data.AWSParameters.EnableEncryption != nil {
+					// Normal Read: preserve existing state value
+					return data.AWSParameters.EnableEncryption
+				}
+				// Import case: read from API
+				if nestedBlockData, ok := blockData["enable_encryption"].(map[string]interface{}); ok {
+					return &AWSTGWSiteAWSParametersEnableEncryptionModel{
+						KmsKeyID: func() types.String {
+							if v, ok := nestedBlockData["kms_key_id"].(string); ok && v != "" {
+								return types.StringValue(v)
+							}
+							return types.StringNull()
+						}(),
+					}
+				}
+				return nil
 			}(),
 			EnableInternetVIP: func() *AWSTGWSiteEmptyModel {
 				if !isImport && data.AWSParameters != nil {
@@ -5125,6 +5657,12 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 				// Import case: read from API
 				if nestedBlockData, ok := blockData["new_vpc"].(map[string]interface{}); ok {
 					return &AWSTGWSiteAWSParametersNewVPCModel{
+						AllocateIpv6: func() types.Bool {
+							if v, ok := nestedBlockData["allocate_ipv6"].(bool); ok {
+								return types.BoolValue(v)
+							}
+							return types.BoolNull()
+						}(),
 						NameTag: func() types.String {
 							if v, ok := nestedBlockData["name_tag"].(string); ok && v != "" {
 								return types.StringValue(v)
@@ -5236,12 +5774,12 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 	// Normal Read: preserve existing state value
 	if blockData, ok := apiResource.Spec["blocked_services"].(map[string]interface{}); ok && (isImport || data.BlockedServices != nil) {
 		data.BlockedServices = &AWSTGWSiteBlockedServicesModel{
-			BlockedSevice: func() []AWSTGWSiteBlockedServicesBlockedSeviceModel {
-				if listData, ok := blockData["blocked_sevice"].([]interface{}); ok && len(listData) > 0 {
-					var result []AWSTGWSiteBlockedServicesBlockedSeviceModel
+			BlockedService: func() []AWSTGWSiteBlockedServicesBlockedServiceModel {
+				if listData, ok := blockData["blocked_service"].([]interface{}); ok && len(listData) > 0 {
+					var result []AWSTGWSiteBlockedServicesBlockedServiceModel
 					for _, item := range listData {
 						if itemMap, ok := item.(map[string]interface{}); ok {
-							result = append(result, AWSTGWSiteBlockedServicesBlockedSeviceModel{
+							result = append(result, AWSTGWSiteBlockedServicesBlockedServiceModel{
 								DNS: func() *AWSTGWSiteEmptyModel {
 									if _, ok := itemMap["dns"].(map[string]interface{}); ok {
 										return &AWSTGWSiteEmptyModel{}
@@ -5451,11 +5989,6 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 			}(),
 		}
 	}
-	if _, ok := apiResource.Spec["performance_enhancement_mode"].(map[string]interface{}); ok && isImport && data.PerformanceEnhancementMode == nil {
-		// Import case: populate from API since state is nil and psd is empty
-		data.PerformanceEnhancementMode = &AWSTGWSitePerformanceEnhancementModeModel{}
-	}
-	// Normal Read: preserve existing state value
 	if _, ok := apiResource.Spec["private_connectivity"].(map[string]interface{}); ok && isImport && data.PrivateConnectivity == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.PrivateConnectivity = &AWSTGWSitePrivateConnectivityModel{}

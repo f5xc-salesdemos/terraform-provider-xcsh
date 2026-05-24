@@ -9,10 +9,10 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -44,13 +44,13 @@ type PolicerResource struct {
 type PolicerResourceModel struct {
 	Name                     types.String   `tfsdk:"name"`
 	Namespace                types.String   `tfsdk:"namespace"`
+	BurstSize                types.Int64    `tfsdk:"burst_size"`
+	CommittedInformationRate types.Int64    `tfsdk:"committed_information_rate"`
 	Annotations              types.Map      `tfsdk:"annotations"`
 	Description              types.String   `tfsdk:"description"`
 	Disable                  types.Bool     `tfsdk:"disable"`
 	Labels                   types.Map      `tfsdk:"labels"`
 	ID                       types.String   `tfsdk:"id"`
-	BurstSize                types.Int64    `tfsdk:"burst_size"`
-	CommittedInformationRate types.Int64    `tfsdk:"committed_information_rate"`
 	PolicerMode              types.String   `tfsdk:"policer_mode"`
 	PolicerType              types.String   `tfsdk:"policer_type"`
 	Timeouts                 timeouts.Value `tfsdk:"timeouts"`
@@ -84,6 +84,14 @@ func (r *PolicerResource) Schema(ctx context.Context, req resource.SchemaRequest
 					validators.NamespaceValidator(),
 				},
 			},
+			"burst_size": schema.Int64Attribute{
+				MarkdownDescription: "The maximum size permitted for bursts of data. E.g. 10000 pps burst .",
+				Required:            true,
+			},
+			"committed_information_rate": schema.Int64Attribute{
+				MarkdownDescription: "The committed information rate is the guaranteed packets rate for traffic arriving or departing under normal conditions. E.g. 10000 pps .",
+				Required:            true,
+			},
 			"annotations": schema.MapAttribute{
 				MarkdownDescription: "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata.",
 				Optional:            true,
@@ -109,36 +117,26 @@ func (r *PolicerResource) Schema(ctx context.Context, req resource.SchemaRequest
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"burst_size": schema.Int64Attribute{
-				MarkdownDescription: "The maximum size permitted for bursts of data. E.g. 10000 pps burst .",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
-			"committed_information_rate": schema.Int64Attribute{
-				MarkdownDescription: "The committed information rate is the guaranteed packets rate for traffic arriving or departing under normal conditions. E.g. 10000 pps .",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
 			"policer_mode": schema.StringAttribute{
-				MarkdownDescription: "[Enum: POLICER_MODE_NOT_SHARED|POLICER_MODE_SHARED] - POLICER_MODE_NOT_SHARED: Not Shared A separate policer instance is created for each reference to the policer - POLICER_MODE_SHARED: Shared A common policer instance is used for for all references to the policer. Possible values are `POLICER_MODE_NOT_SHARED`, `POLICER_MODE_SHARED`. Defaults to `POLICER_MODE_NOT_SHARED`.",
+				MarkdownDescription: "[Enum: POLICER_MODE_NOT_SHARED|POLICER_MODE_SHARED] - POLICER_MODE_NOT_SHARED: Not Shared A separate policer instance is created for each reference to the policer - POLICER_MODE_SHARED: Shared A common policer instance is used for for all references to the policer. Possible values are `POLICER_MODE_NOT_SHARED`, `POLICER_MODE_SHARED`. Defaults to `POLICER_MODE_NOT_SHARED`. Server applies default when omitted.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.String{
+					stringvalidator.OneOf("POLICER_MODE_NOT_SHARED", "POLICER_MODE_SHARED"),
 				},
 			},
 			"policer_type": schema.StringAttribute{
-				MarkdownDescription: "[Enum: POLICER_SINGLE_RATE_TWO_COLOR] Specifies the type of Policer Basic Single-Rate Two-Color Policer. The only possible value is `POLICER_SINGLE_RATE_TWO_COLOR`. Defaults to `POLICER_SINGLE_RATE_TWO_COLOR`.",
+				MarkdownDescription: "[Enum: POLICER_SINGLE_RATE_TWO_COLOR] Specifies the type of Policer Basic Single-Rate Two-Color Policer. The only possible value is `POLICER_SINGLE_RATE_TWO_COLOR`. Defaults to `POLICER_SINGLE_RATE_TWO_COLOR`. Server applies default when omitted.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+				},
+				Validators: []validator.String{
+					stringvalidator.OneOf("POLICER_SINGLE_RATE_TWO_COLOR"),
 				},
 			},
 		},
@@ -482,20 +480,6 @@ func (r *PolicerResource) Update(ctx context.Context, req resource.UpdateRequest
 	}
 
 	// Set computed fields from API response
-	if v, ok := fetched.Spec["burst_size"].(float64); ok {
-		data.BurstSize = types.Int64Value(int64(v))
-	} else if data.BurstSize.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.BurstSize = types.Int64Null()
-	}
-	// If plan had a value, preserve it
-	if v, ok := fetched.Spec["committed_information_rate"].(float64); ok {
-		data.CommittedInformationRate = types.Int64Value(int64(v))
-	} else if data.CommittedInformationRate.IsUnknown() {
-		// API didn't return value and plan was unknown - set to null
-		data.CommittedInformationRate = types.Int64Null()
-	}
-	// If plan had a value, preserve it
 	if v, ok := fetched.Spec["policer_mode"].(string); ok && v != "" {
 		data.PolicerMode = types.StringValue(v)
 	} else if data.PolicerMode.IsUnknown() {

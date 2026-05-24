@@ -2,6 +2,18 @@
 # Manages DNS Load Balancer Health Check in a given namespace. If one already exist it will give a error. in F5 Distributed Cloud.
 
 # Basic DNS LB Health Check configuration
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+
 resource "f5xc_dns_lb_health_check" "example" {
   name      = "example-dns-lb-health-check"
   namespace = "staging"

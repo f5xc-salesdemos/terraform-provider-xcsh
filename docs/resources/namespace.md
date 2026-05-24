@@ -2,12 +2,12 @@
 page_title: "f5xc_namespace Resource - terraform-provider-f5xc"
 subcategory: "Organization"
 description: |-
-  Manages new namespace. Name of the object is name of the name space. in F5 Distributed Cloud.
+  Manages new namespace. Name of the object is name of the namespace. in F5 Distributed Cloud.
 ---
 
 # f5xc_namespace (Resource)
 
-Manages new namespace. Name of the object is name of the name space. in F5 Distributed Cloud.
+Manages new namespace. Name of the object is name of the namespace. in F5 Distributed Cloud.
 
 ~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
@@ -15,7 +15,18 @@ Manages new namespace. Name of the object is name of the name space. in F5 Distr
 
 ```terraform
 # Namespace Resource Example
-# Manages new namespace. Name of the object is name of the name space. in F5 Distributed Cloud.
+# Manages new namespace. Name of the object is name of the namespace. in F5 Distributed Cloud.
+
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
 
 # Basic Namespace configuration
 resource "f5xc_namespace" "example" {
@@ -101,7 +112,7 @@ Transformers apply transformations to input values before matching. Multiple tra
 | ----- | ----------- |
 | `LOWER_CASE` | Convert to lowercase |
 | `UPPER_CASE` | Convert to uppercase |
-| `BASE64_DECODE` | Decode base64 content |
+| `BASE64_DECODE` | Decodebase64 content |
 | `NORMALIZE_PATH` | Normalize URL path |
 | `REMOVE_WHITESPACE` | Remove whitespace characters |
 | `URL_DECODE` | Decode URL-encoded characters |

@@ -2,21 +2,40 @@
 page_title: "f5xc_site Data Source - terraform-provider-f5xc"
 subcategory: "Uncategorized"
 description: |-
-  Manages a Site resource in F5 Distributed Cloud for app stack site specification. configuration.
+  Manages virtual site object in given namespace. in F5 Distributed Cloud.
 ---
 
 # f5xc_site (Data Source)
 
-Manages a Site resource in F5 Distributed Cloud for app stack site specification. configuration.
+Manages virtual site object in given namespace. in F5 Distributed Cloud.
 
 ~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
 ```terraform
+# Site Data Source Example
+# Retrieves information about an existing Site
+
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+# Look up an existing Site by name
 data "f5xc_site" "example" {
-  name      = "example-resource"
-  namespace = "system"
+  name      = "example-site"
+  namespace = "staging"
+}
+
+output "site_id" {
+  value = data.f5xc_site.example.id
 }
 ```
 
@@ -65,7 +84,7 @@ Transformers apply transformations to input values before matching. Multiple tra
 | ----- | ----------- |
 | `LOWER_CASE` | Convert to lowercase |
 | `UPPER_CASE` | Convert to uppercase |
-| `BASE64_DECODE` | Decode base64 content |
+| `BASE64_DECODE` | Decodebase64 content |
 | `NORMALIZE_PATH` | Normalize URL path |
 | `REMOVE_WHITESPACE` | Remove whitespace characters |
 | `URL_DECODE` | Decode URL-encoded characters |
