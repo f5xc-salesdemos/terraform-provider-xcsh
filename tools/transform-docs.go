@@ -876,6 +876,8 @@ func transformIndexDoc(filePath string) error {
 	text = normalizeBlankLines(text)
 
 	text = fixUpstreamTerminology(text)
+	text = fixDataSourceDescriptions(text, filePath)
+	text = fixDescriptionGrammar(text)
 	text = wrapLongLines(text, 400)
 
 	return os.WriteFile(filePath, []byte(text), 0644)
@@ -1230,6 +1232,8 @@ func transformAnchorsOnly(filePath string, content string) error {
 
 	// Fix upstream API terminology to pass textlint
 	result = fixUpstreamTerminology(result)
+	result = fixDataSourceDescriptions(result, filePath)
+	result = fixDescriptionGrammar(result)
 
 	// Wrap long lines to pass MD013 (max 400 chars)
 	result = wrapLongLines(result, 400)
@@ -2219,6 +2223,8 @@ func transformDoc(filePath string) error {
 
 	// Fix upstream API terminology to pass textlint
 	result = fixUpstreamTerminology(result)
+	result = fixDataSourceDescriptions(result, filePath)
+	result = fixDescriptionGrammar(result)
 
 	// Wrap long lines to pass MD013 (max 400 chars)
 	result = wrapLongLines(result, 400)
@@ -3415,6 +3421,58 @@ func fixUpstreamTerminology(content string) string {
 
 	base64Regex := regexp.MustCompile(`Base64`)
 	content = base64Regex.ReplaceAllString(content, "base64")
+
+	return content
+}
+
+// fixDataSourceDescriptions corrects data-source docs that incorrectly say "Manages" instead of "Retrieves".
+func fixDataSourceDescriptions(content string, filePath string) string {
+	if !strings.Contains(filePath, "data-sources/") {
+		return content
+	}
+
+	content = strings.Replace(content, "Manages a ", "Retrieves information about an existing ", 1)
+	content = strings.Replace(content, "Manages new ", "Retrieves information about an existing ", 1)
+	content = strings.Replace(content, "Manages ", "Retrieves information about ", 1)
+
+	lines := strings.Split(content, "\n")
+	for i, line := range lines {
+		if strings.HasPrefix(line, "# ") && strings.Contains(line, "(Data Source)") {
+			for j := i + 1; j < len(lines); j++ {
+				if strings.TrimSpace(lines[j]) == "" {
+					continue
+				}
+				if !strings.Contains(lines[j], "read-only data source") {
+					lines[j] = lines[j] + " This is a read-only data source."
+				}
+				break
+			}
+			break
+		}
+	}
+	return strings.Join(lines, "\n")
+}
+
+// fixDescriptionGrammar corrects common grammar issues from upstream API descriptions.
+func fixDescriptionGrammar(content string) string {
+	content = strings.NewReplacer(
+		" a API ", " an API ",
+		" a HTTP ", " an HTTP ",
+		" a HTTPS ", " an HTTPS ",
+		" a Origin ", " an Origin ",
+		" a origin ", " an origin ",
+		" a App ", " an App ",
+		" a app ", " an app ",
+		" a Alert ", " an Alert ",
+		" a alert ", " an alert ",
+		" a Authentication ", " an Authentication ",
+		" a authentication ", " an authentication ",
+		" a Endpoint ", " an Endpoint ",
+		" a endpoint ", " an endpoint ",
+		" a Enhanced ", " an Enhanced ",
+		" a External ", " an External ",
+		" a Event ", " an Event ",
+	).Replace(content)
 
 	return content
 }

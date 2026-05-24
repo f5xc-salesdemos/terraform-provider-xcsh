@@ -6,10 +6,21 @@
       "paths": ["guides/**"]
     },
     {
+      "label": "Functions",
+      "description": "Provider-defined functions for secret management",
+      "paths": ["functions/**"]
+    },
+    {
       "label": "Resources",
-      "description": "Terraform resource and data source reference",
-      "paths": ["resources/**", "data-sources/**"]
+      "description": "Terraform resource reference for creating and managing F5 XC objects",
+      "paths": ["resources/**"]
+    },
+    {
+      "label": "Data Sources",
+      "description": "Terraform data source reference for reading existing F5 XC objects",
+      "paths": ["data-sources/**"]
     }
   ],
-  "promote": ["index*", "guides/**"]
+  "promote": ["index*", "guides/**", "functions/**"],
+  "demote": ["data-sources/**"]
 }
