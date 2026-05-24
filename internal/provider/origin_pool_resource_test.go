@@ -6,8 +6,13 @@ import (
 	"fmt"
 	"testing"
 
+	"regexp"
+
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
 )
@@ -189,6 +194,328 @@ func testAccOriginPoolImportStateIdFunc(resourceName string) resource.ImportStat
 }
 
 // =============================================================================
+// TEST: Plan checks (create, update, noop)
+// =============================================================================
+func TestAccOriginPoolResource_planChecks(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_origin_pool.test"
+	rName := acctest.RandomName("tf-test-op")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckOriginPoolDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOriginPoolConfig_basicSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionCreate),
+					},
+				},
+			},
+			{
+				Config: testAccOriginPoolConfig_labelsUpdateSystem(rName, "staging"),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccOriginPoolConfig_labelsUpdateSystem(rName, "staging"),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionNoop),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Known values plan check
+// =============================================================================
+func TestAccOriginPoolResource_knownValues(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_origin_pool.test"
+	rName := acctest.RandomName("tf-test-op")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckOriginPoolDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOriginPoolConfig_basicSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectKnownValue(resourceName, tfjsonpath.New("name"), knownvalue.StringExact(rName)),
+						plancheck.ExpectKnownValue(resourceName, tfjsonpath.New("namespace"), knownvalue.StringExact("system")),
+						plancheck.ExpectKnownValue(resourceName, tfjsonpath.New("port"), knownvalue.Int64Exact(443)),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Name validation
+// =============================================================================
+func TestAccOriginPoolResource_invalidName(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccOriginPoolConfig_basicSystem("Invalid-NAME"),
+				ExpectError: regexp.MustCompile(`(?i)(invalid|name|must)`),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Name change requires replacement
+// =============================================================================
+func TestAccOriginPoolResource_requiresReplace(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_origin_pool.test"
+	rName1 := acctest.RandomName("tf-test-op")
+	rName2 := acctest.RandomName("tf-test-op")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckOriginPoolDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOriginPoolConfig_basicSystem(rName1),
+				Check:  acctest.CheckOriginPoolExists(resourceName),
+			},
+			{
+				Config: testAccOriginPoolConfig_basicSystem(rName2),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionDestroyBeforeCreate),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Origin with public_ip instead of public_name
+// =============================================================================
+func TestAccOriginPoolResource_publicIp(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_origin_pool.test"
+	rName := acctest.RandomName("tf-test-op")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckOriginPoolDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOriginPoolConfig_publicIpSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckOriginPoolExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "port", "8080"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccOriginPoolImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Multiple origin servers
+// =============================================================================
+func TestAccOriginPoolResource_multipleOrigins(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_origin_pool.test"
+	rName := acctest.RandomName("tf-test-op")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckOriginPoolDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOriginPoolConfig_multipleOriginsSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckOriginPoolExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "origin_servers.#", "2"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccOriginPoolImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Origin pool with healthcheck reference
+// =============================================================================
+func TestAccOriginPoolResource_withHealthcheckRef(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_origin_pool.test"
+	rName := acctest.RandomName("tf-test-op")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy: func(s *terraform.State) error {
+			if err := acctest.CheckOriginPoolDestroyed(s); err != nil {
+				return err
+			}
+			return acctest.CheckHealthcheckDestroyed(s)
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOriginPoolConfig_withHealthcheckRefSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckOriginPoolExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "healthcheck.#", "1"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccOriginPoolImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Port update
+// =============================================================================
+func TestAccOriginPoolResource_updatePort(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_origin_pool.test"
+	rName := acctest.RandomName("tf-test-op")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckOriginPoolDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOriginPoolConfig_portSystem(rName, 443),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckOriginPoolExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "port", "443"),
+				),
+			},
+			{
+				Config: testAccOriginPoolConfig_portSystem(rName, 8443),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckOriginPoolExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "port", "8443"),
+				),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Full lifecycle
+// =============================================================================
+func TestAccOriginPoolResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_origin_pool.test"
+	rName := acctest.RandomName("tf-test-op")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckOriginPoolDestroyed,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccOriginPoolConfig_withLabelsSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckOriginPoolExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "description", "Test origin pool"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "disable", "description"},
+				ImportStateIdFunc:       testAccOriginPoolImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccOriginPoolConfig_portSystem(rName, 8080),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckOriginPoolExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "port", "8080"),
+				),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccOriginPoolConfig_portSystem(rName, 8080),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+			{
+				Config: testAccOriginPoolConfig_basicSystem(rName),
+				Check:  acctest.CheckOriginPoolExists(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
 // CONFIG HELPERS - Use "system" namespace
 // =============================================================================
 
@@ -238,6 +565,114 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 `, name)
+}
+
+func testAccOriginPoolConfig_publicIpSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_origin_pool" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  port = 8080
+
+  origin_servers {
+    labels {}
+    public_ip {
+      ip = "93.184.216.34"
+    }
+  }
+
+  no_tls {}
+  same_as_endpoint_port {}
+}
+`, name)
+}
+
+func testAccOriginPoolConfig_multipleOriginsSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_origin_pool" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  port = 443
+
+  origin_servers {
+    labels {}
+    public_name {
+      dns_name = "backend1.example.com"
+    }
+  }
+
+  origin_servers {
+    labels {}
+    public_name {
+      dns_name = "backend2.example.com"
+    }
+  }
+
+  no_tls {}
+  same_as_endpoint_port {}
+}
+`, name)
+}
+
+func testAccOriginPoolConfig_withHealthcheckRefSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = 3
+  unhealthy_threshold = 1
+  timeout             = 3
+  interval            = 15
+
+  tcp_health_check {}
+}
+
+resource "f5xc_origin_pool" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  port = 443
+
+  origin_servers {
+    labels {}
+    public_name {
+      dns_name = "example.com"
+    }
+  }
+
+  healthcheck {
+    name      = f5xc_healthcheck.test.name
+    namespace = f5xc_healthcheck.test.namespace
+  }
+
+  no_tls {}
+  same_as_endpoint_port {}
+}
+`, name)
+}
+
+func testAccOriginPoolConfig_portSystem(name string, port int) string {
+	return fmt.Sprintf(`
+resource "f5xc_origin_pool" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  port = %[2]d
+
+  origin_servers {
+    labels {}
+    public_name {
+      dns_name = "example.com"
+    }
+  }
+
+  no_tls {}
+  same_as_endpoint_port {}
+}
+`, name, port)
 }
 
 func testAccOriginPoolConfig_labelsUpdateSystem(name, env string) string {

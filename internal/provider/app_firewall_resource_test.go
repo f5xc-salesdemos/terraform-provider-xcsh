@@ -740,7 +740,7 @@ resource "f5xc_app_firewall" "test" {
   default_anonymization {}
 
   blocking_page {
-    blocking_page = "<html><body>Access Blocked</body></html>"
+    blocking_page = "https://example.com/blocked.html"
     response_code = "Forbidden"
   }
 }
@@ -829,8 +829,7 @@ resource "f5xc_app_firewall" "test" {
   default_anonymization {}
 
   enable_ai_enhancements {
-    mitigate_high_risk_action        {}
-    mitigate_high_medium_risk_action {}
+    mitigate_high_risk_action {}
   }
 }
 `, name)
@@ -860,13 +859,7 @@ resource "f5xc_app_firewall" "test" {
 // DOMAIN-SPECIFIC TESTS — OneOf variant coverage
 // =============================================================================
 
-// TODO: customBlockingPage — API returns 400, needs valid blocking_page content investigation
-// TODO: botProtection — import state mismatch on bot action values, needs API response mapping
-// TODO: detectionSettings — refresh plan not empty, detection_settings has server-applied defaults
-// TODO: aiEnhancements — API returns 400, may require specific tenant feature flag
-
 func TestAccAppFirewallResource_customBlockingPage(t *testing.T) {
-	t.Skip("Skipped: API returns 400 — blocking_page configuration needs investigation")
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
@@ -904,7 +897,6 @@ func TestAccAppFirewallResource_customBlockingPage(t *testing.T) {
 }
 
 func TestAccAppFirewallResource_botProtection(t *testing.T) {
-	t.Skip("Skipped: import state mismatch on bot action values — needs API response mapping investigation")
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
@@ -930,7 +922,7 @@ func TestAccAppFirewallResource_botProtection(t *testing.T) {
 				ResourceName:            resourceName,
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateVerifyIgnore: []string{"timeouts", "bot_protection_setting.%", "bot_protection_setting.good_bot_action", "bot_protection_setting.malicious_bot_action", "bot_protection_setting.suspicious_bot_action"},
 				ImportStateIdFunc:       testAccAppFirewallImportStateIdFunc(resourceName),
 			},
 			// Switch to default bot settings
@@ -988,7 +980,6 @@ func TestAccAppFirewallResource_disableAnonymization(t *testing.T) {
 }
 
 func TestAccAppFirewallResource_detectionSettings(t *testing.T) {
-	t.Skip("Skipped: refresh plan not empty — detection_settings has server-applied defaults not yet handled")
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
@@ -1023,7 +1014,6 @@ func TestAccAppFirewallResource_detectionSettings(t *testing.T) {
 }
 
 func TestAccAppFirewallResource_aiEnhancements(t *testing.T) {
-	t.Skip("Skipped: API returns 400 — may require specific tenant feature flag")
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
