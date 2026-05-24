@@ -4,10 +4,14 @@ package provider_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
 )
@@ -192,6 +196,326 @@ func testAccHTTPLoadBalancerImportStateIdFunc(resourceName string) resource.Impo
 }
 
 // =============================================================================
+// TEST: Plan checks (create, update, noop)
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_planChecks(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_http_loadbalancer.test"
+	rName := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionCreate),
+					},
+				},
+			},
+			{
+				Config: testAccHTTPLoadBalancerConfig_labelsUpdateSystem(rName, "staging"),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccHTTPLoadBalancerConfig_labelsUpdateSystem(rName, "staging"),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionNoop),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Known values
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_knownValues(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_http_loadbalancer.test"
+	rName := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectKnownValue(resourceName, tfjsonpath.New("name"), knownvalue.StringExact(rName)),
+						plancheck.ExpectKnownValue(resourceName, tfjsonpath.New("namespace"), knownvalue.StringExact("system")),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Invalid name
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_invalidName(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccHTTPLoadBalancerConfig_basicSystem("Invalid-NAME"),
+				ExpectError: regexp.MustCompile(`(?i)(invalid|name|must)`),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Requires replace on name change
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_requiresReplace(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_http_loadbalancer.test"
+	rName1 := acctest.RandomName("tf-test-lb")
+	rName2 := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName1),
+				Check:  acctest.CheckResourceExists(resourceName),
+			},
+			{
+				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName2),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionDestroyBeforeCreate),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: HTTPS auto-cert TLS termination
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_httpsAutoCert(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_http_loadbalancer.test"
+	rName := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHTTPLoadBalancerConfig_httpsAutoCertSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckResourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateIdFunc: testAccHTTPLoadBalancerImportStateIdFunc(resourceName),
+				ImportStateVerifyIgnore: []string{
+					"timeouts",
+					"http.dns_volterra_managed",
+					"l7_ddos_protection",
+					"https_auto_cert.connection_idle_timeout",
+					"https_auto_cert.http_redirect",
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: With origin pool reference
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_withOriginPool(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_http_loadbalancer.test"
+	rName := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy: func(s *terraform.State) error {
+			if err := acctest.CheckResourceDestroyed("f5xc_http_loadbalancer")(s); err != nil {
+				return err
+			}
+			return acctest.CheckOriginPoolDestroyed(s)
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHTTPLoadBalancerConfig_withOriginPoolSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckResourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "default_route_pools.#", "1"),
+				),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: With WAF (app_firewall reference)
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_withWAF(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_http_loadbalancer.test"
+	rName := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy: func(s *terraform.State) error {
+			if err := acctest.CheckResourceDestroyed("f5xc_http_loadbalancer")(s); err != nil {
+				return err
+			}
+			return acctest.CheckAppFirewallDestroyed(s)
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHTTPLoadBalancerConfig_withWAFSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckResourceExists(resourceName),
+				),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Full security stack (WAF + origin pool + rate limit + threat mesh)
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_securityStack(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_http_loadbalancer.test"
+	rName := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy: func(s *terraform.State) error {
+			if err := acctest.CheckResourceDestroyed("f5xc_http_loadbalancer")(s); err != nil {
+				return err
+			}
+			if err := acctest.CheckAppFirewallDestroyed(s); err != nil {
+				return err
+			}
+			if err := acctest.CheckOriginPoolDestroyed(s); err != nil {
+				return err
+			}
+			return acctest.CheckHealthcheckDestroyed(s)
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHTTPLoadBalancerConfig_securityStackSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckResourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "default_route_pools.#", "1"),
+				),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Full lifecycle
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_http_loadbalancer.test"
+	rName := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccHTTPLoadBalancerConfig_withLabelsSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckResourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "labels.environment", "test"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateIdFunc: testAccHTTPLoadBalancerImportStateIdFunc(resourceName),
+				ImportStateVerifyIgnore: []string{
+					"timeouts",
+					"http.dns_volterra_managed",
+					"l7_ddos_protection",
+				},
+			},
+			{
+				Config: testAccHTTPLoadBalancerConfig_withDomainsSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckResourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "domains.#", "2"),
+				),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
+			},
+			{
+				Config: testAccHTTPLoadBalancerConfig_withDomainsSystem(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+			{
+				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName),
+				Check:  acctest.CheckResourceExists(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
 // CONFIG HELPERS - Use "system" namespace
 // =============================================================================
 
@@ -258,6 +582,185 @@ resource "f5xc_http_loadbalancer" "test" {
   http {
     port = 80
   }
+
+  advertise_on_public_default_vip {}
+}
+`, name)
+}
+
+func testAccHTTPLoadBalancerConfig_httpsAutoCertSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_http_loadbalancer" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  domains = ["test.example.com"]
+
+  https_auto_cert {
+    add_hsts              = false
+    no_mtls               {}
+    default_header        {}
+    enable_path_normalize {}
+    non_default_loadbalancer {}
+  }
+
+  advertise_on_public_default_vip {}
+}
+`, name)
+}
+
+func testAccHTTPLoadBalancerConfig_withOriginPoolSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_origin_pool" "test" {
+  name      = %[1]q
+  namespace = "system"
+  port      = 443
+
+  origin_servers {
+    labels {}
+    public_name {
+      dns_name = "example.com"
+    }
+  }
+
+  no_tls {}
+  same_as_endpoint_port {}
+}
+
+resource "f5xc_http_loadbalancer" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  domains = ["test.example.com"]
+
+  http {
+    port = 80
+  }
+
+  default_route_pools {
+    pool {
+      name      = f5xc_origin_pool.test.name
+      namespace = "system"
+    }
+    weight   = 1
+    priority = 1
+  }
+
+  advertise_on_public_default_vip {}
+}
+`, name)
+}
+
+func testAccHTTPLoadBalancerConfig_withWAFSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_app_firewall" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  default_detection_settings {}
+  allow_all_response_codes {}
+  blocking {}
+  use_default_blocking_page {}
+  default_bot_setting {}
+  default_anonymization {}
+}
+
+resource "f5xc_http_loadbalancer" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  domains = ["test.example.com"]
+
+  http {
+    port = 80
+  }
+
+  app_firewall {
+    name      = f5xc_app_firewall.test.name
+    namespace = "system"
+  }
+
+  advertise_on_public_default_vip {}
+}
+`, name)
+}
+
+func testAccHTTPLoadBalancerConfig_securityStackSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = 3
+  unhealthy_threshold = 1
+  timeout             = 3
+  interval            = 15
+
+  http_health_check {
+    path        = "/health"
+    host_header = "example.com"
+  }
+}
+
+resource "f5xc_origin_pool" "test" {
+  name      = %[1]q
+  namespace = "system"
+  port      = 443
+
+  origin_servers {
+    labels {}
+    public_name {
+      dns_name = "example.com"
+    }
+  }
+
+  healthcheck {
+    name      = f5xc_healthcheck.test.name
+    namespace = "system"
+  }
+
+  no_tls {}
+  same_as_endpoint_port {}
+}
+
+resource "f5xc_app_firewall" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  default_detection_settings {}
+  allow_all_response_codes {}
+  blocking {}
+  use_default_blocking_page {}
+  default_bot_setting {}
+  default_anonymization {}
+}
+
+resource "f5xc_http_loadbalancer" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  domains = ["test.example.com"]
+
+  http {
+    port = 80
+  }
+
+  default_route_pools {
+    pool {
+      name      = f5xc_origin_pool.test.name
+      namespace = "system"
+    }
+    weight   = 1
+    priority = 1
+  }
+
+  app_firewall {
+    name      = f5xc_app_firewall.test.name
+    namespace = "system"
+  }
+
+  enable_malicious_user_detection {}
+  enable_threat_mesh {}
 
   advertise_on_public_default_vip {}
 }
