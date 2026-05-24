@@ -1303,3 +1303,39 @@ resource "f5xc_healthcheck" "test" {
 }
 `, name, path)
 }
+
+// =============================================================================
+// NEGATIVE: Conflicting health check types (OneOf violation)
+// =============================================================================
+func TestAccHealthcheckResource_conflictTcpAndHttp(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-hc")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  healthy_threshold   = 1
+  unhealthy_threshold = 2
+  timeout             = 3
+  interval            = 5
+
+  tcp_health_check {}
+  http_health_check {
+    path = "/health"
+  }
+}
+`, rName),
+				ExpectError: regexp.MustCompile(`(?i)(conflict|mutually exclusive|only one|Invalid|these attributes cannot)`),
+			},
+		},
+	})
+}

@@ -1085,3 +1085,79 @@ func TestAccAppFirewallResource_allowedResponseCodes(t *testing.T) {
 		},
 	})
 }
+
+// =============================================================================
+// NEGATIVE: Conflicting blocking and monitoring modes (OneOf violation)
+// =============================================================================
+func TestAccAppFirewallResource_conflictBlockingAndMonitoring(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-test-waf")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "f5xc_app_firewall" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  blocking {}
+  monitoring {}
+
+  default_detection_settings {}
+  allow_all_response_codes {}
+  use_default_blocking_page {}
+  default_bot_setting {}
+  default_anonymization {}
+}
+`, rName),
+				ExpectError: regexp.MustCompile(`(?i)(conflict|mutually exclusive|only one|Invalid|these attributes cannot)`),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// NEGATIVE: Conflicting blocking page options (OneOf violation)
+// =============================================================================
+func TestAccAppFirewallResource_conflictBlockingPageOptions(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-test-waf")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "f5xc_app_firewall" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  blocking {}
+
+  use_default_blocking_page {}
+  blocking_page {
+    blocking_page = "https://example.com/blocked.html"
+    response_code = "Forbidden"
+  }
+
+  default_detection_settings {}
+  allow_all_response_codes {}
+  default_bot_setting {}
+  default_anonymization {}
+}
+`, rName),
+				ExpectError: regexp.MustCompile(`(?i)(conflict|mutually exclusive|only one|Invalid|these attributes cannot)`),
+			},
+		},
+	})
+}

@@ -1222,3 +1222,112 @@ resource "f5xc_http_loadbalancer" "test" {
 }
 `, name, env)
 }
+
+// =============================================================================
+// NEGATIVE: Conflicting advertise options (OneOf violation)
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_conflictAdvertiseOptions(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "f5xc_http_loadbalancer" "test" {
+  name      = %[1]q
+  namespace = "system"
+  domains   = ["test.example.com"]
+
+  http {
+    port = 80
+  }
+
+  advertise_on_public_default_vip {}
+  do_not_advertise {}
+}
+`, rName),
+				ExpectError: regexp.MustCompile(`(?i)(conflict|mutually exclusive|only one|Client Error|BAD_REQUEST|Invalid|these attributes cannot)`),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// NEGATIVE: Conflicting challenge options (OneOf violation)
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_conflictChallengeOptions(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "f5xc_http_loadbalancer" "test" {
+  name      = %[1]q
+  namespace = "system"
+  domains   = ["test.example.com"]
+
+  http {
+    port = 80
+  }
+
+  js_challenge {
+    js_script_delay = 5000
+    cookie_expiry   = 3600
+  }
+  no_challenge {}
+
+  advertise_on_public_default_vip {}
+}
+`, rName),
+				ExpectError: regexp.MustCompile(`(?i)(conflict|mutually exclusive|only one|Client Error|BAD_REQUEST|Invalid|these attributes cannot)`),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// NEGATIVE: Conflicting LB algorithm options (OneOf violation)
+// =============================================================================
+func TestAccHTTPLoadBalancerResource_conflictAlgorithmOptions(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-test-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "f5xc_http_loadbalancer" "test" {
+  name      = %[1]q
+  namespace = "system"
+  domains   = ["test.example.com"]
+
+  http {
+    port = 80
+  }
+
+  round_robin {}
+  least_active {}
+
+  advertise_on_public_default_vip {}
+}
+`, rName),
+				ExpectError: regexp.MustCompile(`(?i)(conflict|mutually exclusive|only one|Client Error|BAD_REQUEST|Invalid|these attributes cannot)`),
+			},
+		},
+	})
+}

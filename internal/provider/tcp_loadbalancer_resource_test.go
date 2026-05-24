@@ -922,3 +922,122 @@ resource "f5xc_tcp_loadbalancer" "test" {
 }
 `, name, port)
 }
+
+// =============================================================================
+// NEGATIVE: Conflicting protocol options (OneOf violation)
+// =============================================================================
+func TestAccTCPLoadBalancerResource_conflictTcpAndTls(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-test-tcp-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "f5xc_origin_pool" "test" {
+  name      = "%[1]s-pool"
+  namespace = "system"
+  port      = 443
+
+  origin_servers {
+    labels {}
+    public_name {
+      dns_name = "example.com"
+    }
+  }
+
+  no_tls {}
+  same_as_endpoint_port {}
+}
+
+resource "f5xc_tcp_loadbalancer" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  domains     = ["%[1]s.example.com"]
+  listen_port = 443
+
+  tcp {}
+  tls_tcp {}
+
+  sni {}
+
+  origin_pools_weights {
+    pool {
+      name      = f5xc_origin_pool.test.name
+      namespace = "system"
+    }
+    weight = 1
+  }
+
+  advertise_on_public_default_vip {}
+}
+`, rName),
+				ExpectError: regexp.MustCompile(`(?i)(conflict|mutually exclusive|only one|Invalid|these attributes cannot)`),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// NEGATIVE: Conflicting listen_port and port_ranges (OneOf violation)
+// =============================================================================
+func TestAccTCPLoadBalancerResource_conflictPortOptions(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-test-tcp-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "f5xc_origin_pool" "test" {
+  name      = "%[1]s-pool"
+  namespace = "system"
+  port      = 443
+
+  origin_servers {
+    labels {}
+    public_name {
+      dns_name = "example.com"
+    }
+  }
+
+  no_tls {}
+  same_as_endpoint_port {}
+}
+
+resource "f5xc_tcp_loadbalancer" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  domains     = ["%[1]s.example.com"]
+  listen_port = 443
+  port_ranges = "8080-8090"
+
+  tcp {}
+  sni {}
+
+  origin_pools_weights {
+    pool {
+      name      = f5xc_origin_pool.test.name
+      namespace = "system"
+    }
+    weight = 1
+  }
+
+  advertise_on_public_default_vip {}
+}
+`, rName),
+				ExpectError: regexp.MustCompile(`(?i)(conflict|mutually exclusive|only one|Invalid|these attributes cannot)`),
+			},
+		},
+	})
+}

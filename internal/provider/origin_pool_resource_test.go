@@ -699,3 +699,47 @@ resource "f5xc_origin_pool" "test" {
 }
 `, name, env)
 }
+
+// =============================================================================
+// NEGATIVE: Conflicting TLS options (OneOf violation)
+// =============================================================================
+func TestAccOriginPoolResource_conflictTlsOptions(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-test-op")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "f5xc_origin_pool" "test" {
+  name      = %[1]q
+  namespace = "system"
+  port      = 443
+
+  origin_servers {
+    labels {}
+    public_name {
+      dns_name = "example.com"
+    }
+  }
+
+  no_tls {}
+  use_tls {
+    tls_config {
+      default_security {}
+    }
+    no_mtls {}
+    volterra_trusted_ca {}
+  }
+  same_as_endpoint_port {}
+}
+`, rName),
+				ExpectError: regexp.MustCompile(`(?i)(conflict|mutually exclusive|only one|Invalid|these attributes cannot)`),
+			},
+		},
+	})
+}
