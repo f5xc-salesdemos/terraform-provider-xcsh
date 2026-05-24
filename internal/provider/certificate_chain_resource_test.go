@@ -51,6 +51,26 @@ func TestAccCertificateChainResource_basic(t *testing.T) {
 	})
 }
 
+func TestAccCertificateChainResource_emptyPlan(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-certchain")
+	nsName := acctest.RandomName("tf-acc-test-ns")
+	certs := acctest.MustGenerateTestCertificates()
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        map[string]resource.ExternalProvider{"time": {Source: "hashicorp/time"}},
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_certificate_chain"),
+		Steps: []resource.TestStep{
+			{Config: testAccCertificateChainConfig_basic(nsName, rName, certs)},
+			{Config: testAccCertificateChainConfig_basic(nsName, rName, certs), PlanOnly: true, ExpectNonEmptyPlan: false},
+		},
+	})
+}
+
 func testAccCertificateChainImportStateIdFunc(resourceName string) resource.ImportStateIdFunc {
 	return func(s *terraform.State) (string, error) {
 		rs, ok := s.RootModule().Resources[resourceName]

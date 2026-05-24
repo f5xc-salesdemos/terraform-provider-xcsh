@@ -51,6 +51,25 @@ func TestAccBotDefenseAppInfrastructureResource_basic(t *testing.T) {
 	})
 }
 
+func TestAccBotDefenseAppInfrastructureResource_emptyPlan(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	rName := acctest.RandomName("tf-acc-test-bot")
+	nsName := acctest.RandomName("tf-acc-test-ns")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_bot_defense_app_infrastructure"),
+		Steps: []resource.TestStep{
+			{Config: testAccBotDefenseAppInfrastructureConfig_basic(nsName, rName)},
+			{Config: testAccBotDefenseAppInfrastructureConfig_basic(nsName, rName), PlanOnly: true, ExpectNonEmptyPlan: false},
+		},
+	})
+}
+
 func testAccBotDefenseAppInfrastructureImportStateIdFunc(resourceName string) resource.ImportStateIdFunc {
 	return func(s *terraform.State) (string, error) {
 		rs, ok := s.RootModule().Resources[resourceName]
@@ -86,7 +105,7 @@ resource "f5xc_bot_defense_app_infrastructure" "test" {
 
   cloud_hosted {
     infra_host_name = "test.example.com"
-    region          = "us-west-2"
+    region          = "US"
   }
 }
 `, nsName, name))

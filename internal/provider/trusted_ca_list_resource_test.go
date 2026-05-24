@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
@@ -298,7 +299,114 @@ func testAccTrustedCaListResourceImportStateIdFunc(resourceName string) resource
 // Test Configuration Functions
 // =============================================================================
 
+// =============================================================================
+// TEST: Empty plan (no drift)
+// =============================================================================
+func TestAccTrustedCaListResource_emptyPlan(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	nsName := acctest.RandomName("tf-test-ns")
+	rName := acctest.RandomName("tf-test-tcl")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		Steps: []resource.TestStep{
+			{Config: testAccTrustedCaListResourceConfig_basic(nsName, rName)},
+			{Config: testAccTrustedCaListResourceConfig_basic(nsName, rName), PlanOnly: true, ExpectNonEmptyPlan: false},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Plan checks (create, update, noop)
+// =============================================================================
+func TestAccTrustedCaListResource_planChecks(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_trusted_ca_list.test"
+	nsName := acctest.RandomName("tf-test-ns")
+	rName := acctest.RandomName("tf-test-tcl")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccTrustedCaListResourceConfig_basic(nsName, rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionCreate)},
+				},
+			},
+			{
+				Config: testAccTrustedCaListResourceConfig_allAttributes(nsName, rName, "updated"),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate)},
+				},
+			},
+			{
+				Config: testAccTrustedCaListResourceConfig_allAttributes(nsName, rName, "updated"),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionNoop)},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: Full lifecycle
+// =============================================================================
+func TestAccTrustedCaListResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_trusted_ca_list.test"
+	nsName := acctest.RandomName("tf-test-ns")
+	rName := acctest.RandomName("tf-test-tcl")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		ExternalProviders:        acctest.ExternalProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccTrustedCaListResourceConfig_allAttributes(nsName, rName, "lifecycle test"),
+				Check:  acctest.CheckResourceExists(resourceName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "disable", "description"},
+				ImportStateIdFunc:       testAccTrustedCaListResourceImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccTrustedCaListResourceConfig_basic(nsName, rName),
+				Check:  acctest.CheckResourceExists(resourceName),
+			},
+			{
+				Config:             testAccTrustedCaListResourceConfig_basic(nsName, rName),
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: false,
+			},
+		},
+	})
+}
+
+// =============================================================================
+// Test Configuration Functions
+// =============================================================================
+
 func testAccTrustedCaListResourceConfig_basic(nsName, name string) string {
+	return testAccTrustedCaListResourceConfig_basicWithCert(nsName, name, acctest.MustGenerateTestCertificates().IntermediateCABase64)
+}
+
+func testAccTrustedCaListResourceConfig_basicWithCert(nsName, name, certBase64 string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
@@ -312,14 +420,16 @@ resource "time_sleep" "wait_for_namespace" {
 }
 
 resource "f5xc_trusted_ca_list" "test" {
-  depends_on = [time_sleep.wait_for_namespace]
-  name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  depends_on     = [time_sleep.wait_for_namespace]
+  name           = %[2]q
+  namespace      = f5xc_namespace.test.name
+  trusted_ca_url = "string:///%[3]s"
 }
-`, nsName, name))
+`, nsName, name, certBase64))
 }
 
 func testAccTrustedCaListResourceConfig_allAttributes(nsName, name, description string) string {
+	certs := acctest.MustGenerateTestCertificates()
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
@@ -333,10 +443,11 @@ resource "time_sleep" "wait_for_namespace" {
 }
 
 resource "f5xc_trusted_ca_list" "test" {
-  depends_on  = [time_sleep.wait_for_namespace]
-  name        = %[2]q
-  namespace   = f5xc_namespace.test.name
-  description = %[3]q
+  depends_on     = [time_sleep.wait_for_namespace]
+  name           = %[2]q
+  namespace      = f5xc_namespace.test.name
+  trusted_ca_url = "string:///%[4]s"
+  description    = %[3]q
 
   labels = {
     environment = "test"
@@ -348,10 +459,11 @@ resource "f5xc_trusted_ca_list" "test" {
     owner   = "ci-cd"
   }
 }
-`, nsName, name, description))
+`, nsName, name, description, certs.IntermediateCABase64))
 }
 
 func testAccTrustedCaListResourceConfig_withLabels(nsName, name, environment, managedBy string) string {
+	certs := acctest.MustGenerateTestCertificates()
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
@@ -365,19 +477,21 @@ resource "time_sleep" "wait_for_namespace" {
 }
 
 resource "f5xc_trusted_ca_list" "test" {
-  depends_on = [time_sleep.wait_for_namespace]
-  name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  depends_on     = [time_sleep.wait_for_namespace]
+  name           = %[2]q
+  namespace      = f5xc_namespace.test.name
+  trusted_ca_url = "string:///%[5]s"
 
   labels = {
     environment = %[3]q
     managed_by  = %[4]q
   }
 }
-`, nsName, name, environment, managedBy))
+`, nsName, name, environment, managedBy, certs.IntermediateCABase64))
 }
 
 func testAccTrustedCaListResourceConfig_withDescription(nsName, name, description string) string {
+	certs := acctest.MustGenerateTestCertificates()
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
@@ -391,15 +505,17 @@ resource "time_sleep" "wait_for_namespace" {
 }
 
 resource "f5xc_trusted_ca_list" "test" {
-  depends_on  = [time_sleep.wait_for_namespace]
-  name        = %[2]q
-  namespace   = f5xc_namespace.test.name
-  description = %[3]q
+  depends_on     = [time_sleep.wait_for_namespace]
+  name           = %[2]q
+  namespace      = f5xc_namespace.test.name
+  trusted_ca_url = "string:///%[4]s"
+  description    = %[3]q
 }
-`, nsName, name, description))
+`, nsName, name, description, certs.IntermediateCABase64))
 }
 
 func testAccTrustedCaListResourceConfig_withAnnotations(nsName, name, value1, value2 string) string {
+	certs := acctest.MustGenerateTestCertificates()
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
@@ -413,14 +529,15 @@ resource "time_sleep" "wait_for_namespace" {
 }
 
 resource "f5xc_trusted_ca_list" "test" {
-  depends_on = [time_sleep.wait_for_namespace]
-  name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  depends_on     = [time_sleep.wait_for_namespace]
+  name           = %[2]q
+  namespace      = f5xc_namespace.test.name
+  trusted_ca_url = "string:///%[5]s"
 
   annotations = {
     key1 = %[3]q
     key2 = %[4]q
   }
 }
-`, nsName, name, value1, value2))
+`, nsName, name, value1, value2, certs.IntermediateCABase64))
 }
