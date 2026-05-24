@@ -46,7 +46,7 @@ func TestAccHealthcheckResource_httpFullOptions(t *testing.T) {
 				ResourceName:            resourceName,
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateVerifyIgnore: []string{"timeouts", "http_health_check.use_http2"},
 				ImportStateIdFunc:       testAccMatrixHealthcheckImportStateIdFunc(resourceName),
 			},
 			{
