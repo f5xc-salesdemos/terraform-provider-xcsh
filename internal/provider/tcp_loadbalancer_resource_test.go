@@ -726,6 +726,157 @@ resource "f5xc_tcp_loadbalancer" "test" {
 `, name, value)
 }
 
+// =============================================================================
+// TEST: TCP LB with healthcheck + origin pool integration
+// =============================================================================
+func TestAccTCPLoadBalancerResource_withHealthcheck(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_tcp_loadbalancer.test"
+	rName := acctest.RandomName("tf-test-tcp-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy: func(s *terraform.State) error {
+			if err := acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer")(s); err != nil {
+				return err
+			}
+			if err := acctest.CheckOriginPoolDestroyed(s); err != nil {
+				return err
+			}
+			return acctest.CheckHealthcheckDestroyed(s)
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccTCPLoadBalancerConfig_withHealthcheckSystem(rName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckResourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rName),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts"},
+				ImportStateIdFunc:       testAccTCPLoadBalancerImportStateIdFunc(resourceName),
+			},
+		},
+	})
+}
+
+// =============================================================================
+// TEST: TCP LB full lifecycle
+// =============================================================================
+func TestAccTCPLoadBalancerResource_fullLifecycle(t *testing.T) {
+	acctest.SkipIfNotAccTest(t)
+	acctest.PreCheck(t)
+
+	resourceName := "f5xc_tcp_loadbalancer.test"
+	rName := acctest.RandomName("tf-test-tcp-lb")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy: func(s *terraform.State) error {
+			if err := acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer")(s); err != nil {
+				return err
+			}
+			return acctest.CheckOriginPoolDestroyed(s)
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccTCPLoadBalancerConfig_allAttributesSystem(rName),
+				Check:  acctest.CheckResourceExists(resourceName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"timeouts", "disable", "description"},
+				ImportStateIdFunc:       testAccTCPLoadBalancerImportStateIdFunc(resourceName),
+			},
+			{
+				Config: testAccTCPLoadBalancerConfig_withListenPortSystem(rName, 8443),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.CheckResourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "listen_port", "8443"),
+				),
+			},
+			{
+				Config: testAccTCPLoadBalancerConfig_withListenPortSystem(rName, 8443),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+		},
+	})
+}
+
+// =============================================================================
+// CONFIG: TCP LB with healthcheck
+// =============================================================================
+func testAccTCPLoadBalancerConfig_withHealthcheckSystem(name string) string {
+	return fmt.Sprintf(`
+resource "f5xc_healthcheck" "test" {
+  name      = "%[1]s-hc"
+  namespace = "system"
+
+  healthy_threshold   = 3
+  unhealthy_threshold = 1
+  timeout             = 3
+  interval            = 15
+
+  tcp_health_check {}
+}
+
+resource "f5xc_origin_pool" "test" {
+  name      = "%[1]s-pool"
+  namespace = "system"
+  port      = 443
+
+  origin_servers {
+    labels {}
+    public_name {
+      dns_name = "example.com"
+    }
+  }
+
+  healthcheck {
+    name      = f5xc_healthcheck.test.name
+    namespace = "system"
+  }
+
+  no_tls {}
+  same_as_endpoint_port {}
+}
+
+resource "f5xc_tcp_loadbalancer" "test" {
+  name      = %[1]q
+  namespace = "system"
+
+  domains    = ["%[1]s.example.com"]
+  listen_port = 443
+  tcp {}
+  sni {}
+
+  origin_pools_weights {
+    pool {
+      name      = f5xc_origin_pool.test.name
+      namespace = "system"
+    }
+    weight = 1
+  }
+
+  advertise_on_public_default_vip {}
+}
+`, name)
+}
+
 func testAccTCPLoadBalancerConfig_withListenPortSystem(name string, port int) string {
 	return fmt.Sprintf(`
 resource "f5xc_origin_pool" "test" {
