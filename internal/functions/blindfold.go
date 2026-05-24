@@ -45,7 +45,7 @@ Returns a sealed secret string suitable for use in ` + "`blindfold_secret_info.l
 **Security**: The encryption happens locally using the public key fetched from F5XC.
 The plaintext secret is **never** transmitted to F5XC during encryption.
 
-### Example
+## Example
 
 ` + "```hcl" + `
 resource "f5xc_http_loadbalancer" "example" {

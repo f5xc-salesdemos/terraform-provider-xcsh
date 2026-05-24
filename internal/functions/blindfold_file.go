@@ -51,7 +51,7 @@ provider::f5xc::blindfold(base64encode(file(path)), policy_name, namespace)
 **Security**: The encryption happens locally using the public key fetched from F5XC.
 The file contents are **never** transmitted to F5XC during encryption.
 
-### Example
+## Example
 
 ` + "```hcl" + `
 resource "f5xc_http_loadbalancer" "example" {
