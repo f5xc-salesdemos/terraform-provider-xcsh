@@ -4,7 +4,7 @@ Terraform resources for managing F5 Distributed Cloud infrastructure.
 
 ## Overview
 
-This provider includes 150+ resources across all F5XC domains:
+This provider includes ~100 resources across all F5XC domains:
 
 - **Security**: WAF, DDoS protection, certificates
 - **Networking**: Load balancers, origin pools, DNS
