@@ -3369,6 +3369,13 @@ func fixUpstreamTerminology(content string) string {
 		"javascript", "JavaScript",
 		"MAC OS", "macOS",
 		"Clientside", "client-side",
+		"Client Side", "client-side",
+		"client side", "client-side",
+		"server side", "server-side",
+		"sub-class", "subclass",
+		"Code Base", "codebase",
+		"code base", "codebase",
+		"Internet", "internet",
 	).Replace(content)
 
 	cdnRegex := regexp.MustCompile(`\bcdn\b`)
@@ -3405,6 +3412,9 @@ func fixUpstreamTerminology(content string) string {
 
 	mongodbRegex := regexp.MustCompile(`\bmongodb\b`)
 	content = mongodbRegex.ReplaceAllString(content, "MongoDB")
+
+	base64Regex := regexp.MustCompile(`Base64`)
+	content = base64Regex.ReplaceAllString(content, "base64")
 
 	return content
 }
