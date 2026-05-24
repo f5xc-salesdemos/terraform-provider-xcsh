@@ -210,8 +210,8 @@ create<br>See [Metadata](#rule-list-rules-metadata) below.
 
 <a id="rule-list-rules-source-ip-prefix-set"></a>&#x2022; [`source_ip_prefix_set`](#rule-list-rules-source-ip-prefix-set) - Optional Block<br>List of references to ip_prefix_set objects<br>See [Source IP Prefix Set](#rule-list-rules-source-ip-prefix-set) below.
 
-<a id="rule-list-rules-source-label-selector"></a>&#x2022; [`source_label_selector`](#rule-list-rules-source-label-selector) - Optional Block<br>Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector
-matches all objects<br>See [Source Label Selector](#rule-list-rules-source-label-selector) below.
+<a id="rule-list-rules-source-label-selector"></a>&#x2022; [`source_label_selector`](#rule-list-rules-source-label-selector) - Optional Block<br>Type can be used to establish a 'selector reference' from one object(called selector) to a set of other objects(called selectees) based on the value of expressions. A label selector is a label query over a set of resources. An empty label selector matches
+all objects<br>See [Source Label Selector](#rule-list-rules-source-label-selector) below.
 
 <a id="rule-list-rules-source-prefix-list"></a>&#x2022; [`source_prefix_list`](#rule-list-rules-source-prefix-list) - Optional Block<br>List of IPv4 prefixes that represent an endpoint<br>See [Source Prefix List](#rule-list-rules-source-prefix-list) below.
 
