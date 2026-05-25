@@ -1,13 +1,8 @@
 {
   "customSets": [
     {
-      "label": "Getting Started",
-      "description": "Authentication, provider setup, and first HTTP load balancer deployment",
-      "paths": ["guides/authentication*", "guides/http-loadbalancer*", "index*"]
-    },
-    {
       "label": "Guides",
-      "description": "Step-by-step tutorials for F5 Distributed Cloud scenarios",
+      "description": "Step-by-step guides for provider setup, load balancers, security, and migrations",
       "paths": ["guides/**"]
     },
     {
@@ -16,47 +11,150 @@
       "paths": ["functions/**"]
     },
     {
-      "label": "Load Balancers",
-      "description": "HTTP, TCP, UDP, and CDN load balancer resources with routing, TLS, and security",
+      "label": "Load Balancing",
+      "description": "HTTP, TCP, UDP, and CDN load balancers with routing, origins, and health checks",
       "paths": [
-        "resources/http_loadbalancer*",
-        "resources/tcp_loadbalancer*",
-        "resources/udp_loadbalancer*",
-        "resources/cdn_loadbalancer*"
+        "resources/advertise_policy",
+        "resources/cdn_cache_rule",
+        "resources/cdn_loadbalancer",
+        "resources/cdn_purge_command",
+        "resources/cluster",
+        "resources/endpoint",
+        "resources/healthcheck",
+        "resources/http_loadbalancer",
+        "resources/origin_pool",
+        "resources/route",
+        "resources/tcp_loadbalancer",
+        "resources/udp_loadbalancer",
+        "resources/virtual_host"
       ]
     },
     {
       "label": "Security",
-      "description": "WAF, bot defense, rate limiting, service policies, and user identification",
+      "description": "WAF, bot defense, firewall policies, rate limiting, service policies, and API security",
       "paths": [
-        "resources/app_firewall*",
-        "resources/service_policy*",
-        "resources/rate_limiter*",
-        "resources/waf_exclusion*",
-        "resources/malicious_user*",
-        "resources/user_identification*",
-        "resources/sensitive_data*"
+        "resources/alert_policy",
+        "resources/api_crawler",
+        "resources/api_definition",
+        "resources/api_discovery",
+        "resources/api_testing",
+        "resources/app_api_group",
+        "resources/app_firewall",
+        "resources/bgp_routing_policy",
+        "resources/bot_defense_app_infrastructure",
+        "resources/data_type",
+        "resources/enhanced_firewall_policy",
+        "resources/fast_acl",
+        "resources/fast_acl_rule",
+        "resources/forward_proxy_policy",
+        "resources/malicious_user_mitigation",
+        "resources/nat_policy",
+        "resources/network_firewall",
+        "resources/network_policy",
+        "resources/network_policy_rule",
+        "resources/network_policy_view",
+        "resources/protocol_inspection",
+        "resources/protocol_policer",
+        "resources/rate_limiter",
+        "resources/rate_limiter_policy",
+        "resources/sensitive_data_policy",
+        "resources/service_policy",
+        "resources/service_policy_rule",
+        "resources/usb_policy",
+        "resources/user_identification",
+        "resources/waf_exclusion_policy"
       ]
     },
     {
-      "label": "Infrastructure",
-      "description": "Origin pools, healthchecks, certificates, TLS, sites, and networking",
+      "label": "Networking",
+      "description": "BGP, VPNs, tunnels, connectors, segments, and virtual networks",
       "paths": [
-        "resources/origin_pool*",
-        "resources/healthcheck*",
-        "resources/certificate*",
-        "resources/trusted_ca*",
-        "resources/crl*",
-        "resources/site*",
-        "resources/namespace*",
-        "resources/virtual_site*",
-        "resources/virtual_network*"
+        "resources/bgp",
+        "resources/bgp_asn_set",
+        "resources/cloud_connect",
+        "resources/cloud_link",
+        "resources/dc_cluster_group",
+        "resources/external_connector",
+        "resources/forwarding_class",
+        "resources/ip_prefix_set",
+        "resources/network_connector",
+        "resources/network_interface",
+        "resources/nfv_service",
+        "resources/nginx_service_discovery",
+        "resources/policy_based_routing",
+        "resources/proxy",
+        "resources/segment",
+        "resources/subnet",
+        "resources/tunnel",
+        "resources/virtual_network"
       ]
     },
     {
-      "label": "All Resources",
-      "description": "Complete Terraform resource reference for F5 Distributed Cloud",
-      "paths": ["resources/**"]
+      "label": "Sites & Cloud",
+      "description": "Cloud sites (AWS, Azure, GCP), site mesh groups, virtual sites, and cloud resources",
+      "paths": [
+        "resources/address_allocator",
+        "resources/aws_tgw_site",
+        "resources/aws_vpc_site",
+        "resources/azure_vnet_site",
+        "resources/cloud_elastic_ip",
+        "resources/fleet",
+        "resources/gcp_vpc_site",
+        "resources/securemesh_site",
+        "resources/site",
+        "resources/site_mesh_group",
+        "resources/virtual_site",
+        "resources/voltstack_site"
+      ]
+    },
+    {
+      "label": "Certificates & DNS",
+      "description": "TLS certificates, CA lists, CRLs, DNS domains, and compliance checks",
+      "paths": [
+        "resources/certificate",
+        "resources/certificate_chain",
+        "resources/crl",
+        "resources/dns_compliance_checks",
+        "resources/dns_domain",
+        "resources/dns_proxy",
+        "resources/trusted_ca_list"
+      ]
+    },
+    {
+      "label": "Applications & Integrations",
+      "description": "App settings, BIG-IP integration, Kubernetes workloads, service mesh, and code integrations",
+      "paths": [
+        "resources/app_setting",
+        "resources/app_type",
+        "resources/bigip_http_proxy",
+        "resources/code_base_integration",
+        "resources/container_registry",
+        "resources/data_group",
+        "resources/discovery",
+        "resources/filter_set",
+        "resources/irule",
+        "resources/policer",
+        "resources/workload",
+        "resources/workload_flavor"
+      ]
+    },
+    {
+      "label": "Monitoring & Operations",
+      "description": "Alerts, APM, log receivers, namespaces, authentication, subscriptions, and tenant configuration",
+      "paths": [
+        "resources/alert_receiver",
+        "resources/apm",
+        "resources/application_profiles",
+        "resources/authentication",
+        "resources/authorization_server",
+        "resources/cloud_credentials",
+        "resources/cminstance",
+        "resources/global_log_receiver",
+        "resources/log_receiver",
+        "resources/namespace",
+        "resources/secret_management_access",
+        "resources/tenant_configuration"
+      ]
     },
     {
       "label": "Data Sources",
