@@ -8,6 +8,8 @@
 name: Sync OpenAPI Specs
 
 on:
+  repository_dispatch:
+    types: [enriched-specs-updated]
   schedule:
     # 7am Atlantic Time (11:00 UTC during AST, 10:00 UTC during ADT)
     - cron: '0 11 * * *'
