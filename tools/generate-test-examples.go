@@ -208,6 +208,8 @@ func extractHCL(funcBody string) string {
 func cleanConfig(config string) string {
 	config = strings.TrimSpace(config)
 
+	config = regexp.MustCompile(`%\[\d+\]s(\s*)\}`).ReplaceAllString(config, "    example-key = \"example-value\"\n$1}")
+
 	config = regexp.MustCompile(`%\[1\]q`).ReplaceAllString(config, `"example"`)
 	config = regexp.MustCompile(`%\[1\]s`).ReplaceAllString(config, "example")
 	config = regexp.MustCompile(`%\[2\]q`).ReplaceAllString(config, `"example-value"`)
