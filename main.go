@@ -1,14 +1,14 @@
 // Copyright (c) 2026 Robin Mordasiewicz. MIT License.
 
 // terraform-provider-f5xc provides Terraform resources for managing F5 Distributed Cloud services.
-// For documentation, see https://registry.terraform.io/providers/robinmordasiewicz/f5xc/latest/docs
+// For documentation, see https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs
 //
 // Documentation features OneOf property grouping for mutually exclusive arguments,
 // improving clarity by grouping related properties with a single explanatory note.
 //
 // Version tagging and releases are automated via CI/CD using semantic versioning.
 // Release workflow uses forked action with updated dependencies for improved cache performance.
-// MCP server documentation is available at https://github.com/robinmordasiewicz/terraform-provider-f5xc/tree/main/mcp-server
+// MCP server documentation is available at https://github.com/f5xc-salesdemos/terraform-provider-f5xc/tree/main/mcp-server
 
 package main
 
@@ -48,7 +48,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "registry.terraform.io/robinmordasiewicz/f5xc",
+		Address: "registry.terraform.io/f5xc-salesdemos/f5xc",
 		Debug:   debug,
 	}
 

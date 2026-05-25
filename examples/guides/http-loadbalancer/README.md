@@ -32,6 +32,7 @@ cp terraform.tfvars.example terraform.tfvars
 ```
 
 Edit `terraform.tfvars` with your values:
+
 - `domain` - Your application's domain name
 - `origin_server` - Your backend server's DNS name or IP
 - Optionally customize security features
@@ -109,10 +110,10 @@ terraform destroy
 ## Full Documentation
 
 For detailed documentation including architecture diagrams and troubleshooting, see:
-[HTTP Load Balancer Guide](https://registry.terraform.io/providers/robinmordasiewicz/f5xc/latest/docs/guides/http-loadbalancer)
+[HTTP Load Balancer Guide](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/guides/http-loadbalancer)
 
 ## Support
 
-- [F5XC Provider Documentation](https://registry.terraform.io/providers/robinmordasiewicz/f5xc/latest/docs)
+- [F5XC Provider Documentation](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs)
 - [F5 Distributed Cloud Documentation](https://docs.cloud.f5.com/)
-- [GitHub Issues](https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc/issues)
+- [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc/issues)

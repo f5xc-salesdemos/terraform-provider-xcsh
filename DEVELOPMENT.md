@@ -28,7 +28,7 @@ cp terraform-provider-f5xc ~/.terraform.d/plugins/registry.terraform.io/f5xc-sal
 ## Environment Variables
 
 - `F5XC_API_TOKEN` - API token for F5 Distributed Cloud (one of token or P12 required)
-- `F5XC_API_URL` - Optional API URL (defaults to `https://console.ves.volterra.io`)
+- `F5XC_API_URL` - API URL for your F5 Distributed Cloud tenant (required, no default)
 - `F5XC_P12_FILE` - Path to P12 certificate file (alternative to token auth)
 - `F5XC_P12_PASSWORD` - Password for P12 file (required with F5XC_P12_FILE)
 - `TF_ACC=1` - Enable acceptance tests
@@ -191,6 +191,7 @@ Starting with v3.0.0, the provider uses v2 API specs from the enriched API repos
 ## Release Process
 
 Releases are automated via GoReleaser on tag push (`v*`):
+
 1. Builds cross-platform binaries
 2. Signs checksums with GPG
 3. Publishes to GitHub Releases with Terraform Registry manifest

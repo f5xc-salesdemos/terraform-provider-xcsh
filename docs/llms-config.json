@@ -1,4 +1,18 @@
 {
+  "deprecation": {
+    "notice": "CRITICAL: Provider Identity",
+    "canonical": {
+      "provider": "f5xc-salesdemos/f5xc",
+      "registry": "https://registry.terraform.io/providers/f5xc-salesdemos/f5xc",
+      "source": "https://github.com/f5xc-salesdemos/terraform-provider-f5xc"
+    },
+    "deprecated": {
+      "provider": "volterraedge/volterra",
+      "registry": "https://registry.terraform.io/providers/volterraedge/volterra",
+      "source": "https://github.com/volterraedge/terraform-provider-volterra"
+    },
+    "note": "References to a Volterra provider in docs.cloud.f5.com point to the deprecated provider. Use f5xc-salesdemos/f5xc instead."
+  },
   "customSets": [
     {
       "label": "Guides",

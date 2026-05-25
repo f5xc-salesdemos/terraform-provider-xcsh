@@ -13,24 +13,28 @@ This example demonstrates how to use F5XC Blindfold functions to securely encryp
 ### Setup
 
 1. **Clone the repository:**
+
    ```bash
-   git clone https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc.git
+   git clone https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc.git
    cd terraform-provider-f5xc/examples/guides/blindfold
    ```
 
 2. **Configure authentication:**
+
    ```bash
    export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
    export F5XC_API_TOKEN="your-api-token"
    ```
 
 3. **Copy and edit the configuration:**
+
    ```bash
    cp terraform.tfvars.example terraform.tfvars
    # Edit terraform.tfvars with your values
    ```
 
 4. **Deploy:**
+
    ```bash
    terraform init
    terraform plan

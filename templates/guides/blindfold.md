@@ -86,7 +86,7 @@ export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/robinmordasiewicz/terraform-provider-f5xc.git
+git clone https://github.com/f5xc-salesdemos/terraform-provider-f5xc.git
 cd terraform-provider-f5xc/examples/guides/blindfold
 ```
 
@@ -395,7 +395,7 @@ Field descriptions:
 - `key_version`: Public key version used for encryption
 - `policy_id`: Reference to the SecretPolicy (namespace/name format)
 - `tenant`: Your F5XC tenant identifier
-- `data`: Base64-encoded RSA-OAEP ciphertext
+- `data`: base64-encoded RSA-OAEP ciphertext
 
 ### Function Behavior
 
@@ -469,7 +469,7 @@ export F5XC_API_TOKEN="your-api-token"
 
 2. Verify the file exists and is readable
 
-### Invalid Base64
+### Invalid base64
 
 **Symptom:** Error about invalid base64 encoding.
 
@@ -516,4 +516,4 @@ Now that you understand blindfold encryption, explore related resources:
 - **Provider Documentation:** [F5XC Provider](../index.md)
 - **F5 Documentation:** [F5 Distributed Cloud Docs](https://docs.cloud.f5.com/)
 - **Secret Management:** [F5XC Secret Management](https://docs.cloud.f5.com/docs/how-to/secrets-management)
-- **Issues:** [GitHub Issues](https://github.com/robinmordasiewicz/terraform-provider-f5xc/issues)
+- **Issues:** [GitHub Issues](https://github.com/f5xc-salesdemos/terraform-provider-f5xc/issues)

@@ -106,5 +106,5 @@ This confirms authentication is working correctly.
 
 ## Documentation
 
-- [Full Authentication Guide](https://registry.terraform.io/providers/robinmordasiewicz/f5xc/latest/docs/guides/authentication)
+- [Full Authentication Guide](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/guides/authentication)
 - [F5 Credentials Documentation](https://docs.cloud.f5.com/docs-v2/administration/how-tos/user-mgmt/Credentials)
