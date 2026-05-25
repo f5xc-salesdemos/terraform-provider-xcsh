@@ -3374,12 +3374,12 @@ var HTTPLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFinancialServi
 
 // HTTPLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel represents flight block
 type HTTPLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel struct {
-	Checkinggggg *HTTPLoadBalancerEmptyModel `tfsdk:"checkinggggg"`
+	Checking *HTTPLoadBalancerEmptyModel `tfsdk:"checking"`
 }
 
 // HTTPLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModelAttrTypes defines the attribute types for HTTPLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel
 var HTTPLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModelAttrTypes = map[string]attr.Type{
-	"checkinggggg": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"checking": types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // HTTPLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelProfileManagementModel represents profile_management block
@@ -13263,7 +13263,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																		MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																		Optional:            true,
 																		Validators: []validator.String{
-																			stringvalidator.LengthAtMost(1024),
+																			stringvalidator.LengthBetween(4, 131072),
 																		},
 																	},
 																	"store_provider": schema.StringAttribute{
@@ -13319,7 +13319,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																		MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																		Optional:            true,
 																		Validators: []validator.String{
-																			stringvalidator.LengthAtMost(1024),
+																			stringvalidator.LengthBetween(4, 131072),
 																		},
 																	},
 																	"store_provider": schema.StringAttribute{
@@ -13367,7 +13367,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																		MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																		Optional:            true,
 																		Validators: []validator.String{
-																			stringvalidator.LengthAtMost(1024),
+																			stringvalidator.LengthBetween(4, 131072),
 																		},
 																	},
 																	"store_provider": schema.StringAttribute{
@@ -13434,7 +13434,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																		MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																		Optional:            true,
 																		Validators: []validator.String{
-																			stringvalidator.LengthAtMost(1024),
+																			stringvalidator.LengthBetween(4, 131072),
 																		},
 																	},
 																	"store_provider": schema.StringAttribute{
@@ -14196,7 +14196,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 													MarkdownDescription: "Bot Defense Flow Label Flight Category. Bot Defense Flow Label Flight Category.",
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
-														"checkinggggg": schema.SingleNestedBlock{
+														"checking": schema.SingleNestedBlock{
 															MarkdownDescription: "Enable this option",
 														},
 													},
@@ -15753,7 +15753,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 								MarkdownDescription: "Configuration parameter for no request limit per connection.",
 							},
 							"outlier_detection": schema.SingleNestedBlock{
-								MarkdownDescription: "Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkingggggg. Algorithm 1.",
+								MarkdownDescription: "Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkingg. Algorithm 1.",
 								Attributes: map[string]schema.Attribute{
 									"base_ejection_time": schema.Int64Attribute{
 										MarkdownDescription: "The base time that a host is ejected for. The real time is equal to the base time multiplied by the number of times the host has been ejected. This causes hosts to GET ejected for longer periods if they continue to fail.",
@@ -16696,7 +16696,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																	MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																	Optional:            true,
 																	Validators: []validator.String{
-																		stringvalidator.LengthAtMost(1024),
+																		stringvalidator.LengthBetween(4, 131072),
 																	},
 																},
 																"store_provider": schema.StringAttribute{
@@ -17103,7 +17103,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																			MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																			Optional:            true,
 																			Validators: []validator.String{
-																				stringvalidator.LengthAtMost(1024),
+																				stringvalidator.LengthBetween(4, 131072),
 																			},
 																		},
 																		"store_provider": schema.StringAttribute{
@@ -17840,7 +17840,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
 															Validators: []validator.String{
-																stringvalidator.LengthAtMost(1024),
+																stringvalidator.LengthBetween(4, 131072),
 															},
 														},
 														"store_provider": schema.StringAttribute{
@@ -18737,7 +18737,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 													MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 													Optional:            true,
 													Validators: []validator.String{
-														stringvalidator.LengthAtMost(1024),
+														stringvalidator.LengthBetween(4, 131072),
 													},
 												},
 												"store_provider": schema.StringAttribute{
@@ -18806,7 +18806,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 													MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 													Optional:            true,
 													Validators: []validator.String{
-														stringvalidator.LengthAtMost(1024),
+														stringvalidator.LengthBetween(4, 131072),
 													},
 												},
 												"store_provider": schema.StringAttribute{
@@ -18945,7 +18945,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 													MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 													Optional:            true,
 													Validators: []validator.String{
-														stringvalidator.LengthAtMost(1024),
+														stringvalidator.LengthBetween(4, 131072),
 													},
 												},
 												"store_provider": schema.StringAttribute{
@@ -19014,7 +19014,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 													MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 													Optional:            true,
 													Validators: []validator.String{
-														stringvalidator.LengthAtMost(1024),
+														stringvalidator.LengthBetween(4, 131072),
 													},
 												},
 												"store_provider": schema.StringAttribute{
@@ -21001,7 +21001,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																		MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																		Optional:            true,
 																		Validators: []validator.String{
-																			stringvalidator.LengthAtMost(1024),
+																			stringvalidator.LengthBetween(4, 131072),
 																		},
 																	},
 																	"store_provider": schema.StringAttribute{
@@ -21070,7 +21070,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																		MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																		Optional:            true,
 																		Validators: []validator.String{
-																			stringvalidator.LengthAtMost(1024),
+																			stringvalidator.LengthBetween(4, 131072),
 																		},
 																	},
 																	"store_provider": schema.StringAttribute{
@@ -21209,7 +21209,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																		MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																		Optional:            true,
 																		Validators: []validator.String{
-																			stringvalidator.LengthAtMost(1024),
+																			stringvalidator.LengthBetween(4, 131072),
 																		},
 																	},
 																	"store_provider": schema.StringAttribute{
@@ -21278,7 +21278,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																		MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																		Optional:            true,
 																		Validators: []validator.String{
-																			stringvalidator.LengthAtMost(1024),
+																			stringvalidator.LengthBetween(4, 131072),
 																		},
 																	},
 																	"store_provider": schema.StringAttribute{
@@ -21839,7 +21839,7 @@ func (r *HTTPLoadBalancerResource) Schema(ctx context.Context, req resource.Sche
 																					MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																					Optional:            true,
 																					Validators: []validator.String{
-																						stringvalidator.LengthAtMost(1024),
+																						stringvalidator.LengthBetween(4, 131072),
 																					},
 																				},
 																				"store_provider": schema.StringAttribute{

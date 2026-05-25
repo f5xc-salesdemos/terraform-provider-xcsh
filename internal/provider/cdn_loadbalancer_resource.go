@@ -2141,12 +2141,12 @@ var CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFinancialServic
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel represents flight block
 type CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel struct {
-	Checkinggggg *CDNLoadBalancerEmptyModel `tfsdk:"checkinggggg"`
+	Checking *CDNLoadBalancerEmptyModel `tfsdk:"checking"`
 }
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModelAttrTypes defines the attribute types for CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel
 var CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModelAttrTypes = map[string]attr.Type{
-	"checkinggggg": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"checking": types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelProfileManagementModel represents profile_management block
@@ -8086,7 +8086,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Bot Defense Flow Label Flight Category. Bot Defense Flow Label Flight Category.",
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
-														"checkinggggg": schema.SingleNestedBlock{
+														"checking": schema.SingleNestedBlock{
 															MarkdownDescription: "Enable this option",
 														},
 													},
@@ -9116,7 +9116,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																			MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																			Optional:            true,
 																			Validators: []validator.String{
-																				stringvalidator.LengthAtMost(1024),
+																				stringvalidator.LengthBetween(4, 131072),
 																			},
 																		},
 																		"store_provider": schema.StringAttribute{
@@ -9741,7 +9741,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																	MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																	Optional:            true,
 																	Validators: []validator.String{
-																		stringvalidator.LengthAtMost(1024),
+																		stringvalidator.LengthBetween(4, 131072),
 																	},
 																},
 																"store_provider": schema.StringAttribute{
@@ -10369,7 +10369,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 																	MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 																	Optional:            true,
 																	Validators: []validator.String{
-																		stringvalidator.LengthAtMost(1024),
+																		stringvalidator.LengthBetween(4, 131072),
 																	},
 																},
 																"store_provider": schema.StringAttribute{
@@ -10562,7 +10562,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
 															Validators: []validator.String{
-																stringvalidator.LengthAtMost(1024),
+																stringvalidator.LengthBetween(4, 131072),
 															},
 														},
 														"store_provider": schema.StringAttribute{
@@ -10631,7 +10631,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
 															Validators: []validator.String{
-																stringvalidator.LengthAtMost(1024),
+																stringvalidator.LengthBetween(4, 131072),
 															},
 														},
 														"store_provider": schema.StringAttribute{

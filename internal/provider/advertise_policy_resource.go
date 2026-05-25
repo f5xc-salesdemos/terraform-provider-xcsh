@@ -583,7 +583,7 @@ func (r *AdvertisePolicyResource) Schema(ctx context.Context, req resource.Schem
 															MarkdownDescription: "Location is the uri_ref. It could be in URL format for string:/// Or it could be a path if the store provider is an HTTP/HTTPS location .",
 															Optional:            true,
 															Validators: []validator.String{
-																stringvalidator.LengthAtMost(1024),
+																stringvalidator.LengthBetween(4, 131072),
 															},
 														},
 														"store_provider": schema.StringAttribute{
