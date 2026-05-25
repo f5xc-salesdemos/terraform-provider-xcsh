@@ -1,26 +1,77 @@
 {
   "customSets": [
     {
+      "label": "Getting Started",
+      "description": "Authentication, provider setup, and first HTTP load balancer deployment",
+      "paths": ["guides/authentication*", "guides/http-loadbalancer*", "index*"]
+    },
+    {
       "label": "Guides",
-      "description": "Terraform provider setup and usage guides",
+      "description": "Step-by-step tutorials for F5 Distributed Cloud scenarios",
       "paths": ["guides/**"]
     },
     {
       "label": "Functions",
-      "description": "Provider-defined functions for secret management",
+      "description": "Provider-defined functions for blindfold secret encryption",
       "paths": ["functions/**"]
     },
     {
-      "label": "Resources",
-      "description": "Terraform resource reference for creating and managing F5 XC objects",
+      "label": "Load Balancers",
+      "description": "HTTP, TCP, UDP, and CDN load balancer resources with routing, TLS, and security",
+      "paths": [
+        "resources/http_loadbalancer*",
+        "resources/tcp_loadbalancer*",
+        "resources/udp_loadbalancer*",
+        "resources/cdn_loadbalancer*"
+      ]
+    },
+    {
+      "label": "Security",
+      "description": "WAF, bot defense, rate limiting, service policies, and user identification",
+      "paths": [
+        "resources/app_firewall*",
+        "resources/service_policy*",
+        "resources/rate_limiter*",
+        "resources/waf_exclusion*",
+        "resources/malicious_user*",
+        "resources/user_identification*",
+        "resources/sensitive_data*"
+      ]
+    },
+    {
+      "label": "Infrastructure",
+      "description": "Origin pools, healthchecks, certificates, TLS, sites, and networking",
+      "paths": [
+        "resources/origin_pool*",
+        "resources/healthcheck*",
+        "resources/certificate*",
+        "resources/trusted_ca*",
+        "resources/crl*",
+        "resources/site*",
+        "resources/namespace*",
+        "resources/virtual_site*",
+        "resources/virtual_network*"
+      ]
+    },
+    {
+      "label": "All Resources",
+      "description": "Complete Terraform resource reference for F5 Distributed Cloud",
       "paths": ["resources/**"]
     },
     {
       "label": "Data Sources",
-      "description": "Terraform data source reference for reading existing F5 XC objects",
+      "description": "Read-only data sources for querying existing F5 XC objects",
       "paths": ["data-sources/**"]
     }
   ],
-  "promote": ["index*", "guides/**", "functions/**"],
+  "promote": [
+    "index*",
+    "guides/**",
+    "functions/**",
+    "resources/http_loadbalancer*",
+    "resources/origin_pool*",
+    "resources/healthcheck*",
+    "resources/app_firewall*"
+  ],
   "demote": ["data-sources/**"]
 }

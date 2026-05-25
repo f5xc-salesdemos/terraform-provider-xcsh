@@ -351,6 +351,7 @@ jobs:
         run: |
           go run tools/generate-examples.go
           go run tools/generate-datasource-examples.go
+          go run tools/generate-test-examples.go
           scripts/go-retry.sh 3 tfplugindocs generate
           go run tools/transform-docs.go
 
