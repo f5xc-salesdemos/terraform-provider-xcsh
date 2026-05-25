@@ -2,6 +2,14 @@
 # This configuration is extracted from acceptance tests
 # and verified against the live F5 XC API.
 
+terraform {
+  required_providers {
+    time = {
+      source = "hashicorp/time"
+    }
+  }
+}
+
 resource "f5xc_namespace" "test" {
   name = "example"
 }

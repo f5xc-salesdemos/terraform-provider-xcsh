@@ -69,6 +69,14 @@ resource "f5xc_malicious_user_mitigation" "example" {
 ### All Attributes
 
 ```hcl
+terraform {
+  required_providers {
+    time = {
+      source = "hashicorp/time"
+    }
+  }
+}
+
 resource "f5xc_namespace" "test" {
   name = "example"
 }
@@ -159,6 +167,14 @@ resource "f5xc_malicious_user_mitigation" "test" {
 ### With Annotations
 
 ```hcl
+terraform {
+  required_providers {
+    time = {
+      source = "hashicorp/time"
+    }
+  }
+}
+
 resource "f5xc_namespace" "test" {
   name = "example"
 }
@@ -182,6 +198,14 @@ resource "f5xc_malicious_user_mitigation" "test" {
 ### With Description
 
 ```hcl
+terraform {
+  required_providers {
+    time = {
+      source = "hashicorp/time"
+    }
+  }
+}
+
 resource "f5xc_namespace" "test" {
   name = "example"
 }
@@ -202,6 +226,14 @@ resource "f5xc_malicious_user_mitigation" "test" {
 ### With Labels
 
 ```hcl
+terraform {
+  required_providers {
+    time = {
+      source = "hashicorp/time"
+    }
+  }
+}
+
 resource "f5xc_namespace" "test" {
   name = "example"
 }
@@ -225,6 +257,14 @@ resource "f5xc_malicious_user_mitigation" "test" {
 ### With Mitigation Type
 
 ```hcl
+terraform {
+  required_providers {
+    time = {
+      source = "hashicorp/time"
+    }
+  }
+}
+
 resource "f5xc_namespace" "test" {
   name = "example"
 }
