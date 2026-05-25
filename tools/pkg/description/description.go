@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/naming"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/resource"
 )
 
 // Clean removes example annotations, validation rules, internal vendor extensions,
@@ -198,40 +197,6 @@ func FormatEnum(desc string, enumValues []interface{}) string {
 		return fmt.Sprintf("%s %s", aiPrefix, humanSuffix)
 	}
 	return fmt.Sprintf("%s %s %s", aiPrefix, desc, humanSuffix)
-}
-
-// GetResourceAIMetadata generates AI-parseable metadata prefix for a resource.
-// Format: [Category: X] [Namespace: required|optional] [DependsOn: res1, res2]
-func GetResourceAIMetadata(resourceName string) string {
-	var parts []string
-
-	// Add category if known
-	if category, ok := resource.AICategories[resourceName]; ok {
-		parts = append(parts, fmt.Sprintf("[Category: %s]", category))
-	}
-
-	// Add namespace requirement
-	// Most F5 XC resources require a namespace except for system-level resources
-	systemResources := map[string]bool{
-		"namespace": true, "tenant": true, "role": true, "allowed_tenant": true,
-		"dns_zone": true, "dns_domain": true, "virtual_site": true,
-		"cloud_credentials": true, "certificate": true, "trusted_ca_list": true,
-	}
-	if systemResources[resourceName] {
-		parts = append(parts, "[Namespace: not_required]")
-	} else {
-		parts = append(parts, "[Namespace: required]")
-	}
-
-	// Add dependencies if known
-	if deps, ok := resource.Dependencies[resourceName]; ok && len(deps) > 0 {
-		parts = append(parts, fmt.Sprintf("[DependsOn: %s]", strings.Join(deps, ", ")))
-	}
-
-	if len(parts) == 0 {
-		return ""
-	}
-	return strings.Join(parts, " ")
 }
 
 // TransformResourceDescription converts technical API descriptions into user-friendly

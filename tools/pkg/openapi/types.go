@@ -86,7 +86,8 @@ type Schema struct {
 	XF5XCRecommendedValue     interface{} `json:"x-f5xc-recommended-value"`
 	XF5XCMinimumConfiguration interface{} `json:"x-f5xc-minimum-configuration"`
 
-	// ---- SP-1 additions: schema-level extensions ----
+	// Deserialized from enriched specs for lossless round-tripping.
+	// No generation code consumes these yet.
 	XF5XCValidation      map[string]interface{} `json:"x-f5xc-validation"`
 	XF5XCDefaults        map[string]interface{} `json:"x-f5xc-defaults"`
 	XF5XCConditions      map[string]interface{} `json:"x-f5xc-conditions"`

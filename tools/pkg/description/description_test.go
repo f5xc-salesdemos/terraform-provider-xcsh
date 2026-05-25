@@ -510,19 +510,6 @@ func TestExtractCapability(t *testing.T) {
 	}
 }
 
-func TestGetResourceAIMetadata(t *testing.T) {
-	// Basic smoke test — depends on resource.AICategories and resource.Dependencies
-	result := GetResourceAIMetadata("namespace")
-	if !strings.Contains(result, "[Namespace: not_required]") {
-		t.Errorf("GetResourceAIMetadata('namespace') = %q, want to contain '[Namespace: not_required]'", result)
-	}
-
-	result2 := GetResourceAIMetadata("http_loadbalancer")
-	if !strings.Contains(result2, "[Namespace: required]") {
-		t.Errorf("GetResourceAIMetadata('http_loadbalancer') = %q, want to contain '[Namespace: required]'", result2)
-	}
-}
-
 func TestTransformResourceDescription(t *testing.T) {
 	tests := []struct {
 		name     string
