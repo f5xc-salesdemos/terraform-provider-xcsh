@@ -47,7 +47,7 @@ terraform {
   required_version = ">= 1.0"
   required_providers {
     f5xc = {
-      source  = "robinmordasiewicz/f5xc"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 2.5"
     }
   }
@@ -565,5 +565,5 @@ rate_limit {
 
 ## Support
 
-- **Provider Issues:** [GitHub Issues](https://GitHub.com/robinmordasiewicz/terraform-provider-f5xc/issues)
+- **Provider Issues:** [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc/issues)
 - **F5 Support:** [F5 Distributed Cloud Support](https://docs.cloud.f5.com/docs/support)

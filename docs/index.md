@@ -83,7 +83,7 @@ variable "f5xc_api_token" {
 
 ### Optional
 
-* `api_url` - F5 Distributed Cloud API URL (`String`). Base URL **without** `/api` suffix. Defaults to `https://console.ves.volterra.io`. Can also be set via `F5XC_API_URL` environment variable.
+* `api_url` - F5 Distributed Cloud API URL (`String`). Base URL **without** `/api` suffix. Required. No default. Set to your tenant URL (e.g., `https://your-tenant.console.ves.volterra.io`). Can also be set via `F5XC_API_URL` environment variable.
 
 * `p12_password` - Password for PKCS#12 certificate bundle (`String`, Sensitive). Required when using `api_p12_file`. Can also be set via `F5XC_P12_PASSWORD` environment variable.
 
