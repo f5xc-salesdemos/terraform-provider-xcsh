@@ -42,20 +42,7 @@ resource "f5xc_virtual_network" "example" {
     "owner" = "platform-team"
   }
 
-  // One of the arguments from this list "global_network legacy_type site_local_inside_network site_local_network srv6_network" must be set
-
-  site_local_network {}
-
-  // Static routes configuration (optional)
-  static_routes {
-    ip_prefixes = ["10.0.0.0/8"]
-
-    // One of the arguments from this list "default_gateway ip_address node_interface" must be set
-
-    default_gateway {}
-
-    attrs = ["ROUTE_ATTR_INSTALL_FORWARDING"]
-  }
+  legacy_type = "VIRTUAL_NETWORK_SITE_LOCAL"
 }
 ```
 
