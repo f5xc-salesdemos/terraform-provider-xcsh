@@ -25,8 +25,8 @@ validate_tf() {
   cp "${tf_file}" "${tmpdir}/main.tf"
   (
     cd "${tmpdir}"
-    terraform init -backend=false -no-color >/dev/null 2>&1 && \
-    terraform validate -no-color 2>&1
+    terraform init -backend=false -no-color >/dev/null 2>&1 &&
+      terraform validate -no-color 2>&1
   )
   local rc=$?
   rm -rf "${tmpdir}"
@@ -98,7 +98,7 @@ echo "========================================================================"
 # ── Generate coverage report ──────────────────────────────────────────────────
 TOTAL=$((PASS + FAIL + SKIP))
 COVERAGE_REPORT="${RESULTS_DIR}/coverage-report.json"
-cat > "${COVERAGE_REPORT}" <<EOF
+cat >"${COVERAGE_REPORT}" <<EOF
 {
   "total": ${TOTAL},
   "pass": ${PASS},
