@@ -26,27 +26,12 @@ resource "f5xc_voltstack_site" "example" {
     "owner" = "platform-team"
   }
 
-  # Voltstack Site configuration
-  # Kubernetes configuration
+  volterra_certified_hw = "kvm-voltstack-combo"
+  worker_nodes          = []
+  address               = "123 Main St, Example City, EX 12345"
+
   k8s_cluster {
     name      = "example-k8s-cluster"
     namespace = "staging"
   }
-
-  # Master nodes configuration
-  master_nodes = ["master1.example.com"]
-
-  # Default fleet configuration
-  default_fleet_config {
-    no_bond_devices {}
-    no_dc_cluster_group {}
-    default_storage_config {}
-    no_gpu {}
-  }
-
-  # Disable HA by default
-  disable_ha {}
-
-  # No worker nodes
-  no_worker_nodes {}
 }
