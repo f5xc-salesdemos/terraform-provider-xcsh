@@ -26,23 +26,12 @@ resource "f5xc_udp_loadbalancer" "example" {
     "owner" = "platform-team"
   }
 
-  # UDP Load Balancer configuration
-  listen_port = 53
+  domains                          = ["dns.example.com"]
+  listen_port                      = 53
+  idle_timeout                     = 30000
+  enable_per_packet_load_balancing = true
 
-  # Advertise on public internet
-  advertise_on_internet {
-    default_vip {}
-  }
-
-  # Origin pools
-  origin_pools_weights {
-    pool {
-      name      = "dns-pool"
-      namespace = "staging"
-    }
-    weight = 1
-  }
-
-  # DNS for UDP load balancer
   dns_volterra_managed = true
+
+  advertise_on_public_default_vip {}
 }

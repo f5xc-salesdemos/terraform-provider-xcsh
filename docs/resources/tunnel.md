@@ -42,23 +42,7 @@ resource "f5xc_tunnel" "example" {
     "owner" = "platform-team"
   }
 
-  # Tunnel configuration
-  remote_ip_address = "203.0.113.1"
-  local_ip_address  = "203.0.113.2"
-
-  # IPsec tunnel
-  ipsec {
-    psk = "pre-shared-key-here"
-    ike_params {
-      ike_version = "IKE_V2"
-    }
-  }
-
-  # Site reference
-  site {
-    name      = "example-site"
-    namespace = "staging"
-  }
+  tunnel_type = "IPSEC_PSK"
 }
 ```
 

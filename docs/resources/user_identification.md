@@ -42,10 +42,8 @@ resource "f5xc_user_identification" "example" {
     "owner" = "platform-team"
   }
 
-  # User Identification configuration
   rules {
-    identifier_type = "CLIENT_IP"
-    any_client {}
+    client_ip {}
   }
 }
 ```
