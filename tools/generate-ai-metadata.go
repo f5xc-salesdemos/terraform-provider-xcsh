@@ -269,11 +269,14 @@ func extractOneOfGroups(name, content string) []OneOfGroup {
 		// Build the option list with type resolution.
 		var opts []OneOfOption
 		for _, opt := range options {
-			kind := "block"
+			kind := "unknown"
 			if terraformSchema != nil {
 				resourceFull := "f5xc_" + name
 				if rs, ok := terraformSchema.Resources[resourceFull]; ok {
-					if rs.FieldKind(opt) == pkgschema.FieldKindAttribute {
+					switch rs.FieldKind(opt) {
+					case pkgschema.FieldKindBlock:
+						kind = "block"
+					case pkgschema.FieldKindAttribute:
 						kind = "attribute"
 					}
 				}

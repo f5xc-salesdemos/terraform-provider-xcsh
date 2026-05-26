@@ -125,6 +125,33 @@ jobs:
       - name: Transform documentation
         run: go run tools/transform-docs.go
 
+      - name: Build provider and export Terraform schema
+        run: |
+          echo "::group::Building provider and exporting schema"
+          go build -o terraform-provider-f5xc .
+          mkdir -p /tmp/tf-schema
+          cp terraform-provider-f5xc /tmp/tf-schema/
+          cat > /tmp/tf-schema/main.tf << 'EOF'
+          terraform {
+            required_providers {
+              f5xc = {
+                source  = "f5xc-salesdemos/f5xc"
+                version = ">= 0.1.0"
+              }
+            }
+          }
+          EOF
+          cd /tmp/tf-schema
+          TF_PLUGIN_CACHE_DIR="$(pwd)" terraform init -backend=false -no-color >/dev/null 2>&1 || true
+          terraform providers schema -json 2>/dev/null > /tmp/tf-schema.json || true
+          if [ -s /tmp/tf-schema.json ]; then
+            cp /tmp/tf-schema.json "${GITHUB_WORKSPACE}/tools/terraform-schema.json"
+            echo "Terraform schema exported: $(wc -c < tools/terraform-schema.json) bytes"
+          else
+            echo "Warning: Could not export Terraform schema — AI metadata will use default type inference"
+          fi
+          echo "::endgroup::"
+
       - name: Generate AI metadata
         run: |
           echo "::group::Generating AI metadata JSON files"
