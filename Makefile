@@ -21,7 +21,7 @@ GO=go
 GOFMT=gofmt
 GOLINT=golangci-lint
 
-.PHONY: all build test lint fmt clean clean-generated regenerate generate docs install help download-specs sweep sweep-dry-run testacc testacc-mock testacc-real testacc-staging testacc-all test-report test-comprehensive test-comprehensive-mock test-comprehensive-real test-pr-subset
+.PHONY: all build test lint fmt clean clean-generated regenerate generate docs validate-examples ai-metadata install help download-specs sweep sweep-dry-run testacc testacc-mock testacc-real testacc-staging testacc-all test-report test-comprehensive test-comprehensive-mock test-comprehensive-real test-pr-subset uat
 
 # Default target
 all: generate build lint test docs
@@ -145,6 +145,34 @@ docs:
 	fi
 	@echo "Transforming documentation to Volterra-style format..."
 	$(GO) run $(TOOLS_DIR)/transform-docs.go
+
+# Validate all generated Terraform examples
+validate-examples:
+	@echo "Validating generated Terraform examples..."
+	@fail=0; \
+	for dir in examples/resources/f5xc_*; do \
+		if [ ! -f "$$dir/resource.tf" ]; then continue; fi; \
+		tmpdir=$$(mktemp -d); \
+		cp "$$dir/resource.tf" "$$tmpdir/main.tf"; \
+		cd "$$tmpdir" && terraform init -backend=false -no-color >/dev/null 2>&1 && \
+		if ! terraform validate -no-color 2>&1; then \
+			echo "FAIL: $$dir/resource.tf"; \
+			fail=1; \
+		fi; \
+		cd - >/dev/null; \
+		rm -rf "$$tmpdir"; \
+	done; \
+	if [ $$fail -eq 1 ]; then \
+		echo "Example validation failed"; \
+		exit 1; \
+	fi; \
+	echo "All examples valid"
+
+# Generate AI metadata JSON files for each resource
+ai-metadata:
+	@echo "Generating AI metadata files..."
+	$(GO) run $(TOOLS_DIR)/generate-ai-metadata.go
+	@echo "AI metadata generation complete"
 
 # Clean build artifacts
 clean:
@@ -374,3 +402,8 @@ test-pr-subset:
 clean-test-reports:
 	@echo "Cleaning test reports..."
 	rm -rf test-reports/
+
+# Run UAT test harness for AI-generated Terraform plans
+uat:
+	@echo "Running UAT test harness..."
+	tools/uat/run-uat.sh

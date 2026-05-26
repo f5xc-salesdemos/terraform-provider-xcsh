@@ -18,6 +18,8 @@ This guide walks you through deploying a complete HTTP Load Balancer on F5 Distr
 - **Health Monitoring** - Active health checks on origin servers
 - **Threat Mesh** - Global threat intelligence sharing
 
+For a minimal copy-paste example, see the [Httpbin Minimal Guide](httpbin-minimal.md).
+
 ## Prerequisites
 
 Before you begin, ensure you have:

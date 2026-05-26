@@ -1,0 +1,11 @@
+Give me a complete Terraform configuration that deploys:
+- An HTTP load balancer in a namespace called "demo"
+- An app firewall in blocking mode
+- An origin pool that uses httpbin.org as the backend with TLS
+- A health check on the /get path
+
+Use the f5xc-salesdemos/f5xc provider. The load balancer should use
+HTTPS with auto-cert and advertise on the public default VIP.
+The domain should be "httpbin.example.com".
+
+Output only the Terraform HCL code, no explanations.

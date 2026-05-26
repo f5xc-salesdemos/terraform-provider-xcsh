@@ -1241,6 +1241,8 @@ func transformAnchorsOnly(filePath string, content string) error {
 	// Wrap long lines to pass MD013 (max 400 chars)
 	result = wrapLongLines(result, 400)
 
+	result = injectSyntaxRulesCallout(result)
+
 	return os.WriteFile(filePath, []byte(result), 0644)
 }
 
@@ -1445,6 +1447,34 @@ func headerTextToAnchor(headerText string) string {
 }
 
 // NOTE: convertNestedBlocksHeadings function removed - single-page mode handles H3→bold inline
+
+// injectSyntaxRulesCallout adds a syntax rules note after the Argument Reference
+// heading to help AI assistants distinguish block {} syntax from = value syntax.
+// It is idempotent: if the callout is already present the content is returned unchanged.
+func injectSyntaxRulesCallout(content string) string {
+	const calloutSignature = "-> **Syntax Rule:**"
+	if strings.Contains(content, calloutSignature) {
+		return content
+	}
+
+	callout := "\n-> **Syntax Rule:** This provider uses OneOf groups for mutually " +
+		"exclusive options. Fields documented as \"Optional Block\" use empty block " +
+		"syntax `field_name {}`, **never** `field_name = true`. Boolean attributes " +
+		"(like `add_hsts`, `http_redirect`) use `= true/false` as normal.\n"
+
+	for _, marker := range []string{"## Argument Reference", "## Schema"} {
+		idx := strings.Index(content, marker)
+		if idx >= 0 {
+			insertPos := idx + len(marker)
+			nlIdx := strings.Index(content[insertPos:], "\n")
+			if nlIdx >= 0 {
+				insertPos += nlIdx
+			}
+			return content[:insertPos] + callout + content[insertPos:]
+		}
+	}
+	return content
+}
 
 func transformDoc(filePath string) error {
 	content, err := os.ReadFile(filePath)
@@ -2230,6 +2260,8 @@ func transformDoc(filePath string) error {
 
 	// Wrap long lines to pass MD013 (max 400 chars)
 	result = wrapLongLines(result, 400)
+
+	result = injectSyntaxRulesCallout(result)
 
 	return os.WriteFile(filePath, []byte(result), 0644)
 }

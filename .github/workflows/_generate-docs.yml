@@ -75,6 +75,27 @@ jobs:
           go run tools/generate-examples.go
           echo "::endgroup::"
 
+      - name: Validate generated examples
+        run: |
+          echo "::group::Validating example Terraform files"
+          fail=0
+          for dir in examples/resources/f5xc_*; do
+            if [ ! -f "$dir/resource.tf" ]; then continue; fi
+            tmpdir=$(mktemp -d)
+            cp "$dir/resource.tf" "$tmpdir/main.tf"
+            cd "$tmpdir"
+            terraform init -backend=false -no-color >/dev/null 2>&1
+            if ! terraform validate -no-color 2>&1; then
+              echo "::error::Validation failed: $dir/resource.tf"
+              fail=1
+            fi
+            cd - >/dev/null
+            rm -rf "$tmpdir"
+          done
+          echo "::endgroup::"
+          if [ $fail -eq 1 ]; then exit 1; fi
+          echo "All generated examples validated successfully"
+
       - name: Generate documentation
         run: |
           # Retry logic with exponential backoff for transient network errors
@@ -103,6 +124,25 @@ jobs:
 
       - name: Transform documentation
         run: go run tools/transform-docs.go
+
+      - name: Generate AI metadata
+        run: |
+          echo "::group::Generating AI metadata JSON files"
+          go run tools/generate-ai-metadata.go
+          echo "::endgroup::"
+
+      - name: Validate AI metadata
+        run: |
+          echo "::group::Validating AI metadata JSON files"
+          fail=0
+          for f in docs/resources/*.ai.json; do
+            if ! python3 -c "import json; json.load(open('$f'))"; then
+              echo "::error::Invalid JSON: $f"
+              fail=1
+            fi
+          done
+          echo "::endgroup::"
+          if [ $fail -eq 1 ]; then exit 1; fi
 
       - name: Check for changes
         id: check
