@@ -41,6 +41,10 @@ resource "f5xc_workload_flavor" "example" {
   annotations = {
     "owner" = "platform-team"
   }
+
+  vcpus             = 1
+  memory            = "1024"
+  ephemeral_storage = "1024"
 }
 ```
 

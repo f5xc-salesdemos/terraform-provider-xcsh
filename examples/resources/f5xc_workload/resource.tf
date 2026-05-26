@@ -26,22 +26,19 @@ resource "f5xc_workload" "example" {
     "owner" = "platform-team"
   }
 
-  # Workload configuration
-  # Container configuration
-  containers {
-    name = "web"
-    image {
-      name        = "nginx"
-      public      = {}
-      pull_policy = "IMAGE_PULL_POLICY_ALWAYS"
-    }
-  }
+  // One of the arguments from this list "job service stateful_service" must be set
 
-  # Deploy on regional edge
-  deploy_on_re {
-    virtual_site {
-      name      = "example-virtual-site"
-      namespace = "staging"
+  service {
+    containers {
+      name = "web"
+      image {
+        name        = "nginx"
+        pull_policy = "IMAGE_PULL_POLICY_ALWAYS"
+        public {}
+      }
+    }
+    deploy_options {
+      default_virtual_sites {}
     }
   }
 }
