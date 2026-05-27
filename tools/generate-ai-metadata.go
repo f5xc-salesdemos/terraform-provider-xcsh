@@ -120,12 +120,64 @@ func processFile(mdPath string) error {
 		return fmt.Errorf("marshal %s: %w", name, err)
 	}
 
+	// Collapse short string arrays onto one line to satisfy biome formatting.
+	formatted := collapseShortArrays(out, 120)
+
 	outPath := filepath.Join("docs/resources", name+".ai.json")
-	if err := os.WriteFile(outPath, append(out, '\n'), 0644); err != nil {
+	if err := os.WriteFile(outPath, append(formatted, '\n'), 0644); err != nil {
 		return fmt.Errorf("write %s: %w", outPath, err)
 	}
 	fmt.Printf("Generated: %s\n", outPath)
 	return nil
+}
+
+// collapseShortArrays rewrites multi-line JSON arrays of strings onto a single
+// line when the collapsed form fits within maxWidth. This produces biome-
+// compatible output without changing semantics.
+func collapseShortArrays(src []byte, maxWidth int) []byte {
+	lines := strings.Split(string(src), "\n")
+	var result []string
+	i := 0
+	for i < len(lines) {
+		line := lines[i]
+		trimmed := strings.TrimSpace(line)
+
+		if strings.HasSuffix(trimmed, "[") && !strings.Contains(trimmed, "]") {
+			var elements []string
+			allStrings := true
+			j := i + 1
+			for j < len(lines) {
+				elemTrimmed := strings.TrimSpace(lines[j])
+				if elemTrimmed == "]" || elemTrimmed == "]," {
+					break
+				}
+				clean := strings.TrimSuffix(elemTrimmed, ",")
+				if !strings.HasPrefix(clean, "\"") || !strings.HasSuffix(clean, "\"") {
+					allStrings = false
+					break
+				}
+				elements = append(elements, clean)
+				j++
+			}
+			if allStrings && j < len(lines) {
+				closer := strings.TrimSpace(lines[j])
+				trailingComma := strings.HasSuffix(closer, ",")
+				prefix := strings.TrimSuffix(line, "[")
+				collapsed := prefix + "[" + strings.Join(elements, ", ") + "]"
+				if trailingComma {
+					collapsed += ","
+				}
+				if len(collapsed) <= maxWidth {
+					result = append(result, collapsed)
+					i = j + 1
+					continue
+				}
+			}
+		}
+		result = append(result, line)
+		i++
+	}
+	return []byte(strings.Join(result, "\n"))
 }
 
 // buildMetadata constructs the AIMetadata for one resource.
