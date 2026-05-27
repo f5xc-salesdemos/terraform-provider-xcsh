@@ -779,6 +779,17 @@ func groupByCategory(resources []ResourceInfo) []CategoryInfo {
 	return categories
 }
 
+func truncateAtWord(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	cut := strings.LastIndex(s[:maxLen-3], " ")
+	if cut <= 0 {
+		cut = maxLen - 3
+	}
+	return s[:cut] + "..."
+}
+
 func categorySlug(name string) string {
 	slug := strings.ToLower(name)
 	slug = strings.ReplaceAll(slug, " ", "-")
@@ -878,10 +889,7 @@ func generateL1(cat CategoryInfo) error {
 	// Resources
 	sb.WriteString("## Resources\n\n")
 	for _, res := range cat.Resources {
-		desc := res.Description
-		if len(desc) > 80 {
-			desc = desc[:77] + "..."
-		}
+		desc := truncateAtWord(res.Description, 80)
 		sb.WriteString(fmt.Sprintf("- [%s](_llms-txt/resources/%s.txt) : %s\n",
 			res.Name, res.Name, desc))
 	}
