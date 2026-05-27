@@ -806,7 +806,7 @@ func generateL0(config *LLMsConfig, categories []CategoryInfo) error {
 
 	// Header
 	sb.WriteString("# F5 Distributed Cloud Terraform Provider\n\n")
-	sb.WriteString(fmt.Sprintf("> Provider: %s | Registry: %s\n\n",
+	sb.WriteString(fmt.Sprintf("> Provider: %s | Registry: <%s>\n\n",
 		config.Deprecation.Canonical.Provider,
 		config.Deprecation.Canonical.Registry))
 	sb.WriteString(fmt.Sprintf("DEPRECATED — do not use: %s\n\n",
@@ -885,14 +885,12 @@ func generateL1(cat CategoryInfo) error {
 		sb.WriteString(fmt.Sprintf("- [%s](_llms-txt/resources/%s.txt) : %s\n",
 			res.Name, res.Name, desc))
 	}
-	sb.WriteString("\n")
 
-	// Dependency chain (simplified)
+	// Dependency chain (only if there are known dependencies)
 	if len(cat.Resources) > 0 {
-		sb.WriteString("## Dependency Chain\n\n")
-		// Build a simple chain for key resources
 		deps := buildCategoryDependencyChain(cat.Resources)
 		if deps != "" {
+			sb.WriteString("\n## Dependency Chain\n\n")
 			sb.WriteString(deps + "\n")
 		}
 	}
@@ -990,8 +988,12 @@ func generateL2(res ResourceInfo, reverseDeps map[string][]string) error {
 	// Minimal Valid Config
 	if res.MinimalConfig != "" {
 		sb.WriteString("## Minimal Valid Config\n\n")
+		sb.WriteString("```terraform\n")
 		sb.WriteString(res.MinimalConfig)
-		sb.WriteString("\n\n")
+		if !strings.HasSuffix(res.MinimalConfig, "\n") {
+			sb.WriteString("\n")
+		}
+		sb.WriteString("```\n\n")
 	}
 
 	// Dependencies
