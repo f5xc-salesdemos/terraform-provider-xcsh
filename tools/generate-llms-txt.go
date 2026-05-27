@@ -239,7 +239,7 @@ func parseResource(path, name string, config *LLMsConfig) (ResourceInfo, error) 
 	// Extract minimal config
 	res.MinimalConfig = extractMinimalConfig(content, name)
 
-	// Get dependencies from ai_metadata.go
+	// Get dependencies from resource package
 	if deps, ok := resource.Dependencies[name]; ok {
 		res.Dependencies = deps
 	}

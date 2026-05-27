@@ -354,7 +354,6 @@ jobs:
           go run tools/generate-test-examples.go
           scripts/go-retry.sh 3 tfplugindocs generate
           go run tools/transform-docs.go
-          go run tools/generate-ai-metadata.go
           go run tools/generate-llms-txt.go
 
       - name: Clean build artifacts

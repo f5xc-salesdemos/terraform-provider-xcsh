@@ -193,8 +193,7 @@ Browse the documentation sidebar for the complete list of resources and data sou
 
 For AI assistants and tools, this provider publishes machine-readable documentation:
 
-- **[llms.txt](llms.txt)** — Entry point with provider identity, syntax rules, and category index
-- **Per-resource files** — Self-contained text files at `_llms-txt/resources/<name>.txt` with required fields, OneOf groups, minimal valid configs, and dependency chains
-- **AI JSON metadata** — Machine-readable schemas at `resources/<name>.ai.json`
+* **[llms.txt](llms.txt)** — Entry point with provider identity, syntax rules, and category index
+* **Per-resource files** — Self-contained text files at `_llms-txt/resources/<name>.txt` with required fields, OneOf groups, minimal valid configs, and dependency chains
 
 <!-- Template version: 1.2.0 - Add AI-consumable documentation section -->

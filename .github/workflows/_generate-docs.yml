@@ -164,25 +164,6 @@ jobs:
           fi
           echo "::endgroup::"
 
-      - name: Generate AI metadata
-        run: |
-          echo "::group::Generating AI metadata JSON files"
-          go run tools/generate-ai-metadata.go
-          echo "::endgroup::"
-
-      - name: Validate AI metadata
-        run: |
-          echo "::group::Validating AI metadata JSON files"
-          fail=0
-          for f in docs/resources/*.ai.json; do
-            if ! python3 -c "import json; json.load(open('$f'))"; then
-              echo "::error::Invalid JSON: $f"
-              fail=1
-            fi
-          done
-          echo "::endgroup::"
-          if [ $fail -eq 1 ]; then exit 1; fi
-
       - name: Generate llms.txt hierarchy
         run: |
           echo "::group::Generating llms.txt hierarchy (L0 + L1 + L2)"
