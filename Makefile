@@ -21,7 +21,7 @@ GO=go
 GOFMT=gofmt
 GOLINT=golangci-lint
 
-.PHONY: all build test lint fmt clean clean-generated regenerate generate docs validate-examples ai-metadata install help download-specs sweep sweep-dry-run testacc testacc-mock testacc-real testacc-staging testacc-all test-report test-comprehensive test-comprehensive-mock test-comprehensive-real test-pr-subset uat
+.PHONY: all build test lint fmt clean clean-generated regenerate generate docs validate-examples ai-metadata llms-txt install help download-specs sweep sweep-dry-run testacc testacc-mock testacc-real testacc-staging testacc-all test-report test-comprehensive test-comprehensive-mock test-comprehensive-real test-pr-subset uat
 
 # Default target
 all: generate build lint test docs
@@ -184,6 +184,12 @@ ai-metadata:
 	@echo "Generating AI metadata files..."
 	$(GO) run $(TOOLS_DIR)/generate-ai-metadata.go
 	@echo "AI metadata generation complete"
+
+# Generate llms.txt hierarchy (L0 + L1 category + L2 per-resource)
+llms-txt:
+	@echo "Generating llms.txt hierarchy..."
+	$(GO) run $(TOOLS_DIR)/generate-llms-txt.go
+	@echo "llms.txt hierarchy generation complete"
 
 # Clean build artifacts
 clean:

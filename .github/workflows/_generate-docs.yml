@@ -183,6 +183,12 @@ jobs:
           echo "::endgroup::"
           if [ $fail -eq 1 ]; then exit 1; fi
 
+      - name: Generate llms.txt hierarchy
+        run: |
+          echo "::group::Generating llms.txt hierarchy (L0 + L1 + L2)"
+          go run tools/generate-llms-txt.go
+          echo "::endgroup::"
+
       - name: Check for changes
         id: check
         run: |
