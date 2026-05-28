@@ -197,8 +197,7 @@ resource "f5xc_http_loadbalancer" "example" {
 
   // One of the arguments from this list "disable_malware_protection malware_protection_settings" must be set
 
-  disable_malware_protection {
-  # ... (truncated)
+}
 ```
 
 ## Dependencies

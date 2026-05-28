@@ -143,8 +143,7 @@ resource "f5xc_origin_pool" "example" {
   }
 
   // Load balancing configuration
-  endpoint_sel
-  # ... (truncated)
+}
 ```
 
 ## Dependencies

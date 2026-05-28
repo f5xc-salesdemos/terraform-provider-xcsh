@@ -78,6 +78,51 @@ type CategoryInfo struct {
 	Resources   []ResourceInfo
 }
 
+// JSONIndex is the top-level structure for terraform-llms-index.json.
+type JSONIndex struct {
+	Version    string                  `json:"version"`
+	Provider   JSONProvider            `json:"provider"`
+	Categories []JSONCategory          `json:"categories"`
+	Resources  map[string]JSONResource `json:"resources"`
+}
+
+type JSONProvider struct {
+	Source        string   `json:"source"`
+	Registry      string   `json:"registry"`
+	RequiredBlock string   `json:"required_block"`
+	SyntaxRules   []string `json:"syntax_rules"`
+}
+
+type JSONCategory struct {
+	Name            string   `json:"name"`
+	Slug            string   `json:"slug"`
+	Description     string   `json:"description"`
+	ResourceCount   int      `json:"resource_count"`
+	Resources       []string `json:"resources"`
+	DependencyChain string   `json:"dependency_chain,omitempty"`
+}
+
+type JSONOneOfGroup struct {
+	Parent string   `json:"parent,omitempty"`
+	Fields []string `json:"fields"`
+}
+
+type JSONDependencies struct {
+	Requires []string `json:"requires"`
+	UsedBy   []string `json:"used_by,omitempty"`
+}
+
+type JSONResource struct {
+	Category       string           `json:"category"`
+	Description    string           `json:"description"`
+	Required       []string         `json:"required"`
+	OneOfGroups    []JSONOneOfGroup `json:"oneof_groups,omitempty"`
+	ServerDefaults []string         `json:"server_defaults,omitempty"`
+	MinimalConfig  string           `json:"minimal_config,omitempty"`
+	Dependencies   JSONDependencies `json:"dependencies"`
+	ImportSyntax   string           `json:"import_syntax"`
+}
+
 // categoryDescriptions provides hardcoded descriptions for each category.
 var categoryDescriptions = map[string]string{
 	"API Security":              "API definition, discovery, testing, and security controls for web APIs",
@@ -161,9 +206,16 @@ func main() {
 	}
 	fmt.Println("Generated L0 entry point: docs/llms.txt")
 
+	// Generate JSON index for machine consumption
+	if err := generateJSONIndex(config, categories, reverseDeps); err != nil {
+		fmt.Fprintf(os.Stderr, "Error generating JSON index: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Println("Generated JSON index: docs/terraform-llms-index.json")
+
 	// Summary
-	totalFiles := 1 + len(categories) + len(resources)
-	fmt.Printf("\nTotal: %d files generated (1 L0 + %d L1 + %d L2)\n",
+	totalFiles := 2 + len(categories) + len(resources)
+	fmt.Printf("\nTotal: %d files generated (1 L0 + %d L1 + %d L2 + 1 JSON)\n",
 		totalFiles, len(categories), len(resources))
 }
 
@@ -731,9 +783,18 @@ func extractMinimalConfig(content, name string) string {
 
 	result := strings.Join(cleanLines, "\n")
 
-	// Limit size
+	// Limit size — truncate at line boundary and close unclosed braces
 	if len(result) > 2000 {
-		result = result[:2000] + "\n  # ... (truncated)"
+		cut := strings.LastIndex(result[:2000], "\n")
+		if cut <= 0 {
+			cut = 2000
+		}
+		result = result[:cut]
+		opens := strings.Count(result, "{")
+		closes := strings.Count(result, "}")
+		for i := 0; i < opens-closes; i++ {
+			result += "\n}"
+		}
 	}
 
 	return result
@@ -1024,4 +1085,76 @@ func generateL2(res ResourceInfo, reverseDeps map[string][]string) error {
 	}
 
 	return os.WriteFile(path, []byte(content), 0644)
+}
+
+func generateJSONIndex(config *LLMsConfig, categories []CategoryInfo, reverseDeps map[string][]string) error {
+	idx := JSONIndex{
+		Version: "0.1.0",
+		Provider: JSONProvider{
+			Source:   config.Deprecation.Canonical.Provider,
+			Registry: config.Deprecation.Canonical.Registry,
+			RequiredBlock: `terraform {
+  required_providers {
+    f5xc = {
+      source = "f5xc-salesdemos/f5xc"
+    }
+  }
+}`,
+			SyntaxRules: []string{
+				"OneOf selectors: use empty block `field {}`, never `field = true`",
+				"Cross-resource refs: block with name + namespace attributes",
+				"Boolean attributes: use `= true` / `= false`",
+				`Fields marked "Server applies default when omitted" can be safely omitted`,
+			},
+		},
+		Resources: make(map[string]JSONResource),
+	}
+
+	for _, cat := range categories {
+		jcat := JSONCategory{
+			Name:          cat.Name,
+			Slug:          cat.Slug,
+			Description:   cat.Description,
+			ResourceCount: len(cat.Resources),
+		}
+		for _, res := range cat.Resources {
+			jcat.Resources = append(jcat.Resources, res.Name)
+		}
+		jcat.DependencyChain = buildCategoryDependencyChain(cat.Resources)
+		idx.Categories = append(idx.Categories, jcat)
+
+		for _, res := range cat.Resources {
+			var oneOfGroups []JSONOneOfGroup
+			for _, g := range res.OneOfGroups {
+				oneOfGroups = append(oneOfGroups, JSONOneOfGroup{
+					Parent: g.Parent,
+					Fields: g.Options,
+				})
+			}
+			deps := JSONDependencies{Requires: res.Dependencies}
+			if deps.Requires == nil {
+				deps.Requires = []string{}
+			}
+			if usedBy, ok := reverseDeps[res.Name]; ok {
+				deps.UsedBy = usedBy
+			}
+			idx.Resources[res.Name] = JSONResource{
+				Category:       cat.Slug,
+				Description:    res.Description,
+				Required:       res.RequiredFields,
+				OneOfGroups:    oneOfGroups,
+				ServerDefaults: res.ServerDefaults,
+				MinimalConfig:  res.MinimalConfig,
+				Dependencies:   deps,
+				ImportSyntax:   fmt.Sprintf("terraform import f5xc_%s.example namespace/name", res.Name),
+			}
+		}
+	}
+
+	data, err := json.MarshalIndent(idx, "", "  ")
+	if err != nil {
+		return fmt.Errorf("marshal JSON index: %w", err)
+	}
+	data = append(data, '\n')
+	return os.WriteFile("docs/terraform-llms-index.json", data, 0644)
 }
