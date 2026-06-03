@@ -141,13 +141,6 @@
       "resources": ["app_setting", "app_type", "discovery", "filter_set"]
     },
     {
-      "name": "BIG-IP Integration",
-      "slug": "big-ip-integration",
-      "description": "BIG-IP proxy, data groups, and iRules integration",
-      "resource_count": 3,
-      "resources": ["bigip_http_proxy", "data_group", "irule"]
-    },
-    {
       "name": "Authentication",
       "slug": "authentication",
       "description": "Authentication methods, cloud credentials, and secret management",
@@ -162,6 +155,13 @@
       "resources": ["container_registry", "workload", "workload_flavor"]
     },
     {
+      "name": "BIG-IP Integration",
+      "slug": "big-ip-integration",
+      "description": "BIG-IP proxy, data groups, and iRules integration",
+      "resource_count": 3,
+      "resources": ["bigip_http_proxy", "data_group", "irule"]
+    },
+    {
       "name": "DNS",
       "slug": "dns",
       "description": "DNS domains, zones, compliance checks, and DNS proxy configuration",
@@ -169,11 +169,11 @@
       "resources": ["dns_compliance_checks", "dns_domain", "dns_proxy"]
     },
     {
-      "name": "Cloud Resources",
-      "slug": "cloud-resources",
-      "description": "Cloud elastic IPs, address allocators, and geo-location resources",
+      "name": "Uncategorized",
+      "slug": "uncategorized",
+      "description": "Resources pending categorization",
       "resource_count": 2,
-      "resources": ["address_allocator", "cloud_elastic_ip"]
+      "resources": ["application_profiles", "authorization_server"]
     },
     {
       "name": "Organization",
@@ -183,11 +183,11 @@
       "resources": ["namespace", "tenant_configuration"]
     },
     {
-      "name": "Uncategorized",
-      "slug": "uncategorized",
-      "description": "Resources pending categorization",
+      "name": "Cloud Resources",
+      "slug": "cloud-resources",
+      "description": "Cloud elastic IPs, address allocators, and geo-location resources",
       "resource_count": 2,
-      "resources": ["application_profiles", "authorization_server"]
+      "resources": ["address_allocator", "cloud_elastic_ip"]
     },
     {
       "name": "Integrations",
@@ -1291,14 +1291,14 @@
       "required": ["name", "namespace"],
       "oneof_groups": [
         {
-          "fields": ["allow_list", "deny_list", "rule_list"]
+          "fields": ["allow_all_requests", "allow_list", "deny_all_requests", "deny_list", "rule_list"]
         },
         {
           "fields": ["any_server", "server_name", "server_name_matcher", "server_selector"]
         }
       ],
       "server_defaults": ["port_matcher", "any_server"],
-      "minimal_config": "resource \"f5xc_service_policy\" \"example\" {\n  name      = \"example-service-policy\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  // One of the arguments from this list \"allow_list deny_list rule_list\" must be set\n\n  rule_list {\n    rules {\n      metadata {\n        name = \"allow-api\"\n      }\n      spec {\n        action = \"ALLOW\"\n        any_client {}\n        any_ip {}\n        path {\n          prefix_values = [\"/api/\"]\n        }\n      }\n    }\n  }\n\n  // One of the arguments from this list \"any_server server_name server_name_matcher server_selector\" must be set\n\n  any_server {}\n}",
+      "minimal_config": "resource \"f5xc_service_policy\" \"example\" {\n  name      = \"example-service-policy\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  // One of the arguments from this list \"allow_all_requests allow_list deny_all_requests deny_list rule_list\" must be set\n\n  rule_list {\n    rules {\n      metadata {\n        name = \"allow-api\"\n      }\n      spec {\n        action = \"ALLOW\"\n        any_client {}\n        any_ip {}\n        path {\n          prefix_values = [\"/api/\"]\n        }\n      }\n    }\n  }\n\n  // One of the arguments from this list \"any_server server_name server_name_matcher server_selector\" must be set\n\n  any_server {}\n}",
       "dependencies": {
         "requires": ["namespace"]
       },
