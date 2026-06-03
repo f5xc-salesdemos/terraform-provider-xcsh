@@ -27,7 +27,7 @@ resource "f5xc_service_policy" "example" {
   }
 
   # Service Policy configuration
-  // One of the arguments from this list "allow_list deny_list rule_list" must be set
+  // One of the arguments from this list "allow_all_requests allow_list deny_all_requests deny_list rule_list" must be set
 
   rule_list {
     rules {
