@@ -1,0 +1,38 @@
+# f5xc_k8s_pod_security_policy
+
+Category: Security
+K8s_pod_security_policy will create the object in the storage backend for namespace metadata.namespace
+
+## Required
+
+- name
+- namespace
+
+## Minimal Valid Config
+
+```terraform
+resource "f5xc_k8s_pod_security_policy" "example" {
+  name      = "example-k8s-pod-security-policy"
+  namespace = "staging"
+
+  labels = {
+    environment = "production"
+    managed_by  = "terraform"
+  }
+
+  annotations = {
+    "owner" = "platform-team"
+  }
+
+  psp_spec {
+  }
+  allowed_capabilities {
+  }
+  allowed_host_paths {
+  }
+}
+```
+
+## Dependencies
+
+Requires: none

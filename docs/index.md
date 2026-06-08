@@ -1,0 +1,199 @@
+---
+page_title: "F5XC Provider"
+description: |-
+  Terraform provider for F5 Distributed Cloud (F5XC) enabling infrastructure as code for load balancers, security policies, sites, and networking. Community-maintained provider built from public F5 API documentation.
+---
+
+# F5XC Provider
+
+The F5XC Terraform provider enables infrastructure as code management for F5 Distributed Cloud (F5XC) resources. Configure HTTP/TCP load balancers, origin pools, application firewalls, service policies, cloud sites, and more through declarative Terraform configurations.
+
+This is a community-maintained provider built from public F5 API documentation.
+
+## Requirements
+
+| Name      | Version |
+|-----------|---------|
+| terraform | >= 1.8  |
+
+-> **Note:** This provider uses provider-defined functions which require Terraform 1.8 or later. For details, see the [Functions](/docs/functions) documentation.
+
+## Authenticating to F5 Distributed Cloud
+
+The F5XC Terraform provider supports multiple authentication methods:
+
+1. **API Token** - Simplest method using a personal API token
+2. **P12 Certificate** - Certificate-based authentication using PKCS#12 bundle
+3. **PEM Certificate** - Certificate-based authentication using separate cert/key files
+
+Learn more about [how to generate API credentials](https://docs.cloud.f5.com/docs/how-to/user-mgmt/credentials).
+
+## Example Usage
+
+```terraform
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/f5xc"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+# Configure the F5XC Provider with API Token Authentication
+provider "f5xc" {
+  api_url   = "https://your-tenant.console.ves.volterra.io"
+  api_token = var.f5xc_api_token
+}
+
+# Alternatively, use environment variables:
+# export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
+# export F5XC_API_TOKEN="your-api-token"
+
+variable "f5xc_api_token" {
+  description = "F5 Distributed Cloud API Token"
+  type        = string
+  sensitive   = true
+}
+
+# Or use P12 Certificate Authentication:
+# provider "f5xc" {
+#   api_url      = "https://your-tenant.console.ves.volterra.io"
+#   api_p12_file = "/path/to/certificate.p12"
+#   p12_password = var.f5xc_p12_password
+# }
+#
+# Environment variables for P12 authentication:
+# export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
+# export F5XC_P12_FILE="/path/to/certificate.p12"
+# export F5XC_P12_PASSWORD="your-p12-password"  # gitleaks:allow
+```
+
+## Argument Reference
+
+### Required (one of the following authentication methods)
+
+* `api_token` - F5 Distributed Cloud API Token (`String`, Sensitive). Can also be set via `F5XC_API_TOKEN` environment variable.
+
+* `api_p12_file` - Path to PKCS#12 certificate bundle file (`String`). Can also be set via `F5XC_P12_FILE` environment variable. Requires `p12_password`.
+
+* `api_cert` and `api_key` - Paths to PEM-encoded certificate and private key files (`String`). Can also be set via `F5XC_CERT` and `F5XC_KEY` environment variables.
+
+### Optional
+
+* `api_url` - F5 Distributed Cloud API URL (`String`). Base URL **without** `/api` suffix. Required. No default. Set to your tenant URL (e.g., `https://your-tenant.console.ves.volterra.io`). Can also be set via `F5XC_API_URL` environment variable.
+
+* `p12_password` - Password for PKCS#12 certificate bundle (`String`, Sensitive). Required when using `api_p12_file`. Can also be set via `F5XC_P12_PASSWORD` environment variable.
+
+* `api_ca_cert` - Path to PEM-encoded CA certificate file (`String`). Optional, used for server certificate verification. Can also be set via `F5XC_CACERT` environment variable.
+
+## Authentication Options
+
+### Option 1: API Token Authentication
+
+The simplest authentication method using a personal API token.
+
+**Provider Configuration:**
+
+```hcl
+provider "f5xc" {
+  api_url   = "https://your-tenant.console.ves.volterra.io"
+  api_token = var.f5xc_api_token
+}
+```
+
+**Environment Variables:**
+
+```bash
+export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
+export F5XC_API_TOKEN="your-api-token"
+```
+
+### Option 2: P12 Certificate Authentication
+
+Certificate-based authentication using a PKCS#12 bundle downloaded from F5 Distributed Cloud.
+
+**Provider Configuration:**
+
+```hcl
+provider "f5xc" {
+  api_url      = "https://your-tenant.console.ves.volterra.io"
+  api_p12_file = "/path/to/certificate.p12"
+  p12_password = var.f5xc_p12_password
+}
+```
+
+**Environment Variables:**
+
+```bash
+export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
+export F5XC_P12_FILE="/path/to/certificate.p12"
+export F5XC_P12_PASSWORD="your-p12-password"
+```
+
+### Option 3: PEM Certificate Authentication
+
+Certificate-based authentication using separate PEM-encoded certificate and key files.
+
+**Provider Configuration:**
+
+```hcl
+provider "f5xc" {
+  api_url     = "https://your-tenant.console.ves.volterra.io"
+  api_cert    = "/path/to/certificate.crt"
+  api_key     = "/path/to/private.key"
+  api_ca_cert = "/path/to/ca-certificate.crt"  # Optional
+}
+```
+
+**Environment Variables:**
+
+```bash
+export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
+export F5XC_CERT="/path/to/certificate.crt"
+export F5XC_KEY="/path/to/private.key"
+export F5XC_CACERT="/path/to/ca-certificate.crt"  # Optional
+```
+
+-> **Note:** Environment variables are the recommended approach for CI/CD pipelines and to avoid storing sensitive credentials in version control.
+
+## Getting Started
+
+1. **Generate API Credentials**: Navigate to your F5 Distributed Cloud console, go to **Administration** > **Personal Management** > **Credentials**, and create either an API Token or download a certificate bundle.
+
+2. **Configure the Provider**: Add the provider configuration to your Terraform files using one of the authentication options above.
+
+3. **Create Resources**: Start managing F5XC resources like namespaces, load balancers, and origin pools.
+
+### Example: Create a Namespace
+
+```hcl
+resource "f5xc_namespace" "example" {
+  name = "example-namespace"
+}
+```
+
+### Example: Create an HTTP Load Balancer
+
+```hcl
+resource "f5xc_http_loadbalancer" "example" {
+  name      = "example-load-balancer"
+  namespace = "example-namespace"
+  domains   = ["example.com"]
+}
+```
+
+## Resources and Data Sources
+
+Browse the documentation sidebar for the complete list of resources and data sources organized by category.
+
+## AI-Consumable Documentation
+
+For AI assistants and tools, this provider publishes machine-readable documentation:
+
+* **[llms.txt](llms.txt)** — Entry point with provider identity, syntax rules, and category index
+* **Per-resource files** — Self-contained text files at `_llms-txt/resources/<name>.txt` with required fields, OneOf groups, minimal valid configs, and dependency chains
+
+<!-- Template version: 1.2.0 - Add AI-consumable documentation section -->

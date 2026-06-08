@@ -1,0 +1,38 @@
+# f5xc_k8s_pod_security_admission
+
+Category: Kubernetes
+K8s_pod_security_admission will create the object in the storage backend
+
+## Required
+
+- name
+- namespace
+
+## Minimal Valid Config
+
+```terraform
+resource "f5xc_k8s_pod_security_admission" "example" {
+  name      = "example-k8s-pod-security-admission"
+  namespace = "staging"
+
+  labels = {
+    environment = "production"
+    managed_by  = "terraform"
+  }
+
+  annotations = {
+    "owner" = "platform-team"
+  }
+
+  pod_security_admission_specs {
+  }
+  audit {
+  }
+  baseline {
+  }
+}
+```
+
+## Dependencies
+
+Requires: none

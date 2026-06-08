@@ -1,0 +1,38 @@
+# f5xc_securemesh_site_v2
+
+Category: Sites
+Deploying secure mesh edge sites with enhanced security and networking features
+
+## Required
+
+- name
+- namespace
+
+## Minimal Valid Config
+
+```terraform
+resource "f5xc_securemesh_site_v2" "example" {
+  name      = "example-securemesh-site-v2"
+  namespace = "staging"
+
+  labels = {
+    environment = "production"
+    managed_by  = "terraform"
+  }
+
+  annotations = {
+    "owner" = "platform-team"
+  }
+
+  performance_enhancement_mode {
+  }
+  perf_mode_l3_enhanced {
+  }
+  jumbo {
+  }
+}
+```
+
+## Dependencies
+
+Requires: none

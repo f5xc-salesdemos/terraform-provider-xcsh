@@ -10,6 +10,7 @@ AWS/Azure/GCP VPC sites, SecureMesh, VoltStack, and site mesh groups
 - [fleet](_llms-txt/resources/fleet.txt) : Fleet will create a fleet object in 'system' namespace of the user
 - [gcp_vpc_site](_llms-txt/resources/gcp_vpc_site.txt) : Deploying F5 sites within Google Cloud VPC environments
 - [securemesh_site](_llms-txt/resources/securemesh_site.txt) : Deploying secure mesh edge sites with distributed security capabilities
+- [securemesh_site_v2](_llms-txt/resources/securemesh_site_v2.txt) : Deploying secure mesh edge sites with enhanced security and networking features
 - [site](_llms-txt/resources/site.txt) : Virtual site object in given namespace
 - [site_mesh_group](_llms-txt/resources/site_mesh_group.txt) : Site Mesh Group in system namespace of user
 - [virtual_site](_llms-txt/resources/virtual_site.txt) : Virtual site object in given namespace

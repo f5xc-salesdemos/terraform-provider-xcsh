@@ -1,7 +1,6 @@
 # Srv6 Network Slice Data Source Example
 # Retrieves information about an existing Srv6 Network Slice
 
-# Look up an existing Srv6 Network Slice by name
 terraform {
   required_version = ">= 1.0"
 
@@ -13,10 +12,10 @@ terraform {
   }
 }
 
-
+# Look up an existing Srv6 Network Slice by name
 data "f5xc_srv6_network_slice" "example" {
   name      = "example-srv6-network-slice"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "srv6_network_slice_id" {

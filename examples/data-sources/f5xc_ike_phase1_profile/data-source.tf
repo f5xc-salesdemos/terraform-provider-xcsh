@@ -1,7 +1,6 @@
-# Ike Phase1 Profile Data Source Example
-# Retrieves information about an existing Ike Phase1 Profile
+# IKE Phase1 Profile Data Source Example
+# Retrieves information about an existing IKE Phase1 Profile
 
-# Look up an existing Ike Phase1 Profile by name
 terraform {
   required_version = ">= 1.0"
 
@@ -13,10 +12,10 @@ terraform {
   }
 }
 
-
+# Look up an existing IKE Phase1 Profile by name
 data "f5xc_ike_phase1_profile" "example" {
   name      = "example-ike-phase1-profile"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "ike_phase1_profile_id" {

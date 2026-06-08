@@ -1,7 +1,6 @@
-# K8s Pod Security Admission Data Source Example
-# Retrieves information about an existing K8s Pod Security Admission
+# K8S Pod Security Admission Data Source Example
+# Retrieves information about an existing K8S Pod Security Admission
 
-# Look up an existing K8s Pod Security Admission by name
 terraform {
   required_version = ">= 1.0"
 
@@ -13,10 +12,10 @@ terraform {
   }
 }
 
-
+# Look up an existing K8S Pod Security Admission by name
 data "f5xc_k8s_pod_security_admission" "example" {
   name      = "example-k8s-pod-security-admission"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "k8s_pod_security_admission_id" {

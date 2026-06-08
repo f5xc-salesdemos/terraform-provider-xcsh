@@ -121,7 +121,7 @@ is required, the load balancer uses loadbalancer_algorithm to determine which ho
 
 <a id="no-request-limit-per-connection"></a>&#x2022; [`no_request_limit_per_connection`](#no-request-limit-per-connection) - Optional Block<br>Configuration parameter for no request limit per connection
 
-<a id="outlier-detection"></a>&#x2022; [`outlier_detection`](#outlier-detection) - Optional Block<br>Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkingg. Algorithm 1<br>See [Outlier
+<a id="outlier-detection"></a>&#x2022; [`outlier_detection`](#outlier-detection) - Optional Block<br>Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkinggg. Algorithm 1<br>See [Outlier
 Detection](#outlier-detection) below for details.
 
 <a id="panic-threshold"></a>&#x2022; [`panic_threshold`](#panic-threshold) - Optional Number<br>Configure a threshold (percentage of unhealthy endpoints) below which all endpoints will be considered for loadbalancing ignoring its health status

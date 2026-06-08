@@ -1,0 +1,38 @@
+# f5xc_k8s_cluster_role
+
+Category: Kubernetes
+K8s_cluster_role will create the object in the storage backend for namespace metadata.namespace
+
+## Required
+
+- name
+- namespace
+
+## Minimal Valid Config
+
+```terraform
+resource "f5xc_k8s_cluster_role" "example" {
+  name      = "example-k8s-cluster-role"
+  namespace = "staging"
+
+  labels = {
+    environment = "production"
+    managed_by  = "terraform"
+  }
+
+  annotations = {
+    "owner" = "platform-team"
+  }
+
+  k8s_cluster_role_selector {
+  }
+  policy_rule_list {
+  }
+  policy_rule {
+  }
+}
+```
+
+## Dependencies
+
+Requires: none

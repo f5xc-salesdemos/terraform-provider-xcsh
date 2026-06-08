@@ -1,7 +1,6 @@
 # Ike2 Data Source Example
 # Retrieves information about an existing Ike2
 
-# Look up an existing Ike2 by name
 terraform {
   required_version = ">= 1.0"
 
@@ -13,10 +12,10 @@ terraform {
   }
 }
 
-
+# Look up an existing Ike2 by name
 data "f5xc_ike2" "example" {
   name      = "example-ike2"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "ike2_id" {

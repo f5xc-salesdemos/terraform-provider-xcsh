@@ -1,7 +1,6 @@
-# K8s Cluster Role Data Source Example
-# Retrieves information about an existing K8s Cluster Role
+# K8S Cluster Role Data Source Example
+# Retrieves information about an existing K8S Cluster Role
 
-# Look up an existing K8s Cluster Role by name
 terraform {
   required_version = ">= 1.0"
 
@@ -13,10 +12,10 @@ terraform {
   }
 }
 
-
+# Look up an existing K8S Cluster Role by name
 data "f5xc_k8s_cluster_role" "example" {
   name      = "example-k8s-cluster-role"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "k8s_cluster_role_id" {

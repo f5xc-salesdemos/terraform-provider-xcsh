@@ -1,7 +1,6 @@
 # Securemesh Site V2 Data Source Example
 # Retrieves information about an existing Securemesh Site V2
 
-# Look up an existing Securemesh Site V2 by name
 terraform {
   required_version = ">= 1.0"
 
@@ -13,10 +12,10 @@ terraform {
   }
 }
 
-
+# Look up an existing Securemesh Site V2 by name
 data "f5xc_securemesh_site_v2" "example" {
   name      = "example-securemesh-site-v2"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "securemesh_site_v2_id" {

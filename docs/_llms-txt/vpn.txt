@@ -1,0 +1,10 @@
+# VPN
+
+VPN and IPSec configuration
+
+## Resources
+
+- [ike1](_llms-txt/resources/ike1.txt) : Ike phase1 profile specification. configuration
+- [ike2](_llms-txt/resources/ike2.txt) : Ike phase2 profile specification. configuration
+- [ike_phase1_profile](_llms-txt/resources/ike_phase1_profile.txt) : Ike phase1 profile specification. configuration
+- [ike_phase2_profile](_llms-txt/resources/ike_phase2_profile.txt) : Ike phase2 profile specification. configuration

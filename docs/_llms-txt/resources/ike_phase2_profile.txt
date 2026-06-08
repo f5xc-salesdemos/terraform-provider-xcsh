@@ -1,0 +1,38 @@
+# f5xc_ike_phase2_profile
+
+Category: VPN
+Ike phase2 profile specification. configuration
+
+## Required
+
+- name
+- namespace
+
+## Minimal Valid Config
+
+```terraform
+resource "f5xc_ike_phase2_profile" "example" {
+  name      = "example-ike-phase2-profile"
+  namespace = "staging"
+
+  labels = {
+    environment = "production"
+    managed_by  = "terraform"
+  }
+
+  annotations = {
+    "owner" = "platform-team"
+  }
+
+  dh_group_set {
+  }
+  disable_pfs {
+  }
+  ike_keylifetime_hours {
+  }
+}
+```
+
+## Dependencies
+
+Requires: none

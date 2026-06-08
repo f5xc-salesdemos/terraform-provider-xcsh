@@ -19,6 +19,7 @@ Virtual networks, BGP, cloud connectivity, tunnels, and network interfaces
 - [policy_based_routing](_llms-txt/resources/policy_based_routing.txt) : Network policy based routing create specification. configuration
 - [proxy](_llms-txt/resources/proxy.txt) : Tcp loadbalancer create specification. configuration
 - [segment](_llms-txt/resources/segment.txt) : Segment. configuration
+- [srv6_network_slice](_llms-txt/resources/srv6_network_slice.txt) : Srv6_network_slice creates a new object in the storage backend for...
 - [subnet](_llms-txt/resources/subnet.txt) : Subnet object contains configuration for an interface of a vm/pod. it is...
 - [tunnel](_llms-txt/resources/tunnel.txt) : Tunnel in a given namespace. If one already exist it will give a error
 - [virtual_network](_llms-txt/resources/virtual_network.txt) : Virtual network in given namespace

@@ -1,7 +1,6 @@
-# Virtual K8s Data Source Example
-# Retrieves information about an existing Virtual K8s
+# Virtual K8S Data Source Example
+# Retrieves information about an existing Virtual K8S
 
-# Look up an existing Virtual K8s by name
 terraform {
   required_version = ">= 1.0"
 
@@ -13,10 +12,10 @@ terraform {
   }
 }
 
-
+# Look up an existing Virtual K8S by name
 data "f5xc_virtual_k8s" "example" {
   name      = "example-virtual-k8s"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "virtual_k8s_id" {

@@ -1,7 +1,6 @@
-# K8s Cluster Role Binding Data Source Example
-# Retrieves information about an existing K8s Cluster Role Binding
+# K8S Cluster Role Binding Data Source Example
+# Retrieves information about an existing K8S Cluster Role Binding
 
-# Look up an existing K8s Cluster Role Binding by name
 terraform {
   required_version = ">= 1.0"
 
@@ -13,10 +12,10 @@ terraform {
   }
 }
 
-
+# Look up an existing K8S Cluster Role Binding by name
 data "f5xc_k8s_cluster_role_binding" "example" {
   name      = "example-k8s-cluster-role-binding"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "k8s_cluster_role_binding_id" {

@@ -1,7 +1,6 @@
-# K8s Pod Security Policy Data Source Example
-# Retrieves information about an existing K8s Pod Security Policy
+# K8S Pod Security Policy Data Source Example
+# Retrieves information about an existing K8S Pod Security Policy
 
-# Look up an existing K8s Pod Security Policy by name
 terraform {
   required_version = ">= 1.0"
 
@@ -13,10 +12,10 @@ terraform {
   }
 }
 
-
+# Look up an existing K8S Pod Security Policy by name
 data "f5xc_k8s_pod_security_policy" "example" {
   name      = "example-k8s-pod-security-policy"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "k8s_pod_security_policy_id" {

@@ -1,7 +1,6 @@
-# K8s Cluster Data Source Example
-# Retrieves information about an existing K8s Cluster
+# K8S Cluster Data Source Example
+# Retrieves information about an existing K8S Cluster
 
-# Look up an existing K8s Cluster by name
 terraform {
   required_version = ">= 1.0"
 
@@ -13,10 +12,10 @@ terraform {
   }
 }
 
-
+# Look up an existing K8S Cluster by name
 data "f5xc_k8s_cluster" "example" {
   name      = "example-k8s-cluster"
-  namespace = "system"
+  namespace = "staging"
 }
 
 output "k8s_cluster_id" {
