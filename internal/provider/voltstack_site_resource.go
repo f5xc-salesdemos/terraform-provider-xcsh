@@ -2574,7 +2574,7 @@ type VoltstackSiteCustomStorageConfigStorageDeviceListStorageDevicesPureServiceO
 	NfsEndpointDNSName types.String                                                                                                                    `tfsdk:"nfs_endpoint_dns_name"`
 	NfsEndpointIP      types.String                                                                                                                    `tfsdk:"nfs_endpoint_ip"`
 	APIToken           *VoltstackSiteCustomStorageConfigStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeFlashBladesAPITokenModel `tfsdk:"api_token"`
-	Lables             *VoltstackSiteEmptyModel                                                                                                        `tfsdk:"lables"`
+	Labels             *VoltstackSiteEmptyModel                                                                                                        `tfsdk:"labels"`
 }
 
 // VoltstackSiteCustomStorageConfigStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeFlashBladesModelAttrTypes defines the attribute types for VoltstackSiteCustomStorageConfigStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeFlashBladesModel
@@ -2584,7 +2584,7 @@ var VoltstackSiteCustomStorageConfigStorageDeviceListStorageDevicesPureServiceOr
 	"nfs_endpoint_dns_name": types.StringType,
 	"nfs_endpoint_ip":       types.StringType,
 	"api_token":             types.ObjectType{AttrTypes: VoltstackSiteCustomStorageConfigStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeFlashBladesAPITokenModelAttrTypes},
-	"lables":                types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"labels":                types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // VoltstackSiteCustomStorageConfigStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeFlashBladesAPITokenModel represents api_token block
@@ -7210,7 +7210,7 @@ func (r *VoltstackSiteResource) Schema(ctx context.Context, req resource.SchemaR
 																					},
 																				},
 																			},
-																			"lables": schema.SingleNestedBlock{
+																			"labels": schema.SingleNestedBlock{
 																				MarkdownDescription: "Specifies labels optional, and can be any key-value pair for use with the PSO 'fleet' provisioner.",
 																			},
 																		},

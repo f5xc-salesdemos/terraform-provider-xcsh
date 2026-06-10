@@ -1288,7 +1288,7 @@ type FleetStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBlade
 	NfsEndpointDNSName types.String                                                                                         `tfsdk:"nfs_endpoint_dns_name"`
 	NfsEndpointIP      types.String                                                                                         `tfsdk:"nfs_endpoint_ip"`
 	APIToken           *FleetStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeFlashBladesAPITokenModel `tfsdk:"api_token"`
-	Lables             *FleetEmptyModel                                                                                     `tfsdk:"lables"`
+	Labels             *FleetEmptyModel                                                                                     `tfsdk:"labels"`
 }
 
 // FleetStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeFlashBladesModelAttrTypes defines the attribute types for FleetStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeFlashBladesModel
@@ -1298,7 +1298,7 @@ var FleetStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeF
 	"nfs_endpoint_dns_name": types.StringType,
 	"nfs_endpoint_ip":       types.StringType,
 	"api_token":             types.ObjectType{AttrTypes: FleetStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeFlashBladesAPITokenModelAttrTypes},
-	"lables":                types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"labels":                types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // FleetStorageDeviceListStorageDevicesPureServiceOrchestratorArraysFlashBladeFlashBladesAPITokenModel represents api_token block
@@ -3639,7 +3639,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																			},
 																		},
 																	},
-																	"lables": schema.SingleNestedBlock{
+																	"labels": schema.SingleNestedBlock{
 																		MarkdownDescription: "Specifies labels optional, and can be any key-value pair for use with the PSO 'fleet' provisioner.",
 																	},
 																},
