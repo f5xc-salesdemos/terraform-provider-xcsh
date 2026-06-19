@@ -128,7 +128,7 @@ terraform plan
 terraform apply
 ```
 
-## Checkingggg Activation Eligibility
+## Checkinggggg Activation Eligibility
 
 Before attempting to activate an addon service, check if it's available for your tenant.
 

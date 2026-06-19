@@ -47,7 +47,7 @@ resource "f5xc_fast_acl" "example" {
   protocol_policer {
     # Configure protocol_policer settings
   }
-  # [OneOf: re_acl, site_acl] Fast ACL for RE. Fast ACL defin...
+  # [OneOf: re_acl, site_acl] Fast ACL for RE. Fast ACL define...
   re_acl {
     # Configure re_acl settings
   }

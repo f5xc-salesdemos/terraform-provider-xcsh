@@ -1,7 +1,7 @@
 # f5xc_bgp_routing_policy
 
 Category: Security
-Bgp routing policy is a list of rules containing match criteria and action to be applied. these rules help contol routes which are imported or exported to bgp peers. configuration
+Bgp routing policy is a list of rules containing match criteria and action to be applied. these rules help control routes which are imported or exported to bgp peers. configuration
 
 ## Required
 
