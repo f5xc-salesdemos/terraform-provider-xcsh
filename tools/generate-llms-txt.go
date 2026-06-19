@@ -93,6 +93,8 @@ type JSONProvider struct {
 	Source        string   `json:"source"`
 	Registry      string   `json:"registry"`
 	RequiredBlock string   `json:"required_block"`
+	ConfigBlock   string   `json:"config_block"`
+	AuthMethods   []string `json:"auth_methods"`
 	SyntaxRules   []string `json:"syntax_rules"`
 }
 
@@ -1103,6 +1105,15 @@ func generateJSONIndex(config *LLMsConfig, categories []CategoryInfo, reverseDep
     }
   }
 }`,
+			ConfigBlock: `provider "f5xc" {}`,
+			AuthMethods: []string{
+				"REQUIRED: every .tf must contain a `provider \"f5xc\" {}` block. Without it Terraform errors: \"Provider requires explicit configuration. Add a provider block\".",
+				"Configure exactly ONE auth method, via environment variables (preferred) or explicit arguments in the provider block:",
+				"api_token (env F5XC_API_TOKEN) — API token authentication.",
+				"api_p12_file + p12_password (env F5XC_P12_FILE + F5XC_P12_PASSWORD) — PKCS#12 certificate authentication.",
+				"api_cert + api_key (env F5XC_CERT + F5XC_KEY) — PEM certificate authentication.",
+				"api_url (env F5XC_API_URL) — tenant base URL without /api suffix, e.g. https://your-tenant.console.ves.volterra.io.",
+			},
 			SyntaxRules: []string{
 				"OneOf selectors: use empty block `field {}`, never `field = true`",
 				"Cross-resource refs: block with name + namespace attributes",
