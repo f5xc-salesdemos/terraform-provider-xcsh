@@ -148,25 +148,11 @@
       "resources": ["api_crawler", "api_definition", "api_discovery", "api_testing", "app_api_group"]
     },
     {
-      "name": "Applications",
-      "slug": "applications",
-      "description": "Application settings, types, discovery, and filtering",
-      "resource_count": 4,
-      "resources": ["app_setting", "app_type", "discovery", "filter_set"]
-    },
-    {
       "name": "Monitoring",
       "slug": "monitoring",
       "description": "Log receivers, alert policies, APM, and global logging configuration",
       "resource_count": 4,
       "resources": ["alert_receiver", "apm", "global_log_receiver", "log_receiver"]
-    },
-    {
-      "name": "Certificates",
-      "slug": "certificates",
-      "description": "TLS certificates, certificate chains, CRLs, and trusted CA lists",
-      "resource_count": 4,
-      "resources": ["certificate", "certificate_chain", "crl", "trusted_ca_list"]
     },
     {
       "name": "VPN",
@@ -176,11 +162,25 @@
       "resources": ["ike1", "ike2", "ike_phase1_profile", "ike_phase2_profile"]
     },
     {
-      "name": "DNS",
-      "slug": "dns",
-      "description": "DNS domains, zones, compliance checks, and DNS proxy configuration",
+      "name": "Certificates",
+      "slug": "certificates",
+      "description": "TLS certificates, certificate chains, CRLs, and trusted CA lists",
+      "resource_count": 4,
+      "resources": ["certificate", "certificate_chain", "crl", "trusted_ca_list"]
+    },
+    {
+      "name": "Applications",
+      "slug": "applications",
+      "description": "Application settings, types, discovery, and filtering",
+      "resource_count": 4,
+      "resources": ["app_setting", "app_type", "discovery", "filter_set"]
+    },
+    {
+      "name": "Authentication",
+      "slug": "authentication",
+      "description": "Authentication methods, cloud credentials, and secret management",
       "resource_count": 3,
-      "resources": ["dns_compliance_checks", "dns_domain", "dns_proxy"]
+      "resources": ["authentication", "cloud_credentials", "secret_management_access"]
     },
     {
       "name": "BIG-IP Integration",
@@ -190,11 +190,11 @@
       "resources": ["bigip_http_proxy", "data_group", "irule"]
     },
     {
-      "name": "Authentication",
-      "slug": "authentication",
-      "description": "Authentication methods, cloud credentials, and secret management",
+      "name": "DNS",
+      "slug": "dns",
+      "description": "DNS domains, zones, compliance checks, and DNS proxy configuration",
       "resource_count": 3,
-      "resources": ["authentication", "cloud_credentials", "secret_management_access"]
+      "resources": ["dns_compliance_checks", "dns_domain", "dns_proxy"]
     },
     {
       "name": "Uncategorized",
@@ -218,6 +218,13 @@
       "resources": ["address_allocator", "cloud_elastic_ip"]
     },
     {
+      "name": "Service Mesh",
+      "slug": "service-mesh",
+      "description": "Service mesh policies and traffic management",
+      "resource_count": 1,
+      "resources": ["policer"]
+    },
+    {
       "name": "Subscriptions",
       "slug": "subscriptions",
       "description": "Cloud subscription management and metering",
@@ -230,13 +237,6 @@
       "description": "External integrations including code base and ticket tracking",
       "resource_count": 1,
       "resources": ["code_base_integration"]
-    },
-    {
-      "name": "Service Mesh",
-      "slug": "service-mesh",
-      "description": "Service mesh policies and traffic management",
-      "resource_count": 1,
-      "resources": ["policer"]
     }
   ],
   "resources": {

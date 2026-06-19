@@ -104,7 +104,7 @@ resource "f5xc_discovery" "example" {
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 
-<a id="where"></a>&#x2022; [`where`](#where) - Optional Block<br>NetworkSiteRefSelector defines a union of reference to site or reference to virtual_network or reference to virtual_site It is used to determine virtual network using following rules \* Direct reference to virtual_network object \* Site local network when refering to site object \* All site local<br>See [Where](#where) below for
+<a id="where"></a>&#x2022; [`where`](#where) - Optional Block<br>NetworkSiteRefSelector defines a union of reference to site or reference to virtual_network or reference to virtual_site It is used to determine virtual network using following rules \* Direct reference to virtual_network object \* Site local network when referring to site object \* All site local<br>See [Where](#where) below for
 details.
 
 ### Attributes Reference

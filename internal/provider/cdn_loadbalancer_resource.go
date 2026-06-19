@@ -2141,12 +2141,12 @@ var CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFinancialServic
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel represents flight block
 type CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel struct {
-	Checking *CDNLoadBalancerEmptyModel `tfsdk:"checking"`
+	Checkingg *CDNLoadBalancerEmptyModel `tfsdk:"checkingg"`
 }
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModelAttrTypes defines the attribute types for CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel
 var CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModelAttrTypes = map[string]attr.Type{
-	"checking": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"checkingg": types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelProfileManagementModel represents profile_management block
@@ -6335,7 +6335,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 						MarkdownDescription: "Enable this option",
 					},
 					"server_url_rules": schema.ListNestedBlock{
-						MarkdownDescription: "Set of rules for entire domain or base path that contain multiple endpoints. Order is matter as it uses first match policy. For matching also specific endpoints you can use the API endpoint rules set bellow.",
+						MarkdownDescription: "Set of rules for entire domain or base path that contain multiple endpoints. Order is matter as it uses first match policy. For matching also specific endpoints you can use the API endpoint rules set below.",
 						NestedObject: schema.NestedBlockObject{
 							Attributes: map[string]schema.Attribute{
 								"api_group": schema.StringAttribute{
@@ -8086,7 +8086,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Bot Defense Flow Label Flight Category. Bot Defense Flow Label Flight Category.",
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
-														"checking": schema.SingleNestedBlock{
+														"checkingg": schema.SingleNestedBlock{
 															MarkdownDescription: "Enable this option",
 														},
 													},
