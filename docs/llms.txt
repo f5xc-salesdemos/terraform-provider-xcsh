@@ -39,19 +39,19 @@ DEPRECATED — do not use: volterraedge/volterra
 - [Sites](_llms-txt/sites.txt) (11 resources): AWS/Azure/GCP VPC sites, SecureMesh, VoltStack, and site mesh groups
 - [Kubernetes](_llms-txt/kubernetes.txt) (8 resources): Container registries, workloads, and Kubernetes integrations
 - [API Security](_llms-txt/api-security.txt) (5 resources): API definition, discovery, testing, and security controls for web APIs
+- [Applications](_llms-txt/applications.txt) (4 resources): Application settings, types, discovery, and filtering
+- [Certificates](_llms-txt/certificates.txt) (4 resources): TLS certificates, certificate chains, CRLs, and trusted CA lists
 - [Monitoring](_llms-txt/monitoring.txt) (4 resources): Log receivers, alert policies, APM, and global logging configuration
 - [VPN](_llms-txt/vpn.txt) (4 resources): VPN and IPSec configuration
-- [Certificates](_llms-txt/certificates.txt) (4 resources): TLS certificates, certificate chains, CRLs, and trusted CA lists
-- [Applications](_llms-txt/applications.txt) (4 resources): Application settings, types, discovery, and filtering
 - [Authentication](_llms-txt/authentication.txt) (3 resources): Authentication methods, cloud credentials, and secret management
 - [BIG-IP Integration](_llms-txt/big-ip-integration.txt) (3 resources): BIG-IP proxy, data groups, and iRules integration
 - [DNS](_llms-txt/dns.txt) (3 resources): DNS domains, zones, compliance checks, and DNS proxy configuration
-- [Uncategorized](_llms-txt/uncategorized.txt) (2 resources): Resources pending categorization
-- [Organization](_llms-txt/organization.txt) (2 resources): Namespaces, tenant configuration, and organizational settings
 - [Cloud Resources](_llms-txt/cloud-resources.txt) (2 resources): Cloud elastic IPs, address allocators, and geo-location resources
+- [Organization](_llms-txt/organization.txt) (2 resources): Namespaces, tenant configuration, and organizational settings
+- [Uncategorized](_llms-txt/uncategorized.txt) (2 resources): Resources pending categorization
+- [Integrations](_llms-txt/integrations.txt) (1 resources): External integrations including code base and ticket tracking
 - [Service Mesh](_llms-txt/service-mesh.txt) (1 resources): Service mesh policies and traffic management
 - [Subscriptions](_llms-txt/subscriptions.txt) (1 resources): Cloud subscription management and metering
-- [Integrations](_llms-txt/integrations.txt) (1 resources): External integrations including code base and ticket tracking
 
 ## Data Sources
 

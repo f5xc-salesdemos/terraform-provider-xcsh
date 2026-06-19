@@ -148,6 +148,20 @@
       "resources": ["api_crawler", "api_definition", "api_discovery", "api_testing", "app_api_group"]
     },
     {
+      "name": "Applications",
+      "slug": "applications",
+      "description": "Application settings, types, discovery, and filtering",
+      "resource_count": 4,
+      "resources": ["app_setting", "app_type", "discovery", "filter_set"]
+    },
+    {
+      "name": "Certificates",
+      "slug": "certificates",
+      "description": "TLS certificates, certificate chains, CRLs, and trusted CA lists",
+      "resource_count": 4,
+      "resources": ["certificate", "certificate_chain", "crl", "trusted_ca_list"]
+    },
+    {
       "name": "Monitoring",
       "slug": "monitoring",
       "description": "Log receivers, alert policies, APM, and global logging configuration",
@@ -160,20 +174,6 @@
       "description": "VPN and IPSec configuration",
       "resource_count": 4,
       "resources": ["ike1", "ike2", "ike_phase1_profile", "ike_phase2_profile"]
-    },
-    {
-      "name": "Certificates",
-      "slug": "certificates",
-      "description": "TLS certificates, certificate chains, CRLs, and trusted CA lists",
-      "resource_count": 4,
-      "resources": ["certificate", "certificate_chain", "crl", "trusted_ca_list"]
-    },
-    {
-      "name": "Applications",
-      "slug": "applications",
-      "description": "Application settings, types, discovery, and filtering",
-      "resource_count": 4,
-      "resources": ["app_setting", "app_type", "discovery", "filter_set"]
     },
     {
       "name": "Authentication",
@@ -197,11 +197,11 @@
       "resources": ["dns_compliance_checks", "dns_domain", "dns_proxy"]
     },
     {
-      "name": "Uncategorized",
-      "slug": "uncategorized",
-      "description": "Resources pending categorization",
+      "name": "Cloud Resources",
+      "slug": "cloud-resources",
+      "description": "Cloud elastic IPs, address allocators, and geo-location resources",
       "resource_count": 2,
-      "resources": ["application_profiles", "authorization_server"]
+      "resources": ["address_allocator", "cloud_elastic_ip"]
     },
     {
       "name": "Organization",
@@ -211,11 +211,18 @@
       "resources": ["namespace", "tenant_configuration"]
     },
     {
-      "name": "Cloud Resources",
-      "slug": "cloud-resources",
-      "description": "Cloud elastic IPs, address allocators, and geo-location resources",
+      "name": "Uncategorized",
+      "slug": "uncategorized",
+      "description": "Resources pending categorization",
       "resource_count": 2,
-      "resources": ["address_allocator", "cloud_elastic_ip"]
+      "resources": ["application_profiles", "authorization_server"]
+    },
+    {
+      "name": "Integrations",
+      "slug": "integrations",
+      "description": "External integrations including code base and ticket tracking",
+      "resource_count": 1,
+      "resources": ["code_base_integration"]
     },
     {
       "name": "Service Mesh",
@@ -230,13 +237,6 @@
       "description": "Cloud subscription management and metering",
       "resource_count": 1,
       "resources": ["cminstance"]
-    },
-    {
-      "name": "Integrations",
-      "slug": "integrations",
-      "description": "External integrations including code base and ticket tracking",
-      "resource_count": 1,
-      "resources": ["code_base_integration"]
     }
   ],
   "resources": {
@@ -486,7 +486,7 @@
     },
     "bgp_routing_policy": {
       "category": "security",
-      "description": "Bgp routing policy is a list of rules containing match criteria and action to be applied. these rules help contol routes which are imported or exported to bgp peers. configuration",
+      "description": "Bgp routing policy is a list of rules containing match criteria and action to be applied. these rules help control routes which are imported or exported to bgp peers. configuration",
       "required": ["name", "namespace"],
       "minimal_config": "resource \"f5xc_bgp_routing_policy\" \"example\" {\n  name      = \"example-bgp-routing-policy\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  rules {\n  }\n  action {\n  }\n  aggregate {\n  }\n}",
       "dependencies": {

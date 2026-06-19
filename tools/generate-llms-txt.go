@@ -837,9 +837,15 @@ func groupByCategory(resources []ResourceInfo) []CategoryInfo {
 		categories = append(categories, *cat)
 	}
 
-	// Sort categories by resource count descending
+	// Sort categories by resource count descending, then by name ascending.
+	// The name tiebreaker makes ordering deterministic: without it, equal-count
+	// categories retained Go's randomized map-iteration order, so every
+	// regeneration reshuffled them and produced spurious diffs.
 	sort.Slice(categories, func(i, j int) bool {
-		return len(categories[i].Resources) > len(categories[j].Resources)
+		if len(categories[i].Resources) != len(categories[j].Resources) {
+			return len(categories[i].Resources) > len(categories[j].Resources)
+		}
+		return categories[i].Name < categories[j].Name
 	})
 
 	return categories

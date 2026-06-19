@@ -183,6 +183,13 @@ validate-examples:
 llms-txt:
 	@echo "Generating llms.txt hierarchy..."
 	$(GO) run $(TOOLS_DIR)/generate-llms-txt.go
+	@# json.MarshalIndent output is not biome-formatted; format the index so the
+	@# committed file matches the biome-check gate (pre-commit + super-linter).
+	@if command -v biome >/dev/null 2>&1; then \
+		biome format --write docs/terraform-llms-index.json >/dev/null && echo "Formatted docs/terraform-llms-index.json with biome"; \
+	else \
+		echo "WARNING: biome not found — run 'biome format --write docs/terraform-llms-index.json' before committing"; \
+	fi
 	@echo "llms.txt hierarchy generation complete"
 
 # Clean build artifacts
