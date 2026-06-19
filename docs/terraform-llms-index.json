@@ -295,11 +295,11 @@
       "description": "API Definition",
       "required": ["name", "namespace"],
       "server_defaults": [
+        "swagger_specs",
         "api_inventory_exclusion_list",
         "api_inventory_inclusion_list",
         "non_api_endpoints",
-        "strict_schema_origin",
-        "swagger_specs"
+        "strict_schema_origin"
       ],
       "minimal_config": "resource \"f5xc_api_definition\" \"example\" {\n  name      = \"example-api-definition\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  swagger_specs = [\"string:///base64-openapi-spec\"]\n\n  non_validation_mode {}\n}",
       "dependencies": {
@@ -372,7 +372,6 @@
       "server_defaults": [
         "allow_all_response_codes",
         "default_anonymization",
-        "default_bot_setting",
         "default_detection_settings",
         "disable_ai_enhancements",
         "monitoring",
@@ -458,16 +457,7 @@
       "category": "sites",
       "description": "Deploying F5 sites within Azure Virtual Network environments",
       "required": ["name", "namespace", "machine_type", "resource_group", "ssh_key"],
-      "server_defaults": [
-        "block_all_services",
-        "disk_size",
-        "ingress_gw.accelerated_networking",
-        "ingress_gw.performance_enhancement_mode",
-        "logs_streaming_disabled",
-        "machine_type",
-        "no_worker_nodes",
-        "tags"
-      ],
+      "server_defaults": ["disk_size", "block_all_services", "logs_streaming_disabled", "no_worker_nodes", "tags"],
       "minimal_config": "resource \"f5xc_azure_vnet_site\" \"example\" {\n  name      = \"example-Azure-vnet-site\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  azure_region = \"westus2\"\n\n  azure_cred {\n    name      = \"Azure-credentials\"\n    namespace = \"staging\"\n  }\n\n  resource_group = \"f5xc-rg\"\n\n  vnet {\n    new_vnet {\n      name         = \"f5xc-vnet\"\n      primary_ipv4 = \"10.0.0.0/16\"\n    }\n  }\n\n  machine_type = \"Standard_D3_v2\"\n\n  ingress_egress_gw {\n    azure_certified_hw = \"Azure-byol-multi-nic-voltmesh\"\n    az_nodes {\n      azure_az = \"1\"\n      inside_subnet {\n        subnet_param {\n          ipv4 = \"10.0.1.0/24\"\n        }\n      }\n      outside_subnet {\n        subnet_param {\n          ipv4 = \"10.0.2.0/24\"\n        }\n      }\n    }\n  }\n\n  no_worker_nodes {}\n}",
       "dependencies": {
         "requires": []
@@ -878,15 +868,7 @@
           "fields": ["headers", "request_headers_to_remove"]
         }
       ],
-      "server_defaults": [
-        "http_health_check.expected_response",
-        "http_health_check.expected_status_codes",
-        "http_health_check.headers",
-        "http_health_check.request_headers_to_remove",
-        "http_health_check.use_http2",
-        "http_health_check.use_origin_server_name",
-        "jitter_percent"
-      ],
+      "server_defaults": ["jitter_percent"],
       "minimal_config": "resource \"f5xc_healthcheck\" \"example\" {\n  name      = \"example-healthcheck\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  // One of the arguments from this list \"http_health_check tcp_health_check udp_icmp_health_check\" must be set\n\n  http_health_check {\n    // One of the arguments from this list \"host_header use_origin_server_name\" must be set\n\n    use_origin_server_name {}\n\n    path                  = \"/health\"\n    use_http2             = false\n    expected_status_codes = [\"200\"]\n\n    // One of the arguments from this list \"headers request_headers_to_remove\" must be set\n\n    headers {}\n  }\n\n  healthy_threshold   = 3\n  unhealthy_threshold = 3\n  interval            = 15\n  timeout             = 5\n}",
       "dependencies": {
         "requires": ["namespace"],
@@ -965,45 +947,20 @@
       ],
       "server_defaults": [
         "add_location",
-        "default_pool.advanced_options.auto_http_config",
-        "default_pool.advanced_options.connection_timeout",
-        "default_pool.advanced_options.default_circuit_breaker",
-        "default_pool.advanced_options.disable_outlier_detection",
-        "default_pool.advanced_options.disable_subsets",
-        "default_pool.advanced_options.http_idle_timeout",
-        "default_pool.advanced_options.no_panic_threshold",
-        "default_pool.advanced_options.no_request_limit_per_connection",
-        "default_pool.endpoint_selection",
-        "default_pool.healthcheck",
-        "default_pool.loadbalancer_algorithm",
-        "default_pool.no_tls",
-        "default_pool.same_as_endpoint_port",
-        "default_pool.use_tls.default_session_key_caching",
-        "default_pool.use_tls.no_mtls",
-        "default_pool.use_tls.use_host_header_as_sni",
-        "default_pool.use_tls.volterra_trusted_ca",
+        "endpoint_selection",
+        "loadbalancer_algorithm",
+        "healthcheck",
+        "no_tls",
+        "same_as_endpoint_port",
         "default_sensitive_data_policy",
         "disable_api_definition",
         "disable_api_discovery",
         "disable_api_testing",
-        "disable_bot_defense",
-        "disable_ip_reputation",
-        "disable_malicious_user_detection",
         "disable_malware_protection",
         "disable_rate_limit",
         "disable_threat_mesh",
         "disable_trust_client_ip_headers",
-        "disable_waf",
-        "https_auto_cert.add_hsts",
-        "https_auto_cert.connection_idle_timeout",
-        "https_auto_cert.enable_path_normalize",
-        "https_auto_cert.http_redirect",
-        "https_auto_cert.no_mtls",
         "l7_ddos_protection",
-        "no_challenge",
-        "rate_limit.no_ip_allowed_list",
-        "rate_limit.no_policies",
-        "rate_limit.rate_limiter.period_multiplier",
         "round_robin",
         "service_policies_from_namespace",
         "user_id_client_ip"
@@ -1319,23 +1276,11 @@
         }
       ],
       "server_defaults": [
-        "advanced_options.auto_http_config",
-        "advanced_options.connection_timeout",
-        "advanced_options.default_circuit_breaker",
-        "advanced_options.disable_outlier_detection",
-        "advanced_options.disable_subsets",
-        "advanced_options.http_idle_timeout",
-        "advanced_options.no_panic_threshold",
-        "advanced_options.no_request_limit_per_connection",
         "endpoint_selection",
-        "healthcheck",
         "loadbalancer_algorithm",
+        "healthcheck",
         "no_tls",
-        "same_as_endpoint_port",
-        "use_tls.default_session_key_caching",
-        "use_tls.no_mtls",
-        "use_tls.use_host_header_as_sni",
-        "use_tls.volterra_trusted_ca"
+        "same_as_endpoint_port"
       ],
       "minimal_config": "resource \"f5xc_origin_pool\" \"example\" {\n  name      = \"example-origin-pool\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  // Origin servers configuration\n  origin_servers {\n    // One of the arguments from this list \"consul_service custom_endpoint_object k8s_service private_ip private_name public_ip public_name vn_private_ip vn_private_name\" must be set\n\n    public_name {\n      dns_name         = \"origin.example.com\"\n      refresh_interval = 60\n    }\n  }\n\n  origin_servers {\n    // One of the arguments from this list \"consul_service custom_endpoint_object k8s_service private_ip private_name public_ip public_name vn_private_ip vn_private_name\" must be set\n\n    k8s_service {\n      service_name = \"backend-svc\"\n\n      // One of the arguments from this list \"inside_network outside_network vk8s_networks\" must be set\n\n      vk8s_networks {}\n\n      site_locator {\n        // One of the arguments from this list \"site virtual_site\" must be set\n\n        site {\n          name      = \"example-site\"\n          namespace = \"staging\"\n        }\n      }\n    }\n  }\n\n  port = 443\n\n  // One of the arguments from this list \"no_tls use_tls\" must be set\n\n  use_tls {\n    // One of the arguments from this list \"disable_sni sni use_host_header_as_sni\" must be set\n\n    sni = \"backend.example.com\"\n\n    tls_config {\n      // One of the arguments from this list \"custom_security default_security low_security medium_security\" must be set\n\n      default_security {}\n    }\n\n    // One of the arguments from this list \"no_mtls use_mtls use_mtls_obj\" must be set\n\n    no_mtls {}\n\n    // One of the arguments from this list \"skip_server_verification use_server_verification volterra_trusted_ca\" must be set\n\n    volterra_trusted_ca {}\n  }\n\n  // Health check configuration\n  healthcheck {\n    name      = \"example-healthcheck\"\n    namespace = \"staging\"\n  }\n\n  // Load balancing configuration\n}",
       "dependencies": {
@@ -1472,7 +1417,7 @@
       "category": "security",
       "description": "Sensitive_data_policy creates a new object in the storage backend for metadata.namespace",
       "required": ["name", "namespace"],
-      "server_defaults": ["compliances", "custom_data_types", "disabled_predefined_data_types"],
+      "server_defaults": ["compliances", "disabled_predefined_data_types", "custom_data_types"],
       "minimal_config": "resource \"f5xc_sensitive_data_policy\" \"example\" {\n  name      = \"example-sensitive-data-policy\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  custom_data_types {\n  }\n  custom_data_type_ref {\n  }\n}",
       "dependencies": {
         "requires": []
@@ -1491,7 +1436,7 @@
           "fields": ["any_server", "server_name", "server_name_matcher", "server_selector"]
         }
       ],
-      "server_defaults": ["port_matcher"],
+      "server_defaults": ["port_matcher", "any_server"],
       "minimal_config": "resource \"f5xc_service_policy\" \"example\" {\n  name      = \"example-service-policy\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  // One of the arguments from this list \"allow_all_requests allow_list deny_all_requests deny_list rule_list\" must be set\n\n  rule_list {\n    rules {\n      metadata {\n        name = \"allow-api\"\n      }\n      spec {\n        action = \"ALLOW\"\n        any_client {}\n        any_ip {}\n        path {\n          prefix_values = [\"/api/\"]\n        }\n      }\n    }\n  }\n\n  // One of the arguments from this list \"any_server server_name server_name_matcher server_selector\" must be set\n\n  any_server {}\n}",
       "dependencies": {
         "requires": ["namespace"]
@@ -1566,8 +1511,8 @@
       ],
       "server_defaults": [
         "dns_volterra_managed",
-        "hash_policy_choice_round_robin",
         "idle_timeout",
+        "hash_policy_choice_round_robin",
         "no_sni",
         "retract_cluster",
         "service_policies_from_namespace",

@@ -13,12 +13,9 @@ Deploying F5 sites within Azure Virtual Network environments
 
 ## Server Defaults (safe to omit)
 
-- block_all_services
 - disk_size
-- ingress_gw.accelerated_networking
-- ingress_gw.performance_enhancement_mode
+- block_all_services
 - logs_streaming_disabled
-- machine_type
 - no_worker_nodes
 - tags
 

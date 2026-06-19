@@ -59,23 +59,11 @@ Within use_tls, pick exactly one:
 
 ## Server Defaults (safe to omit)
 
-- advanced_options.auto_http_config
-- advanced_options.connection_timeout
-- advanced_options.default_circuit_breaker
-- advanced_options.disable_outlier_detection
-- advanced_options.disable_subsets
-- advanced_options.http_idle_timeout
-- advanced_options.no_panic_threshold
-- advanced_options.no_request_limit_per_connection
 - endpoint_selection
-- healthcheck
 - loadbalancer_algorithm
+- healthcheck
 - no_tls
 - same_as_endpoint_port
-- use_tls.default_session_key_caching
-- use_tls.no_mtls
-- use_tls.use_host_header_as_sni
-- use_tls.volterra_trusted_ca
 
 ## Minimal Valid Config
 

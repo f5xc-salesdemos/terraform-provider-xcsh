@@ -394,7 +394,7 @@ spec:
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 
-<a id="unhealthy-threshold"></a>&#x2022; [`unhealthy_threshold`](#unhealthy-threshold) - Required Number<br>Number of failed responses before declaring unhealthy. In other words, this is the number of unhealthy health checks required before a host is marked unhealthy. Note that for HTTP health checkingggggg if a host responds with 503 this threshold is ignored and the host is considered unhealthy
+<a id="unhealthy-threshold"></a>&#x2022; [`unhealthy_threshold`](#unhealthy-threshold) - Required Number<br>Number of failed responses before declaring unhealthy. In other words, this is the number of unhealthy health checks required before a host is marked unhealthy. Note that for HTTP health checkinggggggg if a host responds with 503 this threshold is ignored and the host is considered unhealthy
 immediately. Recommended: `1`
 
 ### Attributes Reference
@@ -418,7 +418,7 @@ and end values separated by '-'
 
 <a id="http-health-check-host-header"></a>&#x2022; [`host_header`](#http-health-check-host-header) - Optional String<br>The value of the host header
 
-<a id="http-health-check-path"></a>&#x2022; [`path`](#http-health-check-path) - Optional String<br>Specifies the HTTP path that will be requested during health checkingggggg
+<a id="http-health-check-path"></a>&#x2022; [`path`](#http-health-check-path) - Optional String<br>Specifies the HTTP path that will be requested during health checkinggggggg
 
 <a id="remove-35d538"></a>&#x2022; [`request_headers_to_remove`](#remove-35d538) - Optional List<br>Specifies a list of HTTP headers that should be removed from each request that is sent to the health checked cluster. This is a list of keys of headers
 

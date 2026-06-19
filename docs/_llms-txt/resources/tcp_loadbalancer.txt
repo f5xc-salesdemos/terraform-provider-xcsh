@@ -20,8 +20,8 @@ Pick exactly one:
 ## Server Defaults (safe to omit)
 
 - dns_volterra_managed
-- hash_policy_choice_round_robin
 - idle_timeout
+- hash_policy_choice_round_robin
 - no_sni
 - retract_cluster
 - service_policies_from_namespace

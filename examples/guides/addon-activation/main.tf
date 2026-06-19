@@ -2,7 +2,7 @@
 # =========================================================
 #
 # This example demonstrates how to activate F5XC addon services
-# using Terraform. It shows the complete workflow from checkingggggggggggggggggggggggggggggggggg
+# using Terraform. It shows the complete workflow from checkinggggggggggggggggggggggggggggggggggg
 # eligibility to activating and using addon features.
 #
 # QUICK START:

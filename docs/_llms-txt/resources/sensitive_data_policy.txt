@@ -11,8 +11,8 @@ Sensitive_data_policy creates a new object in the storage backend for metadata.n
 ## Server Defaults (safe to omit)
 
 - compliances
-- custom_data_types
 - disabled_predefined_data_types
+- custom_data_types
 
 ## Minimal Valid Config
 

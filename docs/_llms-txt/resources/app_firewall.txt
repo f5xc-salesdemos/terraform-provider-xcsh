@@ -35,7 +35,6 @@ Pick exactly one:
 
 - allow_all_response_codes
 - default_anonymization
-- default_bot_setting
 - default_detection_settings
 - disable_ai_enhancements
 - monitoring
