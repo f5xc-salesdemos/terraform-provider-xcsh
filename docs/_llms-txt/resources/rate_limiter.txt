@@ -1,4 +1,4 @@
-# f5xc_rate_limiter
+# xcsh_rate_limiter
 
 Category: Security
 Rate_limiter creates a new object in the storage backend for metadata.namespace
@@ -15,7 +15,7 @@ Rate_limiter creates a new object in the storage backend for metadata.namespace
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_rate_limiter" "example" {
+resource "xcsh_rate_limiter" "example" {
   name      = "example-rate-limiter"
   namespace = "staging"
 

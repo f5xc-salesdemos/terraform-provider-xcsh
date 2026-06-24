@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_rate_limiter Resource - terraform-provider-f5xc"
+page_title: "xcsh_rate_limiter Resource - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Manages rate_limiter creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_rate_limiter (Resource)
+# xcsh_rate_limiter (Resource)
 
 Manages rate_limiter creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Rate Limiter configuration
-resource "f5xc_rate_limiter" "example" {
+resource "xcsh_rate_limiter" "example" {
   name      = "example-rate-limiter"
   namespace = "staging"
 
@@ -64,7 +64,7 @@ resource "f5xc_rate_limiter" "example" {
 ### All Attributes
 
 ```hcl
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name        = "example"
   namespace   = "system"
   description = "Test rate limiter with all attributes"
@@ -84,7 +84,7 @@ resource "f5xc_rate_limiter" "test" {
 ### Token Bucket
 
 ```hcl
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name      = "example"
   namespace = "system"
 
@@ -101,7 +101,7 @@ resource "f5xc_rate_limiter" "test" {
 ### Unit
 
 ```hcl
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name      = "example"
   namespace = "system"
 
@@ -118,7 +118,7 @@ resource "f5xc_rate_limiter" "test" {
 ### With Annotations
 
 ```hcl
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name      = "example"
   namespace = "system"
 
@@ -131,7 +131,7 @@ resource "f5xc_rate_limiter" "test" {
 ### With Description
 
 ```hcl
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name        = "example"
   namespace   = "system"
   description = "example-value"
@@ -141,7 +141,7 @@ resource "f5xc_rate_limiter" "test" {
 ### With Labels
 
 ```hcl
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name      = "example"
   namespace = "system"
 
@@ -154,7 +154,7 @@ resource "f5xc_rate_limiter" "test" {
 ### With Limits
 
 ```hcl
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name        = "example"
   namespace   = "system"
   description = "Rate limiter with limits configuration"
@@ -370,5 +370,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_rate_limiter.example system/example
+terraform import xcsh_rate_limiter.example system/example
 ```

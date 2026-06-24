@@ -1,8 +1,8 @@
 # HTTP Load Balancer Guide - Variables
 # =====================================
 # Authentication is handled via environment variables:
-#   F5XC_API_URL   - Your tenant URL
-#   F5XC_API_TOKEN - Your API token
+#   XCSH_API_URL   - Your tenant URL
+#   XCSH_API_TOKEN - Your API token
 
 # -----------------------------------------------------------------------------
 # Namespace Configuration

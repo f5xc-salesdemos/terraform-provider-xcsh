@@ -1,4 +1,4 @@
-# f5xc_securemesh_site
+# xcsh_securemesh_site
 
 Category: Sites
 Deploying secure mesh edge sites with distributed security capabilities
@@ -13,7 +13,7 @@ Deploying secure mesh edge sites with distributed security capabilities
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_securemesh_site" "example" {
+resource "xcsh_securemesh_site" "example" {
   name      = "example-securemesh-site"
   namespace = "staging"
 

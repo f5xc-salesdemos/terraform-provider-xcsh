@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_forward_proxy_policy Data Source - terraform-provider-f5xc"
+page_title: "xcsh_forward_proxy_policy Data Source - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about an existing Forward Proxy Policy resource in F5 Distributed Cloud for forward proxy policy specification. configuration.
 ---
 
-# f5xc_forward_proxy_policy (Data Source)
+# xcsh_forward_proxy_policy (Data Source)
 
 Retrieves information about a Forward Proxy Policy resource in F5 Distributed Cloud for forward proxy policy specification. configuration. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Forward Proxy Policy by name
-data "f5xc_forward_proxy_policy" "example" {
+data "xcsh_forward_proxy_policy" "example" {
   name      = "example-forward-proxy-policy"
   namespace = "staging"
 }
 
 output "forward_proxy_policy_id" {
-  value = data.f5xc_forward_proxy_policy.example.id
+  value = data.xcsh_forward_proxy_policy.example.id
 }
 ```
 

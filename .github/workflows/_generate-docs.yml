@@ -81,7 +81,7 @@ jobs:
           fail=0
           warn=0
           pass=0
-          for dir in examples/resources/f5xc_*; do
+          for dir in examples/resources/xcsh_*; do
             if [ ! -f "$dir/resource.tf" ]; then continue; fi
             # Resources with verified test examples (named .tf files beyond resource.tf)
             # are required to pass; others are warn-only
@@ -140,14 +140,14 @@ jobs:
       - name: Build provider and export Terraform schema
         run: |
           echo "::group::Building provider and exporting schema"
-          go build -o terraform-provider-f5xc .
+          go build -o terraform-provider-xcsh .
           mkdir -p /tmp/tf-schema
-          cp terraform-provider-f5xc /tmp/tf-schema/
+          cp terraform-provider-xcsh /tmp/tf-schema/
           cat > /tmp/tf-schema/main.tf << 'EOF'
           terraform {
             required_providers {
-              f5xc = {
-                source  = "f5xc-salesdemos/f5xc"
+              xcsh = {
+                source  = "f5xc-salesdemos/xcsh"
                 version = ">= 0.1.0"
               }
             }

@@ -1,4 +1,4 @@
-# f5xc_ip_prefix_set
+# xcsh_ip_prefix_set
 
 Category: Networking
 Ip_prefix_set creates a new object in the storage backend for metadata.namespace
@@ -11,7 +11,7 @@ Ip_prefix_set creates a new object in the storage backend for metadata.namespace
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_ip_prefix_set" "example" {
+resource "xcsh_ip_prefix_set" "example" {
   name      = "example-ip-prefix-set"
   namespace = "staging"
 

@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	inttimeouts "github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/timeouts"
+	inttimeouts "github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/timeouts"
 )
 
 // ResourceType categorizes resources for timeout configuration

@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_site Resource - terraform-provider-f5xc"
+page_title: "xcsh_site Resource - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Manages virtual site object in given namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_site (Resource)
+# xcsh_site (Resource)
 
 Manages virtual site object in given namespace. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Site configuration
-resource "f5xc_site" "example" {
+resource "xcsh_site" "example" {
   name      = "example-site"
   namespace = "staging"
 
@@ -193,5 +193,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_site.example system/example
+terraform import xcsh_site.example system/example
 ```

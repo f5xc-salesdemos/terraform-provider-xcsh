@@ -1,4 +1,4 @@
-# f5xc_aws_tgw_site
+# xcsh_aws_tgw_site
 
 Category: Sites
 Deploying F5 sites connected via AWS Transit Gateway
@@ -11,7 +11,7 @@ Deploying F5 sites connected via AWS Transit Gateway
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_aws_tgw_site" "example" {
+resource "xcsh_aws_tgw_site" "example" {
   name      = "example-aws-tgw-site"
   namespace = "staging"
 
@@ -33,14 +33,14 @@ resource "f5xc_aws_tgw_site" "example" {
 
   vpc {
     new_vpc {
-      name_tag     = "f5xc-tgw-vpc"
+      name_tag     = "xcsh-tgw-vpc"
       primary_ipv4 = "10.0.0.0/16"
     }
   }
 
   tgw {
     new_tgw {
-      name = "f5xc-tgw"
+      name = "xcsh-tgw"
     }
   }
 

@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	providerDir := "/tmp/terraform-provider-f5xc/internal/provider"
+	providerDir := "/tmp/terraform-provider-xcsh/internal/provider"
 	providerFile := filepath.Join(providerDir, "provider.go")
 
 	// Read all resource files
@@ -68,7 +68,7 @@ func main() {
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 
-		if strings.Contains(line, "func (p *F5XCProvider) Resources(") {
+		if strings.Contains(line, "func (p *XCShProvider) Resources(") {
 			inResourcesFunc = true
 			newLines = append(newLines, line)
 			continue

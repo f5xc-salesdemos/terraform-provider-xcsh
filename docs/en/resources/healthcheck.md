@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_healthcheck Resource - terraform-provider-f5xc"
+page_title: "xcsh_healthcheck Resource - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages a Healthcheck resource in F5 Distributed Cloud for healthcheck object defines method to determine if the given endpoint is healthy. single healthcheck object can be referred to by one or many cluster objects. configuration.
 ---
 
-# f5xc_healthcheck (Resource)
+# xcsh_healthcheck (Resource)
 
 Manages a Healthcheck resource in F5 Distributed Cloud for healthcheck object defines method to determine if the given endpoint is healthy. single healthcheck object can be referred to by one or many cluster objects. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Healthcheck configuration
-resource "f5xc_healthcheck" "example" {
+resource "xcsh_healthcheck" "example" {
   name      = "example-healthcheck"
   namespace = "staging"
 
@@ -78,7 +78,7 @@ resource "f5xc_healthcheck" "example" {
 ### All Attributes
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -104,7 +104,7 @@ resource "f5xc_healthcheck" "test" {
 ### Http Headers Remove
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -124,7 +124,7 @@ resource "f5xc_healthcheck" "test" {
 ### Http Health Check
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -143,7 +143,7 @@ resource "f5xc_healthcheck" "test" {
 ### Http Http2
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -163,7 +163,7 @@ resource "f5xc_healthcheck" "test" {
 ### Http Origin Server Name
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -182,7 +182,7 @@ resource "f5xc_healthcheck" "test" {
 ### Http Status Codes
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -202,7 +202,7 @@ resource "f5xc_healthcheck" "test" {
 ### Http With Path
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -221,7 +221,7 @@ resource "f5xc_healthcheck" "test" {
 ### Thresholds
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -237,7 +237,7 @@ resource "f5xc_healthcheck" "test" {
 ### Udp Icmp
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -253,7 +253,7 @@ resource "f5xc_healthcheck" "test" {
 ### With Annotations
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -274,7 +274,7 @@ resource "f5xc_healthcheck" "test" {
 ### With Description
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name        = "example"
   namespace   = "system"
   description = "example-value"
@@ -291,7 +291,7 @@ resource "f5xc_healthcheck" "test" {
 ### With Jitter
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -308,7 +308,7 @@ resource "f5xc_healthcheck" "test" {
 ### With Labels
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -535,5 +535,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_healthcheck.example system/example
+terraform import xcsh_healthcheck.example system/example
 ```

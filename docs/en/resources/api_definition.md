@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_api_definition Resource - terraform-provider-f5xc"
+page_title: "xcsh_api_definition Resource - terraform-provider-xcsh"
 subcategory: "API Security"
 description: |-
   Manages API Definition. in F5 Distributed Cloud.
 ---
 
-# f5xc_api_definition (Resource)
+# xcsh_api_definition (Resource)
 
 Manages API Definition. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic API Definition configuration
-resource "f5xc_api_definition" "example" {
+resource "xcsh_api_definition" "example" {
   name      = "example-api-definition"
   namespace = "staging"
 
@@ -248,5 +248,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_api_definition.example system/example
+terraform import xcsh_api_definition.example system/example
 ```

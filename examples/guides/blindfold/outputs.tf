@@ -16,7 +16,7 @@ output "namespace" {
 
 output "certificate_name" {
   description = "Name of the created certificate (if enabled)"
-  value       = var.enable_certificate_example ? f5xc_certificate.example[0].name : null
+  value       = var.enable_certificate_example ? xcsh_certificate.example[0].name : null
 }
 
 # -----------------------------------------------------------------------------
@@ -25,17 +25,17 @@ output "certificate_name" {
 
 output "aws_credentials_name" {
   description = "Name of the AWS cloud credentials (if enabled)"
-  value       = var.enable_aws_credentials_example ? f5xc_cloud_credentials.aws[0].name : null
+  value       = var.enable_aws_credentials_example ? xcsh_cloud_credentials.aws[0].name : null
 }
 
 output "azure_credentials_name" {
   description = "Name of the Azure cloud credentials (if enabled)"
-  value       = var.enable_azure_credentials_example ? f5xc_cloud_credentials.azure[0].name : null
+  value       = var.enable_azure_credentials_example ? xcsh_cloud_credentials.azure[0].name : null
 }
 
 output "gcp_credentials_name" {
   description = "Name of the GCP cloud credentials (if enabled)"
-  value       = var.enable_gcp_credentials_example ? f5xc_cloud_credentials.gcp[0].name : null
+  value       = var.enable_gcp_credentials_example ? xcsh_cloud_credentials.gcp[0].name : null
 }
 
 # -----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ output "gcp_credentials_name" {
 
 output "container_registry_name" {
   description = "Name of the container registry (if enabled)"
-  value       = var.enable_container_registry_example ? f5xc_container_registry.example[0].name : null
+  value       = var.enable_container_registry_example ? xcsh_container_registry.example[0].name : null
 }
 
 # -----------------------------------------------------------------------------
@@ -61,19 +61,19 @@ output "next_steps" {
 
     Resources Created:
     %{if var.enable_certificate_example~}
-    - Certificate: ${f5xc_certificate.example[0].name}
+    - Certificate: ${xcsh_certificate.example[0].name}
     %{endif~}
     %{if var.enable_aws_credentials_example~}
-    - AWS Credentials: ${f5xc_cloud_credentials.aws[0].name}
+    - AWS Credentials: ${xcsh_cloud_credentials.aws[0].name}
     %{endif~}
     %{if var.enable_azure_credentials_example~}
-    - Azure Credentials: ${f5xc_cloud_credentials.azure[0].name}
+    - Azure Credentials: ${xcsh_cloud_credentials.azure[0].name}
     %{endif~}
     %{if var.enable_gcp_credentials_example~}
-    - GCP Credentials: ${f5xc_cloud_credentials.gcp[0].name}
+    - GCP Credentials: ${xcsh_cloud_credentials.gcp[0].name}
     %{endif~}
     %{if var.enable_container_registry_example~}
-    - Container Registry: ${f5xc_container_registry.example[0].name}
+    - Container Registry: ${xcsh_container_registry.example[0].name}
     %{endif~}
 
     Verify in F5XC Console:

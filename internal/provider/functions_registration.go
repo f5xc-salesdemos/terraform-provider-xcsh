@@ -13,11 +13,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/function"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/functions"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/functions"
 )
 
-// Ensure F5XCProvider satisfies the provider.ProviderWithFunctions interface.
-var _ provider.ProviderWithFunctions = &F5XCProvider{}
+// Ensure XCShProvider satisfies the provider.ProviderWithFunctions interface.
+var _ provider.ProviderWithFunctions = &XCShProvider{}
 
 // Functions returns utility functions provided by this provider.
 // These include blindfold encryption functions for F5XC Secret Management.
@@ -30,7 +30,7 @@ var _ provider.ProviderWithFunctions = &F5XCProvider{}
 //
 //	provider::f5xc::blindfold(plaintext, policy_name, namespace)
 //	provider::f5xc::blindfold_file(path, policy_name, namespace)
-func (p *F5XCProvider) Functions(ctx context.Context) []func() function.Function {
+func (p *XCShProvider) Functions(ctx context.Context) []func() function.Function {
 	return []func() function.Function{
 		functions.NewBlindfoldFunction,
 		functions.NewBlindfoldFileFunction,

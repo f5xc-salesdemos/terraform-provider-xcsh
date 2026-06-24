@@ -1,4 +1,4 @@
-# f5xc_log_receiver
+# xcsh_log_receiver
 
 Category: Monitoring
 New Log Receiver object
@@ -11,7 +11,7 @@ New Log Receiver object
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_log_receiver" "example" {
+resource "xcsh_log_receiver" "example" {
   name      = "example-log-receiver"
   namespace = "staging"
 

@@ -16,7 +16,7 @@ terraform {
 
   required_providers {
     f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
     time = {
@@ -31,15 +31,15 @@ terraform {
 # =============================================================================
 #
 # Authentication via environment variables (recommended):
-#   export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-#   export F5XC_API_TOKEN="your-api-token"
+#   export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+#   export XCSH_API_TOKEN="your-api-token"
 #
 # Or for P12 certificate:
-#   export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-#   export F5XC_P12_FILE="/path/to/credentials.p12"
-#   export F5XC_P12_PASSWORD="your-p12-password"  # gitleaks:allow
+#   export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+#   export XCSH_P12_FILE="/path/to/credentials.p12"
+#   export XCSH_P12_PASSWORD="your-p12-password"  # gitleaks:allow
 
-provider "f5xc" {
+provider "xcsh" {
   # Authentication via environment variables
 }
 
@@ -48,19 +48,19 @@ provider "f5xc" {
 # =============================================================================
 
 # Get details about Bot Defense addon service
-data "f5xc_addon_service" "bot_defense" {
+data "xcsh_addon_service" "bot_defense" {
   count = var.enable_bot_defense ? 1 : 0
   name  = "f5xc-bot-defense-standard"
 }
 
 # Get details about Client Side Defense addon service
-data "f5xc_addon_service" "client_side_defense" {
+data "xcsh_addon_service" "client_side_defense" {
   count = var.enable_client_side_defense ? 1 : 0
   name  = "f5xc-client-side-defense-standard"
 }
 
 # Get details about WAAP (Web App and API Protection) addon service
-data "f5xc_addon_service" "waap" {
+data "xcsh_addon_service" "waap" {
   count = var.enable_waap ? 1 : 0
   name  = "f5xc-waap-standard"
 }
@@ -70,19 +70,19 @@ data "f5xc_addon_service" "waap" {
 # =============================================================================
 
 # Check Bot Defense activation status
-data "f5xc_addon_service_activation_status" "bot_defense" {
+data "xcsh_addon_service_activation_status" "bot_defense" {
   count         = var.enable_bot_defense ? 1 : 0
   addon_service = "f5xc-bot-defense-standard"
 }
 
 # Check Client Side Defense activation status
-data "f5xc_addon_service_activation_status" "client_side_defense" {
+data "xcsh_addon_service_activation_status" "client_side_defense" {
   count         = var.enable_client_side_defense ? 1 : 0
   addon_service = "f5xc-client-side-defense-standard"
 }
 
 # Check WAAP activation status
-data "f5xc_addon_service_activation_status" "waap" {
+data "xcsh_addon_service_activation_status" "waap" {
   count         = var.enable_waap ? 1 : 0
   addon_service = "f5xc-waap-standard"
 }
@@ -92,12 +92,12 @@ data "f5xc_addon_service_activation_status" "waap" {
 # =============================================================================
 
 # Activate Bot Defense if enabled and available
-resource "f5xc_addon_subscription" "bot_defense" {
+resource "xcsh_addon_subscription" "bot_defense" {
   count = (
     var.enable_bot_defense &&
-    length(data.f5xc_addon_service_activation_status.bot_defense) > 0 &&
-    data.f5xc_addon_service_activation_status.bot_defense[0].can_activate &&
-    data.f5xc_addon_service_activation_status.bot_defense[0].state == "AS_NONE"
+    length(data.xcsh_addon_service_activation_status.bot_defense) > 0 &&
+    data.xcsh_addon_service_activation_status.bot_defense[0].can_activate &&
+    data.xcsh_addon_service_activation_status.bot_defense[0].state == "AS_NONE"
   ) ? 1 : 0
 
   name      = "bot-defense-subscription"
@@ -110,12 +110,12 @@ resource "f5xc_addon_subscription" "bot_defense" {
 }
 
 # Activate Client Side Defense if enabled and available
-resource "f5xc_addon_subscription" "client_side_defense" {
+resource "xcsh_addon_subscription" "client_side_defense" {
   count = (
     var.enable_client_side_defense &&
-    length(data.f5xc_addon_service_activation_status.client_side_defense) > 0 &&
-    data.f5xc_addon_service_activation_status.client_side_defense[0].can_activate &&
-    data.f5xc_addon_service_activation_status.client_side_defense[0].state == "AS_NONE"
+    length(data.xcsh_addon_service_activation_status.client_side_defense) > 0 &&
+    data.xcsh_addon_service_activation_status.client_side_defense[0].can_activate &&
+    data.xcsh_addon_service_activation_status.client_side_defense[0].state == "AS_NONE"
   ) ? 1 : 0
 
   name      = "client-side-defense-subscription"
@@ -128,12 +128,12 @@ resource "f5xc_addon_subscription" "client_side_defense" {
 }
 
 # Activate WAAP if enabled and available
-resource "f5xc_addon_subscription" "waap" {
+resource "xcsh_addon_subscription" "waap" {
   count = (
     var.enable_waap &&
-    length(data.f5xc_addon_service_activation_status.waap) > 0 &&
-    data.f5xc_addon_service_activation_status.waap[0].can_activate &&
-    data.f5xc_addon_service_activation_status.waap[0].state == "AS_NONE"
+    length(data.xcsh_addon_service_activation_status.waap) > 0 &&
+    data.xcsh_addon_service_activation_status.waap[0].can_activate &&
+    data.xcsh_addon_service_activation_status.waap[0].state == "AS_NONE"
   ) ? 1 : 0
 
   name      = "waap-subscription"
@@ -152,15 +152,15 @@ resource "f5xc_addon_subscription" "waap" {
 # Wait for activation to propagate before using features
 resource "time_sleep" "wait_for_activation" {
   count = (
-    length(f5xc_addon_subscription.bot_defense) > 0 ||
-    length(f5xc_addon_subscription.client_side_defense) > 0 ||
-    length(f5xc_addon_subscription.waap) > 0
+    length(xcsh_addon_subscription.bot_defense) > 0 ||
+    length(xcsh_addon_subscription.client_side_defense) > 0 ||
+    length(xcsh_addon_subscription.waap) > 0
   ) ? 1 : 0
 
   depends_on = [
-    f5xc_addon_subscription.bot_defense,
-    f5xc_addon_subscription.client_side_defense,
-    f5xc_addon_subscription.waap,
+    xcsh_addon_subscription.bot_defense,
+    xcsh_addon_subscription.client_side_defense,
+    xcsh_addon_subscription.waap,
   ]
 
   create_duration = var.activation_wait_time
@@ -170,7 +170,7 @@ resource "time_sleep" "wait_for_activation" {
 # EXAMPLE NAMESPACE (for demonstration)
 # =============================================================================
 
-resource "f5xc_namespace" "demo" {
+resource "xcsh_namespace" "demo" {
   count       = var.create_demo_namespace ? 1 : 0
   name        = var.demo_namespace_name
   description = "Namespace for addon activation demonstration"

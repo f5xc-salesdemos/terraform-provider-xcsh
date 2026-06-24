@@ -1,4 +1,4 @@
-# f5xc_nginx_service_discovery
+# xcsh_nginx_service_discovery
 
 Category: Networking
 Api to create nginx service discovery object for a site or virtual site in system namespace. configuration
@@ -11,7 +11,7 @@ Api to create nginx service discovery object for a site or virtual site in syste
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_nginx_service_discovery" "example" {
+resource "xcsh_nginx_service_discovery" "example" {
   name      = "example-nginx-service-discovery"
   namespace = "staging"
 

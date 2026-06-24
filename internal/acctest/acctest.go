@@ -19,8 +19,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/provider"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/provider"
 )
 
 var (
@@ -31,28 +31,28 @@ var (
 )
 
 // Environment variable names for acceptance tests
-// Using F5XC_* prefix for F5 Distributed Cloud branding.
+// Using XCSH_* prefix for xcsh provider branding.
 const (
-	// EnvF5XCURL is the environment variable for the F5 XC API URL
-	EnvF5XCURL = "F5XC_API_URL"
+	// EnvXCShURL is the environment variable for the API URL
+	EnvXCShURL = "XCSH_API_URL"
 
-	// EnvF5XCToken is the environment variable for the F5 XC API token
-	EnvF5XCToken = "F5XC_API_TOKEN"
+	// EnvXCShToken is the environment variable for the API token
+	EnvXCShToken = "XCSH_API_TOKEN"
 
-	// EnvF5XCP12File is the environment variable for the P12 certificate file path
-	EnvF5XCP12File = "F5XC_P12_FILE"
+	// EnvXCShP12File is the environment variable for the P12 certificate file path
+	EnvXCShP12File = "XCSH_P12_FILE"
 
-	// EnvF5XCP12Password is the environment variable for the P12 certificate password
-	EnvF5XCP12Password = "F5XC_P12_PASSWORD" // pragma: allowlist secret
+	// EnvXCShP12Password is the environment variable for the P12 certificate password
+	EnvXCShP12Password = "XCSH_P12_PASSWORD" // pragma: allowlist secret
 
-	// EnvF5XCCert is the environment variable for the PEM certificate file path
-	EnvF5XCCert = "F5XC_CERT"
+	// EnvXCShCert is the environment variable for the PEM certificate file path
+	EnvXCShCert = "XCSH_CERT"
 
-	// EnvF5XCKey is the environment variable for the PEM key file path
-	EnvF5XCKey = "F5XC_KEY"
+	// EnvXCShKey is the environment variable for the PEM key file path
+	EnvXCShKey = "XCSH_KEY"
 
-	// EnvF5XCTenantName is the environment variable for the F5 XC tenant name
-	EnvF5XCTenantName = "F5XC_TENANT_NAME"
+	// EnvXCShTenantName is the environment variable for the tenant name
+	EnvXCShTenantName = "XCSH_TENANT_NAME"
 
 	// EnvTFAccTest enables acceptance tests
 	EnvTFAccTest = "TF_ACC"
@@ -60,7 +60,7 @@ const (
 
 // ProtoV6ProviderFactories returns the provider factories for acceptance testing
 var ProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-	"f5xc": providerserver.NewProtocol6WithError(provider.New("test")()),
+	"xcsh": providerserver.NewProtocol6WithError(provider.New("test")()),
 }
 
 // ExternalProviders defines external providers used in acceptance tests
@@ -88,17 +88,17 @@ const (
 // DetectAuthMethod determines which authentication method is configured
 func DetectAuthMethod() AuthMethod {
 	// Check P12 authentication (preferred for testing)
-	if os.Getenv(EnvF5XCP12File) != "" && os.Getenv(EnvF5XCP12Password) != "" {
+	if os.Getenv(EnvXCShP12File) != "" && os.Getenv(EnvXCShP12Password) != "" {
 		return AuthMethodP12
 	}
 
 	// Check PEM certificate authentication
-	if os.Getenv(EnvF5XCCert) != "" && os.Getenv(EnvF5XCKey) != "" {
+	if os.Getenv(EnvXCShCert) != "" && os.Getenv(EnvXCShKey) != "" {
 		return AuthMethodPEM
 	}
 
 	// Check token authentication
-	if os.Getenv(EnvF5XCToken) != "" {
+	if os.Getenv(EnvXCShToken) != "" {
 		return AuthMethodToken
 	}
 
@@ -107,7 +107,7 @@ func DetectAuthMethod() AuthMethod {
 
 // PreCheck validates that required environment variables are set before running tests.
 // It also logs the test category as REAL_API for reporting purposes.
-// When F5XC_MOCK_MODE is set, it automatically configures the environment to use
+// When XCSH_MOCK_MODE is set, it automatically configures the environment to use
 // the global mock server instead of requiring real credentials.
 func PreCheck(t *testing.T) {
 	t.Helper()
@@ -119,7 +119,7 @@ func PreCheck(t *testing.T) {
 	// Log test category for reporting
 	if IsMockMode() {
 		LogTestCategory(t, TestCategoryMock)
-		t.Logf("Using mock server mode (F5XC_MOCK_MODE=1)")
+		t.Logf("Using mock server mode (XCSH_MOCK_MODE=1)")
 		return // Skip credential validation for mock mode
 	}
 
@@ -127,8 +127,8 @@ func PreCheck(t *testing.T) {
 	LogTestCategory(t, TestCategoryReal)
 
 	// API URL is always required
-	if os.Getenv(EnvF5XCURL) == "" {
-		t.Fatalf("Required environment variable not set: %s", EnvF5XCURL)
+	if os.Getenv(EnvXCShURL) == "" {
+		t.Fatalf("Required environment variable not set: %s", EnvXCShURL)
 	}
 
 	// Check for at least one valid authentication method
@@ -136,10 +136,10 @@ func PreCheck(t *testing.T) {
 
 	switch authMethod {
 	case AuthMethodP12:
-		t.Logf("Using P12 certificate authentication (file: %s)", os.Getenv(EnvF5XCP12File))
+		t.Logf("Using P12 certificate authentication (file: %s)", os.Getenv(EnvXCShP12File))
 	case AuthMethodPEM:
 		t.Logf("Using PEM certificate authentication (cert: %s, key: %s)",
-			os.Getenv(EnvF5XCCert), os.Getenv(EnvF5XCKey))
+			os.Getenv(EnvXCShCert), os.Getenv(EnvXCShKey))
 	case AuthMethodToken:
 		t.Logf("Using API token authentication")
 	case AuthMethodNone:
@@ -147,14 +147,14 @@ func PreCheck(t *testing.T) {
 			"  - P12: %s and %s\n"+
 			"  - PEM: %s and %s\n"+
 			"  - Token: %s",
-			EnvF5XCP12File, EnvF5XCP12Password,
-			EnvF5XCCert, EnvF5XCKey,
-			EnvF5XCToken)
+			EnvXCShP12File, EnvXCShP12Password,
+			EnvXCShCert, EnvXCShKey,
+			EnvXCShToken)
 	}
 }
 
 // SkipIfNotAccTest skips the test if TF_ACC is not set and mock mode is not enabled.
-// When F5XC_MOCK_MODE is set, tests run without requiring TF_ACC.
+// When XCSH_MOCK_MODE is set, tests run without requiring TF_ACC.
 func SkipIfNotAccTest(t *testing.T) {
 	t.Helper()
 
@@ -180,7 +180,7 @@ func RandomNameWithSuffix(prefix, suffix string) string {
 
 // TestNamespace returns the namespace for tests (default: "default")
 func TestNamespace() string {
-	if ns := os.Getenv("F5XC_DEFAULT_NAMESPACE"); ns != "" {
+	if ns := os.Getenv("XCSH_DEFAULT_NAMESPACE"); ns != "" {
 		return ns
 	}
 	return "default"
@@ -202,7 +202,7 @@ func ConfigCompose(configs ...string) string {
 // is needed - the framework injects the provider via reattach configuration.
 func ProviderConfig() string {
 	return `
-provider "f5xc" {
+provider "xcsh" {
   # Configuration from environment variables
 }
 `
@@ -286,7 +286,7 @@ func NewTestResource(resourceType string) *TestResource {
 
 // FullResourceName returns the full Terraform resource name
 func (r *TestResource) FullResourceName() string {
-	return fmt.Sprintf("f5xc_%s.test", r.ResourceType)
+	return fmt.Sprintf("xcsh_%s.test", r.ResourceType)
 }
 
 // IDAttribute returns the attribute path for the ID
@@ -324,7 +324,7 @@ func TestCheckFuncCompose(funcs ...resource.TestCheckFunc) resource.TestCheckFun
 // The client is created once and reused across all tests.
 func GetTestClient() (*client.Client, error) {
 	testClientOnce.Do(func() {
-		apiURL := os.Getenv(EnvF5XCURL)
+		apiURL := os.Getenv(EnvXCShURL)
 		if apiURL == "" {
 			apiURL = "https://console.ves.volterra.io"
 		}
@@ -340,18 +340,18 @@ func GetTestClient() (*client.Client, error) {
 		case AuthMethodP12:
 			testClient, testClientErr = client.NewClientWithP12(
 				apiURL,
-				os.Getenv(EnvF5XCP12File),
-				os.Getenv(EnvF5XCP12Password),
+				os.Getenv(EnvXCShP12File),
+				os.Getenv(EnvXCShP12Password),
 			)
 		case AuthMethodPEM:
 			testClient, testClientErr = client.NewClientWithCert(
 				apiURL,
-				os.Getenv(EnvF5XCCert),
-				os.Getenv(EnvF5XCKey),
+				os.Getenv(EnvXCShCert),
+				os.Getenv(EnvXCShKey),
 				"", // CA cert optional
 			)
 		case AuthMethodToken:
-			testClient = client.NewClient(apiURL, os.Getenv(EnvF5XCToken))
+			testClient = client.NewClient(apiURL, os.Getenv(EnvXCShToken))
 		default:
 			testClientErr = fmt.Errorf("no authentication method configured")
 		}

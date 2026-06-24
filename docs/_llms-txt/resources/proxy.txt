@@ -1,4 +1,4 @@
-# f5xc_proxy
+# xcsh_proxy
 
 Category: Networking
 Tcp loadbalancer create specification. configuration
@@ -12,7 +12,7 @@ Tcp loadbalancer create specification. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_proxy" "example" {
+resource "xcsh_proxy" "example" {
   name      = "example-proxy"
   namespace = "staging"
 

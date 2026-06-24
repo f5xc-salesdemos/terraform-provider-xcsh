@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_external_connector Data Source - terraform-provider-f5xc"
+page_title: "xcsh_external_connector Data Source - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Retrieves information about an existing External Connector resource in F5 Distributed Cloud for external_connector configuration specification. configuration.
 ---
 
-# f5xc_external_connector (Data Source)
+# xcsh_external_connector (Data Source)
 
 Retrieves information about an External Connector resource in F5 Distributed Cloud for external_connector configuration specification. configuration. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing External Connector by name
-data "f5xc_external_connector" "example" {
+data "xcsh_external_connector" "example" {
   name      = "example-external-connector"
   namespace = "staging"
 }
 
 output "external_connector_id" {
-  value = data.f5xc_external_connector.example.id
+  value = data.xcsh_external_connector.example.id
 }
 ```
 

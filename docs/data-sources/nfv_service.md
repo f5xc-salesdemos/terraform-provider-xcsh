@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_nfv_service Data Source - terraform-provider-f5xc"
+page_title: "xcsh_nfv_service Data Source - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Retrieves information about an existing NFV service with configured parameters. in F5 Distributed Cloud.
 ---
 
-# f5xc_nfv_service (Data Source)
+# xcsh_nfv_service (Data Source)
 
 Retrieves information about new NFV service with configured parameters. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Nfv Service by name
-data "f5xc_nfv_service" "example" {
+data "xcsh_nfv_service" "example" {
   name      = "example-nfv-service"
   namespace = "staging"
 }
 
 output "nfv_service_id" {
-  value = data.f5xc_nfv_service.example.id
+  value = data.xcsh_nfv_service.example.id
 }
 ```
 

@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_trusted_ca_list Data Source - terraform-provider-f5xc"
+page_title: "xcsh_trusted_ca_list Data Source - terraform-provider-xcsh"
 subcategory: "Certificates"
 description: |-
   Retrieves information about an existing Trusted CA List resource in F5 Distributed Cloud for trusted certificate authority list management.
 ---
 
-# f5xc_trusted_ca_list (Data Source)
+# xcsh_trusted_ca_list (Data Source)
 
 Retrieves information about a Trusted CA List resource in F5 Distributed Cloud for trusted certificate authority list management. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Trusted CA List by name
-data "f5xc_trusted_ca_list" "example" {
+data "xcsh_trusted_ca_list" "example" {
   name      = "example-trusted-ca-list"
   namespace = "staging"
 }
 
 output "trusted_ca_list_id" {
-  value = data.f5xc_trusted_ca_list.example.id
+  value = data.xcsh_trusted_ca_list.example.id
 }
 ```
 

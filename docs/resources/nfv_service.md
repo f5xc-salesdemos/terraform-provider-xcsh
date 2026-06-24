@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_nfv_service Resource - terraform-provider-f5xc"
+page_title: "xcsh_nfv_service Resource - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Manages new NFV service with configured parameters. in F5 Distributed Cloud.
 ---
 
-# f5xc_nfv_service (Resource)
+# xcsh_nfv_service (Resource)
 
 Manages new NFV service with configured parameters. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Nfv Service configuration
-resource "f5xc_nfv_service" "example" {
+resource "xcsh_nfv_service" "example" {
   name      = "example-nfv-service"
   namespace = "staging"
 
@@ -728,5 +728,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_nfv_service.example system/example
+terraform import xcsh_nfv_service.example system/example
 ```

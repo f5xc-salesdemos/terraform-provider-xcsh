@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_enhanced_firewall_policy Data Source - terraform-provider-f5xc"
+page_title: "xcsh_enhanced_firewall_policy Data Source - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about an existing Enhanced Firewall Policy resource in F5 Distributed Cloud for enhanced firewall policy specification. configuration.
 ---
 
-# f5xc_enhanced_firewall_policy (Data Source)
+# xcsh_enhanced_firewall_policy (Data Source)
 
 Retrieves information about an Enhanced Firewall Policy resource in F5 Distributed Cloud for enhanced firewall policy specification. configuration. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Enhanced Firewall Policy by name
-data "f5xc_enhanced_firewall_policy" "example" {
+data "xcsh_enhanced_firewall_policy" "example" {
   name      = "example-enhanced-firewall-policy"
   namespace = "staging"
 }
 
 output "enhanced_firewall_policy_id" {
-  value = data.f5xc_enhanced_firewall_policy.example.id
+  value = data.xcsh_enhanced_firewall_policy.example.id
 }
 ```
 

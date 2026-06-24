@@ -1,4 +1,4 @@
-# f5xc_alert_receiver
+# xcsh_alert_receiver
 
 Category: Monitoring
 New Alert Receiver object
@@ -12,7 +12,7 @@ New Alert Receiver object
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_alert_receiver" "example" {
+resource "xcsh_alert_receiver" "example" {
   name      = "example-alert-receiver"
   namespace = "staging"
 

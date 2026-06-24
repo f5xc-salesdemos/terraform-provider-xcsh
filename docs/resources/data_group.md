@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_data_group Resource - terraform-provider-f5xc"
+page_title: "xcsh_data_group Resource - terraform-provider-xcsh"
 subcategory: "BIG-IP Integration"
 description: |-
   Manages data group in a given namespace. If one already exists it will give an error. in F5 Distributed Cloud.
 ---
 
-# f5xc_data_group (Resource)
+# xcsh_data_group (Resource)
 
 Manages data group in a given namespace. If one already exists it will give an error. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Data Group configuration
-resource "f5xc_data_group" "example" {
+resource "xcsh_data_group" "example" {
   name      = "example-data-group"
   namespace = "staging"
 
@@ -215,5 +215,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_data_group.example system/example
+terraform import xcsh_data_group.example system/example
 ```

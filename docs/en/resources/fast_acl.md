@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_fast_acl Resource - terraform-provider-f5xc"
+page_title: "xcsh_fast_acl Resource - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Manages object, object contains rules to protect site from denial of service It has destination{destination IP, destination port) and references to. in F5 Distributed Cloud.
 ---
 
-# f5xc_fast_acl (Resource)
+# xcsh_fast_acl (Resource)
 
 Manages object, object contains rules to protect site from denial of service It has destination{destination IP, destination port) and references to. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Fast ACL configuration
-resource "f5xc_fast_acl" "example" {
+resource "xcsh_fast_acl" "example" {
   name      = "example-fast-acl"
   namespace = "staging"
 
@@ -394,5 +394,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_fast_acl.example system/example
+terraform import xcsh_fast_acl.example system/example
 ```

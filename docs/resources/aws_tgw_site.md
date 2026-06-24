@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_aws_tgw_site Resource - terraform-provider-f5xc"
+page_title: "xcsh_aws_tgw_site Resource - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Manages a AWS TGW Site resource in F5 Distributed Cloud for deploying F5 sites connected via AWS Transit Gateway.
 ---
 
-# f5xc_aws_tgw_site (Resource)
+# xcsh_aws_tgw_site (Resource)
 
 Manages a AWS TGW Site resource in F5 Distributed Cloud for deploying F5 sites connected via AWS Transit Gateway.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic AWS TGW Site configuration
-resource "f5xc_aws_tgw_site" "example" {
+resource "xcsh_aws_tgw_site" "example" {
   name      = "example-aws-tgw-site"
   namespace = "staging"
 
@@ -54,7 +54,7 @@ resource "f5xc_aws_tgw_site" "example" {
   # VPC configuration
   vpc {
     new_vpc {
-      name_tag     = "f5xc-tgw-vpc"
+      name_tag     = "xcsh-tgw-vpc"
       primary_ipv4 = "10.0.0.0/16"
     }
   }
@@ -62,7 +62,7 @@ resource "f5xc_aws_tgw_site" "example" {
   # TGW configuration
   tgw {
     new_tgw {
-      name = "f5xc-tgw"
+      name = "xcsh-tgw"
     }
   }
 
@@ -196,7 +196,7 @@ An [`aws_parameters`](#aws-parameters) block supports the following:
 
 <a id="aws-parameters-existing-tgw"></a>&#x2022; [`existing_tgw`](#aws-parameters-existing-tgw) - Optional Block<br>X-displayName: 'Existing TGW Type' Information needed for existing TGW<br>See [Existing TGW](#aws-parameters-existing-tgw) below.
 
-<a id="aws-parameters-f5xc-security-group"></a>&#x2022; [`f5xc_security_group`](#aws-parameters-f5xc-security-group) - Optional Block<br>Enable this option
+<a id="aws-parameters-xcsh-security-group"></a>&#x2022; [`xcsh_security_group`](#aws-parameters-xcsh-security-group) - Optional Block<br>Enable this option
 
 <a id="aws-parameters-instance-type"></a>&#x2022; [`instance_type`](#aws-parameters-instance-type) - Optional String<br>Instance size based on the performance
 
@@ -948,5 +948,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_aws_tgw_site.example system/example
+terraform import xcsh_aws_tgw_site.example system/example
 ```

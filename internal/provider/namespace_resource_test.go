@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/acctest"
 )
 
 // =============================================================================

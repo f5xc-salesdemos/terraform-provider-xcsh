@@ -1,4 +1,4 @@
-# f5xc_dns_domain
+# xcsh_dns_domain
 
 Category: DNS
 DNS Domain in a given namespace. If one already exist it will give a error
@@ -12,7 +12,7 @@ DNS Domain in a given namespace. If one already exist it will give a error
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_dns_domain" "example" {
+resource "xcsh_dns_domain" "example" {
   name      = "example-dns-domain"
   namespace = "staging"
 

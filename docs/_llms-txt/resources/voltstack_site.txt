@@ -1,4 +1,4 @@
-# f5xc_voltstack_site
+# xcsh_voltstack_site
 
 Category: Sites
 Deploying Volterra stack sites for edge computing
@@ -13,7 +13,7 @@ Deploying Volterra stack sites for edge computing
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_voltstack_site" "example" {
+resource "xcsh_voltstack_site" "example" {
   name      = "example-voltstack-site"
   namespace = "staging"
 

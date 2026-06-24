@@ -37,8 +37,8 @@ Since this is a pre-release project, users must:
 If you have existing F5 Distributed Cloud resources (not managed by Terraform), you can import them:
 
 ```bash
-terraform import f5xc_namespace.example my-namespace
-terraform import f5xc_http_loadbalancer.example namespace/loadbalancer-name
+terraform import xcsh_namespace.example my-namespace
+terraform import xcsh_http_loadbalancer.example namespace/loadbalancer-name
 ```
 
 See the provider documentation for resource-specific import formats.
@@ -47,8 +47,8 @@ See the provider documentation for resource-specific import formats.
 
 - 98 resources based on F5 Distributed Cloud API v2 specifications
 - Provider-defined functions:
-  - `provider::f5xc::blindfold` - Encrypt plaintext with F5XC blindfold encryption
-  - `provider::f5xc::blindfold_file` - Encrypt file contents with F5XC blindfold encryption
+  - `provider::xcsh::blindfold` - Encrypt plaintext with F5XC blindfold encryption
+  - `provider::xcsh::blindfold_file` - Encrypt file contents with F5XC blindfold encryption
 
 ### Improved
 

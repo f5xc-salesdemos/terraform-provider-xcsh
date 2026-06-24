@@ -13,13 +13,13 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/naming"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/naming"
 )
 
 func main() {
 	// Read all resource files
-	providerDir := "/tmp/terraform-provider-f5xc/internal/provider"
-	clientFile := "/tmp/terraform-provider-f5xc/internal/client/client.go"
+	providerDir := "/tmp/terraform-provider-xcsh/internal/provider"
+	clientFile := "/tmp/terraform-provider-xcsh/internal/client/client.go"
 
 	files, err := filepath.Glob(filepath.Join(providerDir, "*_resource.go"))
 	if err != nil {

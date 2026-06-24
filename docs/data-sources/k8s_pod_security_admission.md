@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_k8s_pod_security_admission Data Source - terraform-provider-f5xc"
+page_title: "xcsh_k8s_pod_security_admission Data Source - terraform-provider-xcsh"
 subcategory: "Kubernetes"
 description: |-
   Retrieves information about k8s_pod_security_admission will create the object in the storage backend. in F5 Distributed Cloud.
 ---
 
-# f5xc_k8s_pod_security_admission (Data Source)
+# xcsh_k8s_pod_security_admission (Data Source)
 
 Manages k8s_pod_security_admission will create the object in the storage backend. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing K8S Pod Security Admission by name
-data "f5xc_k8s_pod_security_admission" "example" {
+data "xcsh_k8s_pod_security_admission" "example" {
   name      = "example-k8s-pod-security-admission"
   namespace = "staging"
 }
 
 output "k8s_pod_security_admission_id" {
-  value = data.f5xc_k8s_pod_security_admission.example.id
+  value = data.xcsh_k8s_pod_security_admission.example.id
 }
 ```
 

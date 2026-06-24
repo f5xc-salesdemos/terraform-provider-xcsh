@@ -1,4 +1,4 @@
-# f5xc_network_firewall
+# xcsh_network_firewall
 
 Category: Security
 Network firewall is created by users in system namespace. configuration
@@ -17,7 +17,7 @@ Network firewall is created by users in system namespace. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_network_firewall" "example" {
+resource "xcsh_network_firewall" "example" {
   name      = "example-network-firewall"
   namespace = "staging"
 

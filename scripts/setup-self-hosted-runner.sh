@@ -18,11 +18,11 @@
 #   -y, --yes           Auto-confirm all prompts
 #   --skip-secrets      Skip configuring GitHub secrets (use if already set)
 #   --skip-start        Skip starting the runner after setup
-#   --runner-name NAME  Set runner name (default: hostname-f5xc)
+#   --runner-name NAME  Set runner name (default: hostname-xcsh)
 #
 # Environment Variables:
-#   F5XC_API_URL    - F5 XC API URL (used in non-interactive mode)
-#   F5XC_API_TOKEN  - F5 XC API Token (used in non-interactive mode)
+#   XCSH_API_URL    - F5 XC API URL (used in non-interactive mode)
+#   XCSH_API_TOKEN  - F5 XC API Token (used in non-interactive mode)
 #   GITHUB_TOKEN    - GitHub PAT for container mode (repo scope required)
 #
 # Container Mode Requirements:
@@ -215,7 +215,7 @@ configure_credentials() {
     log_step "Configuring F5 XC API credentials"
 
     # Use environment variables if available (non-interactive mode)
-    if [[ -n "${F5XC_API_URL:-}" ]] && [[ -n "${F5XC_API_TOKEN:-}" ]]; then
+    if [[ -n "${XCSH_API_URL:-}" ]] && [[ -n "${XCSH_API_TOKEN:-}" ]]; then
         log_info "Using credentials from environment variables"
     else
         echo ""
@@ -225,18 +225,18 @@ configure_credentials() {
         echo "  3. Copy the token"
         echo ""
 
-        prompt_input "F5 XC API URL" "https://console.ves.volterra.io" "F5XC_API_URL" "false"
-        prompt_input "F5 XC API Token" "" "F5XC_API_TOKEN" "true"
+        prompt_input "F5 XC API URL" "https://console.ves.volterra.io" "XCSH_API_URL" "false"
+        prompt_input "F5 XC API Token" "" "XCSH_API_TOKEN" "true"
     fi
 
-    if [[ -z "${F5XC_API_TOKEN:-}" ]]; then
-        log_error "API Token is required (set F5XC_API_TOKEN or provide interactively)"
+    if [[ -z "${XCSH_API_TOKEN:-}" ]]; then
+        log_error "API Token is required (set XCSH_API_TOKEN or provide interactively)"
         exit 1
     fi
 
     log_info "Setting GitHub secrets..."
-    echo "$F5XC_API_URL" | gh secret set F5XC_API_URL --repo "$REPO_FULL"
-    echo "$F5XC_API_TOKEN" | gh secret set F5XC_API_TOKEN --repo "$REPO_FULL"
+    echo "$XCSH_API_URL" | gh secret set XCSH_API_URL --repo "$REPO_FULL"
+    echo "$XCSH_API_TOKEN" | gh secret set XCSH_API_TOKEN --repo "$REPO_FULL"
     log_success "Secrets configured"
 }
 
@@ -319,7 +319,7 @@ configure_runner() {
     fi
 
     # Configure
-    local runner_name="${HOSTNAME:-$(hostname)}-f5xc"
+    local runner_name="${HOSTNAME:-$(hostname)}-xcsh"
     if [[ -n "$RUNNER_NAME_ARG" ]]; then
         RUNNER_NAME="$RUNNER_NAME_ARG"
         log_info "Using runner name: $RUNNER_NAME"
@@ -405,7 +405,7 @@ print_summary() {
     echo ""
     echo "  Repository:  $REPO_FULL"
     echo "  Runner:      $RUNNER_DIR"
-    [[ -n "${F5XC_API_URL:-}" ]] && echo "  API URL:     $F5XC_API_URL"
+    [[ -n "${XCSH_API_URL:-}" ]] && echo "  API URL:     $XCSH_API_URL"
     echo ""
     echo "  Trigger tests:"
     echo "    gh workflow run acceptance-tests.yml -f mode=full"
@@ -475,29 +475,29 @@ configure_container_env() {
     fi
 
     # Get F5XC credentials if not skipping secrets
-    local f5xc_url="${F5XC_API_URL:-}"
-    local f5xc_token="${F5XC_API_TOKEN:-}"
+    local xcsh_url="${XCSH_API_URL:-}"
+    local xcsh_token="${XCSH_API_TOKEN:-}"
 
     if [[ "$SKIP_SECRETS" != "true" ]]; then  # pragma: allowlist secret
-        if [[ -z "$f5xc_url" ]] || [[ -z "$f5xc_token" ]]; then
+        if [[ -z "$xcsh_url" ]] || [[ -z "$xcsh_token" ]]; then
             echo ""
             echo "To get an API token from F5 XC Console:"
             echo "  1. Administration → Personal Management → Credentials"
             echo "  2. Add Credentials → API Token"
             echo ""
-            [[ -z "$f5xc_url" ]] && prompt_input "F5 XC API URL" "https://console.ves.volterra.io" "f5xc_url" "false"
-            [[ -z "$f5xc_token" ]] && prompt_input "F5 XC API Token" "" "f5xc_token" "true"
+            [[ -z "$xcsh_url" ]] && prompt_input "F5 XC API URL" "https://console.ves.volterra.io" "xcsh_url" "false"
+            [[ -z "$xcsh_token" ]] && prompt_input "F5 XC API Token" "" "xcsh_token" "true"
         fi
 
         # Set GitHub secrets
         log_info "Setting GitHub secrets..."
-        echo "$f5xc_url" | gh secret set F5XC_API_URL --repo "$REPO_FULL"
-        echo "$f5xc_token" | gh secret set F5XC_API_TOKEN --repo "$REPO_FULL"
+        echo "$xcsh_url" | gh secret set XCSH_API_URL --repo "$REPO_FULL"
+        echo "$xcsh_token" | gh secret set XCSH_API_TOKEN --repo "$REPO_FULL"
         log_success "GitHub secrets configured"
     fi
 
     # Create .env file
-    local runner_name="${RUNNER_NAME_ARG:-f5xc-container-runner}"
+    local runner_name="${RUNNER_NAME_ARG:-xcsh-container-runner}"
 
     log_info "Creating container configuration..."
     cat > "$env_file" << EOF
@@ -506,8 +506,8 @@ GITHUB_REPOSITORY=${REPO_FULL}
 GITHUB_TOKEN=${github_token}
 RUNNER_NAME=${runner_name}
 RUNNER_LABELS=self-hosted,Linux,X64,container
-F5XC_API_URL=${f5xc_url:-}
-F5XC_API_TOKEN=${f5xc_token:-}
+XCSH_API_URL=${xcsh_url:-}
+XCSH_API_TOKEN=${xcsh_token:-}
 EOF
 
     chmod 600 "$env_file"
@@ -565,8 +565,8 @@ print_container_summary() {
     echo -e "${BOLD}════════════════════════════════════════════════════════════${NC}"
     echo ""
     echo "  Repository:  $REPO_FULL"
-    echo "  Runner:      Docker container (f5xc-github-runner)"
-    [[ -n "${F5XC_API_URL:-}" ]] && echo "  API URL:     $F5XC_API_URL"
+    echo "  Runner:      Docker container (xcsh-github-runner)"
+    [[ -n "${XCSH_API_URL:-}" ]] && echo "  API URL:     $XCSH_API_URL"
     echo ""
     echo "  Commands:"
     echo "    View logs:    cd .github-runner-docker && docker-compose logs -f"

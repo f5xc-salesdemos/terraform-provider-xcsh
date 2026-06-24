@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_cminstance Resource - terraform-provider-f5xc"
+page_title: "xcsh_cminstance Resource - terraform-provider-xcsh"
 subcategory: "Subscriptions"
 description: |-
   Manages App type will create the configuration in namespace metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_cminstance (Resource)
+# xcsh_cminstance (Resource)
 
 Manages App type will create the configuration in namespace metadata.namespace. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Cminstance configuration
-resource "f5xc_cminstance" "example" {
+resource "xcsh_cminstance" "example" {
   name      = "example-cminstance"
   namespace = "staging"
 
@@ -260,5 +260,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_cminstance.example system/example
+terraform import xcsh_cminstance.example system/example
 ```

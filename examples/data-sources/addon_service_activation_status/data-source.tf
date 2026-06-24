@@ -6,37 +6,37 @@ terraform {
 
   required_providers {
     f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 
-data "f5xc_addon_service_activation_status" "bot_defense" {
+data "xcsh_addon_service_activation_status" "bot_defense" {
   addon_service = "bot_defense"
 }
 
 # Output the activation status
 output "state" {
   description = "Current subscription state (AS_NONE, AS_PENDING, AS_SUBSCRIBED, AS_ERROR)"
-  value       = data.f5xc_addon_service_activation_status.bot_defense.state
+  value       = data.xcsh_addon_service_activation_status.bot_defense.state
 }
 
 output "can_activate" {
   description = "Whether the addon can be activated"
-  value       = data.f5xc_addon_service_activation_status.bot_defense.can_activate
+  value       = data.xcsh_addon_service_activation_status.bot_defense.can_activate
 }
 
 output "status_message" {
   description = "Human-readable status message"
-  value       = data.f5xc_addon_service_activation_status.bot_defense.message
+  value       = data.xcsh_addon_service_activation_status.bot_defense.message
 }
 
 # Example: Conditional subscription based on activation status
 # Only create the subscription if the addon is available for activation
-resource "f5xc_addon_subscription" "bot_defense" {
-  count = data.f5xc_addon_service_activation_status.bot_defense.can_activate && data.f5xc_addon_service_activation_status.bot_defense.state == "AS_NONE" ? 1 : 0
+resource "xcsh_addon_subscription" "bot_defense" {
+  count = data.xcsh_addon_service_activation_status.bot_defense.can_activate && data.xcsh_addon_service_activation_status.bot_defense.state == "AS_NONE" ? 1 : 0
 
   name      = "my-bot-defense-subscription"
   namespace = "system"

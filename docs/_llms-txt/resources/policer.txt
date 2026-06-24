@@ -1,4 +1,4 @@
-# f5xc_policer
+# xcsh_policer
 
 Category: Service Mesh
 New policer with traffic rate limits
@@ -18,7 +18,7 @@ New policer with traffic rate limits
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_policer" "example" {
+resource "xcsh_policer" "example" {
   name      = "example-policer"
   namespace = "staging"
 

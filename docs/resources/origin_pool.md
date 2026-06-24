@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_origin_pool Resource - terraform-provider-f5xc"
+page_title: "xcsh_origin_pool Resource - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages an Origin Pool resource in F5 Distributed Cloud for defining backend server pools for load balancer targets.
 ---
 
-# f5xc_origin_pool (Resource)
+# xcsh_origin_pool (Resource)
 
 Manages an Origin Pool resource in F5 Distributed Cloud for defining backend server pools for load balancer targets.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Origin Pool configuration
-resource "f5xc_origin_pool" "example" {
+resource "xcsh_origin_pool" "example" {
   name      = "example-origin-pool"
   namespace = "staging"
 
@@ -126,7 +126,7 @@ resource "f5xc_origin_pool" "example" {
 ### Labels Update
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example"
   namespace = "system"
 
@@ -151,7 +151,7 @@ resource "f5xc_origin_pool" "test" {
 ### Multiple Origins
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example"
   namespace = "system"
 
@@ -179,7 +179,7 @@ resource "f5xc_origin_pool" "test" {
 ### Port
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example"
   namespace = "system"
 
@@ -200,7 +200,7 @@ resource "f5xc_origin_pool" "test" {
 ### Public Ip
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example"
   namespace = "system"
 
@@ -221,7 +221,7 @@ resource "f5xc_origin_pool" "test" {
 ### With Healthcheck Ref
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -233,7 +233,7 @@ resource "f5xc_healthcheck" "test" {
   tcp_health_check {}
 }
 
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example"
   namespace = "system"
 
@@ -247,8 +247,8 @@ resource "f5xc_origin_pool" "test" {
   }
 
   healthcheck {
-    name      = f5xc_healthcheck.test.name
-    namespace = f5xc_healthcheck.test.namespace
+    name      = xcsh_healthcheck.test.name
+    namespace = xcsh_healthcheck.test.namespace
   }
 
   no_tls {}
@@ -259,7 +259,7 @@ resource "f5xc_origin_pool" "test" {
 ### With Labels
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name        = "example"
   namespace   = "system"
   description = "Test origin pool"
@@ -1052,5 +1052,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_origin_pool.example system/example
+terraform import xcsh_origin_pool.example system/example
 ```

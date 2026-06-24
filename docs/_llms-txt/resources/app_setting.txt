@@ -1,4 +1,4 @@
-# f5xc_app_setting
+# xcsh_app_setting
 
 Category: Applications
 App setting configuration in namespace metadata.namespace
@@ -11,7 +11,7 @@ App setting configuration in namespace metadata.namespace
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_app_setting" "example" {
+resource "xcsh_app_setting" "example" {
   name      = "example-app-setting"
   namespace = "staging"
 

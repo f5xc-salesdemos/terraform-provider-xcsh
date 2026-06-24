@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_discovery Data Source - terraform-provider-f5xc"
+page_title: "xcsh_discovery Data Source - terraform-provider-xcsh"
 subcategory: "Applications"
 description: |-
   Retrieves information about an existing Discovery resource in F5 Distributed Cloud for api to create discovery object for a site or virtual site in system namespace. configuration.
 ---
 
-# f5xc_discovery (Data Source)
+# xcsh_discovery (Data Source)
 
 Retrieves information about a Discovery resource in F5 Distributed Cloud for api to create discovery object for a site or virtual site in system namespace. configuration. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Discovery by name
-data "f5xc_discovery" "example" {
+data "xcsh_discovery" "example" {
   name      = "example-discovery"
   namespace = "staging"
 }
 
 output "discovery_id" {
-  value = data.f5xc_discovery.example.id
+  value = data.xcsh_discovery.example.id
 }
 ```
 

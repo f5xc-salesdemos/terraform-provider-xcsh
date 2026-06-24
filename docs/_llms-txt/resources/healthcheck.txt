@@ -1,4 +1,4 @@
-# f5xc_healthcheck
+# xcsh_healthcheck
 
 Category: Load Balancing
 Healthcheck object defines method to determine if the given endpoint is healthy. single healthcheck object can be referred to by one or many cluster objects. configuration
@@ -34,7 +34,7 @@ Within http_health_check, pick exactly one:
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_healthcheck" "example" {
+resource "xcsh_healthcheck" "example" {
   name      = "example-healthcheck"
   namespace = "staging"
 

@@ -1,4 +1,4 @@
-# f5xc_k8s_pod_security_policy
+# xcsh_k8s_pod_security_policy
 
 Category: Security
 K8s_pod_security_policy will create the object in the storage backend for namespace metadata.namespace
@@ -11,7 +11,7 @@ K8s_pod_security_policy will create the object in the storage backend for namesp
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_k8s_pod_security_policy" "example" {
+resource "xcsh_k8s_pod_security_policy" "example" {
   name      = "example-k8s-pod-security-policy"
   namespace = "staging"
 

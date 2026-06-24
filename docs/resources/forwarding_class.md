@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_forwarding_class Resource - terraform-provider-f5xc"
+page_title: "xcsh_forwarding_class Resource - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Manages a Forwarding Class resource in F5 Distributed Cloud for forwarding class is created by users in system namespace. configuration.
 ---
 
-# f5xc_forwarding_class (Resource)
+# xcsh_forwarding_class (Resource)
 
 Manages a Forwarding Class resource in F5 Distributed Cloud for forwarding class is created by users in system namespace. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Forwarding Class configuration
-resource "f5xc_forwarding_class" "example" {
+resource "xcsh_forwarding_class" "example" {
   name      = "example-forwarding-class"
   namespace = "staging"
 
@@ -233,5 +233,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_forwarding_class.example system/example
+terraform import xcsh_forwarding_class.example system/example
 ```

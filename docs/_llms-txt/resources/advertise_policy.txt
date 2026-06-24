@@ -1,4 +1,4 @@
-# f5xc_advertise_policy
+# xcsh_advertise_policy
 
 Category: Load Balancing
 Advertise_policy object controls how and where a service represented by a given virtual_host object is advertised to consumers. configuration
@@ -14,7 +14,7 @@ Advertise_policy object controls how and where a service represented by a given 
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_advertise_policy" "example" {
+resource "xcsh_advertise_policy" "example" {
   name      = "example-advertise-policy"
   namespace = "staging"
 

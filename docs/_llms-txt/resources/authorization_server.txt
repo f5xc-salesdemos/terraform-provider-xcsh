@@ -1,4 +1,4 @@
-# f5xc_authorization_server
+# xcsh_authorization_server
 
 Category: Uncategorized
 Authorization_server creates a new object in the storage backend for metadata.namespace
@@ -12,7 +12,7 @@ Authorization_server creates a new object in the storage backend for metadata.na
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_authorization_server" "example" {
+resource "xcsh_authorization_server" "example" {
   name      = "example-authorization-server"
   namespace = "staging"
 

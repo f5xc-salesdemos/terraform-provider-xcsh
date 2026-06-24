@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/openapi"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/openapi"
 )
 
 func TestEscapeGoString(t *testing.T) {

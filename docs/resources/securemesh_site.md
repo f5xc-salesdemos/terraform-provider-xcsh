@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_securemesh_site Resource - terraform-provider-f5xc"
+page_title: "xcsh_securemesh_site Resource - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Manages a Securemesh Site resource in F5 Distributed Cloud for deploying secure mesh edge sites with distributed security capabilities.
 ---
 
-# f5xc_securemesh_site (Resource)
+# xcsh_securemesh_site (Resource)
 
 Manages a Securemesh Site resource in F5 Distributed Cloud for deploying secure mesh edge sites with distributed security capabilities.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Securemesh Site configuration
-resource "f5xc_securemesh_site" "example" {
+resource "xcsh_securemesh_site" "example" {
   name      = "example-securemesh-site"
   namespace = "staging"
 
@@ -722,5 +722,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_securemesh_site.example system/example
+terraform import xcsh_securemesh_site.example system/example
 ```

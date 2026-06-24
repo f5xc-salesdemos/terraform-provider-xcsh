@@ -1,4 +1,4 @@
-# f5xc_fast_acl_rule
+# xcsh_fast_acl_rule
 
 Category: Security
 New Fast ACL rule, has specification to match source IP, source port and action to apply
@@ -11,7 +11,7 @@ New Fast ACL rule, has specification to match source IP, source port and action 
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_fast_acl_rule" "example" {
+resource "xcsh_fast_acl_rule" "example" {
   name      = "example-fast-acl-rule"
   namespace = "staging"
 

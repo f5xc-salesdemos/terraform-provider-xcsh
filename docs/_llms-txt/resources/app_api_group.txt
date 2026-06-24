@@ -1,4 +1,4 @@
-# f5xc_app_api_group
+# xcsh_app_api_group
 
 Category: API Security
 App_api_group creates a new object in the storage backend for metadata.namespace
@@ -11,7 +11,7 @@ App_api_group creates a new object in the storage backend for metadata.namespace
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_app_api_group" "example" {
+resource "xcsh_app_api_group" "example" {
   name      = "example-app-api-group"
   namespace = "staging"
 

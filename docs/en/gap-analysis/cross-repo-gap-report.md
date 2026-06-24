@@ -242,31 +242,31 @@
 
 | Consumer | Impact Area | Dependency |
 |----------|------------|------------|
-| terraform-provider-f5xc | Schema generation | api-specs-enriched |
-| terraform-provider-f5xc | Validator generation | x-f5xc-constraints, enum |
-| terraform-provider-f5xc | Documentation | x-f5xc-description-*, x-f5xc-best-practices |
+| terraform-provider-xcsh | Schema generation | api-specs-enriched |
+| terraform-provider-xcsh | Validator generation | x-f5xc-constraints, enum |
+| terraform-provider-xcsh | Documentation | x-f5xc-description-*, x-f5xc-best-practices |
 | api-specs-enriched | Extension emission | extension_constants.py |
 
 ## 8. Prioritized Action Items
 
 | Rank | Action | Repo | Priority Score |
 |------|--------|------|---------------|
-| 1 | Consume x-f5xc-constraints to generate Terraform validators | terraform-provider-f5xc | 3.0 |
-| 2 | Implement ConflictsWith validators | terraform-provider-f5xc | 2.5 |
+| 1 | Consume x-f5xc-constraints to generate Terraform validators | terraform-provider-xcsh | 3.0 |
+| 2 | Implement ConflictsWith validators | terraform-provider-xcsh | 2.5 |
 | 3 | Emit and replace hardcoded maps | both | 2.5 |
-| 4 | Consume for Required field accuracy | terraform-provider-f5xc | 2.0 |
-| 5 | Generate stringvalidator.OneOf from enum fields | terraform-provider-f5xc | 2.0 |
-| 6 | Render in generated code | terraform-provider-f5xc | 2.0 |
-| 7 | Fix struct shape mismatch and embed in docs | terraform-provider-f5xc | 2.0 |
-| 8 | Audit 49 orphan data source files | terraform-provider-f5xc | 2.0 |
-| 9 | Consume operation-level extensions for destruction warnings | terraform-provider-f5xc | 1.3 |
-| 10 | Wire up index-derived dependency map or remove | terraform-provider-f5xc | 1.0 |
+| 4 | Consume for Required field accuracy | terraform-provider-xcsh | 2.0 |
+| 5 | Generate stringvalidator.OneOf from enum fields | terraform-provider-xcsh | 2.0 |
+| 6 | Render in generated code | terraform-provider-xcsh | 2.0 |
+| 7 | Fix struct shape mismatch and embed in docs | terraform-provider-xcsh | 2.0 |
+| 8 | Audit 49 orphan data source files | terraform-provider-xcsh | 2.0 |
+| 9 | Consume operation-level extensions for destruction warnings | terraform-provider-xcsh | 1.3 |
+| 10 | Wire up index-derived dependency map or remove | terraform-provider-xcsh | 1.0 |
 
 ## GitHub Issue Templates
 
 ### Consume x-f5xc-constraints to generate Terraform validators
 
-**Repo**: terraform-provider-f5xc
+**Repo**: terraform-provider-xcsh
 **Priority Score**: 3.0
 **User Impact**: 3 | **Downstream Reach**: 3 | **Effort**: 2
 
@@ -274,7 +274,7 @@ The x-f5xc-constraints extension is parsed into Go structs but never rendered in
 
 ### Implement ConflictsWith validators
 
-**Repo**: terraform-provider-f5xc
+**Repo**: terraform-provider-xcsh
 **Priority Score**: 2.5
 **User Impact**: 3 | **Downstream Reach**: 2 | **Effort**: 2
 
@@ -290,7 +290,7 @@ The x-f5xc-namespace-scope extension is registered but not emitted in any spec f
 
 ### Consume for Required field accuracy
 
-**Repo**: terraform-provider-f5xc
+**Repo**: terraform-provider-xcsh
 **Priority Score**: 2.0
 **User Impact**: 2 | **Downstream Reach**: 2 | **Effort**: 2
 
@@ -298,7 +298,7 @@ The x-f5xc-minimum-configuration extension defines the minimal set of fields nee
 
 ### Generate stringvalidator.OneOf from enum fields
 
-**Repo**: terraform-provider-f5xc
+**Repo**: terraform-provider-xcsh
 **Priority Score**: 2.0
 **User Impact**: 3 | **Downstream Reach**: 1 | **Effort**: 2
 
@@ -306,7 +306,7 @@ Enum fields in the spec define valid string values. Generating stringvalidator.O
 
 ### Render in generated code
 
-**Repo**: terraform-provider-f5xc
+**Repo**: terraform-provider-xcsh
 **Priority Score**: 2.0
 **User Impact**: 2 | **Downstream Reach**: 2 | **Effort**: 2
 
@@ -314,7 +314,7 @@ The x-f5xc-required-for extension is parsed but not rendered. Rendering it would
 
 ### Fix struct shape mismatch and embed in docs
 
-**Repo**: terraform-provider-f5xc
+**Repo**: terraform-provider-xcsh
 **Priority Score**: 2.0
 **User Impact**: 1 | **Downstream Reach**: 3 | **Effort**: 2
 
@@ -322,7 +322,7 @@ The x-f5xc-best-practices extension has a struct shape mismatch between the spec
 
 ### Audit 49 orphan data source files
 
-**Repo**: terraform-provider-f5xc
+**Repo**: terraform-provider-xcsh
 **Priority Score**: 2.0
 **User Impact**: 1 | **Downstream Reach**: 1 | **Effort**: 1
 
@@ -330,7 +330,7 @@ There are approximately 49 data source files that are not connected to any prima
 
 ### Consume operation-level extensions for destruction warnings
 
-**Repo**: terraform-provider-f5xc
+**Repo**: terraform-provider-xcsh
 **Priority Score**: 1.3
 **User Impact**: 2 | **Downstream Reach**: 2 | **Effort**: 3
 
@@ -338,7 +338,7 @@ The x-f5xc-danger-level extension marks operations that may cause service disrup
 
 ### Wire up index-derived dependency map or remove
 
-**Repo**: terraform-provider-f5xc
+**Repo**: terraform-provider-xcsh
 **Priority Score**: 1.0
 **User Impact**: 1 | **Downstream Reach**: 1 | **Effort**: 2
 

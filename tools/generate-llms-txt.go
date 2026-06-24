@@ -25,7 +25,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/resource"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/resource"
 )
 
 // LLMsConfig represents the llms-config.json structure.
@@ -255,7 +255,7 @@ type minimalDefaultsArtifact struct {
 // over re-deriving from rendered docs markers). Returns nil when the artifact is
 // unavailable, so callers fall back to the docs-markdown extraction.
 func loadArtifactServerDefaults() map[string][]string {
-	specDir := os.Getenv("F5XC_SPEC_DIR")
+	specDir := os.Getenv("XCSH_SPEC_DIR")
 	if specDir == "" {
 		specDir = "docs/specifications/api"
 	}

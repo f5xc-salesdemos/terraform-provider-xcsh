@@ -12,16 +12,16 @@ terraform {
   required_version = ">= 1.8"
   required_providers {
     f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Provider configuration uses environment variables:
-# F5XC_API_URL   - Your tenant URL (e.g., https://tenant.console.ves.volterra.io)
-# F5XC_API_TOKEN - Your API token
-provider "f5xc" {}
+# XCSH_API_URL   - Your tenant URL (e.g., https://tenant.console.ves.volterra.io)
+# XCSH_API_TOKEN - Your API token
+provider "xcsh" {}
 
 # -----------------------------------------------------------------------------
 # Local Values
@@ -29,7 +29,7 @@ provider "f5xc" {}
 
 locals {
   # Use created namespace or existing one based on variable
-  namespace = var.create_namespace ? f5xc_namespace.this[0].name : var.namespace_name
+  namespace = var.create_namespace ? xcsh_namespace.this[0].name : var.namespace_name
 
   # Common labels for all resources
   common_labels = merge(var.labels, {
@@ -41,7 +41,7 @@ locals {
 # Namespace (Optional)
 # -----------------------------------------------------------------------------
 
-resource "f5xc_namespace" "this" {
+resource "xcsh_namespace" "this" {
   count = var.create_namespace ? 1 : 0
 
   name        = var.namespace_name
@@ -55,7 +55,7 @@ resource "f5xc_namespace" "this" {
 # Health Check
 # -----------------------------------------------------------------------------
 
-resource "f5xc_healthcheck" "this" {
+resource "xcsh_healthcheck" "this" {
   name      = "${var.app_name}-healthcheck"
   namespace = local.namespace
 
@@ -71,14 +71,14 @@ resource "f5xc_healthcheck" "this" {
   interval            = 15
   timeout             = 5
 
-  depends_on = [f5xc_namespace.this]
+  depends_on = [xcsh_namespace.this]
 }
 
 # -----------------------------------------------------------------------------
 # Origin Pool
 # -----------------------------------------------------------------------------
 
-resource "f5xc_origin_pool" "this" {
+resource "xcsh_origin_pool" "this" {
   name      = "${var.app_name}-origin-pool"
   namespace = local.namespace
 
@@ -106,21 +106,21 @@ resource "f5xc_origin_pool" "this" {
   }
 
   healthcheck {
-    name      = f5xc_healthcheck.this.name
+    name      = xcsh_healthcheck.this.name
     namespace = local.namespace
   }
 
   endpoint_selection     = "LOCAL_PREFERRED"
   loadbalancer_algorithm = "ROUND_ROBIN"
 
-  depends_on = [f5xc_namespace.this]
+  depends_on = [xcsh_namespace.this]
 }
 
 # -----------------------------------------------------------------------------
 # Application Firewall (WAF)
 # -----------------------------------------------------------------------------
 
-resource "f5xc_app_firewall" "this" {
+resource "xcsh_app_firewall" "this" {
   count = var.enable_waf ? 1 : 0
 
   name      = "${var.app_name}-waf"
@@ -143,17 +143,17 @@ resource "f5xc_app_firewall" "this" {
 
   allow_all_response_codes {}
 
-  depends_on = [f5xc_namespace.this]
+  depends_on = [xcsh_namespace.this]
 }
 
 # Note: Rate limiting is configured inline within the HTTP Load Balancer
-# A standalone f5xc_rate_limiter resource can be used for reusable rate limiting policies
+# A standalone xcsh_rate_limiter resource can be used for reusable rate limiting policies
 
 # -----------------------------------------------------------------------------
 # HTTP Load Balancer
 # -----------------------------------------------------------------------------
 
-resource "f5xc_http_loadbalancer" "this" {
+resource "xcsh_http_loadbalancer" "this" {
   name      = "${var.app_name}-lb"
   namespace = local.namespace
 
@@ -182,7 +182,7 @@ resource "f5xc_http_loadbalancer" "this" {
   # Default route to origin pool
   default_route_pools {
     pool {
-      name      = f5xc_origin_pool.this.name
+      name      = xcsh_origin_pool.this.name
       namespace = local.namespace
     }
     weight   = 1
@@ -202,7 +202,7 @@ resource "f5xc_http_loadbalancer" "this" {
   dynamic "app_firewall" {
     for_each = var.enable_waf ? [1] : []
     content {
-      name      = f5xc_app_firewall.this[0].name
+      name      = xcsh_app_firewall.this[0].name
       namespace = local.namespace
     }
   }
@@ -278,5 +278,5 @@ resource "f5xc_http_loadbalancer" "this" {
   # Malware protection (disabled for this guide)
   disable_malware_protection {}
 
-  depends_on = [f5xc_namespace.this]
+  depends_on = [xcsh_namespace.this]
 }

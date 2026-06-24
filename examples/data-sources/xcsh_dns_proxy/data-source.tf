@@ -1,0 +1,23 @@
+# DNS Proxy Data Source Example
+# Retrieves information about an existing DNS Proxy
+
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/xcsh"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+# Look up an existing DNS Proxy by name
+data "xcsh_dns_proxy" "example" {
+  name      = "example-dns-proxy"
+  namespace = "staging"
+}
+
+output "dns_proxy_id" {
+  value = data.xcsh_dns_proxy.example.id
+}

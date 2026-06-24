@@ -1,4 +1,4 @@
-# f5xc_cluster
+# xcsh_cluster
 
 Category: Load Balancing
 Cluster will create the object in the storage backend for namespace metadata.namespace
@@ -16,7 +16,7 @@ Cluster will create the object in the storage backend for namespace metadata.nam
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_cluster" "example" {
+resource "xcsh_cluster" "example" {
   name      = "example-cluster"
   namespace = "staging"
 

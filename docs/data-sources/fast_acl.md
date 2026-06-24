@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_fast_acl Data Source - terraform-provider-f5xc"
+page_title: "xcsh_fast_acl Data Source - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about object, object contains rules to protect site from denial of service It has destination{destination IP, destination port) and references to. in F5 Distributed Cloud.
 ---
 
-# f5xc_fast_acl (Data Source)
+# xcsh_fast_acl (Data Source)
 
 Manages object, object contains rules to protect site from denial of service It has destination{destination IP, destination port) and references to. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Fast ACL by name
-data "f5xc_fast_acl" "example" {
+data "xcsh_fast_acl" "example" {
   name      = "example-fast-acl"
   namespace = "staging"
 }
 
 output "fast_acl_id" {
-  value = data.f5xc_fast_acl.example.id
+  value = data.xcsh_fast_acl.example.id
 }
 ```
 

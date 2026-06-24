@@ -18,7 +18,7 @@ import (
 
 	"golang.org/x/crypto/pkcs12"
 
-	f5xcerrors "github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/errors"
+	f5xcerrors "github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/errors"
 )
 
 // Client configuration defaults

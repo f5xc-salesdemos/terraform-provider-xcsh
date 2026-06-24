@@ -1,4 +1,4 @@
-# f5xc_site
+# xcsh_site
 
 Category: Sites
 Virtual site object in given namespace
@@ -12,7 +12,7 @@ Virtual site object in given namespace
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_site" "example" {
+resource "xcsh_site" "example" {
   name      = "example-site"
   namespace = "staging"
 

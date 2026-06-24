@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_ike2 Resource - terraform-provider-f5xc"
+page_title: "xcsh_ike2 Resource - terraform-provider-xcsh"
 subcategory: "VPN"
 description: |-
   Manages a Ike2 resource in F5 Distributed Cloud for ike phase2 profile specification. configuration.
 ---
 
-# f5xc_ike2 (Resource)
+# xcsh_ike2 (Resource)
 
 Manages a Ike2 resource in F5 Distributed Cloud for ike phase2 profile specification. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Ike2 configuration
-resource "f5xc_ike2" "example" {
+resource "xcsh_ike2" "example" {
   name      = "example-ike2"
   namespace = "staging"
 
@@ -222,5 +222,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_ike2.example system/example
+terraform import xcsh_ike2.example system/example
 ```

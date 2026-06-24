@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_app_firewall Resource - terraform-provider-f5xc"
+page_title: "xcsh_app_firewall Resource - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Manages Application Firewall. in F5 Distributed Cloud.
 ---
 
-# f5xc_app_firewall (Resource)
+# xcsh_app_firewall (Resource)
 
 Manages Application Firewall. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic App Firewall configuration
-resource "f5xc_app_firewall" "example" {
+resource "xcsh_app_firewall" "example" {
   name      = "example-app-firewall"
   namespace = "staging"
 
@@ -86,7 +86,7 @@ resource "f5xc_app_firewall" "example" {
 ### Ai Enhancements
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = "example"
   namespace = "system"
 
@@ -106,7 +106,7 @@ resource "f5xc_app_firewall" "test" {
 ### All Attributes
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name        = "example"
   namespace   = "system"
   description = "Full attributes test"
@@ -132,7 +132,7 @@ resource "f5xc_app_firewall" "test" {
 ### Allowed Response Codes
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = "example"
   namespace = "system"
 
@@ -151,7 +151,7 @@ resource "f5xc_app_firewall" "test" {
 ### Blocking
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = "example"
   namespace = "system"
 ```
@@ -159,7 +159,7 @@ resource "f5xc_app_firewall" "test" {
 ### Bot Protection
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = "example"
   namespace = "system"
 
@@ -180,7 +180,7 @@ resource "f5xc_app_firewall" "test" {
 ### Custom Blocking Page
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = "example"
   namespace = "system"
 
@@ -200,7 +200,7 @@ resource "f5xc_app_firewall" "test" {
 ### Detection Settings
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = "example"
   namespace = "system"
 
@@ -226,7 +226,7 @@ resource "f5xc_app_firewall" "test" {
 ### Disable Anonymization
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = "example"
   namespace = "system"
 
@@ -243,7 +243,7 @@ resource "f5xc_app_firewall" "test" {
 ### Monitoring
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = "example"
   namespace = "system"
 
@@ -259,7 +259,7 @@ resource "f5xc_app_firewall" "test" {
 ### With Labels
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name        = "example"
   namespace   = "system"
   description = "Test application firewall"
@@ -273,7 +273,7 @@ resource "f5xc_app_firewall" "test" {
 ### With Updated Labels
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name        = "example"
   namespace   = "system"
   description = "Test application firewall"
@@ -646,5 +646,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_app_firewall.example system/example
+terraform import xcsh_app_firewall.example system/example
 ```

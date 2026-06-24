@@ -7,10 +7,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/conflicts"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/description"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/naming"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/openapi"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/conflicts"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/description"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/naming"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/openapi"
 )
 
 // ExtractConfig holds resource metadata maps that extractResourceSchema needs

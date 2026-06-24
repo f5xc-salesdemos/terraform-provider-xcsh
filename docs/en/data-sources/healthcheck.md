@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_healthcheck Data Source - terraform-provider-f5xc"
+page_title: "xcsh_healthcheck Data Source - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Retrieves information about an existing Healthcheck resource in F5 Distributed Cloud for healthcheck object defines method to determine if the given endpoint is healthy. single healthcheck object can be referred to by one or many cluster objects. configuration.
 ---
 
-# f5xc_healthcheck (Data Source)
+# xcsh_healthcheck (Data Source)
 
 Retrieves information about a Healthcheck resource in F5 Distributed Cloud for healthcheck object defines method to determine if the given endpoint is healthy. single healthcheck object can be referred to by one or many cluster objects. configuration. This is a read-only data source.
 
@@ -21,31 +21,31 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Healthcheck by name
-data "f5xc_healthcheck" "example" {
+data "xcsh_healthcheck" "example" {
   name      = "example-healthcheck"
   namespace = "staging"
 }
 
 output "healthcheck_id" {
-  value = data.f5xc_healthcheck.example.id
+  value = data.xcsh_healthcheck.example.id
 }
 
 # Example: Reference healthcheck in origin pool
-# resource "f5xc_origin_pool" "example" {
+# resource "xcsh_origin_pool" "example" {
 #   name      = "example-pool"
 #   namespace = "staging"
 #
 #   healthcheck {
-#     name      = data.f5xc_healthcheck.example.name
-#     namespace = data.f5xc_healthcheck.example.namespace
+#     name      = data.xcsh_healthcheck.example.name
+#     namespace = data.xcsh_healthcheck.example.namespace
 #   }
 # }
 ```

@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_secret_management_access Resource - terraform-provider-f5xc"
+page_title: "xcsh_secret_management_access Resource - terraform-provider-xcsh"
 subcategory: "Authentication"
 description: |-
   Manages secret_management_access creates a new object in storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_secret_management_access (Resource)
+# xcsh_secret_management_access (Resource)
 
 Manages secret_management_access creates a new object in storage backend for metadata.namespace. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Secret Management Access configuration
-resource "f5xc_secret_management_access" "example" {
+resource "xcsh_secret_management_access" "example" {
   name      = "example-secret-management-access"
   namespace = "staging"
 
@@ -487,5 +487,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_secret_management_access.example system/example
+terraform import xcsh_secret_management_access.example system/example
 ```

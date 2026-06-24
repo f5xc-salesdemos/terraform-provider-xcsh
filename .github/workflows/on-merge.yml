@@ -283,7 +283,7 @@ jobs:
             echo "Specs not in tree (gitignored) — downloading latest from $ENRICHED_REPO"
             mkdir -p "$SPEC_DIR"
             ASSET_ID=$(gh api "repos/$ENRICHED_REPO/releases" --jq \
-              '[.[0].assets[] | select(.name | startswith("f5xc-api-specs"))] | .[0].id')
+              '[.[0].assets[] | select(.name | startswith("xcsh-api-specs"))] | .[0].id')
             if [ -n "$ASSET_ID" ] && [ "$ASSET_ID" != "null" ]; then
               gh api "repos/$ENRICHED_REPO/releases/assets/$ASSET_ID" \
                 -H "Accept: application/octet-stream" > /tmp/specs.zip
@@ -358,7 +358,7 @@ jobs:
 
       - name: Clean build artifacts
         run: |
-          rm -f terraform-provider-f5xc
+          rm -f terraform-provider-xcsh
 
       - name: Fix generated content for lint compliance
         run: |
@@ -432,8 +432,8 @@ jobs:
             required_version = \">= 1.0\"
 
             required_providers {
-              f5xc = {
-                source  = \"f5xc-salesdemos/f5xc\"
+              xcsh = {
+                source  = \"f5xc-salesdemos/xcsh\"
                 version = \">= 0.1.0\"
               }
             }
@@ -457,12 +457,12 @@ jobs:
               content = open(ds_file).read()
               has_uncommented_output = bool(re.search(r'^output\s', content, re.MULTILINE))
               if not has_uncommented_output:
-                  m = re.search(r'data\s+\"f5xc_(\w+)\"\s+\"(\w+)\"', content)
+                  m = re.search(r'data\s+\"xcsh_(\w+)\"\s+\"(\w+)\"', content)
                   if m:
                       res_name, label = m.group(1), m.group(2)
                       # Remove any commented output block first
                       content = re.sub(r'\n?# Example: Use the data source.*\n(#[^\n]*\n)*', '\n', content)
-                      output_block = f'\noutput \"{res_name}_id\" {{\n  value = data.f5xc_{res_name}.{label}.id\n}}\n'
+                      output_block = f'\noutput \"{res_name}_id\" {{\n  value = data.xcsh_{res_name}.{label}.id\n}}\n'
                       open(ds_file, 'w').write(content.rstrip() + '\n' + output_block)
           "
 

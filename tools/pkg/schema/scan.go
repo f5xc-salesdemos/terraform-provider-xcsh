@@ -3,8 +3,8 @@
 package schema
 
 import (
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/conflicts"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/openapi"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/conflicts"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/openapi"
 )
 
 // HasNestedModelsWithAttrTypes checks recursively if any nested blocks would generate AttrTypes.

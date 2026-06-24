@@ -1,4 +1,4 @@
-# f5xc_site_mesh_group
+# xcsh_site_mesh_group
 
 Category: Sites
 Site Mesh Group in system namespace of user
@@ -11,7 +11,7 @@ Site Mesh Group in system namespace of user
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_site_mesh_group" "example" {
+resource "xcsh_site_mesh_group" "example" {
   name      = "example-site-mesh-group"
   namespace = "staging"
 

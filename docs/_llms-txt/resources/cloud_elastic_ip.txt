@@ -1,4 +1,4 @@
-# f5xc_cloud_elastic_ip
+# xcsh_cloud_elastic_ip
 
 Category: Cloud Resources
 Cloud Elastic IP creates Cloud Elastic IP object Object is attached to a site
@@ -12,7 +12,7 @@ Cloud Elastic IP creates Cloud Elastic IP object Object is attached to a site
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_cloud_elastic_ip" "example" {
+resource "xcsh_cloud_elastic_ip" "example" {
   name      = "example-cloud-elastic-ip"
   namespace = "staging"
 

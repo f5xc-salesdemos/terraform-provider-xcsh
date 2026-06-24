@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_service_policy_rule Data Source - terraform-provider-f5xc"
+page_title: "xcsh_service_policy_rule Data Source - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about service_policy_rule creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_service_policy_rule (Data Source)
+# xcsh_service_policy_rule (Data Source)
 
 Manages service_policy_rule creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Service Policy Rule by name
-data "f5xc_service_policy_rule" "example" {
+data "xcsh_service_policy_rule" "example" {
   name      = "example-service-policy-rule"
   namespace = "staging"
 }
 
 output "service_policy_rule_id" {
-  value = data.f5xc_service_policy_rule.example.id
+  value = data.xcsh_service_policy_rule.example.id
 }
 ```
 

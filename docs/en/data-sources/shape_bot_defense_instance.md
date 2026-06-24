@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_shape_bot_defense_instance Data Source - terraform-provider-f5xc"
+page_title: "xcsh_shape_bot_defense_instance Data Source - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about an existing Shape Bot Defense Instance resource in F5 Distributed Cloud for get virtual host from a given namespace. configuration. (read-only data source)
 ---
 
-# f5xc_shape_bot_defense_instance (Data Source)
+# xcsh_shape_bot_defense_instance (Data Source)
 
 Retrieves information about a Shape Bot Defense Instance resource in F5 Distributed Cloud for get virtual host from a given namespace. configuration. (read-only data source)
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Shape Bot Defense Instance by name
-data "f5xc_shape_bot_defense_instance" "example" {
+data "xcsh_shape_bot_defense_instance" "example" {
   name      = "example-shape-bot-defense-instance"
   namespace = "staging"
 }
 
 output "shape_bot_defense_instance_id" {
-  value = data.f5xc_shape_bot_defense_instance.example.id
+  value = data.xcsh_shape_bot_defense_instance.example.id
 }
 ```
 

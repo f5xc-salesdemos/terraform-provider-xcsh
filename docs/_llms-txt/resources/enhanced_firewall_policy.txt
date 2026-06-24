@@ -1,4 +1,4 @@
-# f5xc_enhanced_firewall_policy
+# xcsh_enhanced_firewall_policy
 
 Category: Security
 Enhanced firewall policy specification. configuration
@@ -15,7 +15,7 @@ Enhanced firewall policy specification. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_enhanced_firewall_policy" "example" {
+resource "xcsh_enhanced_firewall_policy" "example" {
   name      = "example-enhanced-firewall-policy"
   namespace = "staging"
 

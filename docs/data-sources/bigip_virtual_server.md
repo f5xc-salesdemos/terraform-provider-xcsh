@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_bigip_virtual_server Data Source - terraform-provider-f5xc"
+page_title: "xcsh_bigip_virtual_server Data Source - terraform-provider-xcsh"
 subcategory: "BIG-IP Integration"
 description: |-
   Retrieves information about an existing BIG-IP Virtual Server resource in F5 Distributed Cloud for big-ip virtual server specification. configuration. (read-only data source)
 ---
 
-# f5xc_bigip_virtual_server (Data Source)
+# xcsh_bigip_virtual_server (Data Source)
 
 Retrieves information about a BIG-IP Virtual Server resource in F5 Distributed Cloud for big-ip virtual server specification. configuration. (read-only data source)
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Bigip Virtual Server by name
-data "f5xc_bigip_virtual_server" "example" {
+data "xcsh_bigip_virtual_server" "example" {
   name      = "example-bigip-virtual-server"
   namespace = "staging"
 }
 
 output "bigip_virtual_server_id" {
-  value = data.f5xc_bigip_virtual_server.example.id
+  value = data.xcsh_bigip_virtual_server.example.id
 }
 ```
 

@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_ike_phase1_profile Resource - terraform-provider-f5xc"
+page_title: "xcsh_ike_phase1_profile Resource - terraform-provider-xcsh"
 subcategory: "VPN"
 description: |-
   Manages a IKE Phase1 Profile resource in F5 Distributed Cloud for ike phase1 profile specification. configuration.
 ---
 
-# f5xc_ike_phase1_profile (Resource)
+# xcsh_ike_phase1_profile (Resource)
 
 Manages a IKE Phase1 Profile resource in F5 Distributed Cloud for ike phase1 profile specification. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic IKE Phase1 Profile configuration
-resource "f5xc_ike_phase1_profile" "example" {
+resource "xcsh_ike_phase1_profile" "example" {
   name      = "example-ike-phase1-profile"
   namespace = "staging"
 
@@ -238,5 +238,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_ike_phase1_profile.example system/example
+terraform import xcsh_ike_phase1_profile.example system/example
 ```

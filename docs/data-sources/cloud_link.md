@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_cloud_link Data Source - terraform-provider-f5xc"
+page_title: "xcsh_cloud_link Data Source - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Retrieves information about an existing CloudLink with configured parameters. in F5 Distributed Cloud.
 ---
 
-# f5xc_cloud_link (Data Source)
+# xcsh_cloud_link (Data Source)
 
 Retrieves information about new CloudLink with configured parameters. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Cloud Link by name
-data "f5xc_cloud_link" "example" {
+data "xcsh_cloud_link" "example" {
   name      = "example-cloud-link"
   namespace = "staging"
 }
 
 output "cloud_link_id" {
-  value = data.f5xc_cloud_link.example.id
+  value = data.xcsh_cloud_link.example.id
 }
 ```
 

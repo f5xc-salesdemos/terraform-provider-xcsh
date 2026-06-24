@@ -1,4 +1,4 @@
-# f5xc_app_type
+# xcsh_app_type
 
 Category: Applications
 App type will create the configuration in namespace metadata.namespace
@@ -11,7 +11,7 @@ App type will create the configuration in namespace metadata.namespace
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_app_type" "example" {
+resource "xcsh_app_type" "example" {
   name      = "example-app-type"
   namespace = "staging"
 

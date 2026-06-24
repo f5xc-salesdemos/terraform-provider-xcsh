@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/naming"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/naming"
 )
 
 // Clean removes example annotations, validation rules, internal vendor extensions,

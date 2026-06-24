@@ -8,8 +8,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/mocks"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/acctest"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/mocks"
 )
 
 // =============================================================================
@@ -19,7 +19,7 @@ import (
 // They validate provider logic without requiring cloud credentials.
 //
 // Run with:
-//   F5XC_MOCK_MODE=1 go test -v ./internal/provider/ -run TestMockAWSVPCSite -timeout 5m
+//   XCSH_MOCK_MODE=1 go test -v ./internal/provider/ -run TestMockAWSVPCSite -timeout 5m
 //
 // These tests complement the real acceptance tests by:
 // 1. Testing provider CRUD logic without cloud dependencies

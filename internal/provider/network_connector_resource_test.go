@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/acctest"
 )
 
 // TestAccNetworkConnectorResource_basic tests the basic creation and deletion of a network_connector resource

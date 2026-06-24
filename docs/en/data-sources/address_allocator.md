@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_address_allocator Data Source - terraform-provider-f5xc"
+page_title: "xcsh_address_allocator Data Source - terraform-provider-xcsh"
 subcategory: "Cloud Resources"
 description: |-
   Retrieves information about Address Allocator will create an address allocator object in 'system' namespace of the user. in F5 Distributed Cloud.
 ---
 
-# f5xc_address_allocator (Data Source)
+# xcsh_address_allocator (Data Source)
 
 Manages Address Allocator will create an address allocator object in 'system' namespace of the user. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Address Allocator by name
-data "f5xc_address_allocator" "example" {
+data "xcsh_address_allocator" "example" {
   name      = "example-address-allocator"
   namespace = "staging"
 }
 
 output "address_allocator_id" {
-  value = data.f5xc_address_allocator.example.id
+  value = data.xcsh_address_allocator.example.id
 }
 ```
 

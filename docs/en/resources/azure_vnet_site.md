@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_azure_vnet_site Resource - terraform-provider-f5xc"
+page_title: "xcsh_azure_vnet_site Resource - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Manages a Azure VNET Site resource in F5 Distributed Cloud for deploying F5 sites within Azure Virtual Network environments.
 ---
 
-# f5xc_azure_vnet_site (Resource)
+# xcsh_azure_vnet_site (Resource)
 
 Manages a Azure VNET Site resource in F5 Distributed Cloud for deploying F5 sites within Azure Virtual Network environments.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Azure VNET Site configuration
-resource "f5xc_azure_vnet_site" "example" {
+resource "xcsh_azure_vnet_site" "example" {
   name      = "example-Azure-vnet-site"
   namespace = "staging"
 
@@ -52,12 +52,12 @@ resource "f5xc_azure_vnet_site" "example" {
   }
 
   # Resource group
-  resource_group = "f5xc-rg"
+  resource_group = "xcsh-rg"
 
   # VNET configuration
   vnet {
     new_vnet {
-      name         = "f5xc-vnet"
+      name         = "xcsh-vnet"
       primary_ipv4 = "10.0.0.0/16"
     }
   }
@@ -1832,5 +1832,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_azure_vnet_site.example system/example
+terraform import xcsh_azure_vnet_site.example system/example
 ```

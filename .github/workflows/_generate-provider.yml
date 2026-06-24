@@ -41,7 +41,7 @@ jobs:
             echo "Specs not in tree (gitignored) — downloading latest from $ENRICHED_REPO"
             mkdir -p "${{ inputs.spec-dir }}"
             ASSET_ID=$(gh api "repos/$ENRICHED_REPO/releases" --jq \
-              '[.[0].assets[] | select(.name | startswith("f5xc-api-specs"))] | .[0].id')
+              '[.[0].assets[] | select(.name | startswith("xcsh-api-specs"))] | .[0].id')
             if [ -n "$ASSET_ID" ] && [ "$ASSET_ID" != "null" ]; then
               gh api "repos/$ENRICHED_REPO/releases/assets/$ASSET_ID" \
                 -H "Accept: application/octet-stream" > /tmp/specs.zip

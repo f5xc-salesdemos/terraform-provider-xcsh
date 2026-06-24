@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/function"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/blindfold"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/blindfold"
 )
 
 // skipIfNotAccTest skips the test if TF_ACC is not set

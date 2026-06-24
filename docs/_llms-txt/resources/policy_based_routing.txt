@@ -1,4 +1,4 @@
-# f5xc_policy_based_routing
+# xcsh_policy_based_routing
 
 Category: Networking
 Network policy based routing create specification. configuration
@@ -11,7 +11,7 @@ Network policy based routing create specification. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_policy_based_routing" "example" {
+resource "xcsh_policy_based_routing" "example" {
   name      = "example-policy-based-routing"
   namespace = "staging"
 

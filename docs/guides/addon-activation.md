@@ -83,16 +83,16 @@ Configure one of these authentication methods via environment variables:
 #### Option 1: API Token (Recommended for development)
 
 ```bash
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_API_TOKEN="your-api-token"
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_API_TOKEN="your-api-token"
 ```
 
 #### Option 2: P12 Certificate (Recommended for production)
 
 ```bash
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_P12_FILE="/path/to/your-credentials.p12"
-export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_P12_FILE="/path/to/your-credentials.p12"
+export XCSH_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
 ```
 
 ## Quick Start
@@ -100,8 +100,8 @@ export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc.git
-cd terraform-provider-f5xc/examples/guides/addon-activation
+git clone https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh.git
+cd terraform-provider-xcsh/examples/guides/addon-activation
 ```
 
 ### Step 2: Configure Your Deployment
@@ -136,15 +136,15 @@ Before attempting to activate an addon service, check if it's available for your
 
 ```hcl
 # Check if Bot Defense can be activated
-data "f5xc_addon_service_activation_status" "bot_defense" {
+data "xcsh_addon_service_activation_status" "bot_defense" {
   addon_service = "f5xc-bot-defense-standard"
 }
 
 output "bot_defense_status" {
   value = {
-    state        = data.f5xc_addon_service_activation_status.bot_defense.state
-    can_activate = data.f5xc_addon_service_activation_status.bot_defense.can_activate
-    message      = data.f5xc_addon_service_activation_status.bot_defense.message
+    state        = data.xcsh_addon_service_activation_status.bot_defense.state
+    can_activate = data.xcsh_addon_service_activation_status.bot_defense.can_activate
+    message      = data.xcsh_addon_service_activation_status.bot_defense.message
   }
 }
 ```
@@ -162,15 +162,15 @@ output "bot_defense_status" {
 
 ```hcl
 # Get detailed information about an addon service
-data "f5xc_addon_service" "bot_defense" {
+data "xcsh_addon_service" "bot_defense" {
   name = "f5xc-bot-defense-standard"
 }
 
 output "addon_details" {
   value = {
-    display_name    = data.f5xc_addon_service.bot_defense.display_name
-    tier            = data.f5xc_addon_service.bot_defense.tier
-    activation_type = data.f5xc_addon_service.bot_defense.activation_type
+    display_name    = data.xcsh_addon_service.bot_defense.display_name
+    tier            = data.xcsh_addon_service.bot_defense.tier
+    activation_type = data.xcsh_addon_service.bot_defense.activation_type
   }
 }
 ```
@@ -183,13 +183,13 @@ For addon services with `self` activation type, you can activate directly via Te
 
 ```hcl
 # Step 1: Check if we can activate
-data "f5xc_addon_service_activation_status" "bot_defense" {
+data "xcsh_addon_service_activation_status" "bot_defense" {
   addon_service = "f5xc-bot-defense-standard"
 }
 
 # Step 2: Create subscription only if available
-resource "f5xc_addon_subscription" "bot_defense" {
-  count = data.f5xc_addon_service_activation_status.bot_defense.can_activate && data.f5xc_addon_service_activation_status.bot_defense.state == "AS_NONE" ? 1 : 0
+resource "xcsh_addon_subscription" "bot_defense" {
+  count = data.xcsh_addon_service_activation_status.bot_defense.can_activate && data.xcsh_addon_service_activation_status.bot_defense.state == "AS_NONE" ? 1 : 0
 
   name      = "bot-defense-subscription"
   namespace = "system"
@@ -201,7 +201,7 @@ resource "f5xc_addon_subscription" "bot_defense" {
 }
 
 output "activation_result" {
-  value = length(f5xc_addon_subscription.bot_defense) > 0 ? "Activated" : "Not activated (check status)"
+  value = length(xcsh_addon_subscription.bot_defense) > 0 ? "Activated" : "Not activated (check status)"
 }
 ```
 
@@ -218,17 +218,17 @@ locals {
 }
 
 # Check activation status for each
-data "f5xc_addon_service_activation_status" "addons" {
+data "xcsh_addon_service_activation_status" "addons" {
   for_each      = toset(local.addons_to_activate)
   addon_service = each.value
 }
 
 # Create subscriptions for available addons
-resource "f5xc_addon_subscription" "addons" {
+resource "xcsh_addon_subscription" "addons" {
   for_each = {
     for addon in local.addons_to_activate :
     addon => addon
-    if data.f5xc_addon_service_activation_status.addons[addon].can_activate && data.f5xc_addon_service_activation_status.addons[addon].state == "AS_NONE"
+    if data.xcsh_addon_service_activation_status.addons[addon].can_activate && data.xcsh_addon_service_activation_status.addons[addon].state == "AS_NONE"
   }
 
   name      = "${replace(replace(each.value, "f5xc-", ""), "-standard", "")}-subscription"
@@ -249,18 +249,18 @@ Some addons may take time to activate, especially those with partial management.
 
 ```hcl
 # Check status after subscription
-data "f5xc_addon_service_activation_status" "bot_defense_status" {
+data "xcsh_addon_service_activation_status" "bot_defense_status" {
   addon_service = "f5xc-bot-defense-standard"
 
-  depends_on = [f5xc_addon_subscription.bot_defense]
+  depends_on = [xcsh_addon_subscription.bot_defense]
 }
 
 # Validate activation succeeded
 resource "terraform_data" "validate_activation" {
   lifecycle {
     precondition {
-      condition     = data.f5xc_addon_service_activation_status.bot_defense_status.state == "AS_SUBSCRIBED"
-      error_message = "Bot Defense activation not yet complete. Current state: ${data.f5xc_addon_service_activation_status.bot_defense_status.state}"
+      condition     = data.xcsh_addon_service_activation_status.bot_defense_status.state == "AS_SUBSCRIBED"
+      error_message = "Bot Defense activation not yet complete. Current state: ${data.xcsh_addon_service_activation_status.bot_defense_status.state}"
     }
   }
 }
@@ -269,7 +269,7 @@ resource "terraform_data" "validate_activation" {
 ### Pattern 2: Using time_sleep for Simple Delays
 
 ```hcl
-resource "f5xc_addon_subscription" "bot_defense" {
+resource "xcsh_addon_subscription" "bot_defense" {
   name      = "bot-defense-subscription"
   namespace = "system"
 
@@ -281,13 +281,13 @@ resource "f5xc_addon_subscription" "bot_defense" {
 
 # Wait for activation to propagate
 resource "time_sleep" "wait_for_activation" {
-  depends_on = [f5xc_addon_subscription.bot_defense]
+  depends_on = [xcsh_addon_subscription.bot_defense]
 
   create_duration = "30s"
 }
 
 # Use the addon feature after waiting
-resource "f5xc_http_loadbalancer" "with_bot_defense" {
+resource "xcsh_http_loadbalancer" "with_bot_defense" {
   depends_on = [time_sleep.wait_for_activation]
   # ... configuration with bot defense enabled
 }
@@ -299,13 +299,13 @@ For critical deployments, you may want to verify activation before proceeding:
 
 ```hcl
 resource "null_resource" "verify_activation" {
-  depends_on = [f5xc_addon_subscription.bot_defense]
+  depends_on = [xcsh_addon_subscription.bot_defense]
 
   provisioner "local-exec" {
     command = <<-EOT
       for i in {1..30}; do
-        status=$(curl -s -H "Authorization: APIToken $F5XC_API_TOKEN" \
-          "$F5XC_API_URL/api/web/namespaces/system/addon_services/f5xc-bot-defense-standard/activation-status" \
+        status=$(curl -s -H "Authorization: APIToken $XCSH_API_TOKEN" \
+          "$XCSH_API_URL/api/web/namespaces/system/addon_services/f5xc-bot-defense-standard/activation-status" \
           | jq -r '.state')
         if [ "$status" = "AS_SUBSCRIBED" ]; then
           echo "Activation complete!"
@@ -329,20 +329,20 @@ For addon services requiring sales contact, use Terraform to monitor status afte
 
 ```hcl
 # For managed addons, just check status (don't try to create subscription)
-data "f5xc_addon_service_activation_status" "managed_addon" {
+data "xcsh_addon_service_activation_status" "managed_addon" {
   addon_service = "some_managed_addon"
 }
 
 output "managed_addon_status" {
   value = {
-    active  = data.f5xc_addon_service_activation_status.managed_addon.state == "AS_SUBSCRIBED"
-    message = data.f5xc_addon_service_activation_status.managed_addon.message
+    active  = data.xcsh_addon_service_activation_status.managed_addon.state == "AS_SUBSCRIBED"
+    message = data.xcsh_addon_service_activation_status.managed_addon.message
   }
 }
 
 # Use conditional logic based on activation status
-resource "f5xc_http_loadbalancer" "with_managed_feature" {
-  count = data.f5xc_addon_service_activation_status.managed_addon.state == "AS_SUBSCRIBED" ? 1 : 0
+resource "xcsh_http_loadbalancer" "with_managed_feature" {
+  count = data.xcsh_addon_service_activation_status.managed_addon.state == "AS_SUBSCRIBED" ? 1 : 0
 
   # Configuration that uses the managed addon feature
   name      = "lb-with-managed-addon"
@@ -358,8 +358,8 @@ Once an addon is activated, you can use its features in your configurations.
 ### Bot Defense in HTTP Load Balancer
 
 ```hcl
-resource "f5xc_http_loadbalancer" "with_bot_defense" {
-  depends_on = [f5xc_addon_subscription.bot_defense]
+resource "xcsh_http_loadbalancer" "with_bot_defense" {
+  depends_on = [xcsh_addon_subscription.bot_defense]
 
   name      = "my-protected-app"
   namespace = "production"
@@ -368,7 +368,7 @@ resource "f5xc_http_loadbalancer" "with_bot_defense" {
 
   default_route_pools {
     pool {
-      name      = f5xc_origin_pool.backend.name
+      name      = xcsh_origin_pool.backend.name
       namespace = "production"
     }
     weight = 1
@@ -391,8 +391,8 @@ resource "f5xc_http_loadbalancer" "with_bot_defense" {
 ### Client-Side Defense
 
 ```hcl
-resource "f5xc_http_loadbalancer" "with_csd" {
-  depends_on = [f5xc_addon_subscription.client_side_defense]
+resource "xcsh_http_loadbalancer" "with_csd" {
+  depends_on = [xcsh_addon_subscription.client_side_defense]
 
   name      = "my-protected-app"
   namespace = "production"
@@ -432,9 +432,9 @@ resource "f5xc_http_loadbalancer" "with_csd" {
 output "debug_addon_status" {
   value = {
     addon_service = "f5xc-bot-defense-standard"
-    state         = data.f5xc_addon_service_activation_status.bot_defense.state
-    can_activate  = data.f5xc_addon_service_activation_status.bot_defense.can_activate
-    message       = data.f5xc_addon_service_activation_status.bot_defense.message
+    state         = data.xcsh_addon_service_activation_status.bot_defense.state
+    can_activate  = data.xcsh_addon_service_activation_status.bot_defense.can_activate
+    message       = data.xcsh_addon_service_activation_status.bot_defense.message
   }
 }
 ```
@@ -449,7 +449,7 @@ output "debug_addon_status" {
 
 ## Complete Example
 
-See the [addon-activation example](https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc/tree/main/examples/guides/addon-activation) for a complete, working Terraform configuration.
+See the [addon-activation example](https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh/tree/main/examples/guides/addon-activation) for a complete, working Terraform configuration.
 
 ## Related Resources
 

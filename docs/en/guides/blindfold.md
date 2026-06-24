@@ -67,16 +67,16 @@ Configure one of these authentication methods via environment variables:
 #### Option 1: API Token (Recommended for development)
 
 ```bash
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_API_TOKEN="your-api-token"
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_API_TOKEN="your-api-token"
 ```
 
 #### Option 2: P12 Certificate (Recommended for production)
 
 ```bash
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_P12_FILE="/path/to/your-credentials.p12"
-export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_P12_FILE="/path/to/your-credentials.p12"
+export XCSH_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
 ```
 
 -> **Tip:** Add these to your shell profile (`~/.bashrc` or `~/.zshrc`) for persistence across terminal sessions.
@@ -86,8 +86,8 @@ export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc.git
-cd terraform-provider-f5xc/examples/guides/blindfold
+git clone https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh.git
+cd terraform-provider-xcsh/examples/guides/blindfold
 ```
 
 ### Step 2: Configure Your Deployment
@@ -142,7 +142,7 @@ The provider includes two blindfold functions:
 Encrypts base64-encoded plaintext:
 
 ```hcl
-provider::f5xc::blindfold(plaintext, policy_name, namespace)
+provider::xcsh::blindfold(plaintext, policy_name, namespace)
 ```
 
 | Parameter     | Type   | Description                      |
@@ -154,7 +154,7 @@ provider::f5xc::blindfold(plaintext, policy_name, namespace)
 **Example:**
 
 ```hcl
-location = provider::f5xc::blindfold(
+location = provider::xcsh::blindfold(
   base64encode(var.my_secret),
   "ves-io-allow-volterra",
   "shared"
@@ -166,7 +166,7 @@ location = provider::f5xc::blindfold(
 Reads a file and encrypts its contents:
 
 ```hcl
-provider::f5xc::blindfold_file(path, policy_name, namespace)
+provider::xcsh::blindfold_file(path, policy_name, namespace)
 ```
 
 | Parameter     | Type   | Description                     |
@@ -178,7 +178,7 @@ provider::f5xc::blindfold_file(path, policy_name, namespace)
 **Example:**
 
 ```hcl
-location = provider::f5xc::blindfold_file(
+location = provider::xcsh::blindfold_file(
   "${path.module}/certs/server.key",
   "ves-io-allow-volterra",
   "shared"
@@ -196,7 +196,7 @@ Every F5XC tenant includes a default policy: `ves-io-allow-volterra` in the `sha
 Store TLS certificates for load balancers. Note that TLS private keys are typically too large (>1000 bytes) for direct blindfold encryption (~190 byte limit). Use `clear_secret_info` for TLS keys:
 
 ```hcl
-resource "f5xc_certificate" "example" {
+resource "xcsh_certificate" "example" {
   name      = "example-certificate"
   namespace = "shared"
 
@@ -221,7 +221,7 @@ resource "f5xc_certificate" "example" {
 Protect AWS secret access keys for VPC site deployments:
 
 ```hcl
-resource "f5xc_cloud_credentials" "aws" {
+resource "xcsh_cloud_credentials" "aws" {
   name      = "aws-credentials"
   namespace = "system"
 
@@ -230,7 +230,7 @@ resource "f5xc_cloud_credentials" "aws" {
 
     secret_key {
       blindfold_secret_info {
-        location = provider::f5xc::blindfold(
+        location = provider::xcsh::blindfold(
           base64encode(var.aws_secret_access_key),
           "ves-io-allow-volterra",
           "shared"
@@ -246,7 +246,7 @@ resource "f5xc_cloud_credentials" "aws" {
 Secure Azure service principal client secrets:
 
 ```hcl
-resource "f5xc_cloud_credentials" "Azure" {
+resource "xcsh_cloud_credentials" "Azure" {
   name      = "Azure-credentials"
   namespace = "system"
 
@@ -257,7 +257,7 @@ resource "f5xc_cloud_credentials" "Azure" {
 
     client_secret {
       blindfold_secret_info {
-        location = provider::f5xc::blindfold(
+        location = provider::xcsh::blindfold(
           base64encode(var.azure_client_secret),
           "ves-io-allow-volterra",
           "shared"
@@ -273,14 +273,14 @@ resource "f5xc_cloud_credentials" "Azure" {
 Encrypt GCP service account JSON key files:
 
 ```hcl
-resource "f5xc_cloud_credentials" "gcp" {
+resource "xcsh_cloud_credentials" "gcp" {
   name      = "gcp-credentials"
   namespace = "system"
 
   gcp_cred_file {
     credential_file {
       blindfold_secret_info {
-        location = provider::f5xc::blindfold_file(
+        location = provider::xcsh::blindfold_file(
           var.gcp_credentials_file,
           "ves-io-allow-volterra",
           "shared"
@@ -296,7 +296,7 @@ resource "f5xc_cloud_credentials" "gcp" {
 Protect container registry passwords for private image pulls:
 
 ```hcl
-resource "f5xc_container_registry" "example" {
+resource "xcsh_container_registry" "example" {
   name      = "Docker-registry"
   namespace = "shared"
 
@@ -305,7 +305,7 @@ resource "f5xc_container_registry" "example" {
 
   password {
     blindfold_secret_info {
-      location = provider::f5xc::blindfold(
+      location = provider::xcsh::blindfold(
         base64encode(var.registry_password),
         "ves-io-allow-volterra",
         "shared"
@@ -328,7 +328,7 @@ locals {
 }
 
 # Reference your custom policy
-location = provider::f5xc::blindfold(
+location = provider::xcsh::blindfold(
   base64encode(var.secret),
   local.policy_name,
   local.policy_ns
@@ -349,7 +349,7 @@ variable "secrets" {
 locals {
   encrypted_secrets = {
     for name, value in var.secrets :
-    name => provider::f5xc::blindfold(
+    name => provider::xcsh::blindfold(
       base64encode(value),
       "ves-io-allow-volterra",
       "shared"
@@ -413,12 +413,12 @@ Field descriptions:
 
 ```bash
 # Verify environment variables are set
-echo $F5XC_API_URL
-echo $F5XC_API_TOKEN  # or F5XC_P12_FILE
+echo $XCSH_API_URL
+echo $XCSH_API_TOKEN  # or XCSH_P12_FILE
 
 # Set them if missing
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_API_TOKEN="your-api-token"
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_API_TOKEN="your-api-token"
 ```
 
 ### Policy Not Found
@@ -461,7 +461,7 @@ export F5XC_API_TOKEN="your-api-token"
 1. Use `${path.module}` for relative paths:
 
    ```hcl
-   location = provider::f5xc::blindfold_file(
+   location = provider::xcsh::blindfold_file(
      "${path.module}/certs/server.key",  # Correct
      ...
    )
@@ -477,13 +477,13 @@ export F5XC_API_TOKEN="your-api-token"
 
 ```hcl
 # Correct
-location = provider::f5xc::blindfold(
+location = provider::xcsh::blindfold(
   base64encode(var.secret),  # base64encode() wraps the secret
   ...
 )
 
 # Incorrect
-location = provider::f5xc::blindfold(
+location = provider::xcsh::blindfold(
   var.secret,  # Raw secret will fail
   ...
 )
@@ -516,4 +516,4 @@ Now that you understand blindfold encryption, explore related resources:
 - **Provider Documentation:** [F5XC Provider](../index.md)
 - **F5 Documentation:** [F5 Distributed Cloud Docs](https://docs.cloud.f5.com/)
 - **Secret Management:** [F5XC Secret Management](https://docs.cloud.f5.com/docs/how-to/secrets-management)
-- **Issues:** [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc/issues)
+- **Issues:** [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh/issues)

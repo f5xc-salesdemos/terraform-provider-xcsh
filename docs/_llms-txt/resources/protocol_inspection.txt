@@ -1,4 +1,4 @@
-# f5xc_protocol_inspection
+# xcsh_protocol_inspection
 
 Category: Security
 Protocol Inspection Specification in a given namespace. If one already exists it will give an error
@@ -17,7 +17,7 @@ Protocol Inspection Specification in a given namespace. If one already exists it
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_protocol_inspection" "example" {
+resource "xcsh_protocol_inspection" "example" {
   name      = "example-protocol-inspection"
   namespace = "staging"
 

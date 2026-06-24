@@ -1,4 +1,4 @@
-# f5xc_route
+# xcsh_route
 
 Category: Load Balancing
 Route object in a given namespace. Route object is list of route rules. Each rule has match condition to match incoming requests and actions to take on matching requests
@@ -11,7 +11,7 @@ Route object in a given namespace. Route object is list of route rules. Each rul
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_route" "example" {
+resource "xcsh_route" "example" {
   name      = "example-route"
   namespace = "staging"
 

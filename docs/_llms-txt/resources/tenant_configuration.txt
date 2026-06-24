@@ -1,4 +1,4 @@
-# f5xc_tenant_configuration
+# xcsh_tenant_configuration
 
 Category: Organization
 Tenant configuration specification. configuration
@@ -11,7 +11,7 @@ Tenant configuration specification. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_tenant_configuration" "example" {
+resource "xcsh_tenant_configuration" "example" {
   name      = "example-tenant-configuration"
   namespace = "staging"
 

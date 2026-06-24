@@ -1,4 +1,4 @@
-# f5xc_sensitive_data_policy
+# xcsh_sensitive_data_policy
 
 Category: Security
 Sensitive_data_policy creates a new object in the storage backend for metadata.namespace
@@ -17,7 +17,7 @@ Sensitive_data_policy creates a new object in the storage backend for metadata.n
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_sensitive_data_policy" "example" {
+resource "xcsh_sensitive_data_policy" "example" {
   name      = "example-sensitive-data-policy"
   namespace = "staging"
 

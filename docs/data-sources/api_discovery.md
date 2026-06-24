@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_api_discovery Data Source - terraform-provider-f5xc"
+page_title: "xcsh_api_discovery Data Source - terraform-provider-xcsh"
 subcategory: "API Security"
 description: |-
   Retrieves information about API discovery creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_api_discovery (Data Source)
+# xcsh_api_discovery (Data Source)
 
 Manages API discovery creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing API Discovery by name
-data "f5xc_api_discovery" "example" {
+data "xcsh_api_discovery" "example" {
   name      = "example-api-discovery"
   namespace = "staging"
 }
 
 output "api_discovery_id" {
-  value = data.f5xc_api_discovery.example.id
+  value = data.xcsh_api_discovery.example.id
 }
 ```
 

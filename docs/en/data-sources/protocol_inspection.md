@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_protocol_inspection Data Source - terraform-provider-f5xc"
+page_title: "xcsh_protocol_inspection Data Source - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about Protocol Inspection Specification in a given namespace. If one already exists it will give an error. in F5 Distributed Cloud.
 ---
 
-# f5xc_protocol_inspection (Data Source)
+# xcsh_protocol_inspection (Data Source)
 
 Manages Protocol Inspection Specification in a given namespace. If one already exists it will give an error. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Protocol Inspection by name
-data "f5xc_protocol_inspection" "example" {
+data "xcsh_protocol_inspection" "example" {
   name      = "example-protocol-inspection"
   namespace = "staging"
 }
 
 output "protocol_inspection_id" {
-  value = data.f5xc_protocol_inspection.example.id
+  value = data.xcsh_protocol_inspection.example.id
 }
 ```
 

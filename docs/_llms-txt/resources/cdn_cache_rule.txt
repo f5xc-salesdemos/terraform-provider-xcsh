@@ -1,4 +1,4 @@
-# f5xc_cdn_cache_rule
+# xcsh_cdn_cache_rule
 
 Category: Load Balancing
 CDN loadbalancer specification. configuration
@@ -11,7 +11,7 @@ CDN loadbalancer specification. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_cdn_cache_rule" "example" {
+resource "xcsh_cdn_cache_rule" "example" {
   name      = "example-CDN-cache-rule"
   namespace = "staging"
 

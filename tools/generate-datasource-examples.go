@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/naming"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/namespace"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/naming"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/namespace"
 )
 
 func main() {

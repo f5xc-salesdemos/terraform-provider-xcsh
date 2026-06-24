@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_cdn_cache_rule Data Source - terraform-provider-f5xc"
+page_title: "xcsh_cdn_cache_rule Data Source - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Retrieves information about an existing CDN Cache Rule resource in F5 Distributed Cloud for CDN loadbalancer specification. configuration.
 ---
 
-# f5xc_cdn_cache_rule (Data Source)
+# xcsh_cdn_cache_rule (Data Source)
 
 Retrieves information about a CDN Cache Rule resource in F5 Distributed Cloud for CDN loadbalancer specification. configuration. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing CDN Cache Rule by name
-data "f5xc_cdn_cache_rule" "example" {
+data "xcsh_cdn_cache_rule" "example" {
   name      = "example-CDN-cache-rule"
   namespace = "staging"
 }
 
 output "cdn_cache_rule_id" {
-  value = data.f5xc_cdn_cache_rule.example.id
+  value = data.xcsh_cdn_cache_rule.example.id
 }
 ```
 

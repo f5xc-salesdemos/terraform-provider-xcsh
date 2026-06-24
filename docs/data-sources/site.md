@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_site Data Source - terraform-provider-f5xc"
+page_title: "xcsh_site Data Source - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Retrieves information about virtual site object in given namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_site (Data Source)
+# xcsh_site (Data Source)
 
 Manages virtual site object in given namespace. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Site by name
-data "f5xc_site" "example" {
+data "xcsh_site" "example" {
   name      = "example-site"
   namespace = "staging"
 }
 
 output "site_id" {
-  value = data.f5xc_site.example.id
+  value = data.xcsh_site.example.id
 }
 ```
 

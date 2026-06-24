@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_alert_policy Data Source - terraform-provider-f5xc"
+page_title: "xcsh_alert_policy Data Source - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about an existing Alert Policy Object. in F5 Distributed Cloud.
 ---
 
-# f5xc_alert_policy (Data Source)
+# xcsh_alert_policy (Data Source)
 
 Retrieves information about new Alert Policy Object. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Alert Policy by name
-data "f5xc_alert_policy" "example" {
+data "xcsh_alert_policy" "example" {
   name      = "example-alert-policy"
   namespace = "staging"
 }
 
 output "alert_policy_id" {
-  value = data.f5xc_alert_policy.example.id
+  value = data.xcsh_alert_policy.example.id
 }
 ```
 

@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_cdn_purge_command Resource - terraform-provider-f5xc"
+page_title: "xcsh_cdn_purge_command Resource - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages a CDN Purge Command resource in F5 Distributed Cloud for CDN purge command specification. configuration.
 ---
 
-# f5xc_cdn_purge_command (Resource)
+# xcsh_cdn_purge_command (Resource)
 
 Manages a CDN Purge Command resource in F5 Distributed Cloud for CDN purge command specification. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic CDN Purge Command configuration
-resource "f5xc_cdn_purge_command" "example" {
+resource "xcsh_cdn_purge_command" "example" {
   name      = "example-CDN-purge-command"
   namespace = "staging"
 
@@ -214,5 +214,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_cdn_purge_command.example system/example
+terraform import xcsh_cdn_purge_command.example system/example
 ```

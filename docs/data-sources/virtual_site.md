@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_virtual_site Data Source - terraform-provider-f5xc"
+page_title: "xcsh_virtual_site Data Source - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Retrieves information about virtual site object in given namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_virtual_site (Data Source)
+# xcsh_virtual_site (Data Source)
 
 Manages virtual site object in given namespace. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,25 +21,25 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Virtual Site by name
-data "f5xc_virtual_site" "example" {
+data "xcsh_virtual_site" "example" {
   name      = "example-virtual-site"
   namespace = "staging"
 }
 
 output "virtual_site_id" {
-  value = data.f5xc_virtual_site.example.id
+  value = data.xcsh_virtual_site.example.id
 }
 
 # Example: Reference virtual site for site selection
-# resource "f5xc_http_loadbalancer" "example" {
+# resource "xcsh_http_loadbalancer" "example" {
 #   name      = "vs-advertised-lb"
 #   namespace = "staging"
 #
@@ -47,8 +47,8 @@ output "virtual_site_id" {
 #     advertise_where {
 #       virtual_site {
 #         virtual_site {
-#           name      = data.f5xc_virtual_site.example.name
-#           namespace = data.f5xc_virtual_site.example.namespace
+#           name      = data.xcsh_virtual_site.example.name
+#           namespace = data.xcsh_virtual_site.example.namespace
 #         }
 #       }
 #     }

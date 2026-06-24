@@ -1,4 +1,4 @@
-# f5xc_gcp_vpc_site
+# xcsh_gcp_vpc_site
 
 Category: Sites
 Deploying F5 sites within Google Cloud VPC environments
@@ -16,7 +16,7 @@ Deploying F5 sites within Google Cloud VPC environments
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_gcp_vpc_site" "example" {
+resource "xcsh_gcp_vpc_site" "example" {
   name      = "example-gcp-vpc-site"
   namespace = "staging"
 

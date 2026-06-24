@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_voltstack_site Resource - terraform-provider-f5xc"
+page_title: "xcsh_voltstack_site Resource - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Manages a Voltstack Site resource in F5 Distributed Cloud for deploying Volterra stack sites for edge computing.
 ---
 
-# f5xc_voltstack_site (Resource)
+# xcsh_voltstack_site (Resource)
 
 Manages a Voltstack Site resource in F5 Distributed Cloud for deploying Volterra stack sites for edge computing.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Voltstack Site configuration
-resource "f5xc_voltstack_site" "example" {
+resource "xcsh_voltstack_site" "example" {
   name      = "example-voltstack-site"
   namespace = "staging"
 
@@ -1422,5 +1422,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_voltstack_site.example system/example
+terraform import xcsh_voltstack_site.example system/example
 ```

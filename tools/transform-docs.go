@@ -20,10 +20,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/defaults"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/naming"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/openapi"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/resource"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/defaults"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/naming"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/openapi"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/resource"
 )
 
 // Global defaults store for API-discovered default values

@@ -1,4 +1,4 @@
-# f5xc_virtual_network
+# xcsh_virtual_network
 
 Category: Networking
 Virtual network in given namespace
@@ -12,7 +12,7 @@ Virtual network in given namespace
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_virtual_network" "example" {
+resource "xcsh_virtual_network" "example" {
   name      = "example-virtual-network"
   namespace = "staging"
 

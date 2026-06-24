@@ -1,4 +1,4 @@
-# f5xc_bgp
+# xcsh_bgp
 
 Category: Networking
 Bgp object is the configuration for peering with external bgp servers. it is created by users in system namespace. configuration
@@ -11,7 +11,7 @@ Bgp object is the configuration for peering with external bgp servers. it is cre
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_bgp" "example" {
+resource "xcsh_bgp" "example" {
   name      = "example-bgp"
   namespace = "staging"
 

@@ -1,4 +1,4 @@
-# f5xc_forward_proxy_policy
+# xcsh_forward_proxy_policy
 
 Category: Security
 Forward proxy policy specification. configuration
@@ -11,7 +11,7 @@ Forward proxy policy specification. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_forward_proxy_policy" "example" {
+resource "xcsh_forward_proxy_policy" "example" {
   name      = "example-forward-proxy-policy"
   namespace = "staging"
 

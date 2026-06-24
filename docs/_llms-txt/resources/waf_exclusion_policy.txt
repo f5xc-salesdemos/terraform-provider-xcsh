@@ -1,4 +1,4 @@
-# f5xc_waf_exclusion_policy
+# xcsh_waf_exclusion_policy
 
 Category: Security
 WAF exclusion policy
@@ -24,7 +24,7 @@ Within waf_exclusion_rules, pick exactly one:
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_waf_exclusion_policy" "example" {
+resource "xcsh_waf_exclusion_policy" "example" {
   name      = "example-waf-exclusion-policy"
   namespace = "staging"
 

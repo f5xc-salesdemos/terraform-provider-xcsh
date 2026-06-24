@@ -1,4 +1,4 @@
-# f5xc_cdn_purge_command
+# xcsh_cdn_purge_command
 
 Category: Load Balancing
 CDN purge command specification. configuration
@@ -11,7 +11,7 @@ CDN purge command specification. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_cdn_purge_command" "example" {
+resource "xcsh_cdn_purge_command" "example" {
   name      = "example-CDN-purge-command"
   namespace = "staging"
 

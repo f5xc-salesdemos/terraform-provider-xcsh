@@ -1,4 +1,4 @@
-# f5xc_app_firewall
+# xcsh_app_firewall
 
 Category: Security
 Application Firewall
@@ -43,7 +43,7 @@ Pick exactly one:
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_app_firewall" "example" {
+resource "xcsh_app_firewall" "example" {
   name      = "example-app-firewall"
   namespace = "staging"
 

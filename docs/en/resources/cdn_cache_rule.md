@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_cdn_cache_rule Resource - terraform-provider-f5xc"
+page_title: "xcsh_cdn_cache_rule Resource - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages a CDN Cache Rule resource in F5 Distributed Cloud for CDN loadbalancer specification. configuration.
 ---
 
-# f5xc_cdn_cache_rule (Resource)
+# xcsh_cdn_cache_rule (Resource)
 
 Manages a CDN Cache Rule resource in F5 Distributed Cloud for CDN loadbalancer specification. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic CDN Cache Rule configuration
-resource "f5xc_cdn_cache_rule" "example" {
+resource "xcsh_cdn_cache_rule" "example" {
   name      = "example-CDN-cache-rule"
   namespace = "staging"
 
@@ -266,5 +266,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_cdn_cache_rule.example system/example
+terraform import xcsh_cdn_cache_rule.example system/example
 ```

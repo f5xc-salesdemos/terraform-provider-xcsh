@@ -5,7 +5,7 @@ package provider_test
 import (
 	"testing"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/acctest"
 )
 
 func TestAccPolicyBasedRoutingDataSource_basic(t *testing.T) {

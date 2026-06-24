@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_service_policy Resource - terraform-provider-f5xc"
+page_title: "xcsh_service_policy Resource - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Manages service_policy creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_service_policy (Resource)
+# xcsh_service_policy (Resource)
 
 Manages service_policy creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Service Policy configuration
-resource "f5xc_service_policy" "example" {
+resource "xcsh_service_policy" "example" {
   name      = "example-service-policy"
   namespace = "staging"
 
@@ -81,7 +81,7 @@ resource "f5xc_service_policy" "example" {
 ### Allow List
 
 ```hcl
-resource "f5xc_service_policy" "test" {
+resource "xcsh_service_policy" "test" {
   name      = "example"
   namespace = "system"
 ```
@@ -89,7 +89,7 @@ resource "f5xc_service_policy" "test" {
 ### Deny All
 
 ```hcl
-resource "f5xc_service_policy" "test" {
+resource "xcsh_service_policy" "test" {
   name      = "example"
   namespace = "system"
 ```
@@ -97,7 +97,7 @@ resource "f5xc_service_policy" "test" {
 ### Deny List
 
 ```hcl
-resource "f5xc_service_policy" "test" {
+resource "xcsh_service_policy" "test" {
   name      = "example"
   namespace = "system"
 
@@ -115,7 +115,7 @@ resource "f5xc_service_policy" "test" {
 ### With Labels
 
 ```hcl
-resource "f5xc_service_policy" "test" {
+resource "xcsh_service_policy" "test" {
   name        = "example"
   namespace   = "system"
   description = "Test service policy"
@@ -954,5 +954,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_service_policy.example system/example
+terraform import xcsh_service_policy.example system/example
 ```

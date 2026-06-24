@@ -8,17 +8,17 @@ terraform {
   required_version = ">= 1.8"
   required_providers {
     f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
-provider "f5xc" {
+provider "xcsh" {
   # Authentication configured via environment variables:
-  # - F5XC_API_URL (required)
-  # - F5XC_API_TOKEN (token auth) OR
-  # - F5XC_P12_FILE + F5XC_P12_PASSWORD (P12 cert auth)
+  # - XCSH_API_URL (required)
+  # - XCSH_API_TOKEN (token auth) OR
+  # - XCSH_P12_FILE + XCSH_P12_PASSWORD (P12 cert auth)
 }
 
 # -----------------------------------------------------------------------------
@@ -27,7 +27,7 @@ provider "f5xc" {
 
 locals {
   # Use created namespace or existing one based on configuration
-  namespace = var.create_namespace ? f5xc_namespace.this[0].name : var.namespace_name
+  namespace = var.create_namespace ? xcsh_namespace.this[0].name : var.namespace_name
 
   # Built-in SecretPolicy that allows Volterra services to decrypt
   # This policy exists in every F5XC tenant by default
@@ -36,7 +36,7 @@ locals {
 }
 
 # Optional: Create a dedicated namespace for testing
-resource "f5xc_namespace" "this" {
+resource "xcsh_namespace" "this" {
   count = var.create_namespace ? 1 : 0
   name  = var.namespace_name
 }
@@ -53,7 +53,7 @@ resource "f5xc_namespace" "this" {
 # For secrets that fit within the size limit (API keys, passwords, tokens),
 # use blindfold() or blindfold_file() as shown in the other examples.
 
-resource "f5xc_certificate" "example" {
+resource "xcsh_certificate" "example" {
   count     = var.enable_certificate_example ? 1 : 0
   name      = "${var.resource_prefix}-cert"
   namespace = local.namespace
@@ -83,7 +83,7 @@ resource "f5xc_certificate" "example" {
 #
 # The blindfold() function takes base64-encoded plaintext and encrypts it.
 
-resource "f5xc_cloud_credentials" "aws" {
+resource "xcsh_cloud_credentials" "aws" {
   count     = var.enable_aws_credentials_example ? 1 : 0
   name      = "${var.resource_prefix}-aws-creds"
   namespace = "system" # Cloud credentials must be in system namespace
@@ -111,7 +111,7 @@ resource "f5xc_cloud_credentials" "aws" {
 # Use Case: Store Azure service principal credentials for F5XC to manage
 # Azure resources. The client secret is encrypted with blindfold.
 
-resource "f5xc_cloud_credentials" "azure" {
+resource "xcsh_cloud_credentials" "azure" {
   count     = var.enable_azure_credentials_example ? 1 : 0
   name      = "${var.resource_prefix}-azure-creds"
   namespace = "system" # Cloud credentials must be in system namespace
@@ -144,7 +144,7 @@ resource "f5xc_cloud_credentials" "azure" {
 # Note: GCP service account JSON files can be large. Ensure the file is under
 # the RSA-OAEP size limit (~190 bytes for 2048-bit keys).
 
-resource "f5xc_cloud_credentials" "gcp" {
+resource "xcsh_cloud_credentials" "gcp" {
   count     = var.enable_gcp_credentials_example ? 1 : 0
   name      = "${var.resource_prefix}-gcp-creds"
   namespace = "system" # Cloud credentials must be in system namespace
@@ -170,7 +170,7 @@ resource "f5xc_cloud_credentials" "gcp" {
 # Use Case: Store container registry authentication for pulling private images
 # in F5XC app deployments. The password/token is encrypted with blindfold.
 
-resource "f5xc_container_registry" "example" {
+resource "xcsh_container_registry" "example" {
   count     = var.enable_container_registry_example ? 1 : 0
   name      = "${var.resource_prefix}-registry"
   namespace = local.namespace

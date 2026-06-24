@@ -1,4 +1,4 @@
-# f5xc_api_definition
+# xcsh_api_definition
 
 Category: API Security
 API Definition
@@ -19,7 +19,7 @@ API Definition
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_api_definition" "example" {
+resource "xcsh_api_definition" "example" {
   name      = "example-api-definition"
   namespace = "staging"
 

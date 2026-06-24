@@ -88,16 +88,16 @@ API tokens provide bearer token authentication over TLS. This is the quickest wa
 **Using Environment Variables:**
 
 ```bash
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_API_TOKEN="your-api-token"
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_API_TOKEN="your-api-token"
 ```
 
 **Using Provider Configuration:**
 
 ```hcl
-provider "f5xc" {
-  api_url   = var.f5xc_api_url
-  api_token = var.f5xc_api_token
+provider "xcsh" {
+  api_url   = var.xcsh_api_url
+  api_token = var.xcsh_api_token
 }
 ```
 
@@ -108,18 +108,18 @@ P12 certificates provide mutual TLS (mTLS) authentication, where both client and
 **Using Environment Variables:**
 
 ```bash
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_P12_FILE="/path/to/your-credentials.p12"
-export F5XC_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_P12_FILE="/path/to/your-credentials.p12"
+export XCSH_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
 ```
 
 **Using Provider Configuration:**
 
 ```hcl
-provider "f5xc" {
-  api_url      = var.f5xc_api_url
-  api_p12_file = var.f5xc_api_p12_file
-  p12_password = var.f5xc_p12_password
+provider "xcsh" {
+  api_url      = var.xcsh_api_url
+  api_p12_file = var.xcsh_api_p12_file
+  p12_password = var.xcsh_p12_password
 }
 ```
 
@@ -137,12 +137,12 @@ mkdir -p certs
 
 # Extract the certificate
 openssl pkcs12 -in ~/your-tenant.console.ves.volterra.io.api-creds.p12 \
-  -nodes -nokeys -out certs/f5xc.cert
+  -nodes -nokeys -out certs/xcsh.cert
 # Enter Import Password: <your p12 password>
 
 # Extract the private key
 openssl pkcs12 -in ~/your-tenant.console.ves.volterra.io.api-creds.p12 \
-  -nodes -nocerts -out certs/f5xc.key
+  -nodes -nocerts -out certs/xcsh.key
 # Enter Import Password: <your p12 password>
 ```
 
@@ -151,41 +151,41 @@ openssl pkcs12 -in ~/your-tenant.console.ves.volterra.io.api-creds.p12 \
 **Using Environment Variables:**
 
 ```bash
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_CERT="/path/to/certs/f5xc.cert"
-export F5XC_KEY="/path/to/certs/f5xc.key"
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_CERT="/path/to/certs/xcsh.cert"
+export XCSH_KEY="/path/to/certs/xcsh.key"
 ```
 
 **Using Provider Configuration:**
 
 ```hcl
-provider "f5xc" {
-  api_url  = var.f5xc_api_url
-  api_cert = var.f5xc_api_cert
-  api_key  = var.f5xc_api_key
+provider "xcsh" {
+  api_url  = var.xcsh_api_url
+  api_cert = var.xcsh_api_cert
+  api_key  = var.xcsh_api_key
 }
 ```
 
-~> **Note:** For server certificate verification, specify a CA certificate using `F5XC_CACERT` environment variable or `api_ca_cert` provider attribute.
+~> **Note:** For server certificate verification, specify a CA certificate using `XCSH_CACERT` environment variable or `api_ca_cert` provider attribute.
 
 ## Environment Variable Reference
 
 | Variable            | Description                                    | Required                       |
 | ------------------- | ---------------------------------------------- | ------------------------------ |
-| `F5XC_API_URL`      | F5XC tenant API URL                            | Yes                            |
-| `F5XC_API_TOKEN`    | API token for bearer authentication            | One of: token, P12, or PEM     |
-| `F5XC_P12_FILE`     | Path to P12 certificate file                   | With `F5XC_P12_PASSWORD`       |
-| `F5XC_P12_PASSWORD` | Password for P12 file                          | With `F5XC_P12_FILE`           |
-| `F5XC_CERT`         | Path to PEM certificate file                   | With `F5XC_KEY`                |
-| `F5XC_KEY`          | Path to PEM private key file                   | With `F5XC_CERT`               |
-| `F5XC_CACERT`       | Path to CA certificate for server verification | No                             |
+| `XCSH_API_URL`      | F5XC tenant API URL                            | Yes                            |
+| `XCSH_API_TOKEN`    | API token for bearer authentication            | One of: token, P12, or PEM     |
+| `XCSH_P12_FILE`     | Path to P12 certificate file                   | With `XCSH_P12_PASSWORD`       |
+| `XCSH_P12_PASSWORD` | Password for P12 file                          | With `XCSH_P12_FILE`           |
+| `XCSH_CERT`         | Path to PEM certificate file                   | With `XCSH_KEY`                |
+| `XCSH_KEY`          | Path to PEM private key file                   | With `XCSH_CERT`               |
+| `XCSH_CACERT`       | Path to CA certificate for server verification | No                             |
 
 **Adding to Shell Profile:**
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_API_TOKEN="your-api-token"
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_API_TOKEN="your-api-token"
 ```
 
 Then reload: `source ~/.zshrc` or `source ~/.bashrc`
@@ -227,15 +227,15 @@ jobs:
 
       - name: Terraform Plan
         env:
-          F5XC_API_URL: ${{ secrets.F5XC_API_URL }}
-          F5XC_API_TOKEN: ${{ secrets.F5XC_API_TOKEN }}
+          XCSH_API_URL: ${{ secrets.XCSH_API_URL }}
+          XCSH_API_TOKEN: ${{ secrets.XCSH_API_TOKEN }}
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
-          F5XC_API_URL: ${{ secrets.F5XC_API_URL }}
-          F5XC_API_TOKEN: ${{ secrets.F5XC_API_TOKEN }}
+          XCSH_API_URL: ${{ secrets.XCSH_API_URL }}
+          XCSH_API_TOKEN: ${{ secrets.XCSH_API_TOKEN }}
         run: terraform apply -auto-approve tfplan
 ```
 
@@ -243,8 +243,8 @@ jobs:
 
 | Secret Name        | Value                                          |
 | ------------------ | ---------------------------------------------- |
-| `F5XC_API_URL`     | `https://your-tenant.console.ves.volterra.io`  |
-| `F5XC_API_TOKEN`   | Your API token value                           |
+| `XCSH_API_URL`     | `https://your-tenant.console.ves.volterra.io`  |
+| `XCSH_API_TOKEN`   | Your API token value                           |
 
 ### GitHub Actions with P12 Certificate
 
@@ -269,29 +269,29 @@ jobs:
 
       - name: Setup P12 Certificate
         run: |
-          echo "${{ secrets.F5XC_P12_BASE64 }}" | base64 -d > /tmp/f5xc-credentials.p12
-          chmod 600 /tmp/f5xc-credentials.p12
+          echo "${{ secrets.XCSH_P12_BASE64 }}" | base64 -d > /tmp/xcsh-credentials.p12
+          chmod 600 /tmp/xcsh-credentials.p12
 
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Plan
         env:
-          F5XC_API_URL: ${{ secrets.F5XC_API_URL }}
-          F5XC_P12_FILE: /tmp/f5xc-credentials.p12
-          F5XC_P12_PASSWORD: ${{ secrets.F5XC_P12_PASSWORD }}
+          XCSH_API_URL: ${{ secrets.XCSH_API_URL }}
+          XCSH_P12_FILE: /tmp/xcsh-credentials.p12
+          XCSH_P12_PASSWORD: ${{ secrets.XCSH_P12_PASSWORD }}
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
         env:
-          F5XC_API_URL: ${{ secrets.F5XC_API_URL }}
-          F5XC_P12_FILE: /tmp/f5xc-credentials.p12
-          F5XC_P12_PASSWORD: ${{ secrets.F5XC_P12_PASSWORD }}
+          XCSH_API_URL: ${{ secrets.XCSH_API_URL }}
+          XCSH_P12_FILE: /tmp/xcsh-credentials.p12
+          XCSH_P12_PASSWORD: ${{ secrets.XCSH_P12_PASSWORD }}
         run: terraform apply -auto-approve tfplan
 
       - name: Cleanup
         if: always()
-        run: rm -f /tmp/f5xc-credentials.p12
+        run: rm -f /tmp/xcsh-credentials.p12
 ```
 
 **Encoding P12 for GitHub Secrets:**
@@ -308,9 +308,9 @@ base64 -w 0 your-credentials.p12
 
 | Secret Name         | Value                                          |
 | ------------------- | ---------------------------------------------- |
-| `F5XC_API_URL`      | `https://your-tenant.console.ves.volterra.io`  |
-| `F5XC_P12_BASE64`   | Base64-encoded P12 file contents               |
-| `F5XC_P12_PASSWORD` | Password for the P12 file                      |
+| `XCSH_API_URL`      | `https://your-tenant.console.ves.volterra.io`  |
+| `XCSH_P12_BASE64`   | Base64-encoded P12 file contents               |
+| `XCSH_P12_PASSWORD` | Password for the P12 file                      |
 
 ## Security Best Practices
 
@@ -337,8 +337,8 @@ base64 -w 0 your-credentials.p12
 4. Ensure environment variables are exported:
 
 ```bash
-echo $F5XC_API_URL
-echo $F5XC_API_TOKEN
+echo $XCSH_API_URL
+echo $XCSH_API_TOKEN
 ```
 
 ### Certificate Verification Failed
@@ -362,8 +362,8 @@ openssl pkcs12 -in your-credentials.p12 -nokeys -info
 1. Ensure variables are exported:
 
 ```bash
-export F5XC_API_TOKEN="token"  # Correct
-F5XC_API_TOKEN="token"         # Won't work
+export XCSH_API_TOKEN="token"  # Correct
+XCSH_API_TOKEN="token"         # Won't work
 ```
 
 1. Verify spelling is exact (case-sensitive)
@@ -385,4 +385,4 @@ F5XC_API_TOKEN="token"         # Won't work
 - [Provider Documentation](../index.md)
 - [F5 Distributed Cloud Docs](https://docs.cloud.f5.com/)
 - [F5 Credentials Guide](https://docs.cloud.f5.com/docs-v2/administration/how-tos/user-mgmt/Credentials)
-- [GitHub Issues](https://github.com/f5xc-salesdemos/terraform-provider-f5xc/issues)
+- [GitHub Issues](https://github.com/f5xc-salesdemos/terraform-provider-xcsh/issues)

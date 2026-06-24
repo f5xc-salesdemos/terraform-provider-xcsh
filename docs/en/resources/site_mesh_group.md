@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_site_mesh_group Resource - terraform-provider-f5xc"
+page_title: "xcsh_site_mesh_group Resource - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Manages Site Mesh Group in system namespace of user. in F5 Distributed Cloud.
 ---
 
-# f5xc_site_mesh_group (Resource)
+# xcsh_site_mesh_group (Resource)
 
 Manages Site Mesh Group in system namespace of user. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Site Mesh Group configuration
-resource "f5xc_site_mesh_group" "example" {
+resource "xcsh_site_mesh_group" "example" {
   name      = "example-site-mesh-group"
   namespace = "staging"
 
@@ -273,5 +273,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_site_mesh_group.example system/example
+terraform import xcsh_site_mesh_group.example system/example
 ```

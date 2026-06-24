@@ -1,4 +1,4 @@
-# f5xc_network_policy_view
+# xcsh_network_policy_view
 
 Category: Security
 Network policy view specification. configuration
@@ -11,7 +11,7 @@ Network policy view specification. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_network_policy_view" "example" {
+resource "xcsh_network_policy_view" "example" {
   name      = "example-network-policy-view"
   namespace = "staging"
 

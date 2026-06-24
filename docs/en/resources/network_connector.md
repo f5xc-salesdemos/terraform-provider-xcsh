@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_network_connector Resource - terraform-provider-f5xc"
+page_title: "xcsh_network_connector Resource - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Manages a Network Connector resource in F5 Distributed Cloud for network connector is created by users in system namespace. configuration.
 ---
 
-# f5xc_network_connector (Resource)
+# xcsh_network_connector (Resource)
 
 Manages a Network Connector resource in F5 Distributed Cloud for network connector is created by users in system namespace. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Network Connector configuration
-resource "f5xc_network_connector" "example" {
+resource "xcsh_network_connector" "example" {
   name      = "example-network-connector"
   namespace = "staging"
 
@@ -321,5 +321,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_network_connector.example system/example
+terraform import xcsh_network_connector.example system/example
 ```

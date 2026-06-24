@@ -1,4 +1,4 @@
-# f5xc_namespace
+# xcsh_namespace
 
 Category: Organization
 New namespace. Name of the object is name of the namespace
@@ -10,7 +10,7 @@ New namespace. Name of the object is name of the namespace
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_namespace" "example" {
+resource "xcsh_namespace" "example" {
   name      = "example-namespace"
   namespace = "staging"
 

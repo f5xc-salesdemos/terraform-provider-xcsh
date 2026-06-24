@@ -23,7 +23,7 @@ locals {
 }
 
 # Example: Using the encrypted secret in a resource
-resource "f5xc_http_loadbalancer" "example" {
+resource "xcsh_http_loadbalancer" "example" {
   name      = "secure-lb"
   namespace = "production"
 

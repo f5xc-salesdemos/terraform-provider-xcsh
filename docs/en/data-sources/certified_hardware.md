@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_certified_hardware Data Source - terraform-provider-f5xc"
+page_title: "xcsh_certified_hardware Data Source - terraform-provider-xcsh"
 subcategory: "Uncategorized"
 description: |-
   Retrieves information about an existing Certified Hardware resource in F5 Distributed Cloud for get certified hardware object. configuration. (read-only data source)
 ---
 
-# f5xc_certified_hardware (Data Source)
+# xcsh_certified_hardware (Data Source)
 
 Retrieves information about a Certified Hardware resource in F5 Distributed Cloud for get certified hardware object. configuration. (read-only data source)
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Certified Hardware by name
-data "f5xc_certified_hardware" "example" {
+data "xcsh_certified_hardware" "example" {
   name      = "example-certified-hardware"
   namespace = "staging"
 }
 
 output "certified_hardware_id" {
-  value = data.f5xc_certified_hardware.example.id
+  value = data.xcsh_certified_hardware.example.id
 }
 ```
 

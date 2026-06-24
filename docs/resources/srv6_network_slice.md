@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_srv6_network_slice Resource - terraform-provider-f5xc"
+page_title: "xcsh_srv6_network_slice Resource - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Manages srv6_network_slice creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_srv6_network_slice (Resource)
+# xcsh_srv6_network_slice (Resource)
 
 Manages srv6_network_slice creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Srv6 Network Slice configuration
-resource "f5xc_srv6_network_slice" "example" {
+resource "xcsh_srv6_network_slice" "example" {
   name      = "example-srv6-network-slice"
   namespace = "staging"
 
@@ -186,5 +186,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_srv6_network_slice.example system/example
+terraform import xcsh_srv6_network_slice.example system/example
 ```

@@ -1,0 +1,54 @@
+# Discovery Resource Example
+# Manages a Discovery resource in F5 Distributed Cloud for api to create discovery object for a site or virtual site in system namespace. configuration.
+
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/xcsh"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+# Basic Discovery configuration
+resource "xcsh_discovery" "example" {
+  name      = "example-discovery"
+  namespace = "staging"
+
+  labels = {
+    environment = "production"
+    managed_by  = "terraform"
+  }
+
+  annotations = {
+    "owner" = "platform-team"
+  }
+
+  # Discovery configuration
+  discovery_k8s {
+    access_info {
+      kubeconfig_url {
+        clear_secret_info {
+          url = "string:///base64-kubeconfig"
+        }
+      }
+      isolated {}
+    }
+    publish_info {
+      disable {}
+    }
+  }
+
+  # Site selection
+  where {
+    site {
+      ref {
+        name      = "example-site"
+        namespace = "staging"
+      }
+      network_type = "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE"
+    }
+  }
+}

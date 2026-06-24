@@ -1,4 +1,4 @@
-# f5xc_certificate_chain
+# xcsh_certificate_chain
 
 Category: Certificates
 Certificate chain configuration for TLS
@@ -12,7 +12,7 @@ Certificate chain configuration for TLS
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_certificate_chain" "example" {
+resource "xcsh_certificate_chain" "example" {
   name      = "example-certificate-chain"
   namespace = "staging"
 

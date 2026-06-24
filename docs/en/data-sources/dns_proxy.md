@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_dns_proxy Data Source - terraform-provider-f5xc"
+page_title: "xcsh_dns_proxy Data Source - terraform-provider-xcsh"
 subcategory: "DNS"
 description: |-
   Retrieves information about DNS Proxy in a given namespace. If one already exists it will give an error. in F5 Distributed Cloud.
 ---
 
-# f5xc_dns_proxy (Data Source)
+# xcsh_dns_proxy (Data Source)
 
 Manages DNS Proxy in a given namespace. If one already exists it will give an error. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing DNS Proxy by name
-data "f5xc_dns_proxy" "example" {
+data "xcsh_dns_proxy" "example" {
   name      = "example-dns-proxy"
   namespace = "staging"
 }
 
 output "dns_proxy_id" {
-  value = data.f5xc_dns_proxy.example.id
+  value = data.xcsh_dns_proxy.example.id
 }
 ```
 

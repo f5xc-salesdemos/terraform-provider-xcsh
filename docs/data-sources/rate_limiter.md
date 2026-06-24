@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_rate_limiter Data Source - terraform-provider-f5xc"
+page_title: "xcsh_rate_limiter Data Source - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about rate_limiter creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_rate_limiter (Data Source)
+# xcsh_rate_limiter (Data Source)
 
 Manages rate_limiter creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,32 +21,32 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Rate Limiter by name
-data "f5xc_rate_limiter" "example" {
+data "xcsh_rate_limiter" "example" {
   name      = "example-rate-limiter"
   namespace = "staging"
 }
 
 output "rate_limiter_id" {
-  value = data.f5xc_rate_limiter.example.id
+  value = data.xcsh_rate_limiter.example.id
 }
 
 # Example: Reference rate limiter in HTTP load balancer
-# resource "f5xc_http_loadbalancer" "example" {
+# resource "xcsh_http_loadbalancer" "example" {
 #   name      = "rate-limited-lb"
 #   namespace = "staging"
 #
 #   rate_limit {
 #     rate_limiter {
-#       name      = data.f5xc_rate_limiter.example.name
-#       namespace = data.f5xc_rate_limiter.example.namespace
+#       name      = data.xcsh_rate_limiter.example.name
+#       namespace = data.xcsh_rate_limiter.example.namespace
 #     }
 #   }
 # }

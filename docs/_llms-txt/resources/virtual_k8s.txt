@@ -1,4 +1,4 @@
-# f5xc_virtual_k8s
+# xcsh_virtual_k8s
 
 Category: Kubernetes
 Virtual_k8s will create the object in the storage backend for namespace metadata.namespace
@@ -11,7 +11,7 @@ Virtual_k8s will create the object in the storage backend for namespace metadata
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_virtual_k8s" "example" {
+resource "xcsh_virtual_k8s" "example" {
   name      = "example-virtual-k8s"
   namespace = "staging"
 

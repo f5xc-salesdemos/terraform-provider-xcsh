@@ -1,4 +1,4 @@
-# f5xc_usb_policy
+# xcsh_usb_policy
 
 Category: Security
 New USB policy object
@@ -11,7 +11,7 @@ New USB policy object
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_usb_policy" "example" {
+resource "xcsh_usb_policy" "example" {
   name      = "example-usb-policy"
   namespace = "staging"
 

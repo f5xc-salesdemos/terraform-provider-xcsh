@@ -6,35 +6,35 @@ terraform {
 
   required_providers {
     f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 
-data "f5xc_addon_service" "bot_defense" {
+data "xcsh_addon_service" "bot_defense" {
   name = "bot_defense"
 }
 
 # Output the addon service details
 output "display_name" {
   description = "Human-readable name of the addon service"
-  value       = data.f5xc_addon_service.bot_defense.display_name
+  value       = data.xcsh_addon_service.bot_defense.display_name
 }
 
 output "tier" {
   description = "Required subscription tier (NO_TIER, BASIC, STANDARD, ADVANCED, PREMIUM)"
-  value       = data.f5xc_addon_service.bot_defense.tier
+  value       = data.xcsh_addon_service.bot_defense.tier
 }
 
 output "activation_type" {
   description = "How the service is activated (self, partial, managed)"
-  value       = data.f5xc_addon_service.bot_defense.activation_type
+  value       = data.xcsh_addon_service.bot_defense.activation_type
 }
 
 # Example: Check if self-activation is available
 output "is_self_activatable" {
   description = "Whether the addon can be activated without manual intervention"
-  value       = data.f5xc_addon_service.bot_defense.activation_type == "self"
+  value       = data.xcsh_addon_service.bot_defense.activation_type == "self"
 }

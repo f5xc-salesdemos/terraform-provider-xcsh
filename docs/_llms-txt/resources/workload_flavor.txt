@@ -1,4 +1,4 @@
-# f5xc_workload_flavor
+# xcsh_workload_flavor
 
 Category: Kubernetes
 Workload_flavor
@@ -14,7 +14,7 @@ Workload_flavor
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_workload_flavor" "example" {
+resource "xcsh_workload_flavor" "example" {
   name      = "example-workload-flavor"
   namespace = "staging"
 

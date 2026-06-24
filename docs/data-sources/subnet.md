@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_subnet Data Source - terraform-provider-f5xc"
+page_title: "xcsh_subnet Data Source - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Retrieves information about an existing Subnet resource in F5 Distributed Cloud for subnet object contains configuration for an interface of a vm/pod. it is created in user or shared namespace. configuration.
 ---
 
-# f5xc_subnet (Data Source)
+# xcsh_subnet (Data Source)
 
 Retrieves information about a Subnet resource in F5 Distributed Cloud for subnet object contains configuration for an interface of a vm/pod. it is created in user or shared namespace. configuration. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Subnet by name
-data "f5xc_subnet" "example" {
+data "xcsh_subnet" "example" {
   name      = "example-subnet"
   namespace = "staging"
 }
 
 output "subnet_id" {
-  value = data.f5xc_subnet.example.id
+  value = data.xcsh_subnet.example.id
 }
 ```
 

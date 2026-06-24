@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_network_policy_view Data Source - terraform-provider-f5xc"
+page_title: "xcsh_network_policy_view Data Source - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about an existing Network Policy View resource in F5 Distributed Cloud for network policy view specification. configuration.
 ---
 
-# f5xc_network_policy_view (Data Source)
+# xcsh_network_policy_view (Data Source)
 
 Retrieves information about a Network Policy View resource in F5 Distributed Cloud for network policy view specification. configuration. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Network Policy View by name
-data "f5xc_network_policy_view" "example" {
+data "xcsh_network_policy_view" "example" {
   name      = "example-network-policy-view"
   namespace = "staging"
 }
 
 output "network_policy_view_id" {
-  value = data.f5xc_network_policy_view.example.id
+  value = data.xcsh_network_policy_view.example.id
 }
 ```
 

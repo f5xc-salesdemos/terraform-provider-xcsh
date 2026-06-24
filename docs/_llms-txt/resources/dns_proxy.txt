@@ -1,4 +1,4 @@
-# f5xc_dns_proxy
+# xcsh_dns_proxy
 
 Category: DNS
 DNS Proxy in a given namespace. If one already exists it will give an error
@@ -12,7 +12,7 @@ DNS Proxy in a given namespace. If one already exists it will give an error
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_dns_proxy" "example" {
+resource "xcsh_dns_proxy" "example" {
   name      = "example-dns-proxy"
   namespace = "staging"
 

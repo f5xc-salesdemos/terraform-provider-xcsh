@@ -1,4 +1,4 @@
-# f5xc_aws_vpc_site
+# xcsh_aws_vpc_site
 
 Category: Sites
 Deploying F5 sites within AWS VPC environments
@@ -16,7 +16,7 @@ Deploying F5 sites within AWS VPC environments
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_aws_vpc_site" "example" {
+resource "xcsh_aws_vpc_site" "example" {
   name      = "example-aws-vpc-site"
   namespace = "staging"
 
@@ -38,7 +38,7 @@ resource "f5xc_aws_vpc_site" "example" {
 
   vpc {
     new_vpc {
-      name_tag     = "f5xc-vpc"
+      name_tag     = "xcsh-vpc"
       primary_ipv4 = "10.0.0.0/16"
     }
   }

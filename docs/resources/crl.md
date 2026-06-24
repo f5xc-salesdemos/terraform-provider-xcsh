@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_crl Resource - terraform-provider-f5xc"
+page_title: "xcsh_crl Resource - terraform-provider-xcsh"
 subcategory: "Certificates"
 description: |-
   Manages a CRL resource in F5 Distributed Cloud for api to create crl object. configuration.
 ---
 
-# f5xc_crl (Resource)
+# xcsh_crl (Resource)
 
 Manages a CRL resource in F5 Distributed Cloud for api to create crl object. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic CRL configuration
-resource "f5xc_crl" "example" {
+resource "xcsh_crl" "example" {
   name      = "example-crl"
   namespace = "staging"
 
@@ -200,5 +200,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_crl.example system/example
+terraform import xcsh_crl.example system/example
 ```

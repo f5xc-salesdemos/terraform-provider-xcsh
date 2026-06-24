@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_flow_anomaly Data Source - terraform-provider-f5xc"
+page_title: "xcsh_flow_anomaly Data Source - terraform-provider-xcsh"
 subcategory: "Uncategorized"
 description: |-
   Retrieves information about an existing Flow Anomaly resource in F5 Distributed Cloud for flow anomaly specification. configuration. (read-only data source)
 ---
 
-# f5xc_flow_anomaly (Data Source)
+# xcsh_flow_anomaly (Data Source)
 
 Retrieves information about a Flow Anomaly resource in F5 Distributed Cloud for flow anomaly specification. configuration. (read-only data source)
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Flow Anomaly by name
-data "f5xc_flow_anomaly" "example" {
+data "xcsh_flow_anomaly" "example" {
   name      = "example-flow-anomaly"
   namespace = "staging"
 }
 
 output "flow_anomaly_id" {
-  value = data.f5xc_flow_anomaly.example.id
+  value = data.xcsh_flow_anomaly.example.id
 }
 ```
 

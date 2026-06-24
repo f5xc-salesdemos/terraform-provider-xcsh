@@ -1,4 +1,4 @@
-# f5xc_global_log_receiver
+# xcsh_global_log_receiver
 
 Category: Monitoring
 New Global Log Receiver object
@@ -17,7 +17,7 @@ New Global Log Receiver object
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_global_log_receiver" "example" {
+resource "xcsh_global_log_receiver" "example" {
   name      = "example-global-log-receiver"
   namespace = "staging"
 

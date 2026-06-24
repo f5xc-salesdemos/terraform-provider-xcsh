@@ -1,4 +1,4 @@
-# f5xc_cloud_link
+# xcsh_cloud_link
 
 Category: Networking
 New CloudLink with configured parameters
@@ -11,7 +11,7 @@ New CloudLink with configured parameters
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_cloud_link" "example" {
+resource "xcsh_cloud_link" "example" {
   name      = "example-cloud-link"
   namespace = "staging"
 

@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_fleet Data Source - terraform-provider-f5xc"
+page_title: "xcsh_fleet Data Source - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Retrieves information about fleet will create a fleet object in 'system' namespace of the user. in F5 Distributed Cloud.
 ---
 
-# f5xc_fleet (Data Source)
+# xcsh_fleet (Data Source)
 
 Manages fleet will create a fleet object in 'system' namespace of the user. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Fleet by name
-data "f5xc_fleet" "example" {
+data "xcsh_fleet" "example" {
   name      = "example-fleet"
   namespace = "staging"
 }
 
 output "fleet_id" {
-  value = data.f5xc_fleet.example.id
+  value = data.xcsh_fleet.example.id
 }
 ```
 

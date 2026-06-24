@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_udp_loadbalancer Resource - terraform-provider-f5xc"
+page_title: "xcsh_udp_loadbalancer Resource - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages a UDP Load Balancer resource in F5 Distributed Cloud for load balancing UDP traffic across origin pools.
 ---
 
-# f5xc_udp_loadbalancer (Resource)
+# xcsh_udp_loadbalancer (Resource)
 
 Manages a UDP Load Balancer resource in F5 Distributed Cloud for load balancing UDP traffic across origin pools.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic UDP Loadbalancer configuration
-resource "f5xc_udp_loadbalancer" "example" {
+resource "xcsh_udp_loadbalancer" "example" {
   name      = "example-udp-loadbalancer"
   namespace = "staging"
 
@@ -411,5 +411,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_udp_loadbalancer.example system/example
+terraform import xcsh_udp_loadbalancer.example system/example
 ```

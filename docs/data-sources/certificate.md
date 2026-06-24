@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_certificate Data Source - terraform-provider-f5xc"
+page_title: "xcsh_certificate Data Source - terraform-provider-xcsh"
 subcategory: "Certificates"
 description: |-
   Retrieves information about an existing Certificate resource in F5 Distributed Cloud for certificate. configuration.
 ---
 
-# f5xc_certificate (Data Source)
+# xcsh_certificate (Data Source)
 
 Retrieves information about a Certificate resource in F5 Distributed Cloud for certificate. configuration. This is a read-only data source.
 
@@ -21,33 +21,33 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Certificate by name
-data "f5xc_certificate" "example" {
+data "xcsh_certificate" "example" {
   name      = "example-certificate"
   namespace = "staging"
 }
 
 output "certificate_id" {
-  value = data.f5xc_certificate.example.id
+  value = data.xcsh_certificate.example.id
 }
 
 # Example: Reference certificate in HTTPS configuration
-# resource "f5xc_http_loadbalancer" "example" {
+# resource "xcsh_http_loadbalancer" "example" {
 #   name      = "https-lb"
 #   namespace = "staging"
 #
 #   https {
 #     tls_cert_params {
 #       certificates {
-#         name      = data.f5xc_certificate.example.name
-#         namespace = data.f5xc_certificate.example.namespace
+#         name      = data.xcsh_certificate.example.name
+#         namespace = data.xcsh_certificate.example.namespace
 #       }
 #     }
 #   }

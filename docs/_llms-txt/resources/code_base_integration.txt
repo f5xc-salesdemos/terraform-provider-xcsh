@@ -1,4 +1,4 @@
-# f5xc_code_base_integration
+# xcsh_code_base_integration
 
 Category: Integrations
 Integration details
@@ -11,7 +11,7 @@ Integration details
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_code_base_integration" "example" {
+resource "xcsh_code_base_integration" "example" {
   name      = "example-code-base-integration"
   namespace = "staging"
 

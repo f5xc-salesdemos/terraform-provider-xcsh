@@ -1,0 +1,23 @@
+# Route Data Source Example
+# Retrieves information about an existing Route
+
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    f5xc = {
+      source  = "f5xc-salesdemos/xcsh"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+# Look up an existing Route by name
+data "xcsh_route" "example" {
+  name      = "example-route"
+  namespace = "staging"
+}
+
+output "route_id" {
+  value = data.xcsh_route.example.id
+}

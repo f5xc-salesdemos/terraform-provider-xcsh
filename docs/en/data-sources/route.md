@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_route Data Source - terraform-provider-f5xc"
+page_title: "xcsh_route Data Source - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Retrieves information about route object in a given namespace. Route object is list of route rules. Each rule has match condition to match incoming requests and actions to take on matching requests. in F5 Distributed Cloud.
 ---
 
-# f5xc_route (Data Source)
+# xcsh_route (Data Source)
 
 Manages route object in a given namespace. Route object is list of route rules. Each rule has match condition to match incoming requests and actions to take on matching requests. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Route by name
-data "f5xc_route" "example" {
+data "xcsh_route" "example" {
   name      = "example-route"
   namespace = "staging"
 }
 
 output "route_id" {
-  value = data.f5xc_route.example.id
+  value = data.xcsh_route.example.id
 }
 ```
 

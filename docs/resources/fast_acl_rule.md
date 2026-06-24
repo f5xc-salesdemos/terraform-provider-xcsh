@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_fast_acl_rule Resource - terraform-provider-f5xc"
+page_title: "xcsh_fast_acl_rule Resource - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Manages new Fast ACL rule, has specification to match source IP, source port and action to apply. in F5 Distributed Cloud.
 ---
 
-# f5xc_fast_acl_rule (Resource)
+# xcsh_fast_acl_rule (Resource)
 
 Manages new Fast ACL rule, has specification to match source IP, source port and action to apply. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Fast ACL Rule configuration
-resource "f5xc_fast_acl_rule" "example" {
+resource "xcsh_fast_acl_rule" "example" {
   name      = "example-fast-acl-rule"
   namespace = "staging"
 
@@ -286,5 +286,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_fast_acl_rule.example system/example
+terraform import xcsh_fast_acl_rule.example system/example
 ```

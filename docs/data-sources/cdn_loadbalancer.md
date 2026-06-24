@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_cdn_loadbalancer Data Source - terraform-provider-f5xc"
+page_title: "xcsh_cdn_loadbalancer Data Source - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Retrieves information about an existing CDN Load Balancer resource in F5 Distributed Cloud for content delivery and edge caching with load balancing.
 ---
 
-# f5xc_cdn_loadbalancer (Data Source)
+# xcsh_cdn_loadbalancer (Data Source)
 
 Retrieves information about a CDN Load Balancer resource in F5 Distributed Cloud for content delivery and edge caching with load balancing. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing CDN Loadbalancer by name
-data "f5xc_cdn_loadbalancer" "example" {
+data "xcsh_cdn_loadbalancer" "example" {
   name      = "example-CDN-loadbalancer"
   namespace = "staging"
 }
 
 output "cdn_loadbalancer_id" {
-  value = data.f5xc_cdn_loadbalancer.example.id
+  value = data.xcsh_cdn_loadbalancer.example.id
 }
 ```
 

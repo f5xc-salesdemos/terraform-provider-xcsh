@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_bigip_http_proxy Resource - terraform-provider-f5xc"
+page_title: "xcsh_bigip_http_proxy Resource - terraform-provider-xcsh"
 subcategory: "BIG-IP Integration"
 description: |-
   Manages BIG-IP HTTP Proxy in a given namespace. If one already exists, it will give an error. in F5 Distributed Cloud.
 ---
 
-# f5xc_bigip_http_proxy (Resource)
+# xcsh_bigip_http_proxy (Resource)
 
 Manages BIG-IP HTTP Proxy in a given namespace. If one already exists, it will give an error. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Bigip HTTP Proxy configuration
-resource "f5xc_bigip_http_proxy" "example" {
+resource "xcsh_bigip_http_proxy" "example" {
   name      = "example-bigip-http-proxy"
   namespace = "staging"
 
@@ -793,5 +793,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_bigip_http_proxy.example system/example
+terraform import xcsh_bigip_http_proxy.example system/example
 ```

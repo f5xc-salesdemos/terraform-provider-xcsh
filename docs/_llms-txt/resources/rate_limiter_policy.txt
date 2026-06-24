@@ -1,4 +1,4 @@
-# f5xc_rate_limiter_policy
+# xcsh_rate_limiter_policy
 
 Category: Security
 Rate limiter policy create specification. configuration
@@ -17,7 +17,7 @@ Rate limiter policy create specification. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_rate_limiter_policy" "example" {
+resource "xcsh_rate_limiter_policy" "example" {
   name      = "example-rate-limiter-policy"
   namespace = "staging"
 

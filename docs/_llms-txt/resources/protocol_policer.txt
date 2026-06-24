@@ -1,4 +1,4 @@
-# f5xc_protocol_policer
+# xcsh_protocol_policer
 
 Category: Security
 Protocol_policer object, protocol_policer object contains list of L4 protocol match condition and corresponding traffic rate limits
@@ -11,7 +11,7 @@ Protocol_policer object, protocol_policer object contains list of L4 protocol ma
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_protocol_policer" "example" {
+resource "xcsh_protocol_policer" "example" {
   name      = "example-protocol-policer"
   namespace = "staging"
 

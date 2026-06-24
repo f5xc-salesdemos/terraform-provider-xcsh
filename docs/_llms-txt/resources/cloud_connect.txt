@@ -1,4 +1,4 @@
-# f5xc_cloud_connect
+# xcsh_cloud_connect
 
 Category: Networking
 Establishing connectivity to cloud provider networks
@@ -11,7 +11,7 @@ Establishing connectivity to cloud provider networks
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_cloud_connect" "example" {
+resource "xcsh_cloud_connect" "example" {
   name      = "example-cloud-connect"
   namespace = "staging"
 

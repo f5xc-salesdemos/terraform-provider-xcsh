@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_api_crawler Data Source - terraform-provider-f5xc"
+page_title: "xcsh_api_crawler Data Source - terraform-provider-xcsh"
 subcategory: "API Security"
 description: |-
   Retrieves information about an existing API Crawler resource in F5 Distributed Cloud.
 ---
 
-# f5xc_api_crawler (Data Source)
+# xcsh_api_crawler (Data Source)
 
 Retrieves information about an API Crawler resource in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing API Crawler by name
-data "f5xc_api_crawler" "example" {
+data "xcsh_api_crawler" "example" {
   name      = "example-api-crawler"
   namespace = "staging"
 }
 
 output "api_crawler_id" {
-  value = data.f5xc_api_crawler.example.id
+  value = data.xcsh_api_crawler.example.id
 }
 ```
 

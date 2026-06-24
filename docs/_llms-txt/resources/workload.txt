@@ -1,4 +1,4 @@
-# f5xc_workload
+# xcsh_workload
 
 Category: Kubernetes
 Workload. configuration
@@ -18,7 +18,7 @@ Pick exactly one:
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_workload" "example" {
+resource "xcsh_workload" "example" {
   name      = "example-workload"
   namespace = "staging"
 

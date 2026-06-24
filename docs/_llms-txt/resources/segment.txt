@@ -1,4 +1,4 @@
-# f5xc_segment
+# xcsh_segment
 
 Category: Networking
 Segment. configuration
@@ -11,7 +11,7 @@ Segment. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_segment" "example" {
+resource "xcsh_segment" "example" {
   name      = "example-segment"
   namespace = "staging"
 

@@ -1,4 +1,4 @@
-# f5xc_trusted_ca_list
+# xcsh_trusted_ca_list
 
 Category: Certificates
 Trusted certificate authority list management
@@ -12,7 +12,7 @@ Trusted certificate authority list management
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_trusted_ca_list" "example" {
+resource "xcsh_trusted_ca_list" "example" {
   name      = "example-trusted-ca-list"
   namespace = "staging"
 

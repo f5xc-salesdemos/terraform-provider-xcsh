@@ -51,7 +51,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
 )
 
 const (
@@ -77,9 +77,9 @@ func GetSharedClient() (*client.Client, error) {
 		return sharedClient, nil
 	}
 
-	apiURL := os.Getenv(EnvF5XCURL)
+	apiURL := os.Getenv(EnvXCShURL)
 	if apiURL == "" {
-		return nil, fmt.Errorf("%s must be set for sweepers", EnvF5XCURL)
+		return nil, fmt.Errorf("%s must be set for sweepers", EnvXCShURL)
 	}
 
 	// Normalize URL
@@ -92,8 +92,8 @@ func GetSharedClient() (*client.Client, error) {
 	case AuthMethodP12:
 		c, err := client.NewClientWithP12(
 			apiURL,
-			os.Getenv(EnvF5XCP12File),
-			os.Getenv(EnvF5XCP12Password),
+			os.Getenv(EnvXCShP12File),
+			os.Getenv(EnvXCShP12Password),
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create P12 client: %w", err)
@@ -102,8 +102,8 @@ func GetSharedClient() (*client.Client, error) {
 	case AuthMethodPEM:
 		c, err := client.NewClientWithCert(
 			apiURL,
-			os.Getenv(EnvF5XCCert),
-			os.Getenv(EnvF5XCKey),
+			os.Getenv(EnvXCShCert),
+			os.Getenv(EnvXCShKey),
 			"",
 		)
 		if err != nil {
@@ -111,7 +111,7 @@ func GetSharedClient() (*client.Client, error) {
 		}
 		sharedClient = c
 	case AuthMethodToken:
-		sharedClient = client.NewClient(apiURL, os.Getenv(EnvF5XCToken))
+		sharedClient = client.NewClient(apiURL, os.Getenv(EnvXCShToken))
 	default:
 		return nil, fmt.Errorf("no authentication configured for sweepers")
 	}

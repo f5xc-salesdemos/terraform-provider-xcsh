@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
 )
 
 // AuthConfig holds configuration for F5XC API authentication.
@@ -62,10 +62,10 @@ type AuthResult struct {
 // Environment variable names for F5XC authentication.
 // Using F5XC_* prefix for F5 Distributed Cloud branding.
 const (
-	EnvAPIURL      = "F5XC_API_URL"
-	EnvAPIToken    = "F5XC_API_TOKEN"
-	EnvP12File     = "F5XC_P12_FILE"
-	EnvP12Password = "F5XC_P12_PASSWORD" // pragma: allowlist secret
+	EnvAPIURL      = "XCSH_API_URL"
+	EnvAPIToken    = "XCSH_API_TOKEN"
+	EnvP12File     = "XCSH_P12_FILE"
+	EnvP12Password = "XCSH_P12_PASSWORD" // pragma: allowlist secret
 )
 
 // DefaultAPIURL is the default F5XC API URL.

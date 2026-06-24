@@ -1,4 +1,4 @@
-# f5xc_tunnel
+# xcsh_tunnel
 
 Category: Networking
 Tunnel in a given namespace. If one already exist it will give a error
@@ -12,7 +12,7 @@ Tunnel in a given namespace. If one already exist it will give a error
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_tunnel" "example" {
+resource "xcsh_tunnel" "example" {
   name      = "example-tunnel"
   namespace = "staging"
 

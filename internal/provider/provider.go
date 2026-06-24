@@ -15,22 +15,22 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
 )
 
-// Ensure F5XCProvider satisfies various provider interfaces.
-var _ provider.Provider = &F5XCProvider{}
+// Ensure XCShProvider satisfies various provider interfaces.
+var _ provider.Provider = &XCShProvider{}
 
-// F5XCProvider defines the provider implementation.
-type F5XCProvider struct {
+// XCShProvider defines the provider implementation.
+type XCShProvider struct {
 	// version is set to the provider version on release, "dev" when the
 	// provider is built and ran locally, and "test" when running acceptance
 	// testing.
 	version string
 }
 
-// F5XCProviderModel describes the provider data model.
-type F5XCProviderModel struct {
+// XCShProviderModel describes the provider data model.
+type XCShProviderModel struct {
 	APIToken    types.String `tfsdk:"api_token"`
 	APIURL      types.String `tfsdk:"api_url"`
 	APIP12File  types.String `tfsdk:"api_p12_file"`
@@ -40,14 +40,14 @@ type F5XCProviderModel struct {
 	APICACert   types.String `tfsdk:"api_ca_cert"`
 }
 
-func (p *F5XCProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "f5xc"
+func (p *XCShProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "xcsh"
 	resp.Version = p.version
 }
 
-func (p *F5XCProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p *XCShProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Terraform provider for F5 Distributed Cloud (F5XC) enabling infrastructure as code " +
+		MarkdownDescription: "Terraform provider for F5 Distributed Cloud (xcsh) enabling infrastructure as code " +
 			"for load balancers, security policies, sites, and networking. Community-maintained provider " +
 			"built from public F5 API documentation.",
 		Attributes: map[string]schema.Attribute{
@@ -55,54 +55,54 @@ func (p *F5XCProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 				MarkdownDescription: "F5 Distributed Cloud API URL. " +
 					"Defaults to https://console.ves.volterra.io. " +
 					"Example: https://tenant.console.ves.volterra.io. " +
-					"Can also be set via F5XC_API_URL environment variable.",
+					"Can also be set via XCSH_API_URL (or F5XC_API_URL for backward compat) environment variable.",
 				Optional: true,
 			},
 			"api_token": schema.StringAttribute{
 				MarkdownDescription: "F5 Distributed Cloud API Token for token-based authentication. " +
-					"Can also be set via F5XC_API_TOKEN environment variable. " +
+					"Can also be set via XCSH_API_TOKEN (or F5XC_API_TOKEN for backward compat) environment variable. " +
 					"Either api_token or api_p12_file/api_cert must be specified.",
 				Optional:  true,
 				Sensitive: true,
 			},
 			"api_p12_file": schema.StringAttribute{
 				MarkdownDescription: "Path to PKCS#12 certificate bundle file for certificate-based authentication. " +
-					"Can also be set via F5XC_P12_FILE environment variable. " +
+					"Can also be set via XCSH_P12_FILE (or F5XC_P12_FILE for backward compat) environment variable. " +
 					"When using P12 authentication, p12_password must also be provided.",
 				Optional:  true,
 				Sensitive: false,
 			},
 			"p12_password": schema.StringAttribute{
 				MarkdownDescription: "Password for the PKCS#12 certificate bundle. " +
-					"Can also be set via F5XC_P12_PASSWORD environment variable.",
+					"Can also be set via XCSH_P12_PASSWORD (or F5XC_P12_PASSWORD for backward compat) environment variable.",
 				Optional:  true,
 				Sensitive: true,
 			},
 			"api_cert": schema.StringAttribute{
 				MarkdownDescription: "Path to PEM-encoded client certificate file for certificate-based authentication. " +
-					"Can also be set via F5XC_CERT environment variable. " +
+					"Can also be set via XCSH_CERT (or F5XC_CERT for backward compat) environment variable. " +
 					"When using certificate authentication, api_key must also be provided.",
 				Optional: true,
 			},
 			"api_key": schema.StringAttribute{
 				MarkdownDescription: "Path to PEM-encoded client private key file for certificate-based authentication. " +
-					"Can also be set via F5XC_KEY environment variable.",
+					"Can also be set via XCSH_KEY (or F5XC_KEY for backward compat) environment variable.",
 				Optional:  true,
 				Sensitive: true,
 			},
 			"api_ca_cert": schema.StringAttribute{
-				MarkdownDescription: "Path to PEM-encoded CA certificate file for verifying the F5XC API server. " +
-					"Can also be set via F5XC_CACERT environment variable. Optional.",
+				MarkdownDescription: "Path to PEM-encoded CA certificate file for verifying the F5 Distributed Cloud API server. " +
+					"Can also be set via XCSH_CACERT (or F5XC_CACERT for backward compat) environment variable. Optional.",
 				Optional: true,
 			},
 		},
 	}
 }
 
-func (p *F5XCProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	tflog.Info(ctx, "Configuring F5XC client")
+func (p *XCShProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	tflog.Info(ctx, "Configuring xcsh client")
 
-	var config F5XCProviderModel
+	var config XCShProviderModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
 
@@ -111,13 +111,35 @@ func (p *F5XCProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	}
 
 	// Get configuration values from environment variables first
-	apiURL := os.Getenv("F5XC_API_URL")
-	apiToken := os.Getenv("F5XC_API_TOKEN")
-	apiP12File := os.Getenv("F5XC_P12_FILE")
-	p12Password := os.Getenv("F5XC_P12_PASSWORD")
-	apiCert := os.Getenv("F5XC_CERT")
-	apiKey := os.Getenv("F5XC_KEY")
-	apiCACert := os.Getenv("F5XC_CACERT")
+	// Check XCSH_* first, fall back to F5XC_* for backward compatibility
+	apiURL := os.Getenv("XCSH_API_URL")
+	if apiURL == "" {
+		apiURL = os.Getenv("F5XC_API_URL")
+	}
+	apiToken := os.Getenv("XCSH_API_TOKEN")
+	if apiToken == "" {
+		apiToken = os.Getenv("F5XC_API_TOKEN")
+	}
+	apiP12File := os.Getenv("XCSH_P12_FILE")
+	if apiP12File == "" {
+		apiP12File = os.Getenv("F5XC_P12_FILE")
+	}
+	p12Password := os.Getenv("XCSH_P12_PASSWORD")
+	if p12Password == "" {
+		p12Password = os.Getenv("F5XC_P12_PASSWORD")
+	}
+	apiCert := os.Getenv("XCSH_CERT")
+	if apiCert == "" {
+		apiCert = os.Getenv("F5XC_CERT")
+	}
+	apiKey := os.Getenv("XCSH_KEY")
+	if apiKey == "" {
+		apiKey = os.Getenv("F5XC_KEY")
+	}
+	apiCACert := os.Getenv("XCSH_CACERT")
+	if apiCACert == "" {
+		apiCACert = os.Getenv("F5XC_CACERT")
+	}
 
 	// Configuration values override environment variables
 	if !config.APIURL.IsNull() {
@@ -162,44 +184,44 @@ func (p *F5XCProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 				path.Root("p12_password"),
 				"Missing P12 Password",
 				"When using P12 certificate authentication (api_p12_file), the p12_password must be provided. "+
-					"Set the p12_password value in the configuration or use the F5XC_P12_PASSWORD environment variable.",
+					"Set the p12_password value in the configuration or use the XCSH_P12_PASSWORD (or F5XC_P12_PASSWORD) environment variable.",
 			)
 			return
 		}
 		c, err = client.NewClientWithP12(apiURL, apiP12File, p12Password)
 		if err != nil {
 			resp.Diagnostics.AddError(
-				"Failed to Create F5XC Client",
-				"Could not create F5XC client with P12 certificate: "+err.Error(),
+				"Failed to Create xcsh Client",
+				"Could not create xcsh client with P12 certificate: "+err.Error(),
 			)
 			return
 		}
-		tflog.Info(ctx, "Configured F5XC client with P12 certificate authentication", map[string]any{"success": true, "api_url": apiURL})
+		tflog.Info(ctx, "Configured xcsh client with P12 certificate authentication", map[string]any{"success": true, "api_url": apiURL})
 
 	case apiCert != "" && apiKey != "":
 		// PEM certificate/key authentication
 		c, err = client.NewClientWithCert(apiURL, apiCert, apiKey, apiCACert)
 		if err != nil {
 			resp.Diagnostics.AddError(
-				"Failed to Create F5XC Client",
-				"Could not create F5XC client with certificate: "+err.Error(),
+				"Failed to Create xcsh Client",
+				"Could not create xcsh client with certificate: "+err.Error(),
 			)
 			return
 		}
-		tflog.Info(ctx, "Configured F5XC client with certificate authentication", map[string]any{"success": true, "api_url": apiURL})
+		tflog.Info(ctx, "Configured xcsh client with certificate authentication", map[string]any{"success": true, "api_url": apiURL})
 
 	case apiToken != "":
 		// API token authentication
 		c = client.NewClient(apiURL, apiToken)
-		tflog.Info(ctx, "Configured F5XC client with API token authentication", map[string]any{"success": true, "api_url": apiURL})
+		tflog.Info(ctx, "Configured xcsh client with API token authentication", map[string]any{"success": true, "api_url": apiURL})
 
 	default:
 		resp.Diagnostics.AddError(
 			"Missing Authentication Configuration",
 			"The provider requires authentication. Please configure one of the following:\n"+
-				"  - api_token (or F5XC_API_TOKEN environment variable) for API token authentication\n"+
-				"  - api_p12_file and p12_password (or F5XC_P12_FILE and F5XC_P12_PASSWORD environment variables) for P12 certificate authentication\n"+
-				"  - api_cert and api_key (or F5XC_CERT and F5XC_KEY environment variables) for PEM certificate authentication",
+				"  - api_token (or XCSH_API_TOKEN environment variable) for API token authentication\n"+
+				"  - api_p12_file and p12_password (or XCSH_P12_FILE and XCSH_P12_PASSWORD environment variables) for P12 certificate authentication\n"+
+				"  - api_cert and api_key (or XCSH_CERT and XCSH_KEY environment variables) for PEM certificate authentication",
 		)
 		return
 	}
@@ -209,7 +231,7 @@ func (p *F5XCProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	resp.ResourceData = c
 }
 
-func (p *F5XCProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p *XCShProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewAPICrawlerResource,
 		NewAPIDefinitionResource,
@@ -330,7 +352,7 @@ func (p *F5XCProvider) Resources(ctx context.Context) []func() resource.Resource
 	}
 }
 
-func (p *F5XCProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (p *XCShProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewAPICrawlerDataSource,
 		NewAPIDefinitionDataSource,
@@ -464,7 +486,7 @@ func (p *F5XCProvider) DataSources(ctx context.Context) []func() datasource.Data
 
 func New(version string) func() provider.Provider {
 	return func() provider.Provider {
-		return &F5XCProvider{
+		return &XCShProvider{
 			version: version,
 		}
 	}

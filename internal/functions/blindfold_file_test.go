@@ -19,7 +19,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/function"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/blindfold"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/blindfold"
 )
 
 // mockF5XCServerForFile creates a test server that simulates the F5XC API for file tests

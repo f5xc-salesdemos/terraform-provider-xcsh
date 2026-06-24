@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
 )
 
 var (

@@ -4,27 +4,27 @@
 # Sequential test runner with rate limit protection
 #
 # Required environment variables:
-#   F5XC_API_URL - F5 XC API URL (e.g., https://tenant.console.ves.volterra.io)
-#   F5XC_P12_FILE - Path to P12 certificate file (or F5XC_API_TOKEN for token auth)
-#   F5XC_P12_PASSWORD - Password for P12 certificate (required with F5XC_P12_FILE)
+#   XCSH_API_URL - F5 XC API URL (e.g., https://tenant.console.ves.volterra.io)
+#   XCSH_P12_FILE - Path to P12 certificate file (or XCSH_API_TOKEN for token auth)
+#   XCSH_P12_PASSWORD - Password for P12 certificate (required with XCSH_P12_FILE)
 #   TF_ACC=1 - Enable acceptance tests
 
 set -e
 
 # Validate required environment variables
-if [[ -z "${F5XC_API_URL:-}" ]]; then
-    echo "ERROR: F5XC_API_URL environment variable is required"
+if [[ -z "${XCSH_API_URL:-}" ]]; then
+    echo "ERROR: XCSH_API_URL environment variable is required"
     exit 1
 fi
 
 # Check for authentication (either P12 or token)
-if [[ -z "${F5XC_P12_FILE:-}" ]] && [[ -z "${F5XC_API_TOKEN:-}" ]]; then
-    echo "ERROR: F5XC_P12_FILE or F5XC_API_TOKEN environment variable is required"
+if [[ -z "${XCSH_P12_FILE:-}" ]] && [[ -z "${XCSH_API_TOKEN:-}" ]]; then
+    echo "ERROR: XCSH_P12_FILE or XCSH_API_TOKEN environment variable is required"
     exit 1
 fi
 
-if [[ -n "${F5XC_P12_FILE:-}" ]] && [[ -z "${F5XC_P12_PASSWORD:-}" ]]; then
-    echo "ERROR: F5XC_P12_PASSWORD environment variable is required when using F5XC_P12_FILE"
+if [[ -n "${XCSH_P12_FILE:-}" ]] && [[ -z "${XCSH_P12_PASSWORD:-}" ]]; then
+    echo "ERROR: XCSH_P12_PASSWORD environment variable is required when using XCSH_P12_FILE"
     exit 1
 fi
 

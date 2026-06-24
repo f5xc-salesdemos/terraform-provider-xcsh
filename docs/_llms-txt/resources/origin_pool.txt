@@ -1,4 +1,4 @@
-# f5xc_origin_pool
+# xcsh_origin_pool
 
 Category: Load Balancing
 Defining backend server pools for load balancer targets
@@ -68,7 +68,7 @@ Within use_tls, pick exactly one:
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_origin_pool" "example" {
+resource "xcsh_origin_pool" "example" {
   name      = "example-origin-pool"
   namespace = "staging"
 

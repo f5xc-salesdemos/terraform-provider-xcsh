@@ -1,4 +1,4 @@
-# f5xc_forwarding_class
+# xcsh_forwarding_class
 
 Category: Networking
 Forwarding class is created by users in system namespace. configuration
@@ -13,7 +13,7 @@ Forwarding class is created by users in system namespace. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_forwarding_class" "example" {
+resource "xcsh_forwarding_class" "example" {
   name      = "example-forwarding-class"
   namespace = "staging"
 

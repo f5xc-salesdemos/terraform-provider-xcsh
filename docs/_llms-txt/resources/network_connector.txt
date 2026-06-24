@@ -1,4 +1,4 @@
-# f5xc_network_connector
+# xcsh_network_connector
 
 Category: Networking
 Network connector is created by users in system namespace. configuration
@@ -11,7 +11,7 @@ Network connector is created by users in system namespace. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_network_connector" "example" {
+resource "xcsh_network_connector" "example" {
   name      = "example-network-connector"
   namespace = "staging"
 

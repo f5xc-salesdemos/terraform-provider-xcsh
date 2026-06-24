@@ -1,4 +1,4 @@
-# f5xc_srv6_network_slice
+# xcsh_srv6_network_slice
 
 Category: Networking
 Srv6_network_slice creates a new object in the storage backend for metadata.namespace
@@ -14,7 +14,7 @@ Srv6_network_slice creates a new object in the storage backend for metadata.name
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_srv6_network_slice" "example" {
+resource "xcsh_srv6_network_slice" "example" {
   name      = "example-srv6-network-slice"
   namespace = "staging"
 

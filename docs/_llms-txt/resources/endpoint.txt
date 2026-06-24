@@ -1,4 +1,4 @@
-# f5xc_endpoint
+# xcsh_endpoint
 
 Category: Load Balancing
 Endpoint will create the object in the storage backend for namespace metadata.namespace
@@ -14,7 +14,7 @@ Endpoint will create the object in the storage backend for namespace metadata.na
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_endpoint" "example" {
+resource "xcsh_endpoint" "example" {
   name      = "example-endpoint"
   namespace = "staging"
 

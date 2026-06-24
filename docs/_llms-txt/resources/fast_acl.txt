@@ -1,4 +1,4 @@
-# f5xc_fast_acl
+# xcsh_fast_acl
 
 Category: Security
 Object, object contains rules to protect site from denial of service It has destination{destination IP, destination port) and references to
@@ -11,7 +11,7 @@ Object, object contains rules to protect site from denial of service It has dest
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_fast_acl" "example" {
+resource "xcsh_fast_acl" "example" {
   name      = "example-fast-acl"
   namespace = "staging"
 

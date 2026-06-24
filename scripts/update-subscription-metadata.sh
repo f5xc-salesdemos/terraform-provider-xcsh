@@ -16,11 +16,11 @@
 # The generated file triggers documentation regeneration in CI/CD when changed.
 #
 # Required Environment Variables:
-#   F5XC_API_URL      - F5 XC API URL (e.g., https://console.ves.volterra.io)
-#   F5XC_API_TOKEN    - API token (preferred for automation)
+#   XCSH_API_URL      - F5 XC API URL (e.g., https://console.ves.volterra.io)
+#   XCSH_API_TOKEN    - API token (preferred for automation)
 #   OR
-#   F5XC_P12_FILE     - Path to P12 certificate file
-#   F5XC_P12_PASSWORD - Password for P12 file
+#   XCSH_P12_FILE     - Path to P12 certificate file
+#   XCSH_P12_PASSWORD - Password for P12 file
 #
 # Usage:
 #   ./scripts/update-subscription-metadata.sh [--check]
@@ -49,9 +49,9 @@ fi
 
 # Check if credentials are available
 has_credentials() {
-    if [[ -n "${F5XC_API_TOKEN:-}" && -n "${F5XC_API_URL:-}" ]]; then
+    if [[ -n "${XCSH_API_TOKEN:-}" && -n "${XCSH_API_URL:-}" ]]; then
         return 0
-    elif [[ -n "${F5XC_P12_FILE:-}" && -n "${F5XC_P12_PASSWORD:-}" && -n "${F5XC_API_URL:-}" ]]; then
+    elif [[ -n "${XCSH_P12_FILE:-}" && -n "${XCSH_P12_PASSWORD:-}" && -n "${XCSH_API_URL:-}" ]]; then
         return 0
     fi
     return 1
@@ -64,7 +64,7 @@ main() {
     # Check for credentials
     if ! has_credentials; then
         echo -e "${YELLOW}SKIP: F5XC credentials not configured${NC}"
-        echo "Set F5XC_API_URL and either F5XC_API_TOKEN or F5XC_P12_FILE+F5XC_P12_PASSWORD"
+        echo "Set XCSH_API_URL and either XCSH_API_TOKEN or XCSH_P12_FILE+XCSH_P12_PASSWORD"
         echo "to enable subscription tier metadata generation."
         exit 0
     fi

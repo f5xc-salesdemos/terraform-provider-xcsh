@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_fleet Resource - terraform-provider-f5xc"
+page_title: "xcsh_fleet Resource - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Manages fleet will create a fleet object in 'system' namespace of the user. in F5 Distributed Cloud.
 ---
 
-# f5xc_fleet (Resource)
+# xcsh_fleet (Resource)
 
 Manages fleet will create a fleet object in 'system' namespace of the user. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Fleet configuration
-resource "f5xc_fleet" "example" {
+resource "xcsh_fleet" "example" {
   name      = "example-fleet"
   namespace = "staging"
 
@@ -952,5 +952,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_fleet.example system/example
+terraform import xcsh_fleet.example system/example
 ```

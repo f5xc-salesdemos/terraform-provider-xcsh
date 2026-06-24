@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_authorization_server Data Source - terraform-provider-f5xc"
+page_title: "xcsh_authorization_server Data Source - terraform-provider-xcsh"
 subcategory: "Uncategorized"
 description: |-
   Retrieves information about authorization_server creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_authorization_server (Data Source)
+# xcsh_authorization_server (Data Source)
 
 Manages authorization_server creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Authorization Server by name
-data "f5xc_authorization_server" "example" {
+data "xcsh_authorization_server" "example" {
   name      = "example-authorization-server"
   namespace = "staging"
 }
 
 output "authorization_server_id" {
-  value = data.f5xc_authorization_server.example.id
+  value = data.xcsh_authorization_server.example.id
 }
 ```
 

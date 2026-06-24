@@ -52,9 +52,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
-	inttimeouts "github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/timeouts"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/validators"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
+	inttimeouts "github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/timeouts"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/validators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -655,7 +655,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
 )
 
 var (
@@ -795,7 +795,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
 )
 
 var (

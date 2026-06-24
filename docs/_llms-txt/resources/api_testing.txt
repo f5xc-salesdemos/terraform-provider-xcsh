@@ -1,4 +1,4 @@
-# f5xc_api_testing
+# xcsh_api_testing
 
 Category: API Security
 API Testing resource
@@ -12,7 +12,7 @@ API Testing resource
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_api_testing" "example" {
+resource "xcsh_api_testing" "example" {
   name      = "example-api-testing"
   namespace = "staging"
 

@@ -1,4 +1,4 @@
-# f5xc_fleet
+# xcsh_fleet
 
 Category: Sites
 Fleet will create a fleet object in 'system' namespace of the user
@@ -15,7 +15,7 @@ Fleet will create a fleet object in 'system' namespace of the user
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_fleet" "example" {
+resource "xcsh_fleet" "example" {
   name      = "example-fleet"
   namespace = "staging"
 

@@ -1,4 +1,4 @@
-# f5xc_service_policy_rule
+# xcsh_service_policy_rule
 
 Category: Security
 Service_policy_rule creates a new object in the storage backend for metadata.namespace
@@ -15,7 +15,7 @@ Service_policy_rule creates a new object in the storage backend for metadata.nam
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_service_policy_rule" "example" {
+resource "xcsh_service_policy_rule" "example" {
   name      = "example-service-policy-rule"
   namespace = "staging"
 

@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_apm Data Source - terraform-provider-f5xc"
+page_title: "xcsh_apm Data Source - terraform-provider-xcsh"
 subcategory: "Monitoring"
 description: |-
   Retrieves information about an existing APM as a service with configured parameters. in F5 Distributed Cloud.
 ---
 
-# f5xc_apm (Data Source)
+# xcsh_apm (Data Source)
 
 Retrieves information about new APM as a service with configured parameters. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing APM by name
-data "f5xc_apm" "example" {
+data "xcsh_apm" "example" {
   name      = "example-apm"
   namespace = "staging"
 }
 
 output "apm_id" {
-  value = data.f5xc_apm.example.id
+  value = data.xcsh_apm.example.id
 }
 ```
 

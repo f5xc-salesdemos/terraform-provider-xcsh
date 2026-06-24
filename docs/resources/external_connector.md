@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_external_connector Resource - terraform-provider-f5xc"
+page_title: "xcsh_external_connector Resource - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Manages an External Connector resource in F5 Distributed Cloud for external_connector configuration specification. configuration.
 ---
 
-# f5xc_external_connector (Resource)
+# xcsh_external_connector (Resource)
 
 Manages an External Connector resource in F5 Distributed Cloud for external_connector configuration specification. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic External Connector configuration
-resource "f5xc_external_connector" "example" {
+resource "xcsh_external_connector" "example" {
   name      = "example-external-connector"
   namespace = "staging"
 
@@ -402,5 +402,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_external_connector.example system/example
+terraform import xcsh_external_connector.example system/example
 ```

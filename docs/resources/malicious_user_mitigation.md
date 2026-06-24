@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_malicious_user_mitigation Resource - terraform-provider-f5xc"
+page_title: "xcsh_malicious_user_mitigation Resource - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Manages malicious_user_mitigation creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_malicious_user_mitigation (Resource)
+# xcsh_malicious_user_mitigation (Resource)
 
 Manages malicious_user_mitigation creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Malicious User Mitigation configuration
-resource "f5xc_malicious_user_mitigation" "example" {
+resource "xcsh_malicious_user_mitigation" "example" {
   name      = "example-malicious-user-mitigation"
   namespace = "staging"
 
@@ -78,19 +78,19 @@ terraform {
   }
 }
 
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = "example"
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = "example-value"
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = "Test malicious user mitigation with all attributes"
   disable     = false
 
@@ -108,7 +108,7 @@ resource "f5xc_malicious_user_mitigation" "test" {
 ### Block
 
 ```hcl
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   name      = "example"
   namespace = "system"
 
@@ -128,7 +128,7 @@ resource "f5xc_malicious_user_mitigation" "test" {
 ### Captcha
 
 ```hcl
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   name      = "example"
   namespace = "system"
 
@@ -148,7 +148,7 @@ resource "f5xc_malicious_user_mitigation" "test" {
 ### Js Challenge
 
 ```hcl
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   name      = "example"
   namespace = "system"
 
@@ -177,19 +177,19 @@ terraform {
   }
 }
 
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = "example"
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = "example-value"
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   annotations = {
     example-key = "example-value"
@@ -209,19 +209,19 @@ terraform {
   }
 }
 
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = "example"
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = "example-value"
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = "example-description"
 }
 ```
@@ -238,19 +238,19 @@ terraform {
   }
 }
 
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = "example"
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = "example-value"
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   labels = {
     example-key = "example-value"
@@ -270,19 +270,19 @@ terraform {
   }
 }
 
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = "example"
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = "example-value"
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = "Malicious user mitigation with mitigation type configuration"
 
   mitigation_type {
@@ -487,5 +487,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_malicious_user_mitigation.example system/example
+terraform import xcsh_malicious_user_mitigation.example system/example
 ```

@@ -7,8 +7,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/acctest"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/mocks"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/acctest"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/mocks"
 )
 
 // =============================================================================
@@ -22,7 +22,7 @@ import (
 // 4. Run tests in CI/CD without special permissions
 //
 // Run with:
-//   F5XC_MOCK_MODE=1 go test -v ./internal/provider/ -run TestMockTenantConfiguration -timeout 5m
+//   XCSH_MOCK_MODE=1 go test -v ./internal/provider/ -run TestMockTenantConfiguration -timeout 5m
 // =============================================================================
 
 // TestMockTenantConfigurationResource_basic tests basic tenant configuration operations

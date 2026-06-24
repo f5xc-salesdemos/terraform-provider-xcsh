@@ -1,4 +1,4 @@
-# f5xc_malicious_user_mitigation
+# xcsh_malicious_user_mitigation
 
 Category: Security
 Malicious_user_mitigation creates a new object in the storage backend for metadata.namespace
@@ -15,7 +15,7 @@ Malicious_user_mitigation creates a new object in the storage backend for metada
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_malicious_user_mitigation" "example" {
+resource "xcsh_malicious_user_mitigation" "example" {
   name      = "example-malicious-user-mitigation"
   namespace = "staging"
 

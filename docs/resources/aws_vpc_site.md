@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_aws_vpc_site Resource - terraform-provider-f5xc"
+page_title: "xcsh_aws_vpc_site Resource - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Manages a AWS VPC Site resource in F5 Distributed Cloud for deploying F5 sites within AWS VPC environments.
 ---
 
-# f5xc_aws_vpc_site (Resource)
+# xcsh_aws_vpc_site (Resource)
 
 Manages a AWS VPC Site resource in F5 Distributed Cloud for deploying F5 sites within AWS VPC environments.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic AWS VPC Site configuration
-resource "f5xc_aws_vpc_site" "example" {
+resource "xcsh_aws_vpc_site" "example" {
   name      = "example-aws-vpc-site"
   namespace = "staging"
 
@@ -54,7 +54,7 @@ resource "f5xc_aws_vpc_site" "example" {
   # VPC configuration
   vpc {
     new_vpc {
-      name_tag     = "f5xc-vpc"
+      name_tag     = "xcsh-vpc"
       primary_ipv4 = "10.0.0.0/16"
     }
   }
@@ -128,7 +128,7 @@ resource "f5xc_aws_vpc_site" "example" {
 
 -> **One of the following:**
 &#x2022; <a id="custom-security-group"></a>[`custom_security_group`](#custom-security-group) - Optional Block<br>Enter pre created security groups for slo(Site Local Outside) and SLI(Site Local Inside) interface. Supported only for sites deployed on existing VPC<br>See [Custom Security Group](#custom-security-group) below for details.
-<br><br>&#x2022; <a id="f5xc-security-group"></a>[`f5xc_security_group`](#f5xc-security-group) - Optional Block<br>Enable this option
+<br><br>&#x2022; <a id="xcsh-security-group"></a>[`xcsh_security_group`](#xcsh-security-group) - Optional Block<br>Enable this option
 
 <a id="default-blocked-services"></a>&#x2022; [`default_blocked_services`](#default-blocked-services) - Optional Block<br>Enable this option
 
@@ -1166,5 +1166,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_aws_vpc_site.example system/example
+terraform import xcsh_aws_vpc_site.example system/example
 ```

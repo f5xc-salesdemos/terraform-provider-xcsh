@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_tunnel Data Source - terraform-provider-f5xc"
+page_title: "xcsh_tunnel Data Source - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Retrieves information about tunnel in a given namespace. If one already exist it will give a error. in F5 Distributed Cloud.
 ---
 
-# f5xc_tunnel (Data Source)
+# xcsh_tunnel (Data Source)
 
 Manages tunnel in a given namespace. If one already exist it will give a error. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Tunnel by name
-data "f5xc_tunnel" "example" {
+data "xcsh_tunnel" "example" {
   name      = "example-tunnel"
   namespace = "staging"
 }
 
 output "tunnel_id" {
-  value = data.f5xc_tunnel.example.id
+  value = data.xcsh_tunnel.example.id
 }
 ```
 

@@ -46,14 +46,14 @@ The following configuration creates a production-ready HTTP Load Balancer with a
 terraform {
   required_version = ">= 1.0"
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 2.5"
     }
   }
 }
 
-provider "f5xc" {
+provider "xcsh" {
   api_token = var.api_token
   api_url   = var.api_url
 }
@@ -101,7 +101,7 @@ variable "origin_server" {
 The WAF provides signature-based attack detection with configurable bot protection. For detailed WAF configuration options, see [Create Web Application Firewall](https://docs.cloud.f5.com/docs-v2/web-app-and-api-protection/how-to/app-security/application-firewall).
 
 ```hcl
-resource "f5xc_app_firewall" "waf" {
+resource "xcsh_app_firewall" "waf" {
   name      = "${var.name_prefix}-waf"
   namespace = var.namespace
 
@@ -134,7 +134,7 @@ resource "f5xc_app_firewall" "waf" {
 Configure active health monitoring for your origin servers:
 
 ```hcl
-resource "f5xc_healthcheck" "http" {
+resource "xcsh_healthcheck" "http" {
   name      = "${var.name_prefix}-healthcheck"
   namespace = var.namespace
 
@@ -155,7 +155,7 @@ resource "f5xc_healthcheck" "http" {
 The origin pool defines your backend servers. For additional origin pool options, see [Origin Pools](https://docs.cloud.f5.com/docs-v2/multi-cloud-app-connect/how-to/load-balance/create-http-load-balancer).
 
 ```hcl
-resource "f5xc_origin_pool" "backend" {
+resource "xcsh_origin_pool" "backend" {
   name      = "${var.name_prefix}-origin-pool"
   namespace = var.namespace
 
@@ -179,7 +179,7 @@ resource "f5xc_origin_pool" "backend" {
   loadbalancer_algorithm = "ROUND_ROBIN"
 
   healthcheck {
-    name      = f5xc_healthcheck.http.name
+    name      = xcsh_healthcheck.http.name
     namespace = var.namespace
   }
 }
@@ -190,7 +190,7 @@ resource "f5xc_origin_pool" "backend" {
 This is the main resource that brings together all security controls:
 
 ```hcl
-resource "f5xc_http_loadbalancer" "app" {
+resource "xcsh_http_loadbalancer" "app" {
   name      = "${var.name_prefix}-lb"
   namespace = var.namespace
   domains   = [var.domain]
@@ -203,7 +203,7 @@ resource "f5xc_http_loadbalancer" "app" {
 
   default_route_pools {
     pool {
-      name      = f5xc_origin_pool.backend.name
+      name      = xcsh_origin_pool.backend.name
       namespace = var.namespace
     }
     weight = 1
@@ -215,7 +215,7 @@ resource "f5xc_http_loadbalancer" "app" {
   # WAF Configuration
   # ─────────────────────────────────────────────────────────────────────────────
   app_firewall {
-    name      = f5xc_app_firewall.waf.name
+    name      = xcsh_app_firewall.waf.name
     namespace = var.namespace
   }
 
@@ -383,13 +383,13 @@ variable "ip_threat_categories" {
 Then use dynamic blocks in the load balancer:
 
 ```hcl
-resource "f5xc_http_loadbalancer" "app" {
+resource "xcsh_http_loadbalancer" "app" {
   # ... base configuration ...
 
   dynamic "app_firewall" {
     for_each = var.enable_waf ? [1] : []
     content {
-      name      = f5xc_app_firewall.waf[0].name
+      name      = xcsh_app_firewall.waf[0].name
       namespace = var.namespace
     }
   }
@@ -433,7 +433,7 @@ resource "f5xc_http_loadbalancer" "app" {
 For initial deployment or debugging, use monitoring mode instead of blocking:
 
 ```hcl
-resource "f5xc_app_firewall" "waf" {
+resource "xcsh_app_firewall" "waf" {
   name      = "${var.name_prefix}-waf"
   namespace = var.namespace
 
@@ -476,7 +476,7 @@ Add outputs to retrieve deployment information:
 ```hcl
 output "load_balancer_name" {
   description = "Name of the HTTP load balancer"
-  value       = f5xc_http_loadbalancer.app.name
+  value       = xcsh_http_loadbalancer.app.name
 }
 
 output "security_summary" {
@@ -558,12 +558,12 @@ rate_limit {
 
 ### Provider Resources
 
-- [f5xc_http_loadbalancer](../resources/http_loadbalancer.md)
-- [f5xc_app_firewall](../resources/app_firewall.md)
-- [f5xc_origin_pool](../resources/origin_pool.md)
-- [f5xc_healthcheck](../resources/healthcheck.md)
+- [xcsh_http_loadbalancer](../resources/http_loadbalancer.md)
+- [xcsh_app_firewall](../resources/app_firewall.md)
+- [xcsh_origin_pool](../resources/origin_pool.md)
+- [xcsh_healthcheck](../resources/healthcheck.md)
 
 ## Support
 
-- **Provider Issues:** [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc/issues)
+- **Provider Issues:** [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh/issues)
 - **F5 Support:** [F5 Distributed Cloud Support](https://docs.cloud.f5.com/docs/support)

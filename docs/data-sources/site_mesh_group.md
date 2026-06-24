@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_site_mesh_group Data Source - terraform-provider-f5xc"
+page_title: "xcsh_site_mesh_group Data Source - terraform-provider-xcsh"
 subcategory: "Sites"
 description: |-
   Retrieves information about Site Mesh Group in system namespace of user. in F5 Distributed Cloud.
 ---
 
-# f5xc_site_mesh_group (Data Source)
+# xcsh_site_mesh_group (Data Source)
 
 Manages Site Mesh Group in system namespace of user. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Site Mesh Group by name
-data "f5xc_site_mesh_group" "example" {
+data "xcsh_site_mesh_group" "example" {
   name      = "example-site-mesh-group"
   namespace = "staging"
 }
 
 output "site_mesh_group_id" {
-  value = data.f5xc_site_mesh_group.example.id
+  value = data.xcsh_site_mesh_group.example.id
 }
 ```
 

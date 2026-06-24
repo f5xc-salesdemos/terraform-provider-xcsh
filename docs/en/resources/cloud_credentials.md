@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_cloud_credentials Resource - terraform-provider-f5xc"
+page_title: "xcsh_cloud_credentials Resource - terraform-provider-xcsh"
 subcategory: "Authentication"
 description: |-
   Manages a Cloud Credentials resource in F5 Distributed Cloud for api to create cloud_credentials object. configuration.
 ---
 
-# f5xc_cloud_credentials (Resource)
+# xcsh_cloud_credentials (Resource)
 
 Manages a Cloud Credentials resource in F5 Distributed Cloud for api to create cloud_credentials object. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Cloud Credentials configuration
-resource "f5xc_cloud_credentials" "example" {
+resource "xcsh_cloud_credentials" "example" {
   name      = "example-cloud-credentials"
   namespace = "staging"
 
@@ -329,5 +329,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_cloud_credentials.example system/example
+terraform import xcsh_cloud_credentials.example system/example
 ```

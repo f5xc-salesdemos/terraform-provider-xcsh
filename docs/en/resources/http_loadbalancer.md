@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_http_loadbalancer Resource - terraform-provider-f5xc"
+page_title: "xcsh_http_loadbalancer Resource - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages an HTTP Load Balancer resource in F5 Distributed Cloud for load balancing HTTP/HTTPS traffic with advanced routing and security.
 ---
 
-# f5xc_http_loadbalancer (Resource)
+# xcsh_http_loadbalancer (Resource)
 
 Manages an HTTP Load Balancer resource in F5 Distributed Cloud for load balancing HTTP/HTTPS traffic with advanced routing and security.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic HTTP Loadbalancer configuration
-resource "f5xc_http_loadbalancer" "example" {
+resource "xcsh_http_loadbalancer" "example" {
   name      = "example-http-loadbalancer"
   namespace = "staging"
 
@@ -174,7 +174,7 @@ resource "f5xc_http_loadbalancer" "example" {
 ### Conflict Protocol
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
   domains   = ["test.example.com"]
@@ -198,7 +198,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### Do Not Advertise
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
   domains   = ["test.example.com"]
@@ -214,7 +214,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### Https Auto Cert
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -235,7 +235,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### Ip Reputation
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
   domains   = ["test.example.com"]
@@ -253,7 +253,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### Js Challenge
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
   domains   = ["test.example.com"]
@@ -274,7 +274,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### Labels Update
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -296,7 +296,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### Least Active
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
   domains   = ["test.example.com"]
@@ -314,7 +314,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### Security Stack
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example"
   namespace = "system"
 
@@ -329,7 +329,7 @@ resource "f5xc_healthcheck" "test" {
   }
 }
 
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example"
   namespace = "system"
   port      = 443
@@ -342,7 +342,7 @@ resource "f5xc_origin_pool" "test" {
   }
 
   healthcheck {
-    name      = f5xc_healthcheck.test.name
+    name      = xcsh_healthcheck.test.name
     namespace = "system"
   }
 
@@ -350,7 +350,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = "example"
   namespace = "system"
 
@@ -362,7 +362,7 @@ resource "f5xc_app_firewall" "test" {
   default_anonymization {}
 }
 
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -374,7 +374,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
   default_route_pools {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight   = 1
@@ -382,7 +382,7 @@ resource "f5xc_http_loadbalancer" "test" {
   }
 
   app_firewall {
-    name      = f5xc_app_firewall.test.name
+    name      = xcsh_app_firewall.test.name
     namespace = "system"
   }
 
@@ -396,7 +396,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### Source Ip Stickiness
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
   domains   = ["test.example.com"]
@@ -414,7 +414,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### User Identification
 
 ```hcl
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name      = "example"
   namespace = "system"
 
@@ -423,7 +423,7 @@ resource "f5xc_user_identification" "test" {
   }
 }
 
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
   domains   = ["test.example.com"]
@@ -433,7 +433,7 @@ resource "f5xc_http_loadbalancer" "test" {
   }
 
   user_identification {
-    name      = f5xc_user_identification.test.name
+    name      = xcsh_user_identification.test.name
     namespace = "system"
   }
 
@@ -444,7 +444,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### With Domains
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -468,7 +468,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### With Labels
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -491,7 +491,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### With Origin Pool
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example"
   namespace = "system"
   port      = 443
@@ -507,7 +507,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -519,7 +519,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
   default_route_pools {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight   = 1
@@ -533,7 +533,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### With Rate Limit
 
 ```hcl
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
   domains   = ["test.example.com"]
@@ -558,7 +558,7 @@ resource "f5xc_http_loadbalancer" "test" {
 ### With Waf
 
 ```hcl
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = "example"
   namespace = "system"
 
@@ -570,7 +570,7 @@ resource "f5xc_app_firewall" "test" {
   default_anonymization {}
 }
 
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -581,7 +581,7 @@ resource "f5xc_http_loadbalancer" "test" {
   }
 
   app_firewall {
-    name      = f5xc_app_firewall.test.name
+    name      = xcsh_app_firewall.test.name
     namespace = "system"
   }
 
@@ -5626,5 +5626,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_http_loadbalancer.example system/example
+terraform import xcsh_http_loadbalancer.example system/example
 ```

@@ -1,4 +1,4 @@
-# f5xc_azure_vnet_site
+# xcsh_azure_vnet_site
 
 Category: Sites
 Deploying F5 sites within Azure Virtual Network environments
@@ -22,7 +22,7 @@ Deploying F5 sites within Azure Virtual Network environments
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_azure_vnet_site" "example" {
+resource "xcsh_azure_vnet_site" "example" {
   name      = "example-Azure-vnet-site"
   namespace = "staging"
 
@@ -42,11 +42,11 @@ resource "f5xc_azure_vnet_site" "example" {
     namespace = "staging"
   }
 
-  resource_group = "f5xc-rg"
+  resource_group = "xcsh-rg"
 
   vnet {
     new_vnet {
-      name         = "f5xc-vnet"
+      name         = "xcsh-vnet"
       primary_ipv4 = "10.0.0.0/16"
     }
   }

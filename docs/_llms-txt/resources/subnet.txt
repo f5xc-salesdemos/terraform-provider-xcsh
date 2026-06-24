@@ -1,4 +1,4 @@
-# f5xc_subnet
+# xcsh_subnet
 
 Category: Networking
 Subnet object contains configuration for an interface of a vm/pod. it is created in user or shared namespace. configuration
@@ -11,7 +11,7 @@ Subnet object contains configuration for an interface of a vm/pod. it is created
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_subnet" "example" {
+resource "xcsh_subnet" "example" {
   name      = "example-subnet"
   namespace = "staging"
 

@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_endpoint Data Source - terraform-provider-f5xc"
+page_title: "xcsh_endpoint Data Source - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Retrieves information about endpoint will create the object in the storage backend for namespace metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_endpoint (Data Source)
+# xcsh_endpoint (Data Source)
 
 Manages endpoint will create the object in the storage backend for namespace metadata.namespace. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Endpoint by name
-data "f5xc_endpoint" "example" {
+data "xcsh_endpoint" "example" {
   name      = "example-endpoint"
   namespace = "staging"
 }
 
 output "endpoint_id" {
-  value = data.f5xc_endpoint.example.id
+  value = data.xcsh_endpoint.example.id
 }
 ```
 

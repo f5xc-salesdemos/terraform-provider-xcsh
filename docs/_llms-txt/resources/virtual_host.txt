@@ -1,4 +1,4 @@
-# f5xc_virtual_host
+# xcsh_virtual_host
 
 Category: Load Balancing
 Virtual host in a given namespace
@@ -18,7 +18,7 @@ Virtual host in a given namespace
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_virtual_host" "example" {
+resource "xcsh_virtual_host" "example" {
   name      = "example-virtual-host"
   namespace = "staging"
 

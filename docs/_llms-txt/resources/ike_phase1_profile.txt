@@ -1,4 +1,4 @@
-# f5xc_ike_phase1_profile
+# xcsh_ike_phase1_profile
 
 Category: VPN
 Ike phase1 profile specification. configuration
@@ -11,7 +11,7 @@ Ike phase1 profile specification. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_ike_phase1_profile" "example" {
+resource "xcsh_ike_phase1_profile" "example" {
   name      = "example-ike-phase1-profile"
   namespace = "staging"
 

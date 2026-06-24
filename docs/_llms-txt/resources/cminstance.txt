@@ -1,4 +1,4 @@
-# f5xc_cminstance
+# xcsh_cminstance
 
 Category: Subscriptions
 App type will create the configuration in namespace metadata.namespace
@@ -13,7 +13,7 @@ App type will create the configuration in namespace metadata.namespace
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_cminstance" "example" {
+resource "xcsh_cminstance" "example" {
   name      = "example-cminstance"
   namespace = "staging"
 

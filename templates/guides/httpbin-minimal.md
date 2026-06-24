@@ -17,7 +17,7 @@ A complete, validated Terraform configuration that deploys four resources:
 
 ## Complete Configuration
 
-Copy this entire block into a `main.tf` file. Set `F5XC_API_URL` and `F5XC_API_TOKEN` environment variables, then run `terraform init && terraform apply`.
+Copy this entire block into a `main.tf` file. Set `XCSH_API_URL` and `XCSH_API_TOKEN` environment variables, then run `terraform init && terraform apply`.
 
 ~> **Important:** Replace `your-namespace` with your actual F5 XC namespace.
 
@@ -26,17 +26,17 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
-provider "f5xc" {}
+provider "xcsh" {}
 
 # 1. Health Check — monitors httpbin.org /get endpoint
-resource "f5xc_healthcheck" "httpbin" {
+resource "xcsh_healthcheck" "httpbin" {
   name      = "httpbin-health"
   namespace = "your-namespace"
 
@@ -52,7 +52,7 @@ resource "f5xc_healthcheck" "httpbin" {
 }
 
 # 2. Origin Pool — httpbin.org over TLS
-resource "f5xc_origin_pool" "httpbin" {
+resource "xcsh_origin_pool" "httpbin" {
   name      = "httpbin-pool"
   namespace = "your-namespace"
 
@@ -76,8 +76,8 @@ resource "f5xc_origin_pool" "httpbin" {
   }
 
   healthcheck {
-    name      = f5xc_healthcheck.httpbin.name
-    namespace = f5xc_healthcheck.httpbin.namespace
+    name      = xcsh_healthcheck.httpbin.name
+    namespace = xcsh_healthcheck.httpbin.namespace
   }
 
   endpoint_selection     = "LOCAL_PREFERRED"
@@ -85,7 +85,7 @@ resource "f5xc_origin_pool" "httpbin" {
 }
 
 # 3. App Firewall — WAF in blocking mode
-resource "f5xc_app_firewall" "httpbin" {
+resource "xcsh_app_firewall" "httpbin" {
   name      = "httpbin-waf"
   namespace = "your-namespace"
 
@@ -96,7 +96,7 @@ resource "f5xc_app_firewall" "httpbin" {
 }
 
 # 4. HTTP Load Balancer — ties it all together
-resource "f5xc_http_loadbalancer" "httpbin" {
+resource "xcsh_http_loadbalancer" "httpbin" {
   name      = "httpbin-lb"
   namespace = "your-namespace"
   domains   = ["httpbin.example.com"]
@@ -117,16 +117,16 @@ resource "f5xc_http_loadbalancer" "httpbin" {
 
   default_route_pools {
     pool {
-      name      = f5xc_origin_pool.httpbin.name
-      namespace = f5xc_origin_pool.httpbin.namespace
+      name      = xcsh_origin_pool.httpbin.name
+      namespace = xcsh_origin_pool.httpbin.namespace
     }
     weight   = 1
     priority = 1
   }
 
   app_firewall {
-    name      = f5xc_app_firewall.httpbin.name
-    namespace = f5xc_app_firewall.httpbin.namespace
+    name      = xcsh_app_firewall.httpbin.name
+    namespace = xcsh_app_firewall.httpbin.namespace
   }
 }
 ```
@@ -139,10 +139,10 @@ Health Check ──► Origin Pool ──► HTTP Load Balancer
 App Firewall ───────────────────────────┘
 ```
 
-- `f5xc_healthcheck` monitors origin health
-- `f5xc_origin_pool` references the health check and defines the backend
-- `f5xc_app_firewall` defines WAF policy
-- `f5xc_http_loadbalancer` references the origin pool and app firewall
+- `xcsh_healthcheck` monitors origin health
+- `xcsh_origin_pool` references the health check and defines the backend
+- `xcsh_app_firewall` defines WAF policy
+- `xcsh_http_loadbalancer` references the origin pool and app firewall
 
 ## What This Omits
 

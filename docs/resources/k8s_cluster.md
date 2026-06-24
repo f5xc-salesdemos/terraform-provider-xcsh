@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_k8s_cluster Resource - terraform-provider-f5xc"
+page_title: "xcsh_k8s_cluster Resource - terraform-provider-xcsh"
 subcategory: "Kubernetes"
 description: |-
   Manages k8s_cluster will create the object in the storage backend for namespace metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_k8s_cluster (Resource)
+# xcsh_k8s_cluster (Resource)
 
 Manages k8s_cluster will create the object in the storage backend for namespace metadata.namespace. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic K8S Cluster configuration
-resource "f5xc_k8s_cluster" "example" {
+resource "xcsh_k8s_cluster" "example" {
   name      = "example-k8s-cluster"
   namespace = "staging"
 
@@ -394,5 +394,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_k8s_cluster.example system/example
+terraform import xcsh_k8s_cluster.example system/example
 ```

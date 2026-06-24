@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_srv6_network_slice Data Source - terraform-provider-f5xc"
+page_title: "xcsh_srv6_network_slice Data Source - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Retrieves information about srv6_network_slice creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
 ---
 
-# f5xc_srv6_network_slice (Data Source)
+# xcsh_srv6_network_slice (Data Source)
 
 Manages srv6_network_slice creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Srv6 Network Slice by name
-data "f5xc_srv6_network_slice" "example" {
+data "xcsh_srv6_network_slice" "example" {
   name      = "example-srv6-network-slice"
   namespace = "staging"
 }
 
 output "srv6_network_slice_id" {
-  value = data.f5xc_srv6_network_slice.example.id
+  value = data.xcsh_srv6_network_slice.example.id
 }
 ```
 

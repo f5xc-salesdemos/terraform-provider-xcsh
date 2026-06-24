@@ -13,8 +13,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/naming"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/openapi"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/naming"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/openapi"
 )
 
 // CoreResources are resources that must always be registered in the provider,
@@ -163,22 +163,22 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
 )
 
-// Ensure F5XCProvider satisfies various provider interfaces.
-var _ provider.Provider = &F5XCProvider{}
+// Ensure XCShProvider satisfies various provider interfaces.
+var _ provider.Provider = &XCShProvider{}
 
-// F5XCProvider defines the provider implementation.
-type F5XCProvider struct {
+// XCShProvider defines the provider implementation.
+type XCShProvider struct {
 	// version is set to the provider version on release, "dev" when the
 	// provider is built and ran locally, and "test" when running acceptance
 	// testing.
 	version string
 }
 
-// F5XCProviderModel describes the provider data model.
-type F5XCProviderModel struct {
+// XCShProviderModel describes the provider data model.
+type XCShProviderModel struct {
 	APIToken     types.String `+"`"+`tfsdk:"api_token"`+"`"+`
 	APIURL       types.String `+"`"+`tfsdk:"api_url"`+"`"+`
 	APIP12File   types.String `+"`"+`tfsdk:"api_p12_file"`+"`"+`
@@ -188,12 +188,12 @@ type F5XCProviderModel struct {
 	APICACert    types.String `+"`"+`tfsdk:"api_ca_cert"`+"`"+`
 }
 
-func (p *F5XCProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+func (p *XCShProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "f5xc"
 	resp.Version = p.version
 }
 
-func (p *F5XCProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p *XCShProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Terraform provider for F5 Distributed Cloud (F5XC) enabling infrastructure as code " +
 			"for load balancers, security policies, sites, and networking. Community-maintained provider " +
@@ -247,10 +247,10 @@ func (p *F5XCProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 	}
 }
 
-func (p *F5XCProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+func (p *XCShProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	tflog.Info(ctx, "Configuring F5XC client")
 
-	var config F5XCProviderModel
+	var config XCShProviderModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
 
@@ -259,13 +259,13 @@ func (p *F5XCProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	}
 
 	// Get configuration values from environment variables first
-	apiURL := os.Getenv("F5XC_API_URL")
-	apiToken := os.Getenv("F5XC_API_TOKEN")
-	apiP12File := os.Getenv("F5XC_P12_FILE")
-	p12Password := os.Getenv("F5XC_P12_PASSWORD")
-	apiCert := os.Getenv("F5XC_CERT")
-	apiKey := os.Getenv("F5XC_KEY")
-	apiCACert := os.Getenv("F5XC_CACERT")
+	apiURL := os.Getenv("XCSH_API_URL")
+	apiToken := os.Getenv("XCSH_API_TOKEN")
+	apiP12File := os.Getenv("XCSH_P12_FILE")
+	p12Password := os.Getenv("XCSH_P12_PASSWORD")
+	apiCert := os.Getenv("XCSH_CERT")
+	apiKey := os.Getenv("XCSH_KEY")
+	apiCACert := os.Getenv("XCSH_CACERT")
 
 	// Configuration values override environment variables
 	if !config.APIURL.IsNull() {
@@ -357,13 +357,13 @@ func (p *F5XCProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	resp.ResourceData = c
 }
 
-func (p *F5XCProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p *XCShProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 %s
 	}
 }
 
-func (p *F5XCProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (p *XCShProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 %s
 	}
@@ -371,7 +371,7 @@ func (p *F5XCProvider) DataSources(ctx context.Context) []func() datasource.Data
 
 func New(version string) func() provider.Provider {
 	return func() provider.Provider {
-		return &F5XCProvider{
+		return &XCShProvider{
 			version: version,
 		}
 	}

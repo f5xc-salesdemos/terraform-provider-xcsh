@@ -1,4 +1,4 @@
-# f5xc_http_loadbalancer
+# xcsh_http_loadbalancer
 
 Category: Load Balancing
 Load balancing HTTP/HTTPS traffic with advanced routing and security
@@ -131,7 +131,7 @@ Pick exactly one:
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_http_loadbalancer" "example" {
+resource "xcsh_http_loadbalancer" "example" {
   name      = "example-http-loadbalancer"
   namespace = "staging"
 

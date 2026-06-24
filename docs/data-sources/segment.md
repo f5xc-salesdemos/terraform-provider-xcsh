@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_segment Data Source - terraform-provider-f5xc"
+page_title: "xcsh_segment Data Source - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Retrieves information about an existing Segment resource in F5 Distributed Cloud for segment. configuration.
 ---
 
-# f5xc_segment (Data Source)
+# xcsh_segment (Data Source)
 
 Retrieves information about a Segment resource in F5 Distributed Cloud for segment. configuration. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Segment by name
-data "f5xc_segment" "example" {
+data "xcsh_segment" "example" {
   name      = "example-segment"
   namespace = "staging"
 }
 
 output "segment_id" {
-  value = data.f5xc_segment.example.id
+  value = data.xcsh_segment.example.id
 }
 ```
 

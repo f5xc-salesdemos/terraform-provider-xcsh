@@ -1,4 +1,4 @@
-# f5xc_discovery
+# xcsh_discovery
 
 Category: Applications
 Api to create discovery object for a site or virtual site in system namespace. configuration
@@ -11,7 +11,7 @@ Api to create discovery object for a site or virtual site in system namespace. c
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_discovery" "example" {
+resource "xcsh_discovery" "example" {
   name      = "example-discovery"
   namespace = "staging"
 

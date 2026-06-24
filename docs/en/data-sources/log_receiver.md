@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_log_receiver Data Source - terraform-provider-f5xc"
+page_title: "xcsh_log_receiver Data Source - terraform-provider-xcsh"
 subcategory: "Monitoring"
 description: |-
   Retrieves information about an existing Log Receiver object. in F5 Distributed Cloud.
 ---
 
-# f5xc_log_receiver (Data Source)
+# xcsh_log_receiver (Data Source)
 
 Retrieves information about new Log Receiver object. in F5 Distributed Cloud. This is a read-only data source.
 
@@ -21,31 +21,31 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing Log Receiver by name
-data "f5xc_log_receiver" "example" {
+data "xcsh_log_receiver" "example" {
   name      = "example-log-receiver"
   namespace = "staging"
 }
 
 output "log_receiver_id" {
-  value = data.f5xc_log_receiver.example.id
+  value = data.xcsh_log_receiver.example.id
 }
 
 # Example: Reference log receiver in site configuration
-# resource "f5xc_securemesh_site_v2" "example" {
+# resource "xcsh_securemesh_site_v2" "example" {
 #   name      = "example-site"
 #   namespace = "staging"
 #
 #   log_receiver {
-#     name      = data.f5xc_log_receiver.example.name
-#     namespace = data.f5xc_log_receiver.example.namespace
+#     name      = data.xcsh_log_receiver.example.name
+#     namespace = data.xcsh_log_receiver.example.namespace
 #   }
 # }
 ```

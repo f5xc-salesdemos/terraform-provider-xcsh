@@ -1,4 +1,4 @@
-# f5xc_securemesh_site_v2
+# xcsh_securemesh_site_v2
 
 Category: Sites
 Deploying secure mesh edge sites with enhanced security and networking features
@@ -11,7 +11,7 @@ Deploying secure mesh edge sites with enhanced security and networking features
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_securemesh_site_v2" "example" {
+resource "xcsh_securemesh_site_v2" "example" {
   name      = "example-securemesh-site-v2"
   namespace = "staging"
 

@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_global_log_receiver Resource - terraform-provider-f5xc"
+page_title: "xcsh_global_log_receiver Resource - terraform-provider-xcsh"
 subcategory: "Monitoring"
 description: |-
   Manages new Global Log Receiver object. in F5 Distributed Cloud.
 ---
 
-# f5xc_global_log_receiver (Resource)
+# xcsh_global_log_receiver (Resource)
 
 Manages new Global Log Receiver object. in F5 Distributed Cloud.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Global Log Receiver configuration
-resource "f5xc_global_log_receiver" "example" {
+resource "xcsh_global_log_receiver" "example" {
   name      = "example-global-log-receiver"
   namespace = "staging"
 
@@ -1073,5 +1073,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_global_log_receiver.example system/example
+terraform import xcsh_global_log_receiver.example system/example
 ```

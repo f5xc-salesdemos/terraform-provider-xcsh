@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_tcp_loadbalancer Resource - terraform-provider-f5xc"
+page_title: "xcsh_tcp_loadbalancer Resource - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages a TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools.
 ---
 
-# f5xc_tcp_loadbalancer (Resource)
+# xcsh_tcp_loadbalancer (Resource)
 
 Manages a TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic TCP Loadbalancer configuration
-resource "f5xc_tcp_loadbalancer" "example" {
+resource "xcsh_tcp_loadbalancer" "example" {
   name      = "example-tcp-loadbalancer"
   namespace = "staging"
 
@@ -85,7 +85,7 @@ resource "f5xc_tcp_loadbalancer" "example" {
 ### All Attributes
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example-pool"
   namespace = "system"
   port      = 443
@@ -101,7 +101,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name        = "example"
   namespace   = "system"
   description = "Acceptance test tcp loadbalancer with all attributes"
@@ -123,7 +123,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -136,7 +136,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 ### With Annotations
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example-pool"
   namespace = "system"
   port      = 443
@@ -152,7 +152,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -172,7 +172,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -185,7 +185,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 ### With Description
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example-pool"
   namespace = "system"
   port      = 443
@@ -201,7 +201,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name        = "example"
   namespace   = "system"
   description = "example-value"
@@ -218,7 +218,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -231,7 +231,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 ### With Healthcheck
 
 ```hcl
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "example-hc"
   namespace = "system"
 
@@ -243,7 +243,7 @@ resource "f5xc_healthcheck" "test" {
   tcp_health_check {}
 }
 
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example-pool"
   namespace = "system"
   port      = 443
@@ -256,7 +256,7 @@ resource "f5xc_origin_pool" "test" {
   }
 
   healthcheck {
-    name      = f5xc_healthcheck.test.name
+    name      = xcsh_healthcheck.test.name
     namespace = "system"
   }
 
@@ -264,7 +264,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -275,7 +275,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -288,7 +288,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 ### With Labels
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example-pool"
   namespace = "system"
   port      = 443
@@ -304,7 +304,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -320,7 +320,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -333,7 +333,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 ### With Listen Port
 
 ```hcl
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "example-pool"
   namespace = "system"
   port      = 443
@@ -349,7 +349,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name      = "example"
   namespace = "system"
 
@@ -366,7 +366,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -1007,5 +1007,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_tcp_loadbalancer.example system/example
+terraform import xcsh_tcp_loadbalancer.example system/example
 ```

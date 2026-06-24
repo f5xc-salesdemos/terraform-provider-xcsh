@@ -1,4 +1,4 @@
-# f5xc_nfv_service
+# xcsh_nfv_service
 
 Category: Networking
 New NFV service with configured parameters
@@ -11,7 +11,7 @@ New NFV service with configured parameters
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_nfv_service" "example" {
+resource "xcsh_nfv_service" "example" {
   name      = "example-nfv-service"
   namespace = "staging"
 

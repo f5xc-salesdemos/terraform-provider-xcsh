@@ -1,4 +1,4 @@
-# f5xc_certificate
+# xcsh_certificate
 
 Category: Certificates
 Certificate. configuration
@@ -13,7 +13,7 @@ Certificate. configuration
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_certificate" "example" {
+resource "xcsh_certificate" "example" {
   name      = "example-certificate"
   namespace = "staging"
 

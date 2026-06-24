@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_forward_proxy_policy Resource - terraform-provider-f5xc"
+page_title: "xcsh_forward_proxy_policy Resource - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Manages a Forward Proxy Policy resource in F5 Distributed Cloud for forward proxy policy specification. configuration.
 ---
 
-# f5xc_forward_proxy_policy (Resource)
+# xcsh_forward_proxy_policy (Resource)
 
 Manages a Forward Proxy Policy resource in F5 Distributed Cloud for forward proxy policy specification. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Forward Proxy Policy configuration
-resource "f5xc_forward_proxy_policy" "example" {
+resource "xcsh_forward_proxy_policy" "example" {
   name      = "example-forward-proxy-policy"
   namespace = "staging"
 
@@ -513,5 +513,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_forward_proxy_policy.example system/example
+terraform import xcsh_forward_proxy_policy.example system/example
 ```

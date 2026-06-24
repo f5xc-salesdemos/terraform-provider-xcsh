@@ -1,4 +1,4 @@
-# f5xc_k8s_cluster
+# xcsh_k8s_cluster
 
 Category: Kubernetes
 K8s_cluster will create the object in the storage backend for namespace metadata.namespace
@@ -23,7 +23,7 @@ K8s_cluster will create the object in the storage backend for namespace metadata
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_k8s_cluster" "example" {
+resource "xcsh_k8s_cluster" "example" {
   name      = "example-k8s-cluster"
   namespace = "staging"
 

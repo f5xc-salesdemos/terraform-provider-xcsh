@@ -35,8 +35,8 @@ Before you begin, ensure you have:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc.git
-cd terraform-provider-f5xc/examples/guides/http-loadbalancer
+git clone https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh.git
+cd terraform-provider-xcsh/examples/guides/http-loadbalancer
 ```
 
 ### Step 2: Set Environment Variables
@@ -44,8 +44,8 @@ cd terraform-provider-f5xc/examples/guides/http-loadbalancer
 Configure authentication using environment variables. **Never commit credentials to version control.**
 
 ```bash
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_API_TOKEN="your-api-token"
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_API_TOKEN="your-api-token"
 ```
 
 -> **Tip:** Add these to your shell profile (`~/.bashrc` or `~/.zshrc`) for persistence across terminal sessions.
@@ -189,12 +189,12 @@ This guide creates the following resources:
 
 | Resource                 | Purpose                       |
 | ------------------------ | ----------------------------- |
-| `f5xc_namespace`         | Isolates resources (optional) |
-| `f5xc_healthcheck`       | Monitors origin server health |
-| `f5xc_origin_pool`       | Defines backend servers       |
-| `f5xc_app_firewall`      | WAF configuration             |
-| `f5xc_rate_limiter`      | Rate limiting policy          |
-| `f5xc_http_loadbalancer` | Main load balancer            |
+| `xcsh_namespace`         | Isolates resources (optional) |
+| `xcsh_healthcheck`       | Monitors origin server health |
+| `xcsh_origin_pool`       | Defines backend servers       |
+| `xcsh_app_firewall`      | WAF configuration             |
+| `xcsh_rate_limiter`      | Rate limiting policy          |
+| `xcsh_http_loadbalancer` | Main load balancer            |
 
 ## Troubleshooting
 
@@ -273,4 +273,4 @@ Now that you have a basic HTTP Load Balancer deployed, consider exploring:
 
 - **Provider Documentation:** [F5XC Provider](../index.md)
 - **F5 Documentation:** [F5 Distributed Cloud Docs](https://docs.cloud.f5.com/)
-- **Issues:** [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc/issues)
+- **Issues:** [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh/issues)

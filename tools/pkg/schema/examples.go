@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/namespace"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/openapi"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/namespace"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/openapi"
 )
 
 // GenerateExampleUsage creates a sample HCL configuration for the resource.

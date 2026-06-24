@@ -1,4 +1,4 @@
-# f5xc_filter_set
+# xcsh_filter_set
 
 Category: Applications
 Specification
@@ -12,7 +12,7 @@ Specification
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_filter_set" "example" {
+resource "xcsh_filter_set" "example" {
   name      = "example-filter-set"
   namespace = "staging"
 

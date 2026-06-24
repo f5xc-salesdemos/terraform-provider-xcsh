@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_certificate Resource - terraform-provider-f5xc"
+page_title: "xcsh_certificate Resource - terraform-provider-xcsh"
 subcategory: "Certificates"
 description: |-
   Manages a Certificate resource in F5 Distributed Cloud for certificate. configuration.
 ---
 
-# f5xc_certificate (Resource)
+# xcsh_certificate (Resource)
 
 Manages a Certificate resource in F5 Distributed Cloud for certificate. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Certificate configuration
-resource "f5xc_certificate" "example" {
+resource "xcsh_certificate" "example" {
   name      = "example-certificate"
   namespace = "staging"
 
@@ -266,5 +266,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_certificate.example system/example
+terraform import xcsh_certificate.example system/example
 ```

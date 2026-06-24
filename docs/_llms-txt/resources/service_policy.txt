@@ -1,4 +1,4 @@
-# f5xc_service_policy
+# xcsh_service_policy
 
 Category: Security
 Service_policy creates a new object in the storage backend for metadata.namespace
@@ -31,7 +31,7 @@ Pick exactly one:
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_service_policy" "example" {
+resource "xcsh_service_policy" "example" {
   name      = "example-service-policy"
   namespace = "staging"
 

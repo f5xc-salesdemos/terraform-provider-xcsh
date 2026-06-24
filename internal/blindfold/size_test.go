@@ -9,13 +9,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/client"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
 )
 
 func TestSizeAnalysis(t *testing.T) {
-	apiURL := os.Getenv("F5XC_API_URL")
-	p12File := os.Getenv("F5XC_P12_FILE")
-	p12Password := os.Getenv("F5XC_P12_PASSWORD")
+	apiURL := os.Getenv("XCSH_API_URL")
+	p12File := os.Getenv("XCSH_P12_FILE")
+	p12Password := os.Getenv("XCSH_P12_PASSWORD")
 
 	if apiURL == "" || p12File == "" {
 		t.Skip("Skipping: F5XC credentials not set")
@@ -64,9 +64,9 @@ func TestSizeAnalysis(t *testing.T) {
 }
 
 func TestEncryptVariousSizes(t *testing.T) {
-	apiURL := os.Getenv("F5XC_API_URL")
-	p12File := os.Getenv("F5XC_P12_FILE")
-	p12Password := os.Getenv("F5XC_P12_PASSWORD")
+	apiURL := os.Getenv("XCSH_API_URL")
+	p12File := os.Getenv("XCSH_P12_FILE")
+	p12Password := os.Getenv("XCSH_P12_PASSWORD")
 
 	if apiURL == "" || p12File == "" {
 		t.Skip("Skipping: F5XC credentials not set")

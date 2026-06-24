@@ -1,4 +1,4 @@
-# f5xc_udp_loadbalancer
+# xcsh_udp_loadbalancer
 
 Category: Load Balancing
 Load balancing UDP traffic across origin pools
@@ -14,7 +14,7 @@ Load balancing UDP traffic across origin pools
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_udp_loadbalancer" "example" {
+resource "xcsh_udp_loadbalancer" "example" {
   name      = "example-udp-loadbalancer"
   namespace = "staging"
 

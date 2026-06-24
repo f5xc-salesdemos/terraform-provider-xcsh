@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_http_loadbalancer Data Source - terraform-provider-f5xc"
+page_title: "xcsh_http_loadbalancer Data Source - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Retrieves information about an existing HTTP Load Balancer resource in F5 Distributed Cloud for load balancing HTTP/HTTPS traffic with advanced routing and security.
 ---
 
-# f5xc_http_loadbalancer (Data Source)
+# xcsh_http_loadbalancer (Data Source)
 
 Retrieves information about an HTTP Load Balancer resource in F5 Distributed Cloud for load balancing HTTP/HTTPS traffic with advanced routing and security. This is a read-only data source.
 
@@ -21,30 +21,30 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing HTTP Loadbalancer by name
-data "f5xc_http_loadbalancer" "example" {
+data "xcsh_http_loadbalancer" "example" {
   name      = "example-http-loadbalancer"
   namespace = "staging"
 }
 
 output "http_loadbalancer_id" {
-  value = data.f5xc_http_loadbalancer.example.id
+  value = data.xcsh_http_loadbalancer.example.id
 }
 
 # Example: Reference in another load balancer configuration
-# resource "f5xc_service_policy" "example" {
+# resource "xcsh_service_policy" "example" {
 #   name      = "policy-for-lb"
 #   namespace = "staging"
 #
 #   # Use the load balancer's domains
-#   # domain = data.f5xc_http_loadbalancer.example.domains[0]
+#   # domain = data.xcsh_http_loadbalancer.example.domains[0]
 # }
 ```
 

@@ -131,7 +131,7 @@ jobs:
             # V2: Download via gh api (supports private repos)
             echo "Downloading v2 specs via gh api..."
             ASSET_ID=$(gh api "repos/${{ env.ENRICHED_REPO }}/releases" --jq \
-              '[.[0].assets[] | select(.name | startswith("f5xc-api-specs"))] | .[0].id')
+              '[.[0].assets[] | select(.name | startswith("xcsh-api-specs"))] | .[0].id')
             gh api "repos/${{ env.ENRICHED_REPO }}/releases/assets/${ASSET_ID}" \
               -H "Accept: application/octet-stream" > openapi.zip
             echo "Download successful"

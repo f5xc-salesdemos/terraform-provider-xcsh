@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_bgp_routing_policy Data Source - terraform-provider-f5xc"
+page_title: "xcsh_bgp_routing_policy Data Source - terraform-provider-xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about an existing BGP Routing Policy resource in F5 Distributed Cloud for bgp routing policy is a list of rules containing match criteria and action to be applied. these rules help control routes which are imported or exported to bgp peers. configuration.
 ---
 
-# f5xc_bgp_routing_policy (Data Source)
+# xcsh_bgp_routing_policy (Data Source)
 
 Retrieves information about a BGP Routing Policy resource in F5 Distributed Cloud for bgp routing policy is a list of rules containing match criteria and action to be applied. these rules help control routes which are imported or exported to bgp peers. configuration. This is a read-only data source.
 
@@ -21,21 +21,21 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Look up an existing BGP Routing Policy by name
-data "f5xc_bgp_routing_policy" "example" {
+data "xcsh_bgp_routing_policy" "example" {
   name      = "example-bgp-routing-policy"
   namespace = "staging"
 }
 
 output "bgp_routing_policy_id" {
-  value = data.f5xc_bgp_routing_policy.example.id
+  value = data.xcsh_bgp_routing_policy.example.id
 }
 ```
 

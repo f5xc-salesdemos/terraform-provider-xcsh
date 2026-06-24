@@ -7,7 +7,7 @@
 # The encryption happens locally - file contents are never transmitted to F5XC.
 
 # Example: Encrypt a TLS private key file
-resource "f5xc_http_loadbalancer" "secure" {
+resource "xcsh_http_loadbalancer" "secure" {
   name      = "secure-lb"
   namespace = "production"
 
@@ -42,7 +42,7 @@ locals {
   }
 }
 
-resource "f5xc_certificate" "certs" {
+resource "xcsh_certificate" "certs" {
   for_each  = local.certificates
   name      = each.key
   namespace = "production"

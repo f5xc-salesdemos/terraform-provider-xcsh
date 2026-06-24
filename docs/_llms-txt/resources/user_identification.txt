@@ -1,4 +1,4 @@
-# f5xc_user_identification
+# xcsh_user_identification
 
 Category: Security
 User_identification creates a new object in the storage backend for metadata.namespace
@@ -12,7 +12,7 @@ User_identification creates a new object in the storage backend for metadata.nam
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_user_identification" "example" {
+resource "xcsh_user_identification" "example" {
   name      = "example-user-identification"
   namespace = "staging"
 

@@ -1,4 +1,4 @@
-# f5xc_api_crawler
+# xcsh_api_crawler
 
 Category: API Security
 API Crawler resource
@@ -11,7 +11,7 @@ API Crawler resource
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_api_crawler" "example" {
+resource "xcsh_api_crawler" "example" {
   name      = "example-api-crawler"
   namespace = "staging"
 

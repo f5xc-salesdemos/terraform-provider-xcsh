@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_bgp Resource - terraform-provider-f5xc"
+page_title: "xcsh_bgp Resource - terraform-provider-xcsh"
 subcategory: "Networking"
 description: |-
   Manages a BGP resource in F5 Distributed Cloud for bgp object is the configuration for peering with external bgp servers. it is created by users in system namespace. configuration.
 ---
 
-# f5xc_bgp (Resource)
+# xcsh_bgp (Resource)
 
 Manages a BGP resource in F5 Distributed Cloud for bgp object is the configuration for peering with external bgp servers. it is created by users in system namespace. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic BGP configuration
-resource "f5xc_bgp" "example" {
+resource "xcsh_bgp" "example" {
   name      = "example-bgp"
   namespace = "staging"
 
@@ -442,5 +442,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_bgp.example system/example
+terraform import xcsh_bgp.example system/example
 ```

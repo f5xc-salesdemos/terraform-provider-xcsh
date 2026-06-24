@@ -1,4 +1,4 @@
-# f5xc_irule
+# xcsh_irule
 
 Category: BIG-IP Integration
 IRule in a given namespace. If one already exists it will give an error
@@ -14,7 +14,7 @@ IRule in a given namespace. If one already exists it will give an error
 ## Minimal Valid Config
 
 ```terraform
-resource "f5xc_irule" "example" {
+resource "xcsh_irule" "example" {
   name      = "example-irule"
   namespace = "staging"
 

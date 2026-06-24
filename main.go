@@ -1,14 +1,15 @@
 // Copyright (c) 2026 Robin Mordasiewicz. MIT License.
 
-// terraform-provider-f5xc provides Terraform resources for managing F5 Distributed Cloud services.
-// For documentation, see https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs
+// terraform-provider-xcsh provides Terraform resources for managing F5 Distributed Cloud services.
+// For documentation, see https://registry.terraform.io/providers/f5xc-salesdemos/xcsh/latest/docs
 //
 // Documentation features OneOf property grouping for mutually exclusive arguments,
 // improving clarity by grouping related properties with a single explanatory note.
 //
 // Version tagging and releases are automated via CI/CD using semantic versioning.
 // Release workflow uses forked action with updated dependencies for improved cache performance.
-// MCP server documentation is available at https://github.com/f5xc-salesdemos/terraform-provider-f5xc/tree/main/mcp-server
+// MCP server documentation is available at https://github.com/f5xc-salesdemos/terraform-provider-xcsh/tree/main/mcp-server
+// Rebranded from f5xc to xcsh. The GitHub org f5xc-salesdemos is unchanged.
 
 package main
 
@@ -19,7 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/provider"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/provider"
 )
 
 // Run "go generate" to format example terraform files and generate the docs for the registry/website
@@ -48,7 +49,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "registry.terraform.io/f5xc-salesdemos/f5xc",
+		Address: "registry.terraform.io/f5xc-salesdemos/xcsh",
 		Debug:   debug,
 	}
 

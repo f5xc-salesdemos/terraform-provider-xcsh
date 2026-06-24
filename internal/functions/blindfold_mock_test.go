@@ -24,7 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/function"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/internal/blindfold"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/blindfold"
 )
 
 // mockServer creates a comprehensive mock F5XC server for CI/CD testing

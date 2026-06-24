@@ -16,7 +16,7 @@ terraform {
 
   required_providers {
     f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
@@ -30,20 +30,20 @@ terraform {
 # variables and the provider block remains empty.
 #
 # For API Token:
-#   export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-#   export F5XC_API_TOKEN="your-api-token"
+#   export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+#   export XCSH_API_TOKEN="your-api-token"
 #
 # For P12 Certificate:
-#   export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-#   export F5XC_P12_FILE="/path/to/credentials.p12"
-#   export F5XC_P12_PASSWORD="your-p12-password"  # gitleaks:allow
+#   export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+#   export XCSH_P12_FILE="/path/to/credentials.p12"
+#   export XCSH_P12_PASSWORD="your-p12-password"  # gitleaks:allow
 #
 # For PEM Certificate:
-#   export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-#   export F5XC_CERT="/path/to/certificate.pem"
-#   export F5XC_KEY="/path/to/private-key.pem"
+#   export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+#   export XCSH_CERT="/path/to/certificate.pem"
+#   export XCSH_KEY="/path/to/private-key.pem"
 
-provider "f5xc" {
+provider "xcsh" {
   # Authentication via environment variables
   # No explicit configuration needed
 }
@@ -57,9 +57,9 @@ provider "f5xc" {
 # variables (see variables.tf) populated via terraform.tfvars or TF_VAR_
 # environment variables.
 #
-# provider "f5xc" {
-#   api_url   = var.f5xc_api_url
-#   api_token = var.f5xc_api_token
+# provider "xcsh" {
+#   api_url   = var.xcsh_api_url
+#   api_token = var.xcsh_api_token
 # }
 
 # =============================================================================
@@ -68,10 +68,10 @@ provider "f5xc" {
 #
 # For P12 certificate authentication with explicit configuration:
 #
-# provider "f5xc" {
-#   api_url      = var.f5xc_api_url
-#   api_p12_file = var.f5xc_api_p12_file
-#   p12_password = var.f5xc_p12_password
+# provider "xcsh" {
+#   api_url      = var.xcsh_api_url
+#   api_p12_file = var.xcsh_api_p12_file
+#   p12_password = var.xcsh_p12_password
 # }
 
 # =============================================================================
@@ -80,10 +80,10 @@ provider "f5xc" {
 #
 # For PEM certificate authentication (extracted from P12):
 #
-# provider "f5xc" {
-#   api_url  = var.f5xc_api_url
-#   api_cert = var.f5xc_api_cert  # gitleaks:allow
-#   api_key  = var.f5xc_api_key  # gitleaks:allow
+# provider "xcsh" {
+#   api_url  = var.xcsh_api_url
+#   api_cert = var.xcsh_api_cert  # gitleaks:allow
+#   api_key  = var.xcsh_api_key  # gitleaks:allow
 # }
 
 # =============================================================================
@@ -93,7 +93,7 @@ provider "f5xc" {
 # This data source validates that authentication is working correctly.
 # It retrieves information about the "system" namespace which always exists.
 
-data "f5xc_namespace" "system" {
+data "xcsh_namespace" "system" {
   name = "system"
 }
 
@@ -101,7 +101,7 @@ data "f5xc_namespace" "system" {
 output "authentication_test" {
   description = "Authentication successful - retrieved system namespace"
   value = {
-    namespace   = data.f5xc_namespace.system.name
-    description = data.f5xc_namespace.system.description
+    namespace   = data.xcsh_namespace.system.name
+    description = data.xcsh_namespace.system.description
   }
 }

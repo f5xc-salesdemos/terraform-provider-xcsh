@@ -16,7 +16,7 @@
 // Usage: go run tools/generate-all-schemas.go [--spec-dir=/path/to/specs] [--dry-run]
 //
 // Environment Variables:
-//   F5XC_SPEC_DIR - Directory containing OpenAPI spec files (default: /tmp)
+//   XCSH_SPEC_DIR - Directory containing OpenAPI spec files (default: /tmp)
 
 package main
 
@@ -29,12 +29,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/codegen"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/namespace"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/naming"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/openapi"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/registration"
-	"github.com/f5xc-salesdemos/terraform-provider-f5xc/tools/pkg/schema"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/codegen"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/namespace"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/naming"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/openapi"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/registration"
+	"github.com/f5xc-salesdemos/terraform-provider-xcsh/tools/pkg/schema"
 )
 
 // Configuration
@@ -80,7 +80,7 @@ func main() {
 
 	// Check for spec directory
 	if specDir == "" {
-		specDir = os.Getenv("F5XC_SPEC_DIR")
+		specDir = os.Getenv("XCSH_SPEC_DIR")
 	}
 	if specDir == "" {
 		specDir = "docs/specifications/api"

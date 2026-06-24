@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_cdn_loadbalancer Resource - terraform-provider-f5xc"
+page_title: "xcsh_cdn_loadbalancer Resource - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages a CDN Load Balancer resource in F5 Distributed Cloud for content delivery and edge caching with load balancing.
 ---
 
-# f5xc_cdn_loadbalancer (Resource)
+# xcsh_cdn_loadbalancer (Resource)
 
 Manages a CDN Load Balancer resource in F5 Distributed Cloud for content delivery and edge caching with load balancing.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic CDN Loadbalancer configuration
-resource "f5xc_cdn_loadbalancer" "example" {
+resource "xcsh_cdn_loadbalancer" "example" {
   name      = "example-CDN-loadbalancer"
   namespace = "staging"
 
@@ -2644,5 +2644,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_cdn_loadbalancer.example system/example
+terraform import xcsh_cdn_loadbalancer.example system/example
 ```

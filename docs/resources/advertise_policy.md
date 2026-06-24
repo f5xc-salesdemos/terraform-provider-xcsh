@@ -1,11 +1,11 @@
 ---
-page_title: "f5xc_advertise_policy Resource - terraform-provider-f5xc"
+page_title: "xcsh_advertise_policy Resource - terraform-provider-xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages a Advertise Policy resource in F5 Distributed Cloud for advertise_policy object controls how and where a service represented by a given virtual_host object is advertised to consumers. configuration.
 ---
 
-# f5xc_advertise_policy (Resource)
+# xcsh_advertise_policy (Resource)
 
 Manages a Advertise Policy resource in F5 Distributed Cloud for advertise_policy object controls how and where a service represented by a given virtual_host object is advertised to consumers. configuration.
 
@@ -21,15 +21,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
 # Basic Advertise Policy configuration
-resource "f5xc_advertise_policy" "example" {
+resource "xcsh_advertise_policy" "example" {
   name      = "example-advertise-policy"
   namespace = "staging"
 
@@ -392,5 +392,5 @@ Import is supported using the following syntax:
 
 ```shell
 # Import using namespace/name format
-terraform import f5xc_advertise_policy.example system/example
+terraform import xcsh_advertise_policy.example system/example
 ```
