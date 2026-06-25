@@ -61,7 +61,7 @@ Owner: @robinmordasiewicz
 # Rotation procedure:
 1. Generate new fine-grained PAT at https://github.com/settings/tokens?type=beta
 2. Configure scopes: repo, workflow
-3. Set repository access: robinmordasiewicz/terraform-provider-f5xc only
+3. Set repository access: robinmordasiewicz/terraform-provider-xcsh only
 4. Update repository secret:
    echo "new_token_value" | gh secret set AUTO_MERGE_TOKEN
 5. Test with workflow trigger:
@@ -106,9 +106,9 @@ Monitor for:
 1. Visit: https://github.com/settings/tokens?type=beta
 2. Click "Generate new token"
 3. Configure token:
-   - **Name**: `terraform-provider-f5xc-automation`
+   - **Name**: `terraform-provider-xcsh-automation`
    - **Expiration**: 90 days
-   - **Repository access**: Only select repositories → `robinmordasiewicz/terraform-provider-f5xc`
+   - **Repository access**: Only select repositories → `robinmordasiewicz/terraform-provider-xcsh`
    - **Permissions**:
      - Contents: Read and write
      - Pull requests: Read and write
@@ -170,7 +170,7 @@ If the token is accidentally exposed:
 echo "github_pat_NEW_TOKEN" | gh secret set AUTO_MERGE_TOKEN
 
 # 4. Audit recent repository activity
-gh api repos/robinmordasiewicz/terraform-provider-f5xc/events
+gh api repos/robinmordasiewicz/terraform-provider-xcsh/events
 
 # 5. Review recent PRs for suspicious changes
 gh pr list --state all --limit 20

@@ -2,16 +2,16 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    f5xc = {
-      source  = "f5xc-salesdemos/f5xc"
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
       version = ">= 0.1.0"
     }
   }
 }
 
-provider "f5xc" {}
+provider "xcsh" {}
 
-resource "f5xc_healthcheck" "httpbin" {
+resource "xcsh_healthcheck" "httpbin" {
   name      = "httpbin-health"
   namespace = "demo"
 
@@ -26,7 +26,7 @@ resource "f5xc_healthcheck" "httpbin" {
   timeout             = 5
 }
 
-resource "f5xc_origin_pool" "httpbin" {
+resource "xcsh_origin_pool" "httpbin" {
   name      = "httpbin-pool"
   namespace = "demo"
 
@@ -50,15 +50,15 @@ resource "f5xc_origin_pool" "httpbin" {
   }
 
   healthcheck {
-    name      = f5xc_healthcheck.httpbin.name
-    namespace = f5xc_healthcheck.httpbin.namespace
+    name      = xcsh_healthcheck.httpbin.name
+    namespace = xcsh_healthcheck.httpbin.namespace
   }
 
   endpoint_selection     = "LOCAL_PREFERRED"
   loadbalancer_algorithm = "ROUND_ROBIN"
 }
 
-resource "f5xc_app_firewall" "httpbin" {
+resource "xcsh_app_firewall" "httpbin" {
   name      = "httpbin-waf"
   namespace = "demo"
 
@@ -68,7 +68,7 @@ resource "f5xc_app_firewall" "httpbin" {
   allow_all_response_codes {}
 }
 
-resource "f5xc_http_loadbalancer" "httpbin" {
+resource "xcsh_http_loadbalancer" "httpbin" {
   name      = "httpbin-lb"
   namespace = "demo"
   domains   = ["httpbin.example.com"]
@@ -89,15 +89,15 @@ resource "f5xc_http_loadbalancer" "httpbin" {
 
   default_route_pools {
     pool {
-      name      = f5xc_origin_pool.httpbin.name
-      namespace = f5xc_origin_pool.httpbin.namespace
+      name      = xcsh_origin_pool.httpbin.name
+      namespace = xcsh_origin_pool.httpbin.namespace
     }
     weight   = 1
     priority = 1
   }
 
   app_firewall {
-    name      = f5xc_app_firewall.httpbin.name
-    namespace = f5xc_app_firewall.httpbin.namespace
+    name      = xcsh_app_firewall.httpbin.name
+    namespace = xcsh_app_firewall.httpbin.namespace
   }
 }

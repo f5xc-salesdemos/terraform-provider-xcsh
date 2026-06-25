@@ -35,13 +35,13 @@ Set environment variables for authentication:
 
 ```bash
 # Option 1: API Token
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_API_TOKEN="your-api-token"
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_API_TOKEN="your-api-token"
 
 # Option 2: P12 Certificate
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_P12_FILE="/path/to/credentials.p12"
-export F5XC_P12_PASSWORD="your-p12-password"  # gitleaks:allow
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_P12_FILE="/path/to/credentials.p12"
+export XCSH_P12_PASSWORD="your-p12-password"  # gitleaks:allow
 ```
 
 ### 2. Configure Variables
@@ -76,7 +76,7 @@ After applying, you'll see:
 
 ## How It Works
 
-1. **Check eligibility**: The example uses `f5xc_addon_service_activation_status` data source to check if each addon can be activated
+1. **Check eligibility**: The example uses `xcsh_addon_service_activation_status` data source to check if each addon can be activated
 2. **Conditional activation**: Subscriptions are only created if the addon is available and not already active
 3. **Wait for propagation**: An optional delay ensures addons are fully active before dependent resources are created
 
@@ -88,17 +88,17 @@ To activate other addon services, add similar blocks to `main.tf`:
 
 ```hcl
 # Example: Adding WAAP Advanced tier
-data "f5xc_addon_service_activation_status" "waap_advanced" {
+data "xcsh_addon_service_activation_status" "waap_advanced" {
   count         = var.enable_waap_advanced ? 1 : 0
   addon_service = "f5xc-waap-advanced"
 }
 
-resource "f5xc_addon_subscription" "waap_advanced" {
+resource "xcsh_addon_subscription" "waap_advanced" {
   count = (
     var.enable_waap_advanced &&
-    length(data.f5xc_addon_service_activation_status.waap_advanced) > 0 &&
-    data.f5xc_addon_service_activation_status.waap_advanced[0].can_activate &&
-    data.f5xc_addon_service_activation_status.waap_advanced[0].state == "AS_NONE"
+    length(data.xcsh_addon_service_activation_status.waap_advanced) > 0 &&
+    data.xcsh_addon_service_activation_status.waap_advanced[0].can_activate &&
+    data.xcsh_addon_service_activation_status.waap_advanced[0].state == "AS_NONE"
   ) ? 1 : 0
 
   name      = "waap-advanced-subscription"
@@ -138,6 +138,6 @@ Contact F5 support with your tenant ID and the specific error message.
 ## Related Documentation
 
 - [Addon Activation Guide](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/guides/addon-activation)
-- [f5xc_addon_service Data Source](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/data-sources/addon_service)
-- [f5xc_addon_service_activation_status Data Source](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/data-sources/addon_service_activation_status)
-- [f5xc_addon_subscription Resource](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/resources/addon_subscription)
+- [xcsh_addon_service Data Source](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/data-sources/addon_service)
+- [xcsh_addon_service_activation_status Data Source](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/data-sources/addon_service_activation_status)
+- [xcsh_addon_subscription Resource](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/resources/addon_subscription)

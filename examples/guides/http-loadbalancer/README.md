@@ -21,8 +21,8 @@ Deploy a production-ready HTTP Load Balancer on F5 Distributed Cloud with:
 ### 1. Set Environment Variables
 
 ```bash
-export F5XC_API_URL="https://your-tenant.console.ves.volterra.io"
-export F5XC_API_TOKEN="your-api-token"
+export XCSH_API_URL="https://your-tenant.console.ves.volterra.io"
+export XCSH_API_TOKEN="your-api-token"
 ```
 
 ### 2. Configure Your Deployment
@@ -100,12 +100,12 @@ terraform destroy
 
 | Resource | Description |
 |----------|-------------|
-| `f5xc_namespace` | Namespace for resource isolation (optional) |
-| `f5xc_healthcheck` | HTTP health check for origin pool |
-| `f5xc_origin_pool` | Backend server pool configuration |
-| `f5xc_app_firewall` | Web Application Firewall policy |
-| `f5xc_rate_limiter` | Rate limiting configuration |
-| `f5xc_http_loadbalancer` | HTTP load balancer with all features |
+| `xcsh_namespace` | Namespace for resource isolation (optional) |
+| `xcsh_healthcheck` | HTTP health check for origin pool |
+| `xcsh_origin_pool` | Backend server pool configuration |
+| `xcsh_app_firewall` | Web Application Firewall policy |
+| `xcsh_rate_limiter` | Rate limiting configuration |
+| `xcsh_http_loadbalancer` | HTTP load balancer with all features |
 
 ## Full Documentation
 
@@ -116,4 +116,4 @@ For detailed documentation including architecture diagrams and troubleshooting, 
 
 - [F5XC Provider Documentation](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs)
 - [F5 Distributed Cloud Documentation](https://docs.cloud.f5.com/)
-- [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-f5xc/issues)
+- [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh/issues)

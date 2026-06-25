@@ -17,10 +17,10 @@ The mock testing infrastructure enables:
 
 ```bash
 # Run all mock tests
-F5XC_MOCK_MODE=1 go test -v ./internal/provider/ -run TestMock -timeout 5m
+XCSH_MOCK_MODE=1 go test -v ./internal/provider/ -run TestMock -timeout 5m
 
 # Run specific mock test
-F5XC_MOCK_MODE=1 go test -v ./internal/provider/ -run TestMockAWSVPCSiteResource_basic -timeout 5m
+XCSH_MOCK_MODE=1 go test -v ./internal/provider/ -run TestMockAWSVPCSiteResource_basic -timeout 5m
 ```
 
 ### Writing a Mock Test
@@ -54,8 +54,8 @@ func TestMockMyResource_basic(t *testing.T) {
             {
                 Config: testAccMyResourceConfig(mockCfg),
                 Check: resource.ComposeAggregateTestCheckFunc(
-                    acctest.CheckResourceExists("f5xc_my_resource.test"),
-                    resource.TestCheckResourceAttr("f5xc_my_resource.test", "name", "test"),
+                    acctest.CheckResourceExists("xcsh_my_resource.test"),
+                    resource.TestCheckResourceAttr("xcsh_my_resource.test", "name", "test"),
                 ),
             },
         },
@@ -66,7 +66,7 @@ func testAccMyResourceConfig(mockCfg *acctest.MockTestConfig) string {
     return acctest.ConfigCompose(
         mockCfg.MockProviderConfig(),
         `
-resource "f5xc_my_resource" "test" {
+resource "xcsh_my_resource" "test" {
   name      = "test"
   namespace = "my-namespace"
 }
@@ -288,7 +288,7 @@ func TestResource_hybridMode(t *testing.T) {
     }
 
     // Runs with real API if TF_ACC + credentials set
-    // Runs with mock if F5XC_MOCK_MODE=1 set
+    // Runs with mock if XCSH_MOCK_MODE=1 set
     // Skips if neither available
     acctest.RunWithMockOrReal(t, testCase, func(mockCfg *acctest.MockTestConfig) {
         // Optional: customize mock setup
@@ -338,10 +338,10 @@ mockCfg.SetupMyResourceMock("system", "test-resource")
 
 | Variable | Purpose |
 |----------|---------|
-| `F5XC_MOCK_MODE=1` | Enable mock testing mode |
+| `XCSH_MOCK_MODE=1` | Enable mock testing mode |
 | `TF_ACC=1` | Enable real acceptance tests |
-| `F5XC_API_URL` | Real API URL (for non-mock tests) |
-| `F5XC_API_TOKEN` | Real API token (for non-mock tests) |
+| `XCSH_API_URL` | Real API URL (for non-mock tests) |
+| `XCSH_API_TOKEN` | Real API token (for non-mock tests) |
 
 ## Test Categories and Reporting
 
@@ -431,9 +431,9 @@ mockCfg.PrePopulateResource(path, response)
 ```
 
 ### Tests not running
-Check that `F5XC_MOCK_MODE=1` is set:
+Check that `XCSH_MOCK_MODE=1` is set:
 ```bash
-F5XC_MOCK_MODE=1 go test -v ./internal/provider/ -run TestMock
+XCSH_MOCK_MODE=1 go test -v ./internal/provider/ -run TestMock
 ```
 
 ### Cascade delete not working

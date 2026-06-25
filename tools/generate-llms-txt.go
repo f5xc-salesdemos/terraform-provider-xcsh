@@ -958,7 +958,7 @@ func generateL0(config *LLMsConfig, categories []CategoryInfo) error {
 	sb.WriteString("    terraform {\n")
 	sb.WriteString("      required_providers {\n")
 	sb.WriteString("        xcsh = {\n")
-	sb.WriteString("          source = \"f5xc-salesdemos/f5xc\"\n")
+	sb.WriteString("          source = \"f5xc-salesdemos/xcsh\"\n")
 	sb.WriteString("        }\n")
 	sb.WriteString("      }\n")
 	sb.WriteString("    }\n\n")
@@ -1165,7 +1165,7 @@ func generateJSONIndex(config *LLMsConfig, categories []CategoryInfo, reverseDep
 			RequiredBlock: `terraform {
   required_providers {
     xcsh = {
-      source = "f5xc-salesdemos/f5xc"
+      source = "f5xc-salesdemos/xcsh"
     }
   }
 }`,
