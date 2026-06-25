@@ -55,44 +55,44 @@ func (p *XCShProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 				MarkdownDescription: "F5 Distributed Cloud API URL. " +
 					"Defaults to https://console.ves.volterra.io. " +
 					"Example: https://tenant.console.ves.volterra.io. " +
-					"Can also be set via XCSH_API_URL (or F5XC_API_URL for backward compat) environment variable.",
+					"Can also be set via XCSH_API_URL environment variable.",
 				Optional: true,
 			},
 			"api_token": schema.StringAttribute{
 				MarkdownDescription: "F5 Distributed Cloud API Token for token-based authentication. " +
-					"Can also be set via XCSH_API_TOKEN (or F5XC_API_TOKEN for backward compat) environment variable. " +
+					"Can also be set via XCSH_API_TOKEN environment variable. " +
 					"Either api_token or api_p12_file/api_cert must be specified.",
 				Optional:  true,
 				Sensitive: true,
 			},
 			"api_p12_file": schema.StringAttribute{
 				MarkdownDescription: "Path to PKCS#12 certificate bundle file for certificate-based authentication. " +
-					"Can also be set via XCSH_P12_FILE (or F5XC_P12_FILE for backward compat) environment variable. " +
+					"Can also be set via XCSH_P12_FILE environment variable. " +
 					"When using P12 authentication, p12_password must also be provided.",
 				Optional:  true,
 				Sensitive: false,
 			},
 			"p12_password": schema.StringAttribute{
 				MarkdownDescription: "Password for the PKCS#12 certificate bundle. " +
-					"Can also be set via XCSH_P12_PASSWORD (or F5XC_P12_PASSWORD for backward compat) environment variable.",
+					"Can also be set via XCSH_P12_PASSWORD environment variable.",
 				Optional:  true,
 				Sensitive: true,
 			},
 			"api_cert": schema.StringAttribute{
 				MarkdownDescription: "Path to PEM-encoded client certificate file for certificate-based authentication. " +
-					"Can also be set via XCSH_CERT (or F5XC_CERT for backward compat) environment variable. " +
+					"Can also be set via XCSH_CERT environment variable. " +
 					"When using certificate authentication, api_key must also be provided.",
 				Optional: true,
 			},
 			"api_key": schema.StringAttribute{
 				MarkdownDescription: "Path to PEM-encoded client private key file for certificate-based authentication. " +
-					"Can also be set via XCSH_KEY (or F5XC_KEY for backward compat) environment variable.",
+					"Can also be set via XCSH_KEY environment variable.",
 				Optional:  true,
 				Sensitive: true,
 			},
 			"api_ca_cert": schema.StringAttribute{
 				MarkdownDescription: "Path to PEM-encoded CA certificate file for verifying the F5 Distributed Cloud API server. " +
-					"Can also be set via XCSH_CACERT (or F5XC_CACERT for backward compat) environment variable. Optional.",
+					"Can also be set via XCSH_CACERT environment variable. Optional.",
 				Optional: true,
 			},
 		},
@@ -110,36 +110,14 @@ func (p *XCShProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		return
 	}
 
-	// Get configuration values from environment variables first
-	// Check XCSH_* first, fall back to F5XC_* for backward compatibility
+	// Get configuration values from environment variables
 	apiURL := os.Getenv("XCSH_API_URL")
-	if apiURL == "" {
-		apiURL = os.Getenv("F5XC_API_URL")
-	}
 	apiToken := os.Getenv("XCSH_API_TOKEN")
-	if apiToken == "" {
-		apiToken = os.Getenv("F5XC_API_TOKEN")
-	}
 	apiP12File := os.Getenv("XCSH_P12_FILE")
-	if apiP12File == "" {
-		apiP12File = os.Getenv("F5XC_P12_FILE")
-	}
 	p12Password := os.Getenv("XCSH_P12_PASSWORD")
-	if p12Password == "" {
-		p12Password = os.Getenv("F5XC_P12_PASSWORD")
-	}
 	apiCert := os.Getenv("XCSH_CERT")
-	if apiCert == "" {
-		apiCert = os.Getenv("F5XC_CERT")
-	}
 	apiKey := os.Getenv("XCSH_KEY")
-	if apiKey == "" {
-		apiKey = os.Getenv("F5XC_KEY")
-	}
 	apiCACert := os.Getenv("XCSH_CACERT")
-	if apiCACert == "" {
-		apiCACert = os.Getenv("F5XC_CACERT")
-	}
 
 	// Configuration values override environment variables
 	if !config.APIURL.IsNull() {
@@ -184,7 +162,7 @@ func (p *XCShProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 				path.Root("p12_password"),
 				"Missing P12 Password",
 				"When using P12 certificate authentication (api_p12_file), the p12_password must be provided. "+
-					"Set the p12_password value in the configuration or use the XCSH_P12_PASSWORD (or F5XC_P12_PASSWORD) environment variable.",
+					"Set the p12_password value in the configuration or use the XCSH_P12_PASSWORD environment variable.",
 			)
 			return
 		}
