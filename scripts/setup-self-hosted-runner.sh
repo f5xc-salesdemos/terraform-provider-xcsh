@@ -46,35 +46,35 @@ CONTAINER_MODE=false
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --container)
-      CONTAINER_MODE=true
-      shift
-      ;;
-    -y | --yes)
-      AUTO_YES=true
-      shift
-      ;;
-    --skip-secrets) # pragma: allowlist secret
-      SKIP_SECRETS=true
-      shift
-      ;;
-    --skip-start)
-      SKIP_START=true
-      shift
-      ;;
-    --runner-name)
-      RUNNER_NAME_ARG="$2"
-      shift 2
-      ;;
-    --help | -h)
-      sed -n '2,/^set -euo pipefail/p' "$0" | head -n -1
-      exit 0
-      ;;
-    *)
-      echo "Unknown option: $1"
-      echo "Use --help for usage information"
-      exit 1
-      ;;
+  --container)
+    CONTAINER_MODE=true
+    shift
+    ;;
+  -y | --yes)
+    AUTO_YES=true
+    shift
+    ;;
+  --skip-secrets) # pragma: allowlist secret
+    SKIP_SECRETS=true
+    shift
+    ;;
+  --skip-start)
+    SKIP_START=true
+    shift
+    ;;
+  --runner-name)
+    RUNNER_NAME_ARG="$2"
+    shift 2
+    ;;
+  --help | -h)
+    sed -n '2,/^set -euo pipefail/p' "$0" | head -n -1
+    exit 0
+    ;;
+  *)
+    echo "Unknown option: $1"
+    echo "Use --help for usage information"
+    exit 1
+    ;;
   esac
 done
 
@@ -247,21 +247,21 @@ detect_platform() {
   arch=$(uname -m)
 
   case "$os" in
-    linux) RUNNER_OS="linux" ;;
-    darwin) RUNNER_OS="osx" ;;
-    *)
-      log_error "Unsupported OS: $os"
-      exit 1
-      ;;
+  linux) RUNNER_OS="linux" ;;
+  darwin) RUNNER_OS="osx" ;;
+  *)
+    log_error "Unsupported OS: $os"
+    exit 1
+    ;;
   esac
 
   case "$arch" in
-    x86_64 | amd64) RUNNER_ARCH="x64" ;;
-    arm64 | aarch64) RUNNER_ARCH="arm64" ;;
-    *)
-      log_error "Unsupported architecture: $arch"
-      exit 1
-      ;;
+  x86_64 | amd64) RUNNER_ARCH="x64" ;;
+  arm64 | aarch64) RUNNER_ARCH="arm64" ;;
+  *)
+    log_error "Unsupported architecture: $arch"
+    exit 1
+    ;;
   esac
 
   log_info "Platform: ${RUNNER_OS}-${RUNNER_ARCH}"
@@ -378,27 +378,27 @@ start_runner() {
   fi
 
   case "$START_OPTION" in
-    1)
-      log_info "Starting in foreground (Ctrl+C to stop)..."
-      ./run.sh
-      ;;
-    2)
-      nohup ./run.sh >runner.log 2>&1 &
-      echo $! >runner.pid
-      log_success "Started in background (PID: $(cat runner.pid))"
-      log_info "Logs: tail -f $RUNNER_DIR/runner.log"
-      ;;
-    3)
-      if [[ "$RUNNER_OS" == "linux" ]]; then
-        sudo ./svc.sh install && sudo ./svc.sh start
-      else
-        ./svc.sh install && ./svc.sh start
-      fi
-      log_success "Service installed and started"
-      ;;
-    4)
-      log_info "To start manually: cd $RUNNER_DIR && ./run.sh"
-      ;;
+  1)
+    log_info "Starting in foreground (Ctrl+C to stop)..."
+    ./run.sh
+    ;;
+  2)
+    nohup ./run.sh >runner.log 2>&1 &
+    echo $! >runner.pid
+    log_success "Started in background (PID: $(cat runner.pid))"
+    log_info "Logs: tail -f $RUNNER_DIR/runner.log"
+    ;;
+  3)
+    if [[ "$RUNNER_OS" == "linux" ]]; then
+      sudo ./svc.sh install && sudo ./svc.sh start
+    else
+      ./svc.sh install && ./svc.sh start
+    fi
+    log_success "Service installed and started"
+    ;;
+  4)
+    log_info "To start manually: cd $RUNNER_DIR && ./run.sh"
+    ;;
   esac
 }
 

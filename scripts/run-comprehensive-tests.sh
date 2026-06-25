@@ -58,57 +58,57 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --mode)
-      MODE="$2"
-      shift 2
-      ;;
-    --output-dir)
-      OUTPUT_DIR="$2"
-      shift 2
-      ;;
-    --batch-size)
-      BATCH_SIZE="$2"
-      shift 2
-      ;;
-    --batch-delay)
-      BATCH_DELAY="$2"
-      shift 2
-      ;;
-    --timeout)
-      TIMEOUT="$2"
-      shift 2
-      ;;
-    --parallel)
-      PARALLEL="$2"
-      shift 2
-      ;;
-    --dry-run)
-      DRY_RUN=true
-      shift
-      ;;
-    --verbose)
-      VERBOSE=true
-      shift
-      ;;
-    --help)
-      sed -n '2,/^set -euo pipefail/p' "$0" | head -n -1
-      exit 0
-      ;;
-    *)
-      echo "Unknown option: $1"
-      exit 2
-      ;;
+  --mode)
+    MODE="$2"
+    shift 2
+    ;;
+  --output-dir)
+    OUTPUT_DIR="$2"
+    shift 2
+    ;;
+  --batch-size)
+    BATCH_SIZE="$2"
+    shift 2
+    ;;
+  --batch-delay)
+    BATCH_DELAY="$2"
+    shift 2
+    ;;
+  --timeout)
+    TIMEOUT="$2"
+    shift 2
+    ;;
+  --parallel)
+    PARALLEL="$2"
+    shift 2
+    ;;
+  --dry-run)
+    DRY_RUN=true
+    shift
+    ;;
+  --verbose)
+    VERBOSE=true
+    shift
+    ;;
+  --help)
+    sed -n '2,/^set -euo pipefail/p' "$0" | head -n -1
+    exit 0
+    ;;
+  *)
+    echo "Unknown option: $1"
+    exit 2
+    ;;
   esac
 done
 
 # Validate mode
 case $MODE in
-  mock-only | real-only | full | pr-subset)
-    ;;
-  *)
-    echo -e "${RED}ERROR: Invalid mode '$MODE'. Use: mock-only, real-only, full, pr-subset${NC}"
-    exit 2
-    ;;
+mock-only | real-only | full | pr-subset)
+  ;;
+*)
+  echo -e "${RED}ERROR: Invalid mode '$MODE'. Use: mock-only, real-only, full, pr-subset${NC}"
+  exit 2
+  ;;
 esac
 
 # Logging functions
@@ -353,24 +353,24 @@ main() {
 
   # Run tests based on mode
   case $MODE in
-    mock-only)
-      run_mock_tests
-      ;;
-    real-only)
-      run_real_api_tests
-      ;;
-    full)
-      # Run mock tests first (parallel, fast)
-      run_mock_tests
+  mock-only)
+    run_mock_tests
+    ;;
+  real-only)
+    run_real_api_tests
+    ;;
+  full)
+    # Run mock tests first (parallel, fast)
+    run_mock_tests
 
-      # Then run real API tests (sequential, with rate limiting)
-      run_real_api_tests
-      ;;
-    pr-subset)
-      # For PR subset, we only run mock tests by default
-      # This is the safe, fast option for PR validation
-      run_mock_tests
-      ;;
+    # Then run real API tests (sequential, with rate limiting)
+    run_real_api_tests
+    ;;
+  pr-subset)
+    # For PR subset, we only run mock tests by default
+    # This is the safe, fast option for PR validation
+    run_mock_tests
+    ;;
   esac
 
   # Combine outputs and generate reports
