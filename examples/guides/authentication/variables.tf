@@ -46,6 +46,7 @@ variable "xcsh_api_token" {
 # P12 Certificate Authentication
 # -----------------------------------------------------------------------------
 
+# tflint-ignore: terraform_unused_declarations
 variable "xcsh_p12_file" {
   description = "Path to the P12 certificate file. Download from Console under Administration > Personal Management > Credentials."
   type        = string
@@ -57,6 +58,7 @@ variable "xcsh_p12_file" {
   }
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "xcsh_p12_password" {
   description = "Password for the P12 certificate file. Set when creating the certificate in the Console."
   type        = string
@@ -68,6 +70,7 @@ variable "xcsh_p12_password" {
 # PEM Certificate Authentication
 # -----------------------------------------------------------------------------
 
+# tflint-ignore: terraform_unused_declarations
 variable "xcsh_cert" {
   description = "Path to the PEM certificate file. Extract from P12 using: openssl pkcs12 -in creds.p12 -nodes -nokeys -out cert.pem"
   type        = string
@@ -79,6 +82,7 @@ variable "xcsh_cert" {
   }
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "xcsh_key" {
   description = "Path to the PEM private key file. Extract from P12 using: openssl pkcs12 -in creds.p12 -nodes -nocerts -out key.pem"
   type        = string
@@ -86,6 +90,7 @@ variable "xcsh_key" {
   sensitive   = true
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "xcsh_cacert" {
   description = "Optional path to CA certificate for server verification."
   type        = string

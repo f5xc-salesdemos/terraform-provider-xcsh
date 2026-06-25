@@ -32,7 +32,25 @@ locals {
   )
 }
 
-# Example: Using the encrypted secret in a resource
+# Example: Using the encrypted secrets in a resource
+resource "xcsh_origin_pool" "example" {
+  name      = "secure-pool"
+  namespace = "production"
+
+  origin_servers {
+    private_ip {
+      ip = "10.0.0.1"
+    }
+  }
+
+  port = 443
+
+  # Use the encrypted password from locals
+  custom_hash_algorithms {
+    hash_algorithms = [local.encrypted_password]
+  }
+}
+
 resource "xcsh_http_loadbalancer" "example" {
   name      = "secure-lb"
   namespace = "production"
@@ -44,11 +62,7 @@ resource "xcsh_http_loadbalancer" "example" {
       custom_security {
         private_key {
           blindfold_secret_info {
-            location = provider::xcsh::blindfold(
-              base64encode(file("${path.module}/certs/server.key")),
-              "tls-secrets-policy",
-              "shared"
-            )
+            location = local.encrypted_key
           }
         }
       }
