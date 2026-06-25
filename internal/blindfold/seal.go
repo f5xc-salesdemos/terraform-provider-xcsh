@@ -36,7 +36,7 @@ const (
 //
 // Parameters:
 //   - plaintext: Raw bytes to encrypt (not base64-encoded)
-//   - pubKey: Public key fetched from F5XC Secret Management API
+//   - pubKey: Public key fetched from XCSH Secret Management API
 //   - policy: Policy document defining decryption access control
 //
 // Returns:
@@ -131,8 +131,8 @@ func SealBase64(plaintextBase64 string, pubKey *PublicKey, policy *SecretPolicyD
 	return Seal(plaintext, pubKey, policy)
 }
 
-// buildRSAPublicKey constructs an RSA public key from the F5XC public key components.
-// F5XC uses a custom format where the exponent bytes may include a version prefix byte (0x03).
+// buildRSAPublicKey constructs an RSA public key from the XCSH public key components.
+// XCSH uses a custom format where the exponent bytes may include a version prefix byte (0x03).
 // When present, this prefix must be stripped to extract the actual RSA exponent.
 func buildRSAPublicKey(pubKey *PublicKey) (*rsa.PublicKey, error) {
 	// Decode modulus from base64
@@ -153,7 +153,7 @@ func buildRSAPublicKey(pubKey *PublicKey) (*rsa.PublicKey, error) {
 		return nil, fmt.Errorf("public exponent is empty")
 	}
 
-	// F5XC exponent format: The first byte (0x03) is a version/type indicator
+	// XCSH exponent format: The first byte (0x03) is a version/type indicator
 	// that must be stripped to get the actual RSA exponent value.
 	// Example: base64 "AzzBVP0=" decodes to [0x03, 0x3c, 0xc1, 0x54, 0xfd]
 	//          With prefix: 13904205053 (doesn't fit in int32)
@@ -167,7 +167,7 @@ func buildRSAPublicKey(pubKey *PublicKey) (*rsa.PublicKey, error) {
 	modulus := new(big.Int).SetBytes(modulusBytes)
 	exponent := new(big.Int).SetBytes(actualExponentBytes)
 
-	// Validate exponent fits in int (should be 65537 typically, but F5XC uses larger values)
+	// Validate exponent fits in int (should be 65537 typically, but XCSH uses larger values)
 	if !exponent.IsInt64() {
 		return nil, fmt.Errorf("public exponent too large to fit in int64")
 	}
@@ -190,7 +190,7 @@ func buildRSAPublicKey(pubKey *PublicKey) (*rsa.PublicKey, error) {
 }
 
 // MaxPlaintextSize returns the maximum plaintext size that can be encrypted.
-// With envelope encryption, the limit is now the F5XC API limit (128KB),
+// With envelope encryption, the limit is now the XCSH API limit (128KB),
 // not the RSA key size limit.
 //
 // Deprecated: This function is kept for backwards compatibility but no longer

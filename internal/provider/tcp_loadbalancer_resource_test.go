@@ -25,7 +25,7 @@ import (
 //
 // Run with:
 //
-//	TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//	TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //	go test -v ./internal/provider/ -run TestAccTCPLoadBalancerResource -timeout 30m
 //
 // =============================================================================
@@ -38,12 +38,12 @@ func TestAccTCPLoadBalancerResource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTCPLoadBalancerConfig_basicSystem(rName),
@@ -92,12 +92,12 @@ func TestAccTCPLoadBalancerResource_allAttributes(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTCPLoadBalancerConfig_allAttributesSystem(rName),
@@ -134,12 +134,12 @@ func TestAccTCPLoadBalancerResource_updateLabels(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTCPLoadBalancerConfig_withLabelsSystem(rName, "test", "terraform"),
@@ -169,12 +169,12 @@ func TestAccTCPLoadBalancerResource_updateDescription(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTCPLoadBalancerConfig_withDescriptionSystem(rName, "Initial description"),
@@ -202,12 +202,12 @@ func TestAccTCPLoadBalancerResource_updateAnnotations(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTCPLoadBalancerConfig_withAnnotationsSystem(rName, "value1"),
@@ -236,12 +236,12 @@ func TestAccTCPLoadBalancerResource_updateAnnotations(t *testing.T) {
 // 	acctest.PreCheck(t)
 //
 // 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-// 	resourceName := "f5xc_tcp_loadbalancer.test"
+// 	resourceName := "xcsh_tcp_loadbalancer.test"
 //
 // 	resource.ParallelTest(t, resource.TestCase{
 // 		PreCheck:                 func() { acctest.PreCheck(t) },
 // 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-// 		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+// 		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 // 		Steps: []resource.TestStep{
 // 			{
 // 				Config: testAccTCPLoadBalancerConfig_basicSystem(rName),
@@ -263,12 +263,12 @@ func TestAccTCPLoadBalancerResource_emptyPlan(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTCPLoadBalancerConfig_basicSystem(rName),
@@ -293,12 +293,12 @@ func TestAccTCPLoadBalancerResource_planChecks(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTCPLoadBalancerConfig_basicSystem(rName),
@@ -329,12 +329,12 @@ func TestAccTCPLoadBalancerResource_knownValues(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTCPLoadBalancerConfig_basicSystem(rName),
@@ -419,12 +419,12 @@ func TestAccTCPLoadBalancerResource_requiresReplace(t *testing.T) {
 
 	rName1 := acctest.RandomName("tf-acc-test-tcp-lb")
 	rName2 := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTCPLoadBalancerConfig_basicSystem(rName1),
@@ -457,12 +457,12 @@ func TestAccTCPLoadBalancerResource_listenPort(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccTCPLoadBalancerConfig_withListenPortSystem(rName, 8443),
@@ -483,7 +483,7 @@ func TestAccTCPLoadBalancerResource_listenPort(t *testing.T) {
 func testAccTCPLoadBalancerConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
 # Origin pool is required for TCP load balancer - it needs a backend cluster
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name       = "%[1]s-pool"
   namespace  = "system"
 
@@ -500,7 +500,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -523,7 +523,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
   # Required: TCP LB needs origin pools for routing
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -537,7 +537,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
 func testAccTCPLoadBalancerConfig_allAttributesSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name       = "%[1]s-pool"
   namespace  = "system"
   port       = 443
@@ -553,7 +553,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Acceptance test tcp loadbalancer with all attributes"
@@ -575,7 +575,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -588,7 +588,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
 func testAccTCPLoadBalancerConfig_withLabelsSystem(name, env, managedBy string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name       = "%[1]s-pool"
   namespace  = "system"
   port       = 443
@@ -604,7 +604,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -620,7 +620,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -633,7 +633,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
 func testAccTCPLoadBalancerConfig_withDescriptionSystem(name, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name       = "%[1]s-pool"
   namespace  = "system"
   port       = 443
@@ -649,7 +649,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -666,7 +666,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -679,7 +679,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
 func testAccTCPLoadBalancerConfig_withAnnotationsSystem(name, value string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name       = "%[1]s-pool"
   namespace  = "system"
   port       = 443
@@ -695,7 +695,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -715,7 +715,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -733,14 +733,14 @@ func TestAccTCPLoadBalancerResource_withHealthcheck(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-tcp-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		CheckDestroy: func(s *terraform.State) error {
-			if err := acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer")(s); err != nil {
+			if err := acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer")(s); err != nil {
 				return err
 			}
 			if err := acctest.CheckOriginPoolDestroyed(s); err != nil {
@@ -774,14 +774,14 @@ func TestAccTCPLoadBalancerResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-tcp-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		CheckDestroy: func(s *terraform.State) error {
-			if err := acctest.CheckResourceDestroyed("f5xc_tcp_loadbalancer")(s); err != nil {
+			if err := acctest.CheckResourceDestroyed("xcsh_tcp_loadbalancer")(s); err != nil {
 				return err
 			}
 			return acctest.CheckOriginPoolDestroyed(s)
@@ -822,7 +822,7 @@ func TestAccTCPLoadBalancerResource_fullLifecycle(t *testing.T) {
 // =============================================================================
 func testAccTCPLoadBalancerConfig_withHealthcheckSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = "%[1]s-hc"
   namespace = "system"
 
@@ -834,7 +834,7 @@ resource "f5xc_healthcheck" "test" {
   tcp_health_check {}
 }
 
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "%[1]s-pool"
   namespace = "system"
   port      = 443
@@ -847,7 +847,7 @@ resource "f5xc_origin_pool" "test" {
   }
 
   healthcheck {
-    name      = f5xc_healthcheck.test.name
+    name      = xcsh_healthcheck.test.name
     namespace = "system"
   }
 
@@ -855,7 +855,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -866,7 +866,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -879,7 +879,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
 func testAccTCPLoadBalancerConfig_withListenPortSystem(name string, port int) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name       = "%[1]s-pool"
   namespace  = "system"
   port       = 443
@@ -895,7 +895,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -912,7 +912,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -938,7 +938,7 @@ func TestAccTCPLoadBalancerResource_conflictTcpAndTls(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "%[1]s-pool"
   namespace = "system"
   port      = 443
@@ -954,7 +954,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -968,7 +968,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -998,7 +998,7 @@ func TestAccTCPLoadBalancerResource_conflictPortOptions(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "%[1]s-pool"
   namespace = "system"
   port      = 443
@@ -1014,7 +1014,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1027,7 +1027,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1

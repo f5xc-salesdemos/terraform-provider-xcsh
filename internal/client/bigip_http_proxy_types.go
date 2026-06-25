@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// BigIPHTTPProxy represents a F5XC BigIPHTTPProxy
+// BigIPHTTPProxy represents a XCSH BigIPHTTPProxy
 type BigIPHTTPProxy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

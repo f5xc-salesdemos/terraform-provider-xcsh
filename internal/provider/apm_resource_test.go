@@ -17,13 +17,13 @@ func TestAccAPMResource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 	t.Skip("Skipping: apm requires BIG-IP APM license and special permissions (FORBIDDEN 403)")
 
-	resourceName := "f5xc_apm.test"
+	resourceName := "xcsh_apm.test"
 	rName := acctest.RandomName("tf-test-apm")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_apm"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_apm"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPMConfig_basic(rName),
@@ -59,7 +59,7 @@ func testAccAPMImportStateIdFunc(resourceName string) resource.ImportStateIdFunc
 
 func testAccAPMConfig_basic(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_apm" "test" {
+resource "xcsh_apm" "test" {
   name       = %[1]q
   namespace  = "system"
 }

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// K8SClusterRole represents a F5XC K8SClusterRole
+// K8SClusterRole represents a XCSH K8SClusterRole
 type K8SClusterRole struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

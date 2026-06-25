@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// RateLimiterPolicy represents a F5XC RateLimiterPolicy
+// RateLimiterPolicy represents a XCSH RateLimiterPolicy
 type RateLimiterPolicy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

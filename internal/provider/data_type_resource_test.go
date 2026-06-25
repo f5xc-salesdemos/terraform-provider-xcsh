@@ -26,7 +26,7 @@ func TestAccDataTypeResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_type.test"
+	resourceName := "xcsh_data_type.test"
 	rName := acctest.RandomName("tf-test-datatype")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -63,7 +63,7 @@ func TestAccDataTypeResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_type.test"
+	resourceName := "xcsh_data_type.test"
 	rName := acctest.RandomName("tf-test-datatype")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -94,7 +94,7 @@ func TestAccDataTypeResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_type.test"
+	resourceName := "xcsh_data_type.test"
 	rName := acctest.RandomName("tf-test-datatype")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -134,7 +134,7 @@ func TestAccDataTypeResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_type.test"
+	resourceName := "xcsh_data_type.test"
 	rName := acctest.RandomName("tf-test-datatype")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -168,7 +168,7 @@ func TestAccDataTypeResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_type.test"
+	resourceName := "xcsh_data_type.test"
 	rName := acctest.RandomName("tf-test-datatype")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -208,7 +208,7 @@ func TestAccDataTypeResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_type.test"
+	resourceName := "xcsh_data_type.test"
 	rName := acctest.RandomName("tf-test-datatype")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -236,7 +236,7 @@ func TestAccDataTypeResource_emptyPlan(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_type.test"
+	resourceName := "xcsh_data_type.test"
 	rName := acctest.RandomName("tf-test-datatype")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -278,7 +278,7 @@ func TestAccDataTypeResource_planChecks(t *testing.T) {
 				Config: testAccDataTypeConfig_basicSystem(rName),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_data_type.test", plancheck.ResourceActionCreate),
+						plancheck.ExpectResourceAction("xcsh_data_type.test", plancheck.ResourceActionCreate),
 					},
 				},
 			},
@@ -294,7 +294,7 @@ func TestAccDataTypeResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_type.test"
+	resourceName := "xcsh_data_type.test"
 	rName := acctest.RandomName("tf-test-datatype")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -405,15 +405,15 @@ func TestAccDataTypeResource_requiresReplace(t *testing.T) {
 			{
 				Config: testAccDataTypeConfig_basicSystem(rName1),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					acctest.CheckDataTypeExists("f5xc_data_type.test"),
-					resource.TestCheckResourceAttr("f5xc_data_type.test", "name", rName1),
+					acctest.CheckDataTypeExists("xcsh_data_type.test"),
+					resource.TestCheckResourceAttr("xcsh_data_type.test", "name", rName1),
 				),
 			},
 			{
 				Config: testAccDataTypeConfig_basicSystem(rName2),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_data_type.test", plancheck.ResourceActionDestroyBeforeCreate),
+						plancheck.ExpectResourceAction("xcsh_data_type.test", plancheck.ResourceActionDestroyBeforeCreate),
 					},
 				},
 			},
@@ -429,7 +429,7 @@ func TestAccDataTypeResource_piiFlags(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_type.test"
+	resourceName := "xcsh_data_type.test"
 	rName := acctest.RandomName("tf-test-datatype")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -479,7 +479,7 @@ func testAccDataTypeImportStateIdFunc(resourceName string) resource.ImportStateI
 
 func testAccDataTypeConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_data_type" "test" {
+resource "xcsh_data_type" "test" {
   name      = %[1]q
   namespace = "system"
   is_pii    = true
@@ -495,7 +495,7 @@ resource "f5xc_data_type" "test" {
 
 func testAccDataTypeConfig_allAttributesSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_data_type" "test" {
+resource "xcsh_data_type" "test" {
   name              = %[1]q
   namespace         = "system"
   description       = "Test data type description"
@@ -527,7 +527,7 @@ func testAccDataTypeConfig_withLabelsSystem(name string, labels map[string]strin
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_data_type" "test" {
+resource "xcsh_data_type" "test" {
   name      = %[1]q
   namespace = "system"
   is_pii    = true
@@ -546,7 +546,7 @@ resource "f5xc_data_type" "test" {
 
 func testAccDataTypeConfig_withDescriptionSystem(name, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_data_type" "test" {
+resource "xcsh_data_type" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -568,7 +568,7 @@ func testAccDataTypeConfig_withAnnotationsSystem(name string, annotations map[st
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_data_type" "test" {
+resource "xcsh_data_type" "test" {
   name      = %[1]q
   namespace = "system"
   is_pii    = true
@@ -587,7 +587,7 @@ resource "f5xc_data_type" "test" {
 
 func testAccDataTypeConfig_withPiiFlagsSystem(name string, isPii, isSensitive bool) string {
 	return fmt.Sprintf(`
-resource "f5xc_data_type" "test" {
+resource "xcsh_data_type" "test" {
   name              = %[1]q
   namespace         = "system"
   is_pii            = %[2]t

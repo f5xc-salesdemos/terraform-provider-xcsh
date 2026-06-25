@@ -32,7 +32,7 @@ func testAccMaliciousUserMitigationImportStateIdFunc(resourceName string) resour
 
 // TestAccMaliciousUserMitigationResource_basic tests basic malicious_user_mitigation creation
 func TestAccMaliciousUserMitigationResource_basic(t *testing.T) {
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	nsName := acctest.RandomName("mal-user-basic")
 	mumName := acctest.RandomName("mum")
 
@@ -69,7 +69,7 @@ func TestAccMaliciousUserMitigationResource_basic(t *testing.T) {
 
 // TestAccMaliciousUserMitigationResource_allAttributes tests malicious_user_mitigation with all attributes
 func TestAccMaliciousUserMitigationResource_allAttributes(t *testing.T) {
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	nsName := acctest.RandomName("mal-user-all")
 	mumName := acctest.RandomName("mum")
 
@@ -111,7 +111,7 @@ func TestAccMaliciousUserMitigationResource_allAttributes(t *testing.T) {
 
 // TestAccMaliciousUserMitigationResource_updateLabels tests updating labels
 func TestAccMaliciousUserMitigationResource_updateLabels(t *testing.T) {
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	nsName := acctest.RandomName("mal-user-lbl")
 	mumName := acctest.RandomName("mum")
 
@@ -152,7 +152,7 @@ func TestAccMaliciousUserMitigationResource_updateLabels(t *testing.T) {
 
 // TestAccMaliciousUserMitigationResource_updateDescription tests updating description
 func TestAccMaliciousUserMitigationResource_updateDescription(t *testing.T) {
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	nsName := acctest.RandomName("mal-user-desc")
 	mumName := acctest.RandomName("mum")
 
@@ -187,7 +187,7 @@ func TestAccMaliciousUserMitigationResource_updateDescription(t *testing.T) {
 
 // TestAccMaliciousUserMitigationResource_updateAnnotations tests updating annotations
 func TestAccMaliciousUserMitigationResource_updateAnnotations(t *testing.T) {
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	nsName := acctest.RandomName("mal-user-ann")
 	mumName := acctest.RandomName("mum")
 
@@ -228,7 +228,7 @@ func TestAccMaliciousUserMitigationResource_updateAnnotations(t *testing.T) {
 
 // TestAccMaliciousUserMitigationResource_disappears tests resource deletion outside of Terraform
 func TestAccMaliciousUserMitigationResource_disappears(t *testing.T) {
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	nsName := acctest.RandomName("mal-user-disap")
 	mumName := acctest.RandomName("mum")
 
@@ -285,7 +285,7 @@ func TestAccMaliciousUserMitigationResource_emptyPlan(t *testing.T) {
 
 // TestAccMaliciousUserMitigationResource_planChecks tests plan-time validation
 func TestAccMaliciousUserMitigationResource_planChecks(t *testing.T) {
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	nsName := acctest.RandomName("mal-user-plnchk")
 	mumName := acctest.RandomName("mum")
 
@@ -314,7 +314,7 @@ func TestAccMaliciousUserMitigationResource_planChecks(t *testing.T) {
 
 // TestAccMaliciousUserMitigationResource_knownValues tests that computed values are known after apply
 func TestAccMaliciousUserMitigationResource_knownValues(t *testing.T) {
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	nsName := acctest.RandomName("mal-user-known")
 	mumName := acctest.RandomName("mum")
 
@@ -379,7 +379,7 @@ func TestAccMaliciousUserMitigationResource_invalidName(t *testing.T) {
 // TestAccMaliciousUserMitigationResource_nameTooLong tests validation for name exceeding max length
 func TestAccMaliciousUserMitigationResource_nameTooLong(t *testing.T) {
 	nsName := acctest.RandomName("mal-user-long")
-	mumName := acctest.RandomName("this-name-is-way-too-long-and-exceeds-maximum-length-allowed-for-names-in-f5xc")
+	mumName := acctest.RandomName("this-name-is-way-too-long-and-exceeds-maximum-length-allowed-for-names-in-xcsh")
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -423,7 +423,7 @@ func TestAccMaliciousUserMitigationResource_emptyName(t *testing.T) {
 
 // TestAccMaliciousUserMitigationResource_requiresReplace tests that name/namespace changes require replace
 func TestAccMaliciousUserMitigationResource_requiresReplace(t *testing.T) {
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	nsName := acctest.RandomName("mal-user-rep")
 	mumName1 := acctest.RandomName("mum1")
 	mumName2 := acctest.RandomName("mum2")
@@ -461,7 +461,7 @@ func TestAccMaliciousUserMitigationResource_requiresReplace(t *testing.T) {
 // TestAccMaliciousUserMitigationResource_mitigationRules tests malicious user mitigation with rules
 func TestAccMaliciousUserMitigationResource_mitigationRules(t *testing.T) {
 	// t.Skip("Skipping: mitigation_type.rules attributes have state drift - ImportStateVerify fails")
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	nsName := acctest.RandomName("mal-user-rules")
 	mumName := acctest.RandomName("mum")
 
@@ -499,38 +499,38 @@ func TestAccMaliciousUserMitigationResource_mitigationRules(t *testing.T) {
 
 func testAccMaliciousUserMitigationResourceConfig_basic(nsName, mumName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 }
 `, nsName, mumName)
 }
 
 func testAccMaliciousUserMitigationResourceConfig_allAttributes(nsName, mumName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = "Test malicious user mitigation with all attributes"
   disable     = false
 
@@ -553,19 +553,19 @@ func testAccMaliciousUserMitigationResourceConfig_withLabels(nsName, mumName str
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   labels = {
 %[3]s  }
@@ -575,19 +575,19 @@ resource "f5xc_malicious_user_mitigation" "test" {
 
 func testAccMaliciousUserMitigationResourceConfig_withDescription(nsName, mumName, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 }
 `, nsName, mumName, description)
@@ -600,19 +600,19 @@ func testAccMaliciousUserMitigationResourceConfig_withAnnotations(nsName, mumNam
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   annotations = {
 %[3]s  }
@@ -628,7 +628,7 @@ func TestAccMaliciousUserMitigationResource_captchaChallenge(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	rName := acctest.RandomName("tf-test-mum")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -656,7 +656,7 @@ func TestAccMaliciousUserMitigationResource_jsChallenge(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	rName := acctest.RandomName("tf-test-mum")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -684,7 +684,7 @@ func TestAccMaliciousUserMitigationResource_switchAction(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	rName := acctest.RandomName("tf-test-mum")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -713,7 +713,7 @@ func TestAccMaliciousUserMitigationResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_malicious_user_mitigation.test"
+	resourceName := "xcsh_malicious_user_mitigation.test"
 	rName := acctest.RandomName("tf-test-mum")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -755,7 +755,7 @@ func TestAccMaliciousUserMitigationResource_fullLifecycle(t *testing.T) {
 
 func testAccMaliciousUserMitigationConfig_blockSystem(mumName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -775,7 +775,7 @@ resource "f5xc_malicious_user_mitigation" "test" {
 
 func testAccMaliciousUserMitigationConfig_captchaSystem(mumName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -795,7 +795,7 @@ resource "f5xc_malicious_user_mitigation" "test" {
 
 func testAccMaliciousUserMitigationConfig_jsChallengeSystem(mumName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -815,19 +815,19 @@ resource "f5xc_malicious_user_mitigation" "test" {
 
 func testAccMaliciousUserMitigationResourceConfig_withMitigationType(nsName, mumName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_malicious_user_mitigation" "test" {
+resource "xcsh_malicious_user_mitigation" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = "Malicious user mitigation with mitigation type configuration"
 
   mitigation_type {

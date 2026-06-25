@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// GCPVPCSite represents a F5XC GCPVPCSite
+// GCPVPCSite represents a XCSH GCPVPCSite
 type GCPVPCSite struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

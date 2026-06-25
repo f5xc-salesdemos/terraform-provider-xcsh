@@ -16,8 +16,8 @@ func TestAccVirtualNetworkDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_virtual_network.test"
-	dataSourceName := "data.f5xc_virtual_network.test"
+	resourceName := "xcsh_virtual_network.test"
+	dataSourceName := "data.xcsh_virtual_network.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,16 +39,16 @@ func testAccVirtualNetworkDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_virtual_network" "test" {
+resource "xcsh_virtual_network" "test" {
   name      = %[1]q
   namespace = "system"
   global_network {}
 }
 
-data "f5xc_virtual_network" "test" {
-  depends_on = [f5xc_virtual_network.test]
-  name       = f5xc_virtual_network.test.name
-  namespace  = f5xc_virtual_network.test.namespace
+data "xcsh_virtual_network" "test" {
+  depends_on = [xcsh_virtual_network.test]
+  name       = xcsh_virtual_network.test.name
+  namespace  = xcsh_virtual_network.test.namespace
 }
 `, name))
 }

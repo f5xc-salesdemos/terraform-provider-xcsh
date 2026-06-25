@@ -645,7 +645,7 @@ func (r *DiscoveryResource) Schema(ctx context.Context, req resource.SchemaReque
 												Attributes:          map[string]schema.Attribute{},
 												Blocks: map[string]schema.Block{
 													"blindfold_secret_info": schema.SingleNestedBlock{
-														MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+														MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 														Attributes: map[string]schema.Attribute{
 															"decryption_provider": schema.StringAttribute{
 																MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -703,7 +703,7 @@ func (r *DiscoveryResource) Schema(ctx context.Context, req resource.SchemaReque
 										Attributes:          map[string]schema.Attribute{},
 										Blocks: map[string]schema.Block{
 											"blindfold_secret_info": schema.SingleNestedBlock{
-												MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+												MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 												Attributes: map[string]schema.Attribute{
 													"decryption_provider": schema.StringAttribute{
 														MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -809,7 +809,7 @@ func (r *DiscoveryResource) Schema(ctx context.Context, req resource.SchemaReque
 												Attributes:          map[string]schema.Attribute{},
 												Blocks: map[string]schema.Block{
 													"blindfold_secret_info": schema.SingleNestedBlock{
-														MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+														MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 														Attributes: map[string]schema.Attribute{
 															"decryption_provider": schema.StringAttribute{
 																MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -858,7 +858,7 @@ func (r *DiscoveryResource) Schema(ctx context.Context, req resource.SchemaReque
 								Attributes:          map[string]schema.Attribute{},
 								Blocks: map[string]schema.Block{
 									"blindfold_secret_info": schema.SingleNestedBlock{
-										MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+										MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 										Attributes: map[string]schema.Attribute{
 											"decryption_provider": schema.StringAttribute{
 												MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -912,7 +912,7 @@ func (r *DiscoveryResource) Schema(ctx context.Context, req resource.SchemaReque
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"namespace": schema.StringAttribute{
-											MarkdownDescription: "F5XC Application Namespaces. Select a namespace.",
+											MarkdownDescription: "XCSH Application Namespaces. Select a namespace.",
 											Optional:            true,
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
@@ -953,7 +953,7 @@ func (r *DiscoveryResource) Schema(ctx context.Context, req resource.SchemaReque
 										},
 									},
 									"subdomain": schema.StringAttribute{
-										MarkdownDescription: "The DNS subdomain for which F5XC will respond to DNS queries.",
+										MarkdownDescription: "The DNS subdomain for which XCSH will respond to DNS queries.",
 										Optional:            true,
 										Validators: []validator.String{
 											stringvalidator.LengthAtMost(256),

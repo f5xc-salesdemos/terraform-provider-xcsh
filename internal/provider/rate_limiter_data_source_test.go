@@ -16,8 +16,8 @@ func TestAccRateLimiterDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_rate_limiter.test"
-	dataSourceName := "data.f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
+	dataSourceName := "data.xcsh_rate_limiter.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,15 +39,15 @@ func testAccRateLimiterDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name      = %[1]q
   namespace = "system"
 }
 
-data "f5xc_rate_limiter" "test" {
-  depends_on = [f5xc_rate_limiter.test]
-  name       = f5xc_rate_limiter.test.name
-  namespace  = f5xc_rate_limiter.test.namespace
+data "xcsh_rate_limiter" "test" {
+  depends_on = [xcsh_rate_limiter.test]
+  name       = xcsh_rate_limiter.test.name
+  namespace  = xcsh_rate_limiter.test.namespace
 }
 `, name))
 }

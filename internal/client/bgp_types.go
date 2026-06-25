@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// BGP represents a F5XC BGP
+// BGP represents a XCSH BGP
 type BGP struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// NginxServiceDiscovery represents a F5XC NginxServiceDiscovery
+// NginxServiceDiscovery represents a XCSH NginxServiceDiscovery
 type NginxServiceDiscovery struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

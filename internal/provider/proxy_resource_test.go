@@ -18,7 +18,7 @@ func TestAccProxyResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-proxy")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_proxy.test"
+	resourceName := "xcsh_proxy.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -26,7 +26,7 @@ func TestAccProxyResource_basic(t *testing.T) {
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_proxy"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_proxy"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccProxyConfig_basic(nsName, rName),
@@ -64,19 +64,19 @@ func testAccProxyConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_proxy" "test" {
+resource "xcsh_proxy" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   http_proxy {}
   do_not_advertise {}

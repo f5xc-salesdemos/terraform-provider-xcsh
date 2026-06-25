@@ -1622,7 +1622,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				},
 			},
 			"volterra_software_version": schema.StringAttribute{
-				MarkdownDescription: "F5XC software version is human readable string matching released set of version components. The given software version is applied to all sites that are member of the fleet. Current software installed can be overridden via site config.",
+				MarkdownDescription: "XCSH software version is human readable string matching released set of version components. The given software version is applied to all sites that are member of the fleet. Current software installed can be overridden via site config.",
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.LengthAtMost(256),
@@ -2556,7 +2556,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 											Attributes:          map[string]schema.Attribute{},
 											Blocks: map[string]schema.Block{
 												"blindfold_secret_info": schema.SingleNestedBlock{
-													MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+													MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 													Attributes: map[string]schema.Attribute{
 														"decryption_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -2598,7 +2598,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 											Attributes:          map[string]schema.Attribute{},
 											Blocks: map[string]schema.Block{
 												"blindfold_secret_info": schema.SingleNestedBlock{
-													MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+													MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 													Attributes: map[string]schema.Attribute{
 														"decryption_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -2755,7 +2755,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
 														"blindfold_secret_info": schema.SingleNestedBlock{
-															MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+															MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 															Attributes: map[string]schema.Attribute{
 																"decryption_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -2800,7 +2800,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
 														"blindfold_secret_info": schema.SingleNestedBlock{
-															MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+															MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 															Attributes: map[string]schema.Attribute{
 																"decryption_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -3079,7 +3079,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
 														"blindfold_secret_info": schema.SingleNestedBlock{
-															MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+															MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 															Attributes: map[string]schema.Attribute{
 																"decryption_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -3127,7 +3127,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
 														"blindfold_secret_info": schema.SingleNestedBlock{
-															MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+															MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 															Attributes: map[string]schema.Attribute{
 																"decryption_provider": schema.StringAttribute{
 																	MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -3268,7 +3268,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 															Attributes:          map[string]schema.Attribute{},
 															Blocks: map[string]schema.Block{
 																"blindfold_secret_info": schema.SingleNestedBlock{
-																	MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+																	MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 																	Attributes: map[string]schema.Attribute{
 																		"decryption_provider": schema.StringAttribute{
 																			MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -3310,7 +3310,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 															Attributes:          map[string]schema.Attribute{},
 															Blocks: map[string]schema.Block{
 																"blindfold_secret_info": schema.SingleNestedBlock{
-																	MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+																	MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 																	Attributes: map[string]schema.Attribute{
 																		"decryption_provider": schema.StringAttribute{
 																			MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -3502,7 +3502,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																		Attributes:          map[string]schema.Attribute{},
 																		Blocks: map[string]schema.Block{
 																			"blindfold_secret_info": schema.SingleNestedBlock{
-																				MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+																				MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 																				Attributes: map[string]schema.Attribute{
 																					"decryption_provider": schema.StringAttribute{
 																						MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -3602,7 +3602,7 @@ func (r *FleetResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 																		Attributes:          map[string]schema.Attribute{},
 																		Blocks: map[string]schema.Block{
 																			"blindfold_secret_info": schema.SingleNestedBlock{
-																				MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+																				MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 																				Attributes: map[string]schema.Attribute{
 																					"decryption_provider": schema.StringAttribute{
 																						MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",

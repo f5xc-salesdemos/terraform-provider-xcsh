@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// NetworkConnector represents a F5XC NetworkConnector
+// NetworkConnector represents a XCSH NetworkConnector
 type NetworkConnector struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

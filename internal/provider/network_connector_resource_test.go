@@ -20,7 +20,7 @@ import (
 
 // TestAccNetworkConnectorResource_basic tests the basic creation and deletion of a network_connector resource
 func TestAccNetworkConnectorResource_basic(t *testing.T) {
-	resourceName := "f5xc_network_connector.test"
+	resourceName := "xcsh_network_connector.test"
 	rName := acctest.RandomName("tf-acc-test-netconn")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -50,7 +50,7 @@ func TestAccNetworkConnectorResource_basic(t *testing.T) {
 
 // TestAccNetworkConnectorResource_allAttributes tests network_connector with all common attributes
 func TestAccNetworkConnectorResource_allAttributes(t *testing.T) {
-	resourceName := "f5xc_network_connector.test"
+	resourceName := "xcsh_network_connector.test"
 	rName := acctest.RandomName("tf-acc-test-netconn")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -75,7 +75,7 @@ func TestAccNetworkConnectorResource_allAttributes(t *testing.T) {
 
 // TestAccNetworkConnectorResource_updateLabels tests updating labels on an existing resource
 func TestAccNetworkConnectorResource_updateLabels(t *testing.T) {
-	resourceName := "f5xc_network_connector.test"
+	resourceName := "xcsh_network_connector.test"
 	rName := acctest.RandomName("tf-acc-test-netconn")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -103,7 +103,7 @@ func TestAccNetworkConnectorResource_updateLabels(t *testing.T) {
 
 // TestAccNetworkConnectorResource_updateDescription tests updating description
 func TestAccNetworkConnectorResource_updateDescription(t *testing.T) {
-	resourceName := "f5xc_network_connector.test"
+	resourceName := "xcsh_network_connector.test"
 	rName := acctest.RandomName("tf-acc-test-netconn")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -130,7 +130,7 @@ func TestAccNetworkConnectorResource_updateDescription(t *testing.T) {
 
 // TestAccNetworkConnectorResource_updateAnnotations tests updating annotations
 func TestAccNetworkConnectorResource_updateAnnotations(t *testing.T) {
-	resourceName := "f5xc_network_connector.test"
+	resourceName := "xcsh_network_connector.test"
 	rName := acctest.RandomName("tf-acc-test-netconn")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -158,7 +158,7 @@ func TestAccNetworkConnectorResource_updateAnnotations(t *testing.T) {
 
 // TestAccNetworkConnectorResource_disappears tests behavior when resource is deleted outside Terraform
 func TestAccNetworkConnectorResource_disappears(t *testing.T) {
-	resourceName := "f5xc_network_connector.test"
+	resourceName := "xcsh_network_connector.test"
 	rName := acctest.RandomName("tf-acc-test-netconn")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -180,7 +180,7 @@ func TestAccNetworkConnectorResource_disappears(t *testing.T) {
 
 // TestAccNetworkConnectorResource_emptyPlan tests that no changes occur when configuration hasn't changed
 func TestAccNetworkConnectorResource_emptyPlan(t *testing.T) {
-	resourceName := "f5xc_network_connector.test"
+	resourceName := "xcsh_network_connector.test"
 	rName := acctest.RandomName("tf-acc-test-netconn")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -216,7 +216,7 @@ func TestAccNetworkConnectorResource_planChecks(t *testing.T) {
 				Config: testAccNetworkConnectorConfig_basic(rName),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_network_connector.test", plancheck.ResourceActionCreate),
+						plancheck.ExpectResourceAction("xcsh_network_connector.test", plancheck.ResourceActionCreate),
 					},
 				},
 			},
@@ -224,7 +224,7 @@ func TestAccNetworkConnectorResource_planChecks(t *testing.T) {
 				Config: testAccNetworkConnectorConfig_withLabels(rName, "newlabel"),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_network_connector.test", plancheck.ResourceActionUpdate),
+						plancheck.ExpectResourceAction("xcsh_network_connector.test", plancheck.ResourceActionUpdate),
 					},
 				},
 			},
@@ -245,19 +245,19 @@ func TestAccNetworkConnectorResource_knownValues(t *testing.T) {
 				Config: testAccNetworkConnectorConfig_basic(rName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"f5xc_network_connector.test",
+						"xcsh_network_connector.test",
 						tfjsonpath.New("name"),
 						knownvalue.StringExact(rName),
 					),
 					statecheck.ExpectKnownValue(
-						"f5xc_network_connector.test",
+						"xcsh_network_connector.test",
 						tfjsonpath.New("namespace"),
 						knownvalue.StringExact("system"),
 					),
 					statecheck.CompareValuePairs(
-						"f5xc_network_connector.test",
+						"xcsh_network_connector.test",
 						tfjsonpath.New("name"),
-						"f5xc_network_connector.test",
+						"xcsh_network_connector.test",
 						tfjsonpath.New("id"),
 						compare.ValuesSame(),
 					),
@@ -286,7 +286,7 @@ func TestAccNetworkConnectorResource_invalidName(t *testing.T) {
 
 // TestAccNetworkConnectorResource_nameTooLong tests validation of names exceeding maximum length
 func TestAccNetworkConnectorResource_nameTooLong(t *testing.T) {
-	rName := "this-name-is-way-too-long-and-exceeds-the-maximum-allowed-length-for-f5xc-resources-which-should-trigger-validation-error"
+	rName := "this-name-is-way-too-long-and-exceeds-the-maximum-allowed-length-for-xcsh-resources-which-should-trigger-validation-error"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -329,20 +329,20 @@ func TestAccNetworkConnectorResource_requiresReplace(t *testing.T) {
 			{
 				Config: testAccNetworkConnectorConfig_basic(rName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					acctest.CheckNetworkConnectorExists("f5xc_network_connector.test"),
-					resource.TestCheckResourceAttr("f5xc_network_connector.test", "name", rName),
+					acctest.CheckNetworkConnectorExists("xcsh_network_connector.test"),
+					resource.TestCheckResourceAttr("xcsh_network_connector.test", "name", rName),
 				),
 			},
 			{
 				Config: testAccNetworkConnectorConfig_basic(rNameUpdated),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_network_connector.test", plancheck.ResourceActionDestroyBeforeCreate),
+						plancheck.ExpectResourceAction("xcsh_network_connector.test", plancheck.ResourceActionDestroyBeforeCreate),
 					},
 				},
 				Check: resource.ComposeAggregateTestCheckFunc(
-					acctest.CheckNetworkConnectorExists("f5xc_network_connector.test"),
-					resource.TestCheckResourceAttr("f5xc_network_connector.test", "name", rNameUpdated),
+					acctest.CheckNetworkConnectorExists("xcsh_network_connector.test"),
+					resource.TestCheckResourceAttr("xcsh_network_connector.test", "name", rNameUpdated),
 				),
 			},
 		},
@@ -351,7 +351,7 @@ func TestAccNetworkConnectorResource_requiresReplace(t *testing.T) {
 
 // TestAccNetworkConnectorResource_withDescription tests network_connector with description
 func TestAccNetworkConnectorResource_withDescription(t *testing.T) {
-	resourceName := "f5xc_network_connector.test"
+	resourceName := "xcsh_network_connector.test"
 	rName := acctest.RandomName("tf-acc-test-netconn")
 	description := "Test network connector for acceptance tests"
 
@@ -390,7 +390,7 @@ func testAccNetworkConnectorImportStateIdFunc(resourceName string) resource.Impo
 
 func testAccNetworkConnectorConfig_basic(rName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_network_connector" "test" {
+resource "xcsh_network_connector" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -405,7 +405,7 @@ resource "f5xc_network_connector" "test" {
 
 func testAccNetworkConnectorConfig_allAttributes(rName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_network_connector" "test" {
+resource "xcsh_network_connector" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test network connector created by acceptance tests"
@@ -431,7 +431,7 @@ resource "f5xc_network_connector" "test" {
 
 func testAccNetworkConnectorConfig_withLabels(rName, labelValue string) string {
 	return fmt.Sprintf(`
-resource "f5xc_network_connector" "test" {
+resource "xcsh_network_connector" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -450,7 +450,7 @@ resource "f5xc_network_connector" "test" {
 
 func testAccNetworkConnectorConfig_withAnnotations(rName, annotationValue string) string {
 	return fmt.Sprintf(`
-resource "f5xc_network_connector" "test" {
+resource "xcsh_network_connector" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -469,7 +469,7 @@ resource "f5xc_network_connector" "test" {
 
 func testAccNetworkConnectorConfig_withDescription(rName, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_network_connector" "test" {
+resource "xcsh_network_connector" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q

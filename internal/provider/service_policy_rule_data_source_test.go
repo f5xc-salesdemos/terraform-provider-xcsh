@@ -14,11 +14,11 @@ import (
 // =============================================================================
 // SERVICE POLICY RULE DATA SOURCE ACCEPTANCE TESTS
 //
-// These tests verify the f5xc_service_policy_rule data source implementation.
+// These tests verify the xcsh_service_policy_rule data source implementation.
 // Service Policy Rule requires system namespace and waf_action block.
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccServicePolicyRuleDataSource -timeout 30m
 // =============================================================================
 
@@ -27,8 +27,8 @@ func TestAccServicePolicyRuleDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_service_policy_rule.test"
-	dataSourceName := "data.f5xc_service_policy_rule.test"
+	resourceName := "xcsh_service_policy_rule.test"
+	dataSourceName := "data.xcsh_service_policy_rule.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -53,7 +53,7 @@ func testAccServicePolicyRuleDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_service_policy_rule" "test" {
+resource "xcsh_service_policy_rule" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -62,10 +62,10 @@ resource "f5xc_service_policy_rule" "test" {
   }
 }
 
-data "f5xc_service_policy_rule" "test" {
-  depends_on = [f5xc_service_policy_rule.test]
-  name       = f5xc_service_policy_rule.test.name
-  namespace  = f5xc_service_policy_rule.test.namespace
+data "xcsh_service_policy_rule" "test" {
+  depends_on = [xcsh_service_policy_rule.test]
+  name       = xcsh_service_policy_rule.test.name
+  namespace  = xcsh_service_policy_rule.test.namespace
 }
 `, name))
 }

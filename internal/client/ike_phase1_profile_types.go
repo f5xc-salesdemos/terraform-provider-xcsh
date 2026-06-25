@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// IKEPhase1Profile represents a F5XC IKEPhase1Profile
+// IKEPhase1Profile represents a XCSH IKEPhase1Profile
 type IKEPhase1Profile struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

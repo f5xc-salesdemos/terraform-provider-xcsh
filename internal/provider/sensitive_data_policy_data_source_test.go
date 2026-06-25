@@ -17,8 +17,8 @@ func TestAccSensitiveDataPolicyDataSource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_sensitive_data_policy.test"
-	dataSourceName := "data.f5xc_sensitive_data_policy.test"
+	resourceName := "xcsh_sensitive_data_policy.test"
+	dataSourceName := "data.xcsh_sensitive_data_policy.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -43,25 +43,25 @@ func testAccSensitiveDataPolicyDataSourceConfig_basic(nsName, name string) strin
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_sensitive_data_policy" "test" {
+resource "xcsh_sensitive_data_policy" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 }
 
-data "f5xc_sensitive_data_policy" "test" {
-  depends_on = [f5xc_sensitive_data_policy.test]
-  name       = f5xc_sensitive_data_policy.test.name
-  namespace  = f5xc_sensitive_data_policy.test.namespace
+data "xcsh_sensitive_data_policy" "test" {
+  depends_on = [xcsh_sensitive_data_policy.test]
+  name       = xcsh_sensitive_data_policy.test.name
+  namespace  = xcsh_sensitive_data_policy.test.namespace
 }
 `, nsName, name))
 }

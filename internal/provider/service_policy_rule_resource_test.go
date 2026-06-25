@@ -22,7 +22,7 @@ import (
 // 1. Basic Lifecycle Test - Create, Read, Import with custom namespace
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccServicePolicyRuleResource -timeout 30m
 // =============================================================================
 
@@ -36,7 +36,7 @@ func TestAccServicePolicyRuleResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy_rule.test"
+	resourceName := "xcsh_service_policy_rule.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-rule")
 
@@ -81,7 +81,7 @@ func TestAccServicePolicyRuleResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy_rule.test"
+	resourceName := "xcsh_service_policy_rule.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-rule")
 	description := "Comprehensive acceptance test service policy rule"
@@ -129,7 +129,7 @@ func TestAccServicePolicyRuleResource_updateAction(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy_rule.test"
+	resourceName := "xcsh_service_policy_rule.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-rule")
 
@@ -178,7 +178,7 @@ func TestAccServicePolicyRuleResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy_rule.test"
+	resourceName := "xcsh_service_policy_rule.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-rule")
 
@@ -234,7 +234,7 @@ func TestAccServicePolicyRuleResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy_rule.test"
+	resourceName := "xcsh_service_policy_rule.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-rule")
 
@@ -286,7 +286,7 @@ func TestAccServicePolicyRuleResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy_rule.test"
+	resourceName := "xcsh_service_policy_rule.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name1 := acctest.RandomName("tf-acc-test-rule")
 	name2 := acctest.RandomName("tf-acc-test-rule")
@@ -342,7 +342,7 @@ func testAccServicePolicyRuleResourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_service_policy_rule" "test" {
+resource "xcsh_service_policy_rule" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -359,7 +359,7 @@ func testAccServicePolicyRuleResourceConfig_allAttributes(nsName, name, descript
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_service_policy_rule" "test" {
+resource "xcsh_service_policy_rule" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -387,7 +387,7 @@ func testAccServicePolicyRuleResourceConfig_withAction(nsName, name, action stri
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_service_policy_rule" "test" {
+resource "xcsh_service_policy_rule" "test" {
   name      = %[1]q
   namespace = "system"
   action    = %[2]q
@@ -405,7 +405,7 @@ func testAccServicePolicyRuleResourceConfig_withDescription(nsName, name, descri
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_service_policy_rule" "test" {
+resource "xcsh_service_policy_rule" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -423,7 +423,7 @@ func testAccServicePolicyRuleResourceConfig_withLabels(nsName, name, environment
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_service_policy_rule" "test" {
+resource "xcsh_service_policy_rule" "test" {
   name      = %[1]q
   namespace = "system"
 

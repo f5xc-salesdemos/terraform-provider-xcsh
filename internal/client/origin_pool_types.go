@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// OriginPool represents a F5XC OriginPool
+// OriginPool represents a XCSH OriginPool
 type OriginPool struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

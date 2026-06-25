@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// WAFExclusionPolicy represents a F5XC WAFExclusionPolicy
+// WAFExclusionPolicy represents a XCSH WAFExclusionPolicy
 type WAFExclusionPolicy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// NfvService represents a F5XC NfvService
+// NfvService represents a XCSH NfvService
 type NfvService struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

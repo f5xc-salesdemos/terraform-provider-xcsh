@@ -42,7 +42,7 @@ func TestAccAlertPolicyResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_alert_policy.test"
+	resourceName := "xcsh_alert_policy.test"
 	apName := acctest.RandomName("ap")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -75,7 +75,7 @@ func TestAccAlertPolicyResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_alert_policy.test"
+	resourceName := "xcsh_alert_policy.test"
 	apName := acctest.RandomName("ap")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -113,7 +113,7 @@ func TestAccAlertPolicyResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_alert_policy.test"
+	resourceName := "xcsh_alert_policy.test"
 	apName := acctest.RandomName("ap")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -150,7 +150,7 @@ func TestAccAlertPolicyResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_alert_policy.test"
+	resourceName := "xcsh_alert_policy.test"
 	apName := acctest.RandomName("ap")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -181,7 +181,7 @@ func TestAccAlertPolicyResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_alert_policy.test"
+	resourceName := "xcsh_alert_policy.test"
 	apName := acctest.RandomName("ap")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -218,7 +218,7 @@ func TestAccAlertPolicyResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_alert_policy.test"
+	resourceName := "xcsh_alert_policy.test"
 	apName := acctest.RandomName("ap")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -267,7 +267,7 @@ func TestAccAlertPolicyResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_alert_policy.test"
+	resourceName := "xcsh_alert_policy.test"
 	apName := acctest.RandomName("ap")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -292,7 +292,7 @@ func TestAccAlertPolicyResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_alert_policy.test"
+	resourceName := "xcsh_alert_policy.test"
 	apName := acctest.RandomName("ap")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -348,7 +348,7 @@ func TestAccAlertPolicyResource_nameTooLong(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	apName := acctest.RandomName("this-name-is-way-too-long-and-exceeds-maximum-length-allowed-for-names-in-f5xc")
+	apName := acctest.RandomName("this-name-is-way-too-long-and-exceeds-maximum-length-allowed-for-names-in-xcsh")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -384,7 +384,7 @@ func TestAccAlertPolicyResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_alert_policy.test"
+	resourceName := "xcsh_alert_policy.test"
 	apName1 := acctest.RandomName("ap1")
 	apName2 := acctest.RandomName("ap2")
 
@@ -417,7 +417,7 @@ func TestAccAlertPolicyResource_alertSettings(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_alert_policy.test"
+	resourceName := "xcsh_alert_policy.test"
 	apName := acctest.RandomName("ap")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -451,7 +451,7 @@ func TestAccAlertPolicyResource_alertSettings(t *testing.T) {
 
 func testAccAlertPolicyConfig_basicSystem(apName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_alert_policy" "test" {
+resource "xcsh_alert_policy" "test" {
   name       = %[1]q
   namespace  = "system"
 }
@@ -460,7 +460,7 @@ resource "f5xc_alert_policy" "test" {
 
 func testAccAlertPolicyConfig_allAttributesSystem(apName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_alert_policy" "test" {
+resource "xcsh_alert_policy" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test alert policy with all attributes"
@@ -485,7 +485,7 @@ func testAccAlertPolicyConfig_withLabelsSystem(apName string, labels map[string]
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_alert_policy" "test" {
+resource "xcsh_alert_policy" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -497,7 +497,7 @@ resource "f5xc_alert_policy" "test" {
 
 func testAccAlertPolicyConfig_withDescriptionSystem(apName, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_alert_policy" "test" {
+resource "xcsh_alert_policy" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -512,7 +512,7 @@ func testAccAlertPolicyConfig_withAnnotationsSystem(apName string, annotations m
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_alert_policy" "test" {
+resource "xcsh_alert_policy" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -524,7 +524,7 @@ resource "f5xc_alert_policy" "test" {
 
 func testAccAlertPolicyConfig_withSettingsSystem(apName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_alert_policy" "test" {
+resource "xcsh_alert_policy" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Alert policy with specific settings"

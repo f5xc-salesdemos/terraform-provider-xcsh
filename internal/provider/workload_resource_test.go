@@ -29,7 +29,7 @@ import (
 // before creating the workload.
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccWorkloadResource -timeout 30m
 // =============================================================================
 
@@ -46,7 +46,7 @@ func TestAccWorkloadResource_basic(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	workloadName := acctest.RandomName("tf-acc-test-workload")
-	resourceName := "f5xc_workload.test"
+	resourceName := "xcsh_workload.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -92,7 +92,7 @@ func TestAccWorkloadResource_allAttributes(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	workloadName := acctest.RandomName("tf-acc-test-workload")
-	resourceName := "f5xc_workload.test"
+	resourceName := "xcsh_workload.test"
 	description := "Comprehensive acceptance test workload"
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -141,7 +141,7 @@ func TestAccWorkloadResource_updateLabels(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	workloadName := acctest.RandomName("tf-acc-test-workload")
-	resourceName := "f5xc_workload.test"
+	resourceName := "xcsh_workload.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -194,7 +194,7 @@ func TestAccWorkloadResource_updateDescription(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	workloadName := acctest.RandomName("tf-acc-test-workload")
-	resourceName := "f5xc_workload.test"
+	resourceName := "xcsh_workload.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -251,7 +251,7 @@ func TestAccWorkloadResource_updateAnnotations(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	workloadName := acctest.RandomName("tf-acc-test-workload")
-	resourceName := "f5xc_workload.test"
+	resourceName := "xcsh_workload.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -313,19 +313,19 @@ func testAccWorkloadResourceConfig_basic(nsName, workloadName string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload" "test" {
+resource "xcsh_workload" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   simple_service {}
 }
@@ -336,19 +336,19 @@ func testAccWorkloadResourceConfig_allAttributes(nsName, workloadName, descripti
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload" "test" {
+resource "xcsh_workload" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 
   labels = {
@@ -370,19 +370,19 @@ func testAccWorkloadResourceConfig_withLabels(nsName, workloadName, environment,
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload" "test" {
+resource "xcsh_workload" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   labels = {
     environment = %[3]q
@@ -398,19 +398,19 @@ func testAccWorkloadResourceConfig_withDescription(nsName, workloadName, descrip
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload" "test" {
+resource "xcsh_workload" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 
   simple_service {}
@@ -422,19 +422,19 @@ func testAccWorkloadResourceConfig_withAnnotations(nsName, workloadName, value1,
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload" "test" {
+resource "xcsh_workload" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   annotations = {
     key1 = %[3]q

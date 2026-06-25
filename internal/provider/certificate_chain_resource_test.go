@@ -18,7 +18,7 @@ func TestAccCertificateChainResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-certchain")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_certificate_chain.test"
+	resourceName := "xcsh_certificate_chain.test"
 
 	// Generate test certificates dynamically for CI/CD compatibility
 	certs := acctest.MustGenerateTestCertificates()
@@ -29,7 +29,7 @@ func TestAccCertificateChainResource_basic(t *testing.T) {
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_certificate_chain"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_certificate_chain"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCertificateChainConfig_basic(nsName, rName, certs),
@@ -63,7 +63,7 @@ func TestAccCertificateChainResource_emptyPlan(t *testing.T) {
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		ExternalProviders:        map[string]resource.ExternalProvider{"time": {Source: "hashicorp/time"}},
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_certificate_chain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_certificate_chain"),
 		Steps: []resource.TestStep{
 			{Config: testAccCertificateChainConfig_basic(nsName, rName, certs)},
 			{Config: testAccCertificateChainConfig_basic(nsName, rName, certs), PlanOnly: true, ExpectNonEmptyPlan: false},
@@ -90,19 +90,19 @@ func testAccCertificateChainConfig_basic(nsName, name string, certs *acctest.Tes
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_certificate_chain" "test" {
+resource "xcsh_certificate_chain" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   certificate_url = "string:///%[3]s"
 }

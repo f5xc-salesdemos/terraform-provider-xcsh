@@ -16,8 +16,8 @@ func TestAccNamespaceDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_namespace.test"
-	dataSourceName := "data.f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
+	dataSourceName := "data.xcsh_namespace.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -38,12 +38,12 @@ func testAccNamespaceDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
-data "f5xc_namespace" "test" {
-  name      = f5xc_namespace.test.name
+data "xcsh_namespace" "test" {
+  name      = xcsh_namespace.test.name
   namespace = "system"
 }
 `, name))

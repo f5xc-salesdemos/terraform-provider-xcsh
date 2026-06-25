@@ -17,12 +17,12 @@ func TestAccNetworkFirewallResource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-fw")
-	resourceName := "f5xc_network_firewall.test"
+	resourceName := "xcsh_network_firewall.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_network_firewall"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_network_firewall"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccNetworkFirewallConfig_basic(rName),
@@ -60,7 +60,7 @@ func testAccNetworkFirewallConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_network_firewall" "test" {
+resource "xcsh_network_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 

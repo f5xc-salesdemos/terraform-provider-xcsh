@@ -16,8 +16,8 @@ func TestAccBgpRoutingPolicyDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-bgprp")
-	resourceName := "f5xc_bgp_routing_policy.test"
-	dataSourceName := "data.f5xc_bgp_routing_policy.test"
+	resourceName := "xcsh_bgp_routing_policy.test"
+	dataSourceName := "data.xcsh_bgp_routing_policy.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -40,7 +40,7 @@ func testAccBgpRoutingPolicyDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_bgp_routing_policy" "test" {
+resource "xcsh_bgp_routing_policy" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -54,10 +54,10 @@ resource "f5xc_bgp_routing_policy" "test" {
   }
 }
 
-data "f5xc_bgp_routing_policy" "test" {
-  depends_on = [f5xc_bgp_routing_policy.test]
-  name       = f5xc_bgp_routing_policy.test.name
-  namespace  = f5xc_bgp_routing_policy.test.namespace
+data "xcsh_bgp_routing_policy" "test" {
+  depends_on = [xcsh_bgp_routing_policy.test]
+  name       = xcsh_bgp_routing_policy.test.name
+  namespace  = xcsh_bgp_routing_policy.test.namespace
 }
 `, name))
 }

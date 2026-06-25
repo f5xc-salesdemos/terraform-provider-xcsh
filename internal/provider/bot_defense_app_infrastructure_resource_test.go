@@ -19,7 +19,7 @@ func TestAccBotDefenseAppInfrastructureResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-bdai")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_bot_defense_app_infrastructure.test"
+	resourceName := "xcsh_bot_defense_app_infrastructure.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -27,7 +27,7 @@ func TestAccBotDefenseAppInfrastructureResource_basic(t *testing.T) {
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_bot_defense_app_infrastructure"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_bot_defense_app_infrastructure"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccBotDefenseAppInfrastructureConfig_basic(nsName, rName),
@@ -62,7 +62,7 @@ func TestAccBotDefenseAppInfrastructureResource_emptyPlan(t *testing.T) {
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		ExternalProviders:        acctest.ExternalProviders,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_bot_defense_app_infrastructure"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_bot_defense_app_infrastructure"),
 		Steps: []resource.TestStep{
 			{Config: testAccBotDefenseAppInfrastructureConfig_basic(nsName, rName)},
 			{Config: testAccBotDefenseAppInfrastructureConfig_basic(nsName, rName), PlanOnly: true, ExpectNonEmptyPlan: false},
@@ -86,19 +86,19 @@ func testAccBotDefenseAppInfrastructureConfig_basic(nsName, name string) string 
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_bot_defense_app_infrastructure" "test" {
+resource "xcsh_bot_defense_app_infrastructure" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  namespace = xcsh_namespace.test.name
 
   environment_type = "PRODUCTION"
   traffic_type     = "WEB"

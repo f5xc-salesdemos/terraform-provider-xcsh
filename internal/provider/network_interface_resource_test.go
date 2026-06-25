@@ -18,12 +18,12 @@ func TestAccNetworkInterfaceResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ni")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_network_interface.test"
+	resourceName := "xcsh_network_interface.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_network_interface"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_network_interface"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccNetworkInterfaceConfig_basic(nsName, rName),
@@ -63,7 +63,7 @@ func testAccNetworkInterfaceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_network_interface" "test" {
+resource "xcsh_network_interface" "test" {
   name      = %[1]q
   namespace = "system"
 

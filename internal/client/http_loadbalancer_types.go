@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// HTTPLoadBalancer represents a F5XC HTTPLoadBalancer
+// HTTPLoadBalancer represents a XCSH HTTPLoadBalancer
 type HTTPLoadBalancer struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

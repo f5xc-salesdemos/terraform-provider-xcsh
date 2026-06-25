@@ -17,7 +17,7 @@ func TestAccRouteResource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 	t.Skip("Skipping: route resource has state drift on waf_type.inherit_waf empty block (generator issue with nested empty blocks)")
 
-	resourceName := "f5xc_route.test"
+	resourceName := "xcsh_route.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-route")
 
@@ -61,7 +61,7 @@ func testAccRouteResourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_route" "test" {
+resource "xcsh_route" "test" {
   name      = %[1]q
   namespace = "system"
 

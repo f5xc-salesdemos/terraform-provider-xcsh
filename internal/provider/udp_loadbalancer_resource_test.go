@@ -25,7 +25,7 @@ import (
 //
 // Run with:
 //
-//	TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//	TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //	go test -v ./internal/provider/ -run TestAccUDPLoadBalancerResource -timeout 30m
 //
 // =============================================================================
@@ -39,12 +39,12 @@ func TestAccUDPLoadBalancerResource_basic(t *testing.T) {
 	t.Skip("Skipping: udp_loadbalancer requires special permissions for system namespace (FORBIDDEN 403)")
 
 	rName := acctest.RandomName("tf-acc-test-udp-lb")
-	resourceName := "f5xc_udp_loadbalancer.test"
+	resourceName := "xcsh_udp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccUDPLoadBalancerConfig_basicSystem(rName),
@@ -93,12 +93,12 @@ func TestAccUDPLoadBalancerResource_allAttributes(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-udp-lb")
-	resourceName := "f5xc_udp_loadbalancer.test"
+	resourceName := "xcsh_udp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccUDPLoadBalancerConfig_allAttributesSystem(rName),
@@ -135,12 +135,12 @@ func TestAccUDPLoadBalancerResource_updateLabels(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-udp-lb")
-	resourceName := "f5xc_udp_loadbalancer.test"
+	resourceName := "xcsh_udp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccUDPLoadBalancerConfig_withLabelsSystem(rName, "test", "terraform"),
@@ -170,12 +170,12 @@ func TestAccUDPLoadBalancerResource_updateDescription(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-udp-lb")
-	resourceName := "f5xc_udp_loadbalancer.test"
+	resourceName := "xcsh_udp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccUDPLoadBalancerConfig_withDescriptionSystem(rName, "Initial description"),
@@ -203,12 +203,12 @@ func TestAccUDPLoadBalancerResource_updateAnnotations(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-udp-lb")
-	resourceName := "f5xc_udp_loadbalancer.test"
+	resourceName := "xcsh_udp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccUDPLoadBalancerConfig_withAnnotationsSystem(rName, "value1"),
@@ -237,12 +237,12 @@ func TestAccUDPLoadBalancerResource_updateAnnotations(t *testing.T) {
 // 	acctest.PreCheck(t)
 //
 // 	rName := acctest.RandomName("tf-acc-test-udp-lb")
-// 	resourceName := "f5xc_udp_loadbalancer.test"
+// 	resourceName := "xcsh_udp_loadbalancer.test"
 //
 // 	resource.ParallelTest(t, resource.TestCase{
 // 		PreCheck:                 func() { acctest.PreCheck(t) },
 // 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-// 		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+// 		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 // 		Steps: []resource.TestStep{
 // 			{
 // 				Config: testAccUDPLoadBalancerConfig_basicSystem(rName),
@@ -264,12 +264,12 @@ func TestAccUDPLoadBalancerResource_emptyPlan(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-udp-lb")
-	resourceName := "f5xc_udp_loadbalancer.test"
+	resourceName := "xcsh_udp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccUDPLoadBalancerConfig_basicSystem(rName),
@@ -294,12 +294,12 @@ func TestAccUDPLoadBalancerResource_planChecks(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-udp-lb")
-	resourceName := "f5xc_udp_loadbalancer.test"
+	resourceName := "xcsh_udp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccUDPLoadBalancerConfig_basicSystem(rName),
@@ -330,12 +330,12 @@ func TestAccUDPLoadBalancerResource_knownValues(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-udp-lb")
-	resourceName := "f5xc_udp_loadbalancer.test"
+	resourceName := "xcsh_udp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccUDPLoadBalancerConfig_basicSystem(rName),
@@ -420,12 +420,12 @@ func TestAccUDPLoadBalancerResource_requiresReplace(t *testing.T) {
 
 	rName1 := acctest.RandomName("tf-acc-test-udp-lb")
 	rName2 := acctest.RandomName("tf-acc-test-udp-lb")
-	resourceName := "f5xc_udp_loadbalancer.test"
+	resourceName := "xcsh_udp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccUDPLoadBalancerConfig_basicSystem(rName1),
@@ -458,12 +458,12 @@ func TestAccUDPLoadBalancerResource_listenPort(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-udp-lb")
-	resourceName := "f5xc_udp_loadbalancer.test"
+	resourceName := "xcsh_udp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_udp_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_udp_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccUDPLoadBalancerConfig_withListenPortSystem(rName, 5353),
@@ -484,7 +484,7 @@ func TestAccUDPLoadBalancerResource_listenPort(t *testing.T) {
 func testAccUDPLoadBalancerConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
 # Origin pool is required for UDP load balancer - it needs a backend cluster
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "%[1]s-pool"
   namespace = "system"
   port      = 53
@@ -500,7 +500,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_udp_loadbalancer" "test" {
+resource "xcsh_udp_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -514,7 +514,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -527,7 +527,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
 func testAccUDPLoadBalancerConfig_allAttributesSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "%[1]s-pool"
   namespace = "system"
   port      = 53
@@ -543,7 +543,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_udp_loadbalancer" "test" {
+resource "xcsh_udp_loadbalancer" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Acceptance test udp loadbalancer with all attributes"
@@ -563,7 +563,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -576,7 +576,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
 func testAccUDPLoadBalancerConfig_withLabelsSystem(name, env, managedBy string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "%[1]s-pool"
   namespace = "system"
   port      = 53
@@ -592,7 +592,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_udp_loadbalancer" "test" {
+resource "xcsh_udp_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -606,7 +606,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -619,7 +619,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
 func testAccUDPLoadBalancerConfig_withDescriptionSystem(name, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "%[1]s-pool"
   namespace = "system"
   port      = 53
@@ -635,7 +635,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_udp_loadbalancer" "test" {
+resource "xcsh_udp_loadbalancer" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -650,7 +650,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -663,7 +663,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
 func testAccUDPLoadBalancerConfig_withAnnotationsSystem(name, value string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "%[1]s-pool"
   namespace = "system"
   port      = 53
@@ -679,7 +679,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_udp_loadbalancer" "test" {
+resource "xcsh_udp_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -697,7 +697,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -710,7 +710,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
 func testAccUDPLoadBalancerConfig_withListenPortSystem(name string, port int) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = "%[1]s-pool"
   namespace = "system"
   port      = 53
@@ -726,7 +726,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_udp_loadbalancer" "test" {
+resource "xcsh_udp_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -740,7 +740,7 @@ resource "f5xc_udp_loadbalancer" "test" {
 
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1

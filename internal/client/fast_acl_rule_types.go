@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// FastACLRule represents a F5XC FastACLRule
+// FastACLRule represents a XCSH FastACLRule
 type FastACLRule struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

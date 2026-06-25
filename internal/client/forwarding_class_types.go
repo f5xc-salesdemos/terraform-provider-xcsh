@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// ForwardingClass represents a F5XC ForwardingClass
+// ForwardingClass represents a XCSH ForwardingClass
 type ForwardingClass struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

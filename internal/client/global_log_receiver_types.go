@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// GlobalLogReceiver represents a F5XC GlobalLogReceiver
+// GlobalLogReceiver represents a XCSH GlobalLogReceiver
 type GlobalLogReceiver struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

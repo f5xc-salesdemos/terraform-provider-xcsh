@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// VirtualNetwork represents a F5XC VirtualNetwork
+// VirtualNetwork represents a XCSH VirtualNetwork
 type VirtualNetwork struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

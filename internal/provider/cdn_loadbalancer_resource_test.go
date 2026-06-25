@@ -18,12 +18,12 @@ func TestAccCDNLoadBalancerResource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-cdn-lb")
-	resourceName := "f5xc_cdn_loadbalancer.test"
+	resourceName := "xcsh_cdn_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_cdn_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_cdn_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCDNLoadBalancerConfig_basic(rName),
@@ -61,7 +61,7 @@ func testAccCDNLoadBalancerConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_cdn_loadbalancer" "test" {
+resource "xcsh_cdn_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 

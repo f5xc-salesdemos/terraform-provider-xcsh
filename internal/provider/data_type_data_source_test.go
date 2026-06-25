@@ -16,8 +16,8 @@ func TestAccDataTypeDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_data_type.test"
-	dataSourceName := "data.f5xc_data_type.test"
+	resourceName := "xcsh_data_type.test"
+	dataSourceName := "data.xcsh_data_type.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,7 +39,7 @@ func testAccDataTypeDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_data_type" "test" {
+resource "xcsh_data_type" "test" {
   name      = %[1]q
   namespace = "system"
   is_pii = true
@@ -50,10 +50,10 @@ resource "f5xc_data_type" "test" {
   }
 }
 
-data "f5xc_data_type" "test" {
-  depends_on = [f5xc_data_type.test]
-  name       = f5xc_data_type.test.name
-  namespace  = f5xc_data_type.test.namespace
+data "xcsh_data_type" "test" {
+  depends_on = [xcsh_data_type.test]
+  name       = xcsh_data_type.test.name
+  namespace  = xcsh_data_type.test.namespace
 }
 `, name))
 }

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// CodeBaseIntegration represents a F5XC CodeBaseIntegration
+// CodeBaseIntegration represents a XCSH CodeBaseIntegration
 type CodeBaseIntegration struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

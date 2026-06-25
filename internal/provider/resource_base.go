@@ -31,7 +31,7 @@ const (
 
 // BaseResourceConfig holds configuration for base resource behavior
 type BaseResourceConfig struct {
-	// ResourceTypeName is the Terraform resource type name (e.g., "f5xc_namespace")
+	// ResourceTypeName is the Terraform resource type name (e.g., "xcsh_namespace")
 	ResourceTypeName string
 
 	// ResourceType categorizes the resource for timeout configuration

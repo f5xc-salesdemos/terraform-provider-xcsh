@@ -18,7 +18,7 @@ import (
 
 	"golang.org/x/crypto/pkcs12"
 
-	f5xcerrors "github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/errors"
+	xcsherrors "github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/errors"
 )
 
 // Client configuration defaults
@@ -301,7 +301,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 		var err error
 		bodyBytes, err = json.Marshal(body)
 		if err != nil {
-			return nil, f5xcerrors.WrapError(err, "request", "marshal")
+			return nil, xcsherrors.WrapError(err, "request", "marshal")
 		}
 	}
 
@@ -311,7 +311,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 	for attempt := 0; attempt <= c.MaxRetries; attempt++ {
 		// Check context before making request
 		if ctx.Err() != nil {
-			return nil, f5xcerrors.NewTimeoutError("request", method+" "+path, ctx.Err())
+			return nil, xcsherrors.NewTimeoutError("request", method+" "+path, ctx.Err())
 		}
 
 		var reqBody io.Reader
@@ -321,7 +321,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 
 		req, err := http.NewRequestWithContext(ctx, method, url, reqBody)
 		if err != nil {
-			return nil, f5xcerrors.WrapError(err, "request", "create")
+			return nil, xcsherrors.WrapError(err, "request", "create")
 		}
 
 		// Only set Authorization header for token-based authentication
@@ -334,12 +334,12 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 
 		resp, err := c.HTTPClient.Do(req)
 		if err != nil {
-			lastErr = f5xcerrors.NewNetworkError(err)
+			lastErr = xcsherrors.NewNetworkError(err)
 			// Network errors are retryable
 			if attempt < c.MaxRetries {
 				select {
 				case <-ctx.Done():
-					return nil, f5xcerrors.NewTimeoutError("request", method+" "+path, ctx.Err())
+					return nil, xcsherrors.NewTimeoutError("request", method+" "+path, ctx.Err())
 				case <-time.After(c.calculateBackoff(attempt)):
 					continue
 				}
@@ -350,7 +350,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 		respBody, err := io.ReadAll(resp.Body)
 		_ = resp.Body.Close() // Error intentionally ignored - body already read, cleanup only
 		if err != nil {
-			return nil, f5xcerrors.WrapError(err, "response", "read")
+			return nil, xcsherrors.WrapError(err, "response", "read")
 		}
 
 		// Success
@@ -359,7 +359,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 		}
 
 		// Create structured error
-		apiErr := f5xcerrors.NewAPIError(resp.StatusCode, respBody, path, method)
+		apiErr := xcsherrors.NewAPIError(resp.StatusCode, respBody, path, method)
 		lastErr = apiErr
 
 		// Check if error is retryable
@@ -375,7 +375,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 
 		select {
 		case <-ctx.Done():
-			return nil, f5xcerrors.NewTimeoutError("request", method+" "+path, ctx.Err())
+			return nil, xcsherrors.NewTimeoutError("request", method+" "+path, ctx.Err())
 		case <-time.After(backoff):
 			// Continue to next retry
 		}

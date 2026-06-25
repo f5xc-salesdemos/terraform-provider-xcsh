@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// DNSComplianceChecks represents a F5XC DNSComplianceChecks
+// DNSComplianceChecks represents a XCSH DNSComplianceChecks
 type DNSComplianceChecks struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

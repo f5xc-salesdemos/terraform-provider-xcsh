@@ -21,7 +21,7 @@ import (
 // TestAccCloudCredentialsResource_basic tests the basic creation and deletion of a cloud_credentials resource
 func TestAccCloudCredentialsResource_basic(t *testing.T) {
 	t.Skip("Skipping: cloud_credentials API endpoint not available in staging environment (returns 404)")
-	resourceName := "f5xc_cloud_credentials.test"
+	resourceName := "xcsh_cloud_credentials.test"
 	rName := acctest.RandomName("tf-acc-test-cloudcreds")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -52,7 +52,7 @@ func TestAccCloudCredentialsResource_basic(t *testing.T) {
 // TestAccCloudCredentialsResource_allAttributes tests cloud_credentials with all common attributes
 func TestAccCloudCredentialsResource_allAttributes(t *testing.T) {
 	t.Skip("Skipping: cloud_credentials requires actual cloud provider credentials (AWS/Azure/GCP)")
-	resourceName := "f5xc_cloud_credentials.test"
+	resourceName := "xcsh_cloud_credentials.test"
 	rName := acctest.RandomName("tf-acc-test-cloudcreds")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -78,7 +78,7 @@ func TestAccCloudCredentialsResource_allAttributes(t *testing.T) {
 // TestAccCloudCredentialsResource_updateLabels tests updating labels on an existing resource
 func TestAccCloudCredentialsResource_updateLabels(t *testing.T) {
 	t.Skip("Skipping: cloud_credentials requires actual cloud provider credentials (AWS/Azure/GCP)")
-	resourceName := "f5xc_cloud_credentials.test"
+	resourceName := "xcsh_cloud_credentials.test"
 	rName := acctest.RandomName("tf-acc-test-cloudcreds")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -107,7 +107,7 @@ func TestAccCloudCredentialsResource_updateLabels(t *testing.T) {
 // TestAccCloudCredentialsResource_updateDescription tests updating description
 func TestAccCloudCredentialsResource_updateDescription(t *testing.T) {
 	t.Skip("Skipping: cloud_credentials requires actual cloud provider credentials (AWS/Azure/GCP)")
-	resourceName := "f5xc_cloud_credentials.test"
+	resourceName := "xcsh_cloud_credentials.test"
 	rName := acctest.RandomName("tf-acc-test-cloudcreds")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -135,7 +135,7 @@ func TestAccCloudCredentialsResource_updateDescription(t *testing.T) {
 // TestAccCloudCredentialsResource_updateAnnotations tests updating annotations
 func TestAccCloudCredentialsResource_updateAnnotations(t *testing.T) {
 	t.Skip("Skipping: cloud_credentials requires actual cloud provider credentials (AWS/Azure/GCP)")
-	resourceName := "f5xc_cloud_credentials.test"
+	resourceName := "xcsh_cloud_credentials.test"
 	rName := acctest.RandomName("tf-acc-test-cloudcreds")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -164,7 +164,7 @@ func TestAccCloudCredentialsResource_updateAnnotations(t *testing.T) {
 // TestAccCloudCredentialsResource_disappears tests behavior when resource is deleted outside Terraform
 func TestAccCloudCredentialsResource_disappears(t *testing.T) {
 	t.Skip("Skipping: cloud_credentials requires actual cloud provider credentials (AWS/Azure/GCP)")
-	resourceName := "f5xc_cloud_credentials.test"
+	resourceName := "xcsh_cloud_credentials.test"
 	rName := acctest.RandomName("tf-acc-test-cloudcreds")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -187,7 +187,7 @@ func TestAccCloudCredentialsResource_disappears(t *testing.T) {
 // TestAccCloudCredentialsResource_emptyPlan tests that no changes occur when configuration hasn't changed
 func TestAccCloudCredentialsResource_emptyPlan(t *testing.T) {
 	t.Skip("Skipping: cloud_credentials requires actual cloud provider credentials (AWS/Azure/GCP)")
-	resourceName := "f5xc_cloud_credentials.test"
+	resourceName := "xcsh_cloud_credentials.test"
 	rName := acctest.RandomName("tf-acc-test-cloudcreds")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -224,7 +224,7 @@ func TestAccCloudCredentialsResource_planChecks(t *testing.T) {
 				Config: testAccCloudCredentialsConfig_basic(rName),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_cloud_credentials.test", plancheck.ResourceActionCreate),
+						plancheck.ExpectResourceAction("xcsh_cloud_credentials.test", plancheck.ResourceActionCreate),
 					},
 				},
 			},
@@ -232,7 +232,7 @@ func TestAccCloudCredentialsResource_planChecks(t *testing.T) {
 				Config: testAccCloudCredentialsConfig_withLabels(rName, "newlabel"),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_cloud_credentials.test", plancheck.ResourceActionUpdate),
+						plancheck.ExpectResourceAction("xcsh_cloud_credentials.test", plancheck.ResourceActionUpdate),
 					},
 				},
 			},
@@ -254,19 +254,19 @@ func TestAccCloudCredentialsResource_knownValues(t *testing.T) {
 				Config: testAccCloudCredentialsConfig_basic(rName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"f5xc_cloud_credentials.test",
+						"xcsh_cloud_credentials.test",
 						tfjsonpath.New("name"),
 						knownvalue.StringExact(rName),
 					),
 					statecheck.ExpectKnownValue(
-						"f5xc_cloud_credentials.test",
+						"xcsh_cloud_credentials.test",
 						tfjsonpath.New("namespace"),
 						knownvalue.StringExact("system"),
 					),
 					statecheck.CompareValuePairs(
-						"f5xc_cloud_credentials.test",
+						"xcsh_cloud_credentials.test",
 						tfjsonpath.New("name"),
-						"f5xc_cloud_credentials.test",
+						"xcsh_cloud_credentials.test",
 						tfjsonpath.New("id"),
 						compare.ValuesSame(),
 					),
@@ -297,7 +297,7 @@ func TestAccCloudCredentialsResource_invalidName(t *testing.T) {
 // TestAccCloudCredentialsResource_nameTooLong tests validation of names exceeding maximum length
 func TestAccCloudCredentialsResource_nameTooLong(t *testing.T) {
 	t.Skip("Skipping: cloud_credentials requires actual cloud provider credentials (AWS/Azure/GCP)")
-	rName := "this-name-is-way-too-long-and-exceeds-the-maximum-allowed-length-for-f5xc-resources-which-should-trigger-validation-error"
+	rName := "this-name-is-way-too-long-and-exceeds-the-maximum-allowed-length-for-xcsh-resources-which-should-trigger-validation-error"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -342,20 +342,20 @@ func TestAccCloudCredentialsResource_requiresReplace(t *testing.T) {
 			{
 				Config: testAccCloudCredentialsConfig_basic(rName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					acctest.CheckCloudCredentialsExists("f5xc_cloud_credentials.test"),
-					resource.TestCheckResourceAttr("f5xc_cloud_credentials.test", "name", rName),
+					acctest.CheckCloudCredentialsExists("xcsh_cloud_credentials.test"),
+					resource.TestCheckResourceAttr("xcsh_cloud_credentials.test", "name", rName),
 				),
 			},
 			{
 				Config: testAccCloudCredentialsConfig_basic(rNameUpdated),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_cloud_credentials.test", plancheck.ResourceActionDestroyBeforeCreate),
+						plancheck.ExpectResourceAction("xcsh_cloud_credentials.test", plancheck.ResourceActionDestroyBeforeCreate),
 					},
 				},
 				Check: resource.ComposeAggregateTestCheckFunc(
-					acctest.CheckCloudCredentialsExists("f5xc_cloud_credentials.test"),
-					resource.TestCheckResourceAttr("f5xc_cloud_credentials.test", "name", rNameUpdated),
+					acctest.CheckCloudCredentialsExists("xcsh_cloud_credentials.test"),
+					resource.TestCheckResourceAttr("xcsh_cloud_credentials.test", "name", rNameUpdated),
 				),
 			},
 		},
@@ -365,7 +365,7 @@ func TestAccCloudCredentialsResource_requiresReplace(t *testing.T) {
 // TestAccCloudCredentialsResource_awsAssumeRole tests cloud_credentials with AWS assume role configuration
 func TestAccCloudCredentialsResource_awsAssumeRole(t *testing.T) {
 	t.Skip("Skipping: cloud_credentials requires actual cloud provider credentials (AWS/Azure/GCP)")
-	resourceName := "f5xc_cloud_credentials.test"
+	resourceName := "xcsh_cloud_credentials.test"
 	rName := acctest.RandomName("tf-acc-test-cloudcreds")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -403,7 +403,7 @@ func testAccCloudCredentialsImportStateIdFunc(resourceName string) resource.Impo
 
 func testAccCloudCredentialsConfig_basic(rName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_cloud_credentials" "test" {
+resource "xcsh_cloud_credentials" "test" {
   name      = %[1]q
   namespace = "system"
 }
@@ -412,7 +412,7 @@ resource "f5xc_cloud_credentials" "test" {
 
 func testAccCloudCredentialsConfig_allAttributes(rName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_cloud_credentials" "test" {
+resource "xcsh_cloud_credentials" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -430,7 +430,7 @@ resource "f5xc_cloud_credentials" "test" {
 
 func testAccCloudCredentialsConfig_withLabels(rName, labelValue string) string {
 	return fmt.Sprintf(`
-resource "f5xc_cloud_credentials" "test" {
+resource "xcsh_cloud_credentials" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -443,7 +443,7 @@ resource "f5xc_cloud_credentials" "test" {
 
 func testAccCloudCredentialsConfig_withAnnotations(rName, annotationValue string) string {
 	return fmt.Sprintf(`
-resource "f5xc_cloud_credentials" "test" {
+resource "xcsh_cloud_credentials" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -456,7 +456,7 @@ resource "f5xc_cloud_credentials" "test" {
 
 func testAccCloudCredentialsConfig_awsAssumeRole(rName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_cloud_credentials" "test" {
+resource "xcsh_cloud_credentials" "test" {
   name      = %[1]q
   namespace = "system"
 

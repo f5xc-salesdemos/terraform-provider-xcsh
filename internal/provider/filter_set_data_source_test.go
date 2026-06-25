@@ -16,8 +16,8 @@ func TestAccFilterSetDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_filter_set.test"
-	dataSourceName := "data.f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
+	dataSourceName := "data.xcsh_filter_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,7 +39,7 @@ func testAccFilterSetDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_filter_set" "test" {
+resource "xcsh_filter_set" "test" {
   name      = %[1]q
   namespace = "system"
   context_key = "dashboard"
@@ -51,10 +51,10 @@ resource "f5xc_filter_set" "test" {
   }
 }
 
-data "f5xc_filter_set" "test" {
-  depends_on = [f5xc_filter_set.test]
-  name       = f5xc_filter_set.test.name
-  namespace  = f5xc_filter_set.test.namespace
+data "xcsh_filter_set" "test" {
+  depends_on = [xcsh_filter_set.test]
+  name       = xcsh_filter_set.test.name
+  namespace  = xcsh_filter_set.test.namespace
 }
 `, name))
 }

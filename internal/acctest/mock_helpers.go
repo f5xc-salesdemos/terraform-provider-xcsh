@@ -106,7 +106,7 @@ func (m *MockTestConfig) Cleanup() {
 // ProtoV6ProviderFactories returns provider factories for use in terraform-plugin-testing
 func (m *MockTestConfig) ProtoV6ProviderFactories() map[string]func() (tfprotov6.ProviderServer, error) {
 	return map[string]func() (tfprotov6.ProviderServer, error){
-		"f5xc": providerserver.NewProtocol6WithError(provider.New("test")()),
+		"xcsh": providerserver.NewProtocol6WithError(provider.New("test")()),
 	}
 }
 
@@ -115,7 +115,7 @@ func (m *MockTestConfig) ProtoV6ProviderFactories() map[string]func() (tfprotov6
 // handles provider registration automatically.
 func (m *MockTestConfig) MockProviderConfig() string {
 	return fmt.Sprintf(`
-provider "f5xc" {
+provider "xcsh" {
   api_url   = %q
   api_token = "mock-token"
 }

@@ -17,7 +17,7 @@ import (
 //
 // Or to sweep specific resources:
 //
-//	TF_ACC=1 go test ./internal/acctest -v -sweep=f5xc_namespace -timeout 30m
+//	TF_ACC=1 go test ./internal/acctest -v -sweep=xcsh_namespace -timeout 30m
 func TestMain(m *testing.M) {
 	resource.TestMain(m)
 }

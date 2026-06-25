@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// UDPLoadBalancer represents a F5XC UDPLoadBalancer
+// UDPLoadBalancer represents a XCSH UDPLoadBalancer
 type UDPLoadBalancer struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

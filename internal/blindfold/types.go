@@ -2,8 +2,8 @@
 
 package blindfold
 
-// PublicKey represents the F5XC Secret Management public key used for encryption.
-// The key is retrieved from the F5XC API and contains RSA key components.
+// PublicKey represents the XCSH Secret Management public key used for encryption.
+// The key is retrieved from the XCSH API and contains RSA key components.
 type PublicKey struct {
 	// KeyVersion is the version identifier for key rotation support
 	KeyVersion int `json:"key_version" yaml:"keyVersion"`
@@ -15,20 +15,20 @@ type PublicKey struct {
 	// Typically 65537 (0x10001)
 	PublicExponentBase64 string `json:"public_exponent_base64" yaml:"publicExponentBase64"`
 
-	// Tenant is the F5XC tenant identifier
+	// Tenant is the XCSH tenant identifier
 	Tenant string `json:"tenant" yaml:"tenant"`
 }
 
-// SecretPolicyDocument represents an F5XC secret policy that controls
+// SecretPolicyDocument represents an XCSH secret policy that controls
 // which clients are authorized to decrypt secrets encrypted under this policy.
 type SecretPolicyDocument struct {
 	// Name is the policy name
 	Name string `json:"name" yaml:"name"`
 
-	// Namespace is the F5XC namespace containing the policy
+	// Namespace is the XCSH namespace containing the policy
 	Namespace string `json:"namespace" yaml:"namespace"`
 
-	// Tenant is the F5XC tenant identifier
+	// Tenant is the XCSH tenant identifier
 	Tenant string `json:"tenant" yaml:"tenant"`
 
 	// PolicyID is the unique identifier for this policy
@@ -83,7 +83,7 @@ type LabelSelectorType struct {
 // SealedSecret represents the encrypted output from the blindfold operation.
 // This structure uses envelope encryption (hybrid encryption):
 // - A random AES-256 key (DEK) encrypts the actual data
-// - The DEK is encrypted with RSA-OAEP using the F5XC public key (KEK)
+// - The DEK is encrypted with RSA-OAEP using the XCSH public key (KEK)
 // This allows encrypting data of any size (up to 128KB API limit).
 type SealedSecret struct {
 	// KeyVersion identifies which public key version was used for encryption
@@ -92,7 +92,7 @@ type SealedSecret struct {
 	// PolicyID identifies the policy document used
 	PolicyID string `json:"policy_id"`
 
-	// Tenant is the F5XC tenant identifier
+	// Tenant is the XCSH tenant identifier
 	Tenant string `json:"tenant"`
 
 	// EncryptedKey is the base64-encoded RSA-OAEP encrypted AES-256 key (DEK)
@@ -115,7 +115,7 @@ type SealedSecretLegacy struct {
 	// PolicyID identifies the policy document used
 	PolicyID string `json:"policy_id"`
 
-	// Tenant is the F5XC tenant identifier
+	// Tenant is the XCSH tenant identifier
 	Tenant string `json:"tenant"`
 
 	// Data is the base64-encoded RSA-OAEP encrypted ciphertext

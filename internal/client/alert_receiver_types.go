@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// AlertReceiver represents a F5XC AlertReceiver
+// AlertReceiver represents a XCSH AlertReceiver
 type AlertReceiver struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

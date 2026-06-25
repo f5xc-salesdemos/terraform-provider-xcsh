@@ -115,7 +115,7 @@ func main() {
 			continue
 		}
 
-		exampleDir := filepath.Join(examplesDir, "f5xc_"+resourceName)
+		exampleDir := filepath.Join(examplesDir, "xcsh_"+resourceName)
 		if err := os.MkdirAll(exampleDir, 0755); err != nil {
 			fmt.Fprintf(os.Stderr, "Error creating directory %s: %v\n", exampleDir, err)
 			continue
@@ -322,7 +322,7 @@ func generateExample(resourceName string, schema *SchemaInfo) string {
 	sb.WriteString("terraform {\n")
 	sb.WriteString("  required_version = \">= 1.0\"\n\n")
 	sb.WriteString("  required_providers {\n")
-	sb.WriteString("    f5xc = {\n")
+	sb.WriteString("    xcsh = {\n")
 	sb.WriteString("      source  = \"f5xc-salesdemos/f5xc\"\n")
 	sb.WriteString("      version = \">= 0.1.0\"\n")
 	sb.WriteString("    }\n")
@@ -334,7 +334,7 @@ func generateExample(resourceName string, schema *SchemaInfo) string {
 
 	// Generate basic example
 	sb.WriteString(fmt.Sprintf("# Basic %s configuration\n", humanName))
-	sb.WriteString(fmt.Sprintf("resource \"f5xc_%s\" \"example\" {\n", resourceName))
+	sb.WriteString(fmt.Sprintf("resource \"xcsh_%s\" \"example\" {\n", resourceName))
 	sb.WriteString(fmt.Sprintf("  name      = \"example-%s\"\n", strings.ReplaceAll(resourceName, "_", "-")))
 	sb.WriteString(fmt.Sprintf("  namespace = \"%s\"\n\n", namespace))
 
@@ -557,7 +557,7 @@ func addResourceSpecificConfig(sb *strings.Builder, resourceName string, schema 
 		sb.WriteString("  # VPC configuration\n")
 		sb.WriteString("  vpc {\n")
 		sb.WriteString("    new_vpc {\n")
-		sb.WriteString("      name_tag     = \"f5xc-vpc\"\n")
+		sb.WriteString("      name_tag     = \"xcsh-vpc\"\n")
 		sb.WriteString("      primary_ipv4 = \"10.0.0.0/16\"\n")
 		sb.WriteString("    }\n")
 		sb.WriteString("  }\n\n")
@@ -592,11 +592,11 @@ func addResourceSpecificConfig(sb *strings.Builder, resourceName string, schema 
 		sb.WriteString(fmt.Sprintf("    namespace = \"%s\"\n", getNamespaceForReference("cloud_credentials")))
 		sb.WriteString("  }\n\n")
 		sb.WriteString("  # Resource group\n")
-		sb.WriteString("  resource_group = \"f5xc-rg\"\n\n")
+		sb.WriteString("  resource_group = \"xcsh-rg\"\n\n")
 		sb.WriteString("  # VNET configuration\n")
 		sb.WriteString("  vnet {\n")
 		sb.WriteString("    new_vnet {\n")
-		sb.WriteString("      name       = \"f5xc-vnet\"\n")
+		sb.WriteString("      name       = \"xcsh-vnet\"\n")
 		sb.WriteString("      primary_ipv4 = \"10.0.0.0/16\"\n")
 		sb.WriteString("    }\n")
 		sb.WriteString("  }\n\n")
@@ -1188,14 +1188,14 @@ func addResourceSpecificConfig(sb *strings.Builder, resourceName string, schema 
 		sb.WriteString("  # VPC configuration\n")
 		sb.WriteString("  vpc {\n")
 		sb.WriteString("    new_vpc {\n")
-		sb.WriteString("      name_tag     = \"f5xc-tgw-vpc\"\n")
+		sb.WriteString("      name_tag     = \"xcsh-tgw-vpc\"\n")
 		sb.WriteString("      primary_ipv4 = \"10.0.0.0/16\"\n")
 		sb.WriteString("    }\n")
 		sb.WriteString("  }\n\n")
 		sb.WriteString("  # TGW configuration\n")
 		sb.WriteString("  tgw {\n")
 		sb.WriteString("    new_tgw {\n")
-		sb.WriteString("      name = \"f5xc-tgw\"\n")
+		sb.WriteString("      name = \"xcsh-tgw\"\n")
 		sb.WriteString("    }\n")
 		sb.WriteString("  }\n\n")
 		sb.WriteString("  # Instance type\n")
@@ -1403,7 +1403,7 @@ func generateAdvancedExample(resourceName string, schema *SchemaInfo) string {
 
 	humanName := toHumanName(resourceName)
 	sb.WriteString(fmt.Sprintf("\n# Advanced %s with additional configuration\n", humanName))
-	sb.WriteString(fmt.Sprintf("resource \"f5xc_%s\" \"advanced\" {\n", resourceName))
+	sb.WriteString(fmt.Sprintf("resource \"xcsh_%s\" \"advanced\" {\n", resourceName))
 	sb.WriteString(fmt.Sprintf("  name      = \"advanced-%s\"\n", strings.ReplaceAll(resourceName, "_", "-")))
 	sb.WriteString(fmt.Sprintf("  namespace = \"%s\"\n\n", namespace))
 

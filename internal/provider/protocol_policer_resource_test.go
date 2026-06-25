@@ -23,7 +23,7 @@ func TestAccProtocolPolicerResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-pp")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_protocol_policer.test"
+	resourceName := "xcsh_protocol_policer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -31,7 +31,7 @@ func TestAccProtocolPolicerResource_basic(t *testing.T) {
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_protocol_policer"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_protocol_policer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccProtocolPolicerConfig_basic(nsName, rName),
@@ -69,27 +69,27 @@ func testAccProtocolPolicerConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_policer" "test" {
+resource "xcsh_policer" "test" {
   depends_on                = [time_sleep.wait_for_namespace]
   name                      = "%[2]s-policer"
-  namespace                 = f5xc_namespace.test.name
+  namespace                 = xcsh_namespace.test.name
   burst_size                = 1000
   committed_information_rate = 1000
 }
 
-resource "f5xc_protocol_policer" "test" {
-  depends_on = [f5xc_policer.test]
+resource "xcsh_protocol_policer" "test" {
+  depends_on = [xcsh_policer.test]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   protocol_policer {
     protocol {
@@ -97,8 +97,8 @@ resource "f5xc_protocol_policer" "test" {
     }
 
     policer {
-      name      = f5xc_policer.test.name
-      namespace = f5xc_namespace.test.name
+      name      = xcsh_policer.test.name
+      namespace = xcsh_namespace.test.name
     }
   }
 }

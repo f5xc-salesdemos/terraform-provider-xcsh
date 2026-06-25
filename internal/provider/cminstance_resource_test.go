@@ -22,7 +22,7 @@ func TestAccCminstanceResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-cm")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_cminstance.test"
+	resourceName := "xcsh_cminstance.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -30,7 +30,7 @@ func TestAccCminstanceResource_basic(t *testing.T) {
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_cminstance"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_cminstance"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCminstanceConfig_basic(nsName, rName),
@@ -68,19 +68,19 @@ func testAccCminstanceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_cminstance" "test" {
+resource "xcsh_cminstance" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 }
 `, nsName, name))
 }

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// ContainerRegistry represents a F5XC ContainerRegistry
+// ContainerRegistry represents a XCSH ContainerRegistry
 type ContainerRegistry struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -18,12 +18,12 @@ func TestAccFastACLResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-facl")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_fast_acl.test"
+	resourceName := "xcsh_fast_acl.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_fast_acl"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_fast_acl"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccFastACLConfig_basic(nsName, rName),
@@ -62,7 +62,7 @@ func testAccFastACLConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_fast_acl" "test" {
+resource "xcsh_fast_acl" "test" {
   name      = %[1]q
   namespace = "system"
 

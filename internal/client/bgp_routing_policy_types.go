@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// BGPRoutingPolicy represents a F5XC BGPRoutingPolicy
+// BGPRoutingPolicy represents a XCSH BGPRoutingPolicy
 type BGPRoutingPolicy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

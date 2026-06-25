@@ -42,7 +42,7 @@ func TestAccUserIdentificationResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	uiName := acctest.RandomName("ui")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -75,7 +75,7 @@ func TestAccUserIdentificationResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	uiName := acctest.RandomName("ui")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -112,7 +112,7 @@ func TestAccUserIdentificationResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	uiName := acctest.RandomName("ui")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -149,7 +149,7 @@ func TestAccUserIdentificationResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	uiName := acctest.RandomName("ui")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -180,7 +180,7 @@ func TestAccUserIdentificationResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	uiName := acctest.RandomName("ui")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -217,7 +217,7 @@ func TestAccUserIdentificationResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	uiName := acctest.RandomName("ui")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -266,7 +266,7 @@ func TestAccUserIdentificationResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	uiName := acctest.RandomName("ui")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -291,7 +291,7 @@ func TestAccUserIdentificationResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	uiName := acctest.RandomName("ui")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -347,7 +347,7 @@ func TestAccUserIdentificationResource_nameTooLong(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	uiName := acctest.RandomName("this-name-is-way-too-long-and-exceeds-maximum-length-allowed-for-names-in-f5xc")
+	uiName := acctest.RandomName("this-name-is-way-too-long-and-exceeds-maximum-length-allowed-for-names-in-xcsh")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -383,7 +383,7 @@ func TestAccUserIdentificationResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	uiName1 := acctest.RandomName("ui1")
 	uiName2 := acctest.RandomName("ui2")
 
@@ -416,7 +416,7 @@ func TestAccUserIdentificationResource_identificationRules(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	uiName := acctest.RandomName("ui")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -449,7 +449,7 @@ func TestAccUserIdentificationResource_identificationRules(t *testing.T) {
 
 func testAccUserIdentificationConfig_basicSystem(uiName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -462,7 +462,7 @@ resource "f5xc_user_identification" "test" {
 
 func testAccUserIdentificationConfig_allAttributesSystem(uiName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test user identification with all attributes"
@@ -491,7 +491,7 @@ func testAccUserIdentificationConfig_withLabelsSystem(uiName string, labels map[
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -507,7 +507,7 @@ resource "f5xc_user_identification" "test" {
 
 func testAccUserIdentificationConfig_withDescriptionSystem(uiName, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -526,7 +526,7 @@ func testAccUserIdentificationConfig_withAnnotationsSystem(uiName string, annota
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -548,7 +548,7 @@ func TestAccUserIdentificationResource_cookieRule(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	rName := acctest.RandomName("tf-test-uid")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -578,7 +578,7 @@ func TestAccUserIdentificationResource_httpHeaderRule(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	rName := acctest.RandomName("tf-test-uid")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -608,7 +608,7 @@ func TestAccUserIdentificationResource_tlsFingerprintRule(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	rName := acctest.RandomName("tf-test-uid")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -635,7 +635,7 @@ func TestAccUserIdentificationResource_switchRuleType(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	rName := acctest.RandomName("tf-test-uid")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -666,7 +666,7 @@ func TestAccUserIdentificationResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
 	rName := acctest.RandomName("tf-test-uid")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -707,7 +707,7 @@ func TestAccUserIdentificationResource_fullLifecycle(t *testing.T) {
 
 func testAccUserIdentificationConfig_cookieSystem(uiName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -720,7 +720,7 @@ resource "f5xc_user_identification" "test" {
 
 func testAccUserIdentificationConfig_httpHeaderSystem(uiName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -733,7 +733,7 @@ resource "f5xc_user_identification" "test" {
 
 func testAccUserIdentificationConfig_tlsFingerprintSystem(uiName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -746,7 +746,7 @@ resource "f5xc_user_identification" "test" {
 
 func testAccUserIdentificationConfig_withRulesSystem(uiName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "User identification with identification rules"

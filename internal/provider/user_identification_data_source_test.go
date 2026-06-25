@@ -16,8 +16,8 @@ func TestAccUserIdentificationDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_user_identification.test"
-	dataSourceName := "data.f5xc_user_identification.test"
+	resourceName := "xcsh_user_identification.test"
+	dataSourceName := "data.xcsh_user_identification.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,7 +39,7 @@ func testAccUserIdentificationDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name      = %[1]q
   namespace = "system"
   rules {
@@ -47,10 +47,10 @@ resource "f5xc_user_identification" "test" {
   }
 }
 
-data "f5xc_user_identification" "test" {
-  depends_on = [f5xc_user_identification.test]
-  name       = f5xc_user_identification.test.name
-  namespace  = f5xc_user_identification.test.namespace
+data "xcsh_user_identification" "test" {
+  depends_on = [xcsh_user_identification.test]
+  name       = xcsh_user_identification.test.name
+  namespace  = xcsh_user_identification.test.namespace
 }
 `, name))
 }

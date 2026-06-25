@@ -24,7 +24,7 @@ import (
 //
 // Run with:
 //
-//	TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//	TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //	go test -v ./internal/provider/ -run TestAccHealthcheckResource -timeout 30m
 //
 // =============================================================================
@@ -37,7 +37,7 @@ func TestAccHealthcheckResource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -90,7 +90,7 @@ func TestAccHealthcheckResource_allAttributes(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -138,7 +138,7 @@ func TestAccHealthcheckResource_updateLabels(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -188,7 +188,7 @@ func TestAccHealthcheckResource_updateAnnotations(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -235,7 +235,7 @@ func TestAccHealthcheckResource_disappears(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -262,7 +262,7 @@ func TestAccHealthcheckResource_emptyPlan(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -295,7 +295,7 @@ func TestAccHealthcheckResource_planChecks(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -341,7 +341,7 @@ func TestAccHealthcheckResource_knownValues(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -435,7 +435,7 @@ func TestAccHealthcheckResource_requiresReplace(t *testing.T) {
 
 	rName1 := acctest.RandomName("tf-acc-test-hc")
 	rName2 := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -474,7 +474,7 @@ func TestAccHealthcheckResource_httpHealthCheck(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -513,7 +513,7 @@ func TestAccHealthcheckResource_httpHealthCheck_originServerName(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -544,7 +544,7 @@ func TestAccHealthcheckResource_httpHealthCheck_statusCodes(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -577,7 +577,7 @@ func TestAccHealthcheckResource_httpHealthCheck_headersRemove(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -607,7 +607,7 @@ func TestAccHealthcheckResource_httpHealthCheck_http2(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -637,7 +637,7 @@ func TestAccHealthcheckResource_udpIcmpHealthCheck(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -671,7 +671,7 @@ func TestAccHealthcheckResource_description(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -713,7 +713,7 @@ func TestAccHealthcheckResource_jitterPercent(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -755,7 +755,7 @@ func TestAccHealthcheckResource_thresholds_update(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -804,7 +804,7 @@ func TestAccHealthcheckResource_thresholds_boundary(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -844,7 +844,7 @@ func TestAccHealthcheckResource_switchType_tcpToHttp(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -873,7 +873,7 @@ func TestAccHealthcheckResource_switchType_httpToUdp(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -901,7 +901,7 @@ func TestAccHealthcheckResource_httpHealthCheck_updatePath(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -943,7 +943,7 @@ func TestAccHealthcheckResource_httpHealthCheck_switchHostToOrigin(t *testing.T)
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -976,7 +976,7 @@ func TestAccHealthcheckResource_fullLifecycle(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-hc")
-	resourceName := "f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -1039,7 +1039,7 @@ func TestAccHealthcheckResource_fullLifecycle(t *testing.T) {
 
 func testAccHealthcheckConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1055,7 +1055,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_allAttributesSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1081,7 +1081,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_withLabelsSystem(name, environment, managedBy string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1102,7 +1102,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_withAnnotationsSystem(name, value1, value2 string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1123,7 +1123,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_httpHealthCheckSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1142,7 +1142,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_httpOriginServerName(name, path string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1161,7 +1161,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_httpStatusCodes(name, path string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1181,7 +1181,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_httpHeadersRemove(name, path string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1201,7 +1201,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_httpHttp2(name, path string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1221,7 +1221,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_udpIcmp(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1237,7 +1237,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_withDescription(name, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -1254,7 +1254,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_withJitter(name string, jitter int) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1271,7 +1271,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_thresholds(name string, healthy, unhealthy, timeout, interval int) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1287,7 +1287,7 @@ resource "f5xc_healthcheck" "test" {
 
 func testAccHealthcheckConfig_httpWithPath(name, path string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1319,7 +1319,7 @@ func TestAccHealthcheckResource_conflictTcpAndHttp(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 

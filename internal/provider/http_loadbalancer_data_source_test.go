@@ -16,8 +16,8 @@ func TestAccHttpLoadbalancerDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-http-lb")
-	resourceName := "f5xc_http_loadbalancer.test"
-	dataSourceName := "data.f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
+	dataSourceName := "data.xcsh_http_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,7 +39,7 @@ func testAccHttpLoadbalancerDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -57,10 +57,10 @@ resource "f5xc_http_loadbalancer" "test" {
   advertise_on_public_default_vip {}
 }
 
-data "f5xc_http_loadbalancer" "test" {
-  depends_on = [f5xc_http_loadbalancer.test]
-  name       = f5xc_http_loadbalancer.test.name
-  namespace  = f5xc_http_loadbalancer.test.namespace
+data "xcsh_http_loadbalancer" "test" {
+  depends_on = [xcsh_http_loadbalancer.test]
+  name       = xcsh_http_loadbalancer.test.name
+  namespace  = xcsh_http_loadbalancer.test.namespace
 }
 `, name))
 }

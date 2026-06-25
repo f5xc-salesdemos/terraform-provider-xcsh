@@ -16,8 +16,8 @@ func TestAccFleetDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-fleet")
-	resourceName := "f5xc_fleet.test"
-	dataSourceName := "data.f5xc_fleet.test"
+	resourceName := "xcsh_fleet.test"
+	dataSourceName := "data.xcsh_fleet.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -41,15 +41,15 @@ func testAccFleetDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_fleet" "test" {
+resource "xcsh_fleet" "test" {
   name        = %[1]q
   namespace   = "system"
   fleet_label = %[1]q
 }
 
-data "f5xc_fleet" "test" {
-  name      = f5xc_fleet.test.name
-  namespace = f5xc_fleet.test.namespace
+data "xcsh_fleet" "test" {
+  name      = xcsh_fleet.test.name
+  namespace = xcsh_fleet.test.namespace
 }
 `, name))
 }

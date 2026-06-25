@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// ApplicationProfiles represents a F5XC ApplicationProfiles
+// ApplicationProfiles represents a XCSH ApplicationProfiles
 type ApplicationProfiles struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

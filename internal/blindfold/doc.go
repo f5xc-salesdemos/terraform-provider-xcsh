@@ -1,8 +1,8 @@
 // Package blindfold provides F5 Distributed Cloud Secret Management encryption.
 //
-// This package implements the blindfold encryption system used by F5XC to protect
+// This package implements the blindfold encryption system used by XCSH to protect
 // sensitive data such as TLS private keys, passwords, and other secrets. The
-// encryption uses RSA-OAEP with SHA-256 and is compatible with the F5XC Wingman
+// encryption uses RSA-OAEP with SHA-256 and is compatible with the XCSH Wingman
 // sidecar for decryption.
 //
 // This package is MANUALLY MAINTAINED and is NOT auto-generated from OpenAPI
@@ -12,7 +12,7 @@
 //
 // The blindfold system consists of three main components:
 //
-//   - Public Key: RSA public key fetched from F5XC Secret Management API
+//   - Public Key: RSA public key fetched from XCSH Secret Management API
 //   - Policy Document: Access control policy defining who can decrypt secrets
 //   - Sealed Secret: Encrypted data that can only be decrypted by authorized clients
 //
@@ -30,7 +30,7 @@
 //
 // # Security Considerations
 //
-// - Plaintext secrets are never transmitted to F5XC during encryption
+// - Plaintext secrets are never transmitted to XCSH during encryption
 // - Encryption happens locally using the public key
 // - Only authorized clients (per the policy document) can decrypt
 // - The sealed format includes key version for rotation support

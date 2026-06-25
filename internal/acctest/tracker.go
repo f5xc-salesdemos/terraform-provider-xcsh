@@ -16,7 +16,7 @@ import (
 
 // TrackedResource represents a resource created during a test run
 type TrackedResource struct {
-	Type      string    // Resource type (e.g., "f5xc_namespace", "f5xc_http_loadbalancer")
+	Type      string    // Resource type (e.g., "xcsh_namespace", "xcsh_http_loadbalancer")
 	Name      string    // Resource name
 	Namespace string    // Namespace (empty for namespace resources)
 	CreatedAt time.Time // When the resource was registered
@@ -63,7 +63,7 @@ func (t *ResourceTracker) Track(resourceType, name, namespace string) {
 
 // TrackNamespace is a convenience method for tracking namespace resources
 func (t *ResourceTracker) TrackNamespace(name string) {
-	t.Track("f5xc_namespace", name, "")
+	t.Track("xcsh_namespace", name, "")
 }
 
 // TrackResource is a convenience method for tracking namespaced resources
@@ -148,16 +148,16 @@ func CleanupTracked() error {
 
 	// Order: Most dependent first, namespaces last
 	deleteOrder := []string{
-		"f5xc_http_loadbalancer",
-		"f5xc_origin_pool",
-		"f5xc_healthcheck",
-		"f5xc_app_firewall",
-		"f5xc_service_policy",
-		"f5xc_ip_prefix_set",
-		"f5xc_rate_limiter",
-		"f5xc_user_identification",
-		"f5xc_malicious_user_mitigation",
-		"f5xc_namespace", // Always last
+		"xcsh_http_loadbalancer",
+		"xcsh_origin_pool",
+		"xcsh_healthcheck",
+		"xcsh_app_firewall",
+		"xcsh_service_policy",
+		"xcsh_ip_prefix_set",
+		"xcsh_rate_limiter",
+		"xcsh_user_identification",
+		"xcsh_malicious_user_mitigation",
+		"xcsh_namespace", // Always last
 	}
 
 	for _, resourceType := range deleteOrder {
@@ -205,26 +205,26 @@ func deleteTrackedResource(ctx context.Context, c *client.Client, r TrackedResou
 	log.Printf("[CLEANUP] Deleting %s: %s (namespace: %s)", r.Type, r.Name, r.Namespace)
 
 	switch r.Type {
-	case "f5xc_namespace":
+	case "xcsh_namespace":
 		// Use cascade delete for namespaces (standard DELETE returns 501)
 		return c.CascadeDeleteNamespace(deleteCtx, r.Name)
-	case "f5xc_http_loadbalancer":
+	case "xcsh_http_loadbalancer":
 		return c.DeleteHTTPLoadBalancer(deleteCtx, r.Namespace, r.Name)
-	case "f5xc_origin_pool":
+	case "xcsh_origin_pool":
 		return c.DeleteOriginPool(deleteCtx, r.Namespace, r.Name)
-	case "f5xc_healthcheck":
+	case "xcsh_healthcheck":
 		return c.DeleteHealthcheck(deleteCtx, r.Namespace, r.Name)
-	case "f5xc_app_firewall":
+	case "xcsh_app_firewall":
 		return c.DeleteAppFirewall(deleteCtx, r.Namespace, r.Name)
-	case "f5xc_service_policy":
+	case "xcsh_service_policy":
 		return c.DeleteServicePolicy(deleteCtx, r.Namespace, r.Name)
-	case "f5xc_ip_prefix_set":
+	case "xcsh_ip_prefix_set":
 		return c.DeleteIPPrefixSet(deleteCtx, r.Namespace, r.Name)
-	case "f5xc_rate_limiter":
+	case "xcsh_rate_limiter":
 		return c.DeleteRateLimiter(deleteCtx, r.Namespace, r.Name)
-	case "f5xc_user_identification":
+	case "xcsh_user_identification":
 		return c.DeleteUserIdentification(deleteCtx, r.Namespace, r.Name)
-	case "f5xc_malicious_user_mitigation":
+	case "xcsh_malicious_user_mitigation":
 		return c.DeleteMaliciousUserMitigation(deleteCtx, r.Namespace, r.Name)
 	default:
 		return fmt.Errorf("unknown resource type: %s", r.Type)

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// TCPLoadBalancer represents a F5XC TCPLoadBalancer
+// TCPLoadBalancer represents a XCSH TCPLoadBalancer
 type TCPLoadBalancer struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

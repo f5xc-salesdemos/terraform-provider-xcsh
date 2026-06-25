@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Robin Mordasiewicz. MIT License.
 
-// Package blindfold provides F5XC Secret Management encryption utilities.
+// Package blindfold provides XCSH Secret Management encryption utilities.
 package blindfold
 
 import (
@@ -11,7 +11,7 @@ import (
 	"github.com/f5xc-salesdemos/terraform-provider-xcsh/internal/client"
 )
 
-// AuthConfig holds configuration for F5XC API authentication.
+// AuthConfig holds configuration for XCSH API authentication.
 type AuthConfig struct {
 	// APIToken is the API token for bearer authentication.
 	APIToken string
@@ -19,7 +19,7 @@ type AuthConfig struct {
 	P12File string
 	// P12Password is the password for the P12 certificate.
 	P12Password string
-	// BaseURL is the F5XC API base URL.
+	// BaseURL is the XCSH API base URL.
 	BaseURL string
 }
 
@@ -53,14 +53,14 @@ type AuthResult struct {
 	Client *http.Client
 	// Method indicates which authentication method was used.
 	Method AuthMethod
-	// BaseURL is the F5XC API base URL.
+	// BaseURL is the XCSH API base URL.
 	BaseURL string
 	// Token is the API token (only set for token auth).
 	Token string
 }
 
-// Environment variable names for F5XC authentication.
-// Using F5XC_* prefix for F5 Distributed Cloud branding.
+// Environment variable names for XCSH authentication.
+// Using XCSH_* prefix for XC SuperHub branding.
 const (
 	EnvAPIURL      = "XCSH_API_URL"
 	EnvAPIToken    = "XCSH_API_TOKEN"
@@ -68,7 +68,7 @@ const (
 	EnvP12Password = "XCSH_P12_PASSWORD" // pragma: allowlist secret
 )
 
-// DefaultAPIURL is the default F5XC API URL.
+// DefaultAPIURL is the default XCSH API URL.
 const DefaultAPIURL = "https://console.ves.volterra.io"
 
 // DefaultTimeout reuses the client package's standard HTTP timeout.
@@ -91,7 +91,7 @@ func GetAuthConfigFromEnv() (*AuthConfig, error) {
 	// Validate that at least one auth method is configured
 	if config.APIToken == "" && config.P12File == "" {
 		return nil, fmt.Errorf(
-			"no F5XC authentication configured: set either %s for API token authentication "+
+			"no XCSH authentication configured: set either %s for API token authentication "+
 				"or %s and %s for P12 certificate authentication",
 			EnvAPIToken, EnvP12File, EnvP12Password,
 		)
@@ -100,12 +100,12 @@ func GetAuthConfigFromEnv() (*AuthConfig, error) {
 	return config, nil
 }
 
-// CreateAuthenticatedClient creates an HTTP client configured for F5XC API authentication.
+// CreateAuthenticatedClient creates an HTTP client configured for XCSH API authentication.
 // It prioritizes API token authentication over P12 certificate authentication.
 //
 // Priority:
-//  1. API token (F5XC_API_TOKEN)
-//  2. P12 certificate (F5XC_P12_FILE + F5XC_P12_PASSWORD)
+//  1. API token (XCSH_API_TOKEN)
+//  2. P12 certificate (XCSH_P12_FILE + XCSH_P12_PASSWORD)
 //
 // Returns an AuthResult containing the client and authentication metadata.
 func CreateAuthenticatedClient(config *AuthConfig) (*AuthResult, error) {

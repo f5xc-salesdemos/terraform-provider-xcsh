@@ -17,8 +17,8 @@ func TestAccContainerRegistryDataSource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_container_registry.test"
-	dataSourceName := "data.f5xc_container_registry.test"
+	resourceName := "xcsh_container_registry.test"
+	dataSourceName := "data.xcsh_container_registry.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -43,19 +43,19 @@ func testAccContainerRegistryDataSourceConfig_basic(nsName, name string) string 
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_container_registry" "test" {
+resource "xcsh_container_registry" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
   registry          = "registry.example.com"
   user_name         = "testuser"
   password {
@@ -65,10 +65,10 @@ resource "f5xc_container_registry" "test" {
   }
 }
 
-data "f5xc_container_registry" "test" {
-  depends_on = [f5xc_container_registry.test]
-  name       = f5xc_container_registry.test.name
-  namespace  = f5xc_container_registry.test.namespace
+data "xcsh_container_registry" "test" {
+  depends_on = [xcsh_container_registry.test]
+  name       = xcsh_container_registry.test.name
+  namespace  = xcsh_container_registry.test.namespace
 }
 `, nsName, name))
 }

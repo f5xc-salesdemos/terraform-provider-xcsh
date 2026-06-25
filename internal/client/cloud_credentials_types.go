@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// CloudCredentials represents a F5XC CloudCredentials
+// CloudCredentials represents a XCSH CloudCredentials
 type CloudCredentials struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

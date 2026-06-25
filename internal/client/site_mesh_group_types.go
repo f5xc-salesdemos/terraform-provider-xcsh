@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// SiteMeshGroup represents a F5XC SiteMeshGroup
+// SiteMeshGroup represents a XCSH SiteMeshGroup
 type SiteMeshGroup struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

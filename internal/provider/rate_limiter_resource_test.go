@@ -42,7 +42,7 @@ func TestAccRateLimiterResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rlName := acctest.RandomName("rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -75,7 +75,7 @@ func TestAccRateLimiterResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rlName := acctest.RandomName("rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -112,7 +112,7 @@ func TestAccRateLimiterResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rlName := acctest.RandomName("rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -149,7 +149,7 @@ func TestAccRateLimiterResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rlName := acctest.RandomName("rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -180,7 +180,7 @@ func TestAccRateLimiterResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rlName := acctest.RandomName("rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -217,7 +217,7 @@ func TestAccRateLimiterResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rlName := acctest.RandomName("rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -266,7 +266,7 @@ func TestAccRateLimiterResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rlName := acctest.RandomName("rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -291,7 +291,7 @@ func TestAccRateLimiterResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rlName := acctest.RandomName("rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -347,7 +347,7 @@ func TestAccRateLimiterResource_nameTooLong(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	rlName := acctest.RandomName("this-name-is-way-too-long-and-exceeds-maximum-length-allowed-for-names-in-f5xc")
+	rlName := acctest.RandomName("this-name-is-way-too-long-and-exceeds-maximum-length-allowed-for-names-in-xcsh")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -383,7 +383,7 @@ func TestAccRateLimiterResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rlName1 := acctest.RandomName("rl1")
 	rlName2 := acctest.RandomName("rl2")
 
@@ -416,7 +416,7 @@ func TestAccRateLimiterResource_rateLimitValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rlName := acctest.RandomName("rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -451,7 +451,7 @@ func TestAccRateLimiterResource_rateLimitValues(t *testing.T) {
 
 func testAccRateLimiterConfig_basicSystem(rlName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name       = %[1]q
   namespace  = "system"
 }
@@ -460,7 +460,7 @@ resource "f5xc_rate_limiter" "test" {
 
 func testAccRateLimiterConfig_allAttributesSystem(rlName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test rate limiter with all attributes"
@@ -485,7 +485,7 @@ func testAccRateLimiterConfig_withLabelsSystem(rlName string, labels map[string]
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -497,7 +497,7 @@ resource "f5xc_rate_limiter" "test" {
 
 func testAccRateLimiterConfig_withDescriptionSystem(rlName, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -512,7 +512,7 @@ func testAccRateLimiterConfig_withAnnotationsSystem(rlName string, annotations m
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -530,7 +530,7 @@ func TestAccRateLimiterResource_tokenBucket(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rName := acctest.RandomName("tf-test-rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -561,7 +561,7 @@ func TestAccRateLimiterResource_switchAlgorithm(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rName := acctest.RandomName("tf-test-rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -598,7 +598,7 @@ func TestAccRateLimiterResource_unitVariations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rName := acctest.RandomName("tf-test-rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -629,7 +629,7 @@ func TestAccRateLimiterResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_rate_limiter.test"
+	resourceName := "xcsh_rate_limiter.test"
 	rName := acctest.RandomName("tf-test-rl")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -679,7 +679,7 @@ func TestAccRateLimiterResource_fullLifecycle(t *testing.T) {
 
 func testAccRateLimiterConfig_tokenBucketSystem(rlName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -696,7 +696,7 @@ resource "f5xc_rate_limiter" "test" {
 
 func testAccRateLimiterConfig_unitSystem(rlName, unit string, totalNumber int) string {
 	return fmt.Sprintf(`
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -713,7 +713,7 @@ resource "f5xc_rate_limiter" "test" {
 
 func testAccRateLimiterConfig_withLimitsSystem(rlName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_rate_limiter" "test" {
+resource "xcsh_rate_limiter" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Rate limiter with limits configuration"

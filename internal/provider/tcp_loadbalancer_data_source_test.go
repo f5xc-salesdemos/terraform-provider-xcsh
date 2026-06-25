@@ -16,8 +16,8 @@ func TestAccTcpLoadbalancerDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-tcp-lb")
-	resourceName := "f5xc_tcp_loadbalancer.test"
-	dataSourceName := "data.f5xc_tcp_loadbalancer.test"
+	resourceName := "xcsh_tcp_loadbalancer.test"
+	dataSourceName := "data.xcsh_tcp_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -40,7 +40,7 @@ func testAccTcpLoadbalancerDataSourceConfig_basic(nsName, name string) string {
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
 # Origin pool is required for TCP load balancer - it needs a backend cluster
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name       = "%[2]s-pool"
   namespace  = "system"
 
@@ -57,7 +57,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_tcp_loadbalancer" "test" {
+resource "xcsh_tcp_loadbalancer" "test" {
   name       = %[2]q
   namespace  = "system"
 
@@ -80,7 +80,7 @@ resource "f5xc_tcp_loadbalancer" "test" {
   # Required: TCP LB needs origin pools for routing
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -90,10 +90,10 @@ resource "f5xc_tcp_loadbalancer" "test" {
   advertise_on_public_default_vip {}
 }
 
-data "f5xc_tcp_loadbalancer" "test" {
-  depends_on = [f5xc_tcp_loadbalancer.test]
-  name       = f5xc_tcp_loadbalancer.test.name
-  namespace  = f5xc_tcp_loadbalancer.test.namespace
+data "xcsh_tcp_loadbalancer" "test" {
+  depends_on = [xcsh_tcp_loadbalancer.test]
+  name       = xcsh_tcp_loadbalancer.test.name
+  namespace  = xcsh_tcp_loadbalancer.test.namespace
 }
 `, nsName, name))
 }

@@ -56,7 +56,7 @@ type LLMsConfig struct {
 // ResourceInfo holds parsed information about a resource.
 type ResourceInfo struct {
 	Name           string
-	FullName       string // f5xc_<name>
+	FullName       string // xcsh_<name>
 	Category       string
 	Description    string
 	RequiredFields []string
@@ -159,7 +159,7 @@ var (
 	serverDefaultLineRE = regexp.MustCompile(`^#\s+-\s+(\S+)\s*$`)
 	requiredFieldRE     = regexp.MustCompile(`<a[^>]*>.*?</a>.*?\[(` + "`" + `[^` + "`" + `]+` + "`" + `)\].*?-\s*Required\s+(String|Number|Bool|Block)`)
 	serverDefaultTagRE  = regexp.MustCompile(`Server Default|⚙️\s*\*\*Server Default\*\*`)
-	resourceBlockRE     = regexp.MustCompile(`(?s)resource\s+"f5xc_\w+"\s+"[^"]+"\s+\{[^}]*\}`)
+	resourceBlockRE     = regexp.MustCompile(`(?s)resource\s+"xcsh_\w+"\s+"[^"]+"\s+\{[^}]*\}`)
 )
 
 func main() {
@@ -322,7 +322,7 @@ func parseResource(path, name string, config *LLMsConfig, artifactServerDefaults
 
 	res := ResourceInfo{
 		Name:     name,
-		FullName: "f5xc_" + name,
+		FullName: "xcsh_" + name,
 	}
 
 	// Extract frontmatter
@@ -614,7 +614,7 @@ func extractOneOfGroupsWithContext(content string) []OneOfGroup {
 		for i := 0; i < opens; i++ {
 			if !insideResource {
 				// Check if this is the resource block opening
-				if strings.Contains(trimmed, "resource \"f5xc_") {
+				if strings.Contains(trimmed, "resource \"xcsh_") {
 					insideResource = true
 					depth = 1
 					break // only one open brace on this line for resource
@@ -667,7 +667,7 @@ func findBlockFields(codeBlock string) map[string]bool {
 		}
 		if m := blockRE.FindStringSubmatch(line); m != nil {
 			name := m[1]
-			if name != "resource" && name != "terraform" && name != "required_providers" && name != "f5xc" {
+			if name != "resource" && name != "terraform" && name != "required_providers" && name != "xcsh" {
 				blockFields[name] = true
 			}
 		}
@@ -812,7 +812,7 @@ func extractMinimalConfig(content, name string) string {
 	var configLines []string
 	inResource := false
 	braceDepth := 0
-	resourcePattern := fmt.Sprintf(`resource "f5xc_%s"`, name)
+	resourcePattern := fmt.Sprintf(`resource "xcsh_%s"`, name)
 
 	for _, line := range lines {
 		if !inResource && strings.Contains(line, resourcePattern) {
@@ -957,7 +957,7 @@ func generateL0(config *LLMsConfig, categories []CategoryInfo) error {
 	sb.WriteString("## Required Block\n\n")
 	sb.WriteString("    terraform {\n")
 	sb.WriteString("      required_providers {\n")
-	sb.WriteString("        f5xc = {\n")
+	sb.WriteString("        xcsh = {\n")
 	sb.WriteString("          source = \"f5xc-salesdemos/f5xc\"\n")
 	sb.WriteString("        }\n")
 	sb.WriteString("      }\n")
@@ -1164,19 +1164,19 @@ func generateJSONIndex(config *LLMsConfig, categories []CategoryInfo, reverseDep
 			Registry: config.Deprecation.Canonical.Registry,
 			RequiredBlock: `terraform {
   required_providers {
-    f5xc = {
+    xcsh = {
       source = "f5xc-salesdemos/f5xc"
     }
   }
 }`,
-			ConfigBlock: `provider "f5xc" {}`,
+			ConfigBlock: `provider "xcsh" {}`,
 			AuthMethods: []string{
-				"REQUIRED: every .tf must contain a `provider \"f5xc\" {}` block. Without it Terraform errors: \"Provider requires explicit configuration. Add a provider block\".",
+				"REQUIRED: every .tf must contain a `provider \"xcsh\" {}` block. Without it Terraform errors: \"Provider requires explicit configuration. Add a provider block\".",
 				"Configure exactly ONE auth method, via environment variables (preferred) or explicit arguments in the provider block:",
-				"api_token (env F5XC_API_TOKEN) — API token authentication.",
-				"api_p12_file + p12_password (env F5XC_P12_FILE + F5XC_P12_PASSWORD) — PKCS#12 certificate authentication.",
-				"api_cert + api_key (env F5XC_CERT + F5XC_KEY) — PEM certificate authentication.",
-				"api_url (env F5XC_API_URL) — tenant base URL without /api suffix, e.g. https://your-tenant.console.ves.volterra.io.",
+				"api_token (env XCSH_API_TOKEN) — API token authentication.",
+				"api_p12_file + p12_password (env XCSH_P12_FILE + XCSH_P12_PASSWORD) — PKCS#12 certificate authentication.",
+				"api_cert + api_key (env XCSH_CERT + XCSH_KEY) — PEM certificate authentication.",
+				"api_url (env XCSH_API_URL) — tenant base URL without /api suffix, e.g. https://your-tenant.console.ves.volterra.io.",
 			},
 			SyntaxRules: []string{
 				"OneOf selectors: use empty block `field {}`, never `field = true`",
@@ -1224,7 +1224,7 @@ func generateJSONIndex(config *LLMsConfig, categories []CategoryInfo, reverseDep
 				ServerDefaults: res.ServerDefaults,
 				MinimalConfig:  res.MinimalConfig,
 				Dependencies:   deps,
-				ImportSyntax:   fmt.Sprintf("terraform import f5xc_%s.example namespace/name", res.Name),
+				ImportSyntax:   fmt.Sprintf("terraform import xcsh_%s.example namespace/name", res.Name),
 			}
 		}
 	}

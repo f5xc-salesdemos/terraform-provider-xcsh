@@ -25,7 +25,7 @@ func TestAccOriginPoolResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -63,7 +63,7 @@ func TestAccOriginPoolResource_withLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -93,7 +93,7 @@ func TestAccOriginPoolResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -127,7 +127,7 @@ func TestAccOriginPoolResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -155,7 +155,7 @@ func TestAccOriginPoolResource_emptyPlan(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -200,7 +200,7 @@ func TestAccOriginPoolResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -243,7 +243,7 @@ func TestAccOriginPoolResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -291,7 +291,7 @@ func TestAccOriginPoolResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName1 := acctest.RandomName("tf-test-op")
 	rName2 := acctest.RandomName("tf-test-op")
 
@@ -323,7 +323,7 @@ func TestAccOriginPoolResource_publicIp(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -356,7 +356,7 @@ func TestAccOriginPoolResource_multipleOrigins(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -389,7 +389,7 @@ func TestAccOriginPoolResource_withHealthcheckRef(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -427,7 +427,7 @@ func TestAccOriginPoolResource_updatePort(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -465,7 +465,7 @@ func TestAccOriginPoolResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
 	rName := acctest.RandomName("tf-test-op")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -521,7 +521,7 @@ func TestAccOriginPoolResource_fullLifecycle(t *testing.T) {
 
 func testAccOriginPoolConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -542,7 +542,7 @@ resource "f5xc_origin_pool" "test" {
 
 func testAccOriginPoolConfig_withLabelsSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test origin pool"
@@ -569,7 +569,7 @@ resource "f5xc_origin_pool" "test" {
 
 func testAccOriginPoolConfig_publicIpSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -590,7 +590,7 @@ resource "f5xc_origin_pool" "test" {
 
 func testAccOriginPoolConfig_multipleOriginsSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -618,7 +618,7 @@ resource "f5xc_origin_pool" "test" {
 
 func testAccOriginPoolConfig_withHealthcheckRefSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -630,7 +630,7 @@ resource "f5xc_healthcheck" "test" {
   tcp_health_check {}
 }
 
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -644,8 +644,8 @@ resource "f5xc_origin_pool" "test" {
   }
 
   healthcheck {
-    name      = f5xc_healthcheck.test.name
-    namespace = f5xc_healthcheck.test.namespace
+    name      = xcsh_healthcheck.test.name
+    namespace = xcsh_healthcheck.test.namespace
   }
 
   no_tls {}
@@ -656,7 +656,7 @@ resource "f5xc_origin_pool" "test" {
 
 func testAccOriginPoolConfig_portSystem(name string, port int) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -677,7 +677,7 @@ resource "f5xc_origin_pool" "test" {
 
 func testAccOriginPoolConfig_labelsUpdateSystem(name, env string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -715,7 +715,7 @@ func TestAccOriginPoolResource_conflictTlsOptions(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = %[1]q
   namespace = "system"
   port      = 443

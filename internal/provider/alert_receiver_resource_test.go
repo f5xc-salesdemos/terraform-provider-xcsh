@@ -23,7 +23,7 @@ import (
 
 // TestAccAlertReceiverResource_basic tests the basic creation and deletion of an alert_receiver resource
 func TestAccAlertReceiverResource_basic(t *testing.T) {
-	resourceName := "f5xc_alert_receiver.test"
+	resourceName := "xcsh_alert_receiver.test"
 	rName := acctest.RandomName("tf-acc-test-alertrecv")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -53,7 +53,7 @@ func TestAccAlertReceiverResource_basic(t *testing.T) {
 
 // TestAccAlertReceiverResource_allAttributes tests alert_receiver with all common attributes
 func TestAccAlertReceiverResource_allAttributes(t *testing.T) {
-	resourceName := "f5xc_alert_receiver.test"
+	resourceName := "xcsh_alert_receiver.test"
 	rName := acctest.RandomName("tf-acc-test-alertrecv")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -78,7 +78,7 @@ func TestAccAlertReceiverResource_allAttributes(t *testing.T) {
 
 // TestAccAlertReceiverResource_updateLabels tests updating labels on an existing resource
 func TestAccAlertReceiverResource_updateLabels(t *testing.T) {
-	resourceName := "f5xc_alert_receiver.test"
+	resourceName := "xcsh_alert_receiver.test"
 	rName := acctest.RandomName("tf-acc-test-alertrecv")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -106,7 +106,7 @@ func TestAccAlertReceiverResource_updateLabels(t *testing.T) {
 
 // TestAccAlertReceiverResource_updateDescription tests updating description
 func TestAccAlertReceiverResource_updateDescription(t *testing.T) {
-	resourceName := "f5xc_alert_receiver.test"
+	resourceName := "xcsh_alert_receiver.test"
 	rName := acctest.RandomName("tf-acc-test-alertrecv")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -133,7 +133,7 @@ func TestAccAlertReceiverResource_updateDescription(t *testing.T) {
 
 // TestAccAlertReceiverResource_updateAnnotations tests updating annotations
 func TestAccAlertReceiverResource_updateAnnotations(t *testing.T) {
-	resourceName := "f5xc_alert_receiver.test"
+	resourceName := "xcsh_alert_receiver.test"
 	rName := acctest.RandomName("tf-acc-test-alertrecv")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -161,7 +161,7 @@ func TestAccAlertReceiverResource_updateAnnotations(t *testing.T) {
 
 // TestAccAlertReceiverResource_disappears tests behavior when resource is deleted outside Terraform
 func TestAccAlertReceiverResource_disappears(t *testing.T) {
-	resourceName := "f5xc_alert_receiver.test"
+	resourceName := "xcsh_alert_receiver.test"
 	rName := acctest.RandomName("tf-acc-test-alertrecv")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -183,7 +183,7 @@ func TestAccAlertReceiverResource_disappears(t *testing.T) {
 
 // TestAccAlertReceiverResource_emptyPlan tests that no changes occur when configuration hasn't changed
 func TestAccAlertReceiverResource_emptyPlan(t *testing.T) {
-	resourceName := "f5xc_alert_receiver.test"
+	resourceName := "xcsh_alert_receiver.test"
 	rName := acctest.RandomName("tf-acc-test-alertrecv")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -219,7 +219,7 @@ func TestAccAlertReceiverResource_planChecks(t *testing.T) {
 				Config: testAccAlertReceiverConfig_basic(rName),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_alert_receiver.test", plancheck.ResourceActionCreate),
+						plancheck.ExpectResourceAction("xcsh_alert_receiver.test", plancheck.ResourceActionCreate),
 					},
 				},
 			},
@@ -227,7 +227,7 @@ func TestAccAlertReceiverResource_planChecks(t *testing.T) {
 				Config: testAccAlertReceiverConfig_withLabels(rName, "newlabel"),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_alert_receiver.test", plancheck.ResourceActionUpdate),
+						plancheck.ExpectResourceAction("xcsh_alert_receiver.test", plancheck.ResourceActionUpdate),
 					},
 				},
 			},
@@ -248,19 +248,19 @@ func TestAccAlertReceiverResource_knownValues(t *testing.T) {
 				Config: testAccAlertReceiverConfig_basic(rName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"f5xc_alert_receiver.test",
+						"xcsh_alert_receiver.test",
 						tfjsonpath.New("name"),
 						knownvalue.StringExact(rName),
 					),
 					statecheck.ExpectKnownValue(
-						"f5xc_alert_receiver.test",
+						"xcsh_alert_receiver.test",
 						tfjsonpath.New("namespace"),
 						knownvalue.StringExact("system"),
 					),
 					statecheck.CompareValuePairs(
-						"f5xc_alert_receiver.test",
+						"xcsh_alert_receiver.test",
 						tfjsonpath.New("name"),
-						"f5xc_alert_receiver.test",
+						"xcsh_alert_receiver.test",
 						tfjsonpath.New("id"),
 						compare.ValuesSame(),
 					),
@@ -289,7 +289,7 @@ func TestAccAlertReceiverResource_invalidName(t *testing.T) {
 
 // TestAccAlertReceiverResource_nameTooLong tests validation of names exceeding maximum length
 func TestAccAlertReceiverResource_nameTooLong(t *testing.T) {
-	rName := "this-name-is-way-too-long-and-exceeds-the-maximum-allowed-length-for-f5xc-resources-which-should-trigger-validation-error"
+	rName := "this-name-is-way-too-long-and-exceeds-the-maximum-allowed-length-for-xcsh-resources-which-should-trigger-validation-error"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -332,20 +332,20 @@ func TestAccAlertReceiverResource_requiresReplace(t *testing.T) {
 			{
 				Config: testAccAlertReceiverConfig_basic(rName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					acctest.CheckAlertReceiverExists("f5xc_alert_receiver.test"),
-					resource.TestCheckResourceAttr("f5xc_alert_receiver.test", "name", rName),
+					acctest.CheckAlertReceiverExists("xcsh_alert_receiver.test"),
+					resource.TestCheckResourceAttr("xcsh_alert_receiver.test", "name", rName),
 				),
 			},
 			{
 				Config: testAccAlertReceiverConfig_basic(rNameUpdated),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_alert_receiver.test", plancheck.ResourceActionDestroyBeforeCreate),
+						plancheck.ExpectResourceAction("xcsh_alert_receiver.test", plancheck.ResourceActionDestroyBeforeCreate),
 					},
 				},
 				Check: resource.ComposeAggregateTestCheckFunc(
-					acctest.CheckAlertReceiverExists("f5xc_alert_receiver.test"),
-					resource.TestCheckResourceAttr("f5xc_alert_receiver.test", "name", rNameUpdated),
+					acctest.CheckAlertReceiverExists("xcsh_alert_receiver.test"),
+					resource.TestCheckResourceAttr("xcsh_alert_receiver.test", "name", rNameUpdated),
 				),
 			},
 		},
@@ -354,7 +354,7 @@ func TestAccAlertReceiverResource_requiresReplace(t *testing.T) {
 
 // TestAccAlertReceiverResource_emailConfig tests alert_receiver with email configuration
 func TestAccAlertReceiverResource_emailConfig(t *testing.T) {
-	resourceName := "f5xc_alert_receiver.test"
+	resourceName := "xcsh_alert_receiver.test"
 	rName := acctest.RandomName("tf-acc-test-alertrecv")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -395,7 +395,7 @@ func testAccAlertReceiverImportStateIdFunc(resourceName string) resource.ImportS
 
 func testAccAlertReceiverConfig_basic(rName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_alert_receiver" "test" {
+resource "xcsh_alert_receiver" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -408,7 +408,7 @@ resource "f5xc_alert_receiver" "test" {
 
 func testAccAlertReceiverConfig_allAttributes(rName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_alert_receiver" "test" {
+resource "xcsh_alert_receiver" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -430,7 +430,7 @@ resource "f5xc_alert_receiver" "test" {
 
 func testAccAlertReceiverConfig_withLabels(rName, labelValue string) string {
 	return fmt.Sprintf(`
-resource "f5xc_alert_receiver" "test" {
+resource "xcsh_alert_receiver" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -447,7 +447,7 @@ resource "f5xc_alert_receiver" "test" {
 
 func testAccAlertReceiverConfig_withAnnotations(rName, annotationValue string) string {
 	return fmt.Sprintf(`
-resource "f5xc_alert_receiver" "test" {
+resource "xcsh_alert_receiver" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -464,7 +464,7 @@ resource "f5xc_alert_receiver" "test" {
 
 func testAccAlertReceiverConfig_email(rName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_alert_receiver" "test" {
+resource "xcsh_alert_receiver" "test" {
   name      = %[1]q
   namespace = "system"
 

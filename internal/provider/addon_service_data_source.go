@@ -54,7 +54,7 @@ source allows you to query addon service details including tier requirements and
 activation type.
 
 ~> **Note:** Addon services cannot be created or modified via Terraform. Use the
-` + "`f5xc_addon_subscription`" + ` resource to subscribe to an addon service.`,
+` + "`xcsh_addon_subscription`" + ` resource to subscribe to an addon service.`,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique identifier for the data source.",

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// CRL represents a F5XC CRL
+// CRL represents a XCSH CRL
 type CRL struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

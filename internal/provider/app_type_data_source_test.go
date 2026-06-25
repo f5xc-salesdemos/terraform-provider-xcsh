@@ -17,8 +17,8 @@ func TestAccAppTypeDataSource_basic(t *testing.T) {
 
 	// app_type resources must be created in the "shared" namespace
 	rName := acctest.RandomName("tf-acc-test-apptype")
-	resourceName := "f5xc_app_type.test"
-	dataSourceName := "data.f5xc_app_type.test"
+	resourceName := "xcsh_app_type.test"
+	dataSourceName := "data.xcsh_app_type.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -41,15 +41,15 @@ func testAccAppTypeDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_app_type" "test" {
+resource "xcsh_app_type" "test" {
   name      = %[1]q
   namespace = "shared"
 }
 
-data "f5xc_app_type" "test" {
-  depends_on = [f5xc_app_type.test]
-  name       = f5xc_app_type.test.name
-  namespace  = f5xc_app_type.test.namespace
+data "xcsh_app_type" "test" {
+  depends_on = [xcsh_app_type.test]
+  name       = xcsh_app_type.test.name
+  namespace  = xcsh_app_type.test.namespace
 }
 `, name))
 }

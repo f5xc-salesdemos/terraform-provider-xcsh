@@ -24,7 +24,7 @@ func TestAccAWSTGWSiteResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-tgw")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_aws_tgw_site.test"
+	resourceName := "xcsh_aws_tgw_site.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -34,7 +34,7 @@ func TestAccAWSTGWSiteResource_basic(t *testing.T) {
 				Source: "hashicorp/time",
 			},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_aws_tgw_site"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_aws_tgw_site"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAWSTGWSiteConfig_basic(nsName, rName),
@@ -72,12 +72,12 @@ func testAccAWSTGWSiteConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
@@ -86,11 +86,11 @@ resource "time_sleep" "wait_for_namespace" {
 # - aws_parameters block with region, VPC, credentials, subnets, etc.
 # - Proper networking configuration
 # - Security groups and access controls
-resource "f5xc_aws_tgw_site" "test" {
+resource "xcsh_aws_tgw_site" "test" {
   depends_on = [time_sleep.wait_for_namespace]
 
   name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  namespace = xcsh_namespace.test.name
 
   # Minimal configuration - would need extensive aws_parameters block for real deployment
 }

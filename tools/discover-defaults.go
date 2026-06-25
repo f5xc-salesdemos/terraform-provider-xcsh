@@ -16,8 +16,8 @@
 // Environment Variables Required:
 //
 //	XCSH_API_URL - API URL (e.g., https://tenant.console.ves.volterra.io)
-//	F5XC_P12_FILE + F5XC_P12_PASSWORD - P12 certificate authentication
-//	or F5XC_API_TOKEN - Token authentication
+//	XCSH_P12_FILE + XCSH_P12_PASSWORD - P12 certificate authentication
+//	or XCSH_API_TOKEN - Token authentication
 package main
 
 import (
@@ -462,8 +462,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error creating API client: %v\n", err)
 		fmt.Fprintf(os.Stderr, "\nRequired environment variables:\n")
 		fmt.Fprintf(os.Stderr, "  XCSH_API_URL - API URL\n")
-		fmt.Fprintf(os.Stderr, "  F5XC_P12_FILE + F5XC_P12_PASSWORD - P12 cert auth\n")
-		fmt.Fprintf(os.Stderr, "  or F5XC_API_TOKEN - Token auth\n")
+		fmt.Fprintf(os.Stderr, "  XCSH_P12_FILE + XCSH_P12_PASSWORD - P12 cert auth\n")
+		fmt.Fprintf(os.Stderr, "  or XCSH_API_TOKEN - Token auth\n")
 		os.Exit(1)
 	}
 

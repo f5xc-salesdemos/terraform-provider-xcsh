@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// SensitiveDataPolicy represents a F5XC SensitiveDataPolicy
+// SensitiveDataPolicy represents a XCSH SensitiveDataPolicy
 type SensitiveDataPolicy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

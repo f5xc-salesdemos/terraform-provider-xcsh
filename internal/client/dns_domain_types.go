@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// DNSDomain represents a F5XC DNSDomain
+// DNSDomain represents a XCSH DNSDomain
 type DNSDomain struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

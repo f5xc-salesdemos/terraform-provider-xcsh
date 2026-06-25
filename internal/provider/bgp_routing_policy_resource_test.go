@@ -18,7 +18,7 @@ func TestAccBGPRoutingPolicyResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-bgprp")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_bgp_routing_policy.test"
+	resourceName := "xcsh_bgp_routing_policy.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -26,7 +26,7 @@ func TestAccBGPRoutingPolicyResource_basic(t *testing.T) {
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_bgp_routing_policy"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_bgp_routing_policy"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccBGPRoutingPolicyConfig_basic(nsName, rName),
@@ -66,7 +66,7 @@ func testAccBGPRoutingPolicyConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_bgp_routing_policy" "test" {
+resource "xcsh_bgp_routing_policy" "test" {
   name       = %[1]q
   namespace  = "system"
 

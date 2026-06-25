@@ -35,7 +35,7 @@ import (
 // 10. Domains Test - Test domains attribute functionality
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccVirtualHostResource -timeout 30m
 // =============================================================================
 
@@ -49,7 +49,7 @@ func TestAccVirtualHostResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-vh")
 
@@ -96,7 +96,7 @@ func TestAccVirtualHostResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-vh")
 	description := "Comprehensive acceptance test virtual host"
@@ -150,7 +150,7 @@ func TestAccVirtualHostResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-vh")
 
@@ -204,7 +204,7 @@ func TestAccVirtualHostResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-vh")
 
@@ -262,7 +262,7 @@ func TestAccVirtualHostResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-vh")
 
@@ -314,7 +314,7 @@ func TestAccVirtualHostResource_updateDomains(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-vh")
 
@@ -366,7 +366,7 @@ func TestAccVirtualHostResource_emptyPlan(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-vh")
 
@@ -409,7 +409,7 @@ func TestAccVirtualHostResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-vh")
 
@@ -466,7 +466,7 @@ func TestAccVirtualHostResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-vh")
 
@@ -602,7 +602,7 @@ func TestAccVirtualHostResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name1 := acctest.RandomName("tf-acc-test-vh")
 	name2 := acctest.RandomName("tf-acc-test-vh")
@@ -651,7 +651,7 @@ func TestAccVirtualHostResource_domainsWildcard(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_virtual_host.test"
+	resourceName := "xcsh_virtual_host.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-vh")
 
@@ -704,19 +704,19 @@ func testAccVirtualHostResourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_virtual_host" "test" {
+resource "xcsh_virtual_host" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   domains = ["%[2]s.example.com"]
   proxy   = "SMA_PROXY"
@@ -728,19 +728,19 @@ func testAccVirtualHostResourceConfig_allAttributes(nsName, name, description st
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_virtual_host" "test" {
+resource "xcsh_virtual_host" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 
   labels = {
@@ -766,19 +766,19 @@ func testAccVirtualHostResourceConfig_withLabels(nsName, name, environment, mana
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_virtual_host" "test" {
+resource "xcsh_virtual_host" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   domains = ["%[2]s.example.com"]
   proxy   = "SMA_PROXY"
@@ -795,19 +795,19 @@ func testAccVirtualHostResourceConfig_withDescription(nsName, name, description 
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_virtual_host" "test" {
+resource "xcsh_virtual_host" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 
   domains = ["%[2]s.example.com"]
@@ -820,19 +820,19 @@ func testAccVirtualHostResourceConfig_withAnnotations(nsName, name, value1, valu
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_virtual_host" "test" {
+resource "xcsh_virtual_host" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   domains = ["%[2]s.example.com"]
   proxy   = "SMA_PROXY"
@@ -854,19 +854,19 @@ func testAccVirtualHostResourceConfig_withDomains(nsName, name string, domains [
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_virtual_host" "test" {
+resource "xcsh_virtual_host" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   domains = [
 %[3]s  ]

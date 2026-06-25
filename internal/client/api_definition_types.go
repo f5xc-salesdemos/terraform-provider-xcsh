@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// APIDefinition represents a F5XC APIDefinition
+// APIDefinition represents a XCSH APIDefinition
 type APIDefinition struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -18,13 +18,13 @@ func TestAccAppSettingResource_basic(t *testing.T) {
 
 	// app_setting can only be created in namespaces with namespace_type: "app"
 	// Using "hipster-shop" which is an existing app-type namespace in the staging environment
-	resourceName := "f5xc_app_setting.test"
+	resourceName := "xcsh_app_setting.test"
 	rName := acctest.RandomName("tf-test-appset")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_app_setting"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_app_setting"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAppSettingConfig_basic(rName),
@@ -62,7 +62,7 @@ func testAccAppSettingConfig_basic(name string) string {
 	// App setting requires app_type_settings with at least one app_type_ref
 	// Must be created in a namespace with namespace_type: "app" (e.g., hipster-shop)
 	return fmt.Sprintf(`
-resource "f5xc_app_setting" "test" {
+resource "xcsh_app_setting" "test" {
   name      = %[1]q
   namespace = "hipster-shop"
 

@@ -28,7 +28,7 @@ import (
 // Tests create a temporary namespace and wait for it to be ready
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccTrustedCaListResource -timeout 30m
 // =============================================================================
 
@@ -42,7 +42,7 @@ func TestAccTrustedCaListResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_trusted_ca_list.test"
+	resourceName := "xcsh_trusted_ca_list.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-ca")
 
@@ -85,7 +85,7 @@ func TestAccTrustedCaListResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_trusted_ca_list.test"
+	resourceName := "xcsh_trusted_ca_list.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-ca")
 	description := "Comprehensive acceptance test trusted CA list"
@@ -132,7 +132,7 @@ func TestAccTrustedCaListResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_trusted_ca_list.test"
+	resourceName := "xcsh_trusted_ca_list.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-ca")
 
@@ -184,7 +184,7 @@ func TestAccTrustedCaListResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_trusted_ca_list.test"
+	resourceName := "xcsh_trusted_ca_list.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-ca")
 
@@ -240,7 +240,7 @@ func TestAccTrustedCaListResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_trusted_ca_list.test"
+	resourceName := "xcsh_trusted_ca_list.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-ca")
 
@@ -328,7 +328,7 @@ func TestAccTrustedCaListResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_trusted_ca_list.test"
+	resourceName := "xcsh_trusted_ca_list.test"
 	nsName := acctest.RandomName("tf-test-ns")
 	rName := acctest.RandomName("tf-test-tcl")
 	certBase64 := acctest.MustGenerateTestCertificates().RootCABase64
@@ -361,7 +361,7 @@ func TestAccTrustedCaListResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_trusted_ca_list.test"
+	resourceName := "xcsh_trusted_ca_list.test"
 	nsName := acctest.RandomName("tf-test-ns")
 	rName := acctest.RandomName("tf-test-tcl")
 	certBase64 := acctest.MustGenerateTestCertificates().RootCABase64
@@ -407,19 +407,19 @@ func testAccTrustedCaListResourceConfig_basicWithCert(nsName, name, certBase64 s
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_trusted_ca_list" "test" {
+resource "xcsh_trusted_ca_list" "test" {
   depends_on     = [time_sleep.wait_for_namespace]
   name           = %[2]q
-  namespace      = f5xc_namespace.test.name
+  namespace      = xcsh_namespace.test.name
   trusted_ca_url = "string:///%[3]s"
 }
 `, nsName, name, certBase64))
@@ -430,19 +430,19 @@ func testAccTrustedCaListResourceConfig_allAttributes(nsName, name, description 
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_trusted_ca_list" "test" {
+resource "xcsh_trusted_ca_list" "test" {
   depends_on     = [time_sleep.wait_for_namespace]
   name           = %[2]q
-  namespace      = f5xc_namespace.test.name
+  namespace      = xcsh_namespace.test.name
   trusted_ca_url = "string:///%[4]s"
   description    = %[3]q
 
@@ -464,19 +464,19 @@ func testAccTrustedCaListResourceConfig_withLabels(nsName, name, environment, ma
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_trusted_ca_list" "test" {
+resource "xcsh_trusted_ca_list" "test" {
   depends_on     = [time_sleep.wait_for_namespace]
   name           = %[2]q
-  namespace      = f5xc_namespace.test.name
+  namespace      = xcsh_namespace.test.name
   trusted_ca_url = "string:///%[5]s"
 
   labels = {
@@ -492,19 +492,19 @@ func testAccTrustedCaListResourceConfig_withDescription(nsName, name, descriptio
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_trusted_ca_list" "test" {
+resource "xcsh_trusted_ca_list" "test" {
   depends_on     = [time_sleep.wait_for_namespace]
   name           = %[2]q
-  namespace      = f5xc_namespace.test.name
+  namespace      = xcsh_namespace.test.name
   trusted_ca_url = "string:///%[4]s"
   description    = %[3]q
 }
@@ -516,19 +516,19 @@ func testAccTrustedCaListResourceConfig_withAnnotations(nsName, name, value1, va
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_trusted_ca_list" "test" {
+resource "xcsh_trusted_ca_list" "test" {
   depends_on     = [time_sleep.wait_for_namespace]
   name           = %[2]q
-  namespace      = f5xc_namespace.test.name
+  namespace      = xcsh_namespace.test.name
   trusted_ca_url = "string:///%[5]s"
 
   annotations = {

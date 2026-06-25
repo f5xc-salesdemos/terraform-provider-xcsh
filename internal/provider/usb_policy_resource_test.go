@@ -15,7 +15,7 @@ import (
 // =============================================================================
 // USB_POLICY RESOURCE ACCEPTANCE TESTS
 //
-// These tests verify the f5xc_usb_policy resource implementation following
+// These tests verify the xcsh_usb_policy resource implementation following
 // HashiCorp's acceptance testing best practices.
 //
 // Test categories implemented:
@@ -25,7 +25,7 @@ import (
 // 4. Custom Namespace Pattern - Create namespace with time_sleep delay
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccUsbPolicyResource -timeout 30m
 // =============================================================================
 
@@ -40,7 +40,7 @@ func TestAccUsbPolicyResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_usb_policy.test"
+	resourceName := "xcsh_usb_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-usb-policy")
 
@@ -88,7 +88,7 @@ func TestAccUsbPolicyResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_usb_policy.test"
+	resourceName := "xcsh_usb_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-usb-policy")
 	description := "Comprehensive acceptance test USB policy"
@@ -145,7 +145,7 @@ func TestAccUsbPolicyResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_usb_policy.test"
+	resourceName := "xcsh_usb_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-usb-policy")
 
@@ -200,7 +200,7 @@ func TestAccUsbPolicyResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_usb_policy.test"
+	resourceName := "xcsh_usb_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-usb-policy")
 
@@ -259,7 +259,7 @@ func TestAccUsbPolicyResource_updateAllowedDevices(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_usb_policy.test"
+	resourceName := "xcsh_usb_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-usb-policy")
 
@@ -333,19 +333,19 @@ func testAccUsbPolicyResourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_usb_policy" "test" {
+resource "xcsh_usb_policy" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 }
 `, nsName, name))
 }
@@ -354,19 +354,19 @@ func testAccUsbPolicyResourceConfig_allAttributes(nsName, name, description stri
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_usb_policy" "test" {
+resource "xcsh_usb_policy" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 
   labels = {
@@ -397,19 +397,19 @@ func testAccUsbPolicyResourceConfig_withLabels(nsName, name, environment, manage
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_usb_policy" "test" {
+resource "xcsh_usb_policy" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   labels = {
     environment = %[3]q
@@ -423,19 +423,19 @@ func testAccUsbPolicyResourceConfig_withDescription(nsName, name, description st
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_usb_policy" "test" {
+resource "xcsh_usb_policy" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 }
 `, nsName, name, description))
@@ -445,19 +445,19 @@ func testAccUsbPolicyResourceConfig_withSingleDevice(nsName, name string) string
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_usb_policy" "test" {
+resource "xcsh_usb_policy" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   allowed_devices {
     id_vendor  = "0x046d"
@@ -471,19 +471,19 @@ func testAccUsbPolicyResourceConfig_withMultipleDevices(nsName, name string) str
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_usb_policy" "test" {
+resource "xcsh_usb_policy" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   allowed_devices {
     id_vendor  = "0x046d"
@@ -502,19 +502,19 @@ func testAccUsbPolicyResourceConfig_withDeviceAttributes(nsName, name string) st
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_usb_policy" "test" {
+resource "xcsh_usb_policy" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   allowed_devices {
     id_vendor          = "0x046d"

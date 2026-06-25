@@ -18,8 +18,8 @@ func TestAccTunnelDataSource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_tunnel.test"
-	dataSourceName := "data.f5xc_tunnel.test"
+	resourceName := "xcsh_tunnel.test"
+	dataSourceName := "data.xcsh_tunnel.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -44,25 +44,25 @@ func testAccTunnelDataSourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_tunnel" "test" {
+resource "xcsh_tunnel" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 }
 
-data "f5xc_tunnel" "test" {
-  depends_on = [f5xc_tunnel.test]
-  name       = f5xc_tunnel.test.name
-  namespace  = f5xc_tunnel.test.namespace
+data "xcsh_tunnel" "test" {
+  depends_on = [xcsh_tunnel.test]
+  name       = xcsh_tunnel.test.name
+  namespace  = xcsh_tunnel.test.namespace
 }
 `, nsName, name))
 }

@@ -19,8 +19,8 @@ func TestAccDnsDomainDataSource_basic(t *testing.T) {
 	// Generate a unique domain name using random string
 	domainName := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
 	nsName := "" // unused, DNS domain must be in system namespace
-	resourceName := "f5xc_dns_domain.test"
-	dataSourceName := "data.f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
+	dataSourceName := "data.xcsh_dns_domain.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -44,15 +44,15 @@ func testAccDnsDomainDataSourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_dns_domain" "test" {
+resource "xcsh_dns_domain" "test" {
   name      = %[1]q
   namespace = "system"
 }
 
-data "f5xc_dns_domain" "test" {
-  depends_on = [f5xc_dns_domain.test]
-  name       = f5xc_dns_domain.test.name
-  namespace  = f5xc_dns_domain.test.namespace
+data "xcsh_dns_domain" "test" {
+  depends_on = [xcsh_dns_domain.test]
+  name       = xcsh_dns_domain.test.name
+  namespace  = xcsh_dns_domain.test.namespace
 }
 `, name))
 }

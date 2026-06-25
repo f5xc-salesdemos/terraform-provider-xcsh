@@ -16,8 +16,8 @@ func TestAccHealthcheckDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_healthcheck.test"
-	dataSourceName := "data.f5xc_healthcheck.test"
+	resourceName := "xcsh_healthcheck.test"
+	dataSourceName := "data.xcsh_healthcheck.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,7 +39,7 @@ func testAccHealthcheckDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
   healthy_threshold   = 1
@@ -49,10 +49,10 @@ resource "f5xc_healthcheck" "test" {
   tcp_health_check {}
 }
 
-data "f5xc_healthcheck" "test" {
-  depends_on = [f5xc_healthcheck.test]
-  name       = f5xc_healthcheck.test.name
-  namespace  = f5xc_healthcheck.test.namespace
+data "xcsh_healthcheck" "test" {
+  depends_on = [xcsh_healthcheck.test]
+  name       = xcsh_healthcheck.test.name
+  namespace  = xcsh_healthcheck.test.namespace
 }
 `, name))
 }

@@ -26,55 +26,55 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Address & Network Resources
 	// ============================================================================
-	"f5xc_address_allocator": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_address_allocator": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAddressAllocator(ctx, ns, name)
 		return err
 	},
-	"f5xc_advertise_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_advertise_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAdvertisePolicy(ctx, ns, name)
 		return err
 	},
-	"f5xc_cluster": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_cluster": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetCluster(ctx, ns, name)
 		return err
 	},
-	"f5xc_endpoint": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_endpoint": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetEndpoint(ctx, ns, name)
 		return err
 	},
-	"f5xc_network_connector": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_connector": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetNetworkConnector(ctx, ns, name)
 		return err
 	},
-	"f5xc_network_firewall": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_firewall": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetNetworkFirewall(ctx, ns, name)
 		return err
 	},
-	"f5xc_network_interface": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_interface": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetNetworkInterface(ctx, ns, name)
 		return err
 	},
-	"f5xc_network_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetNetworkPolicy(ctx, ns, name)
 		return err
 	},
-	"f5xc_network_policy_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_policy_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetNetworkPolicyRule(ctx, ns, name)
 		return err
 	},
-	"f5xc_network_policy_view": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_policy_view": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetNetworkPolicyView(ctx, ns, name)
 		return err
 	},
-	"f5xc_segment": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_segment": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetSegment(ctx, ns, name)
 		return err
 	},
-	"f5xc_tunnel": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_tunnel": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetTunnel(ctx, ns, name)
 		return err
 	},
-	"f5xc_virtual_network": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_virtual_network": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetVirtualNetwork(ctx, ns, name)
 		return err
 	},
@@ -82,19 +82,19 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Alert & Monitoring Resources
 	// ============================================================================
-	"f5xc_alert_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_alert_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAlertPolicy(ctx, ns, name)
 		return err
 	},
-	"f5xc_alert_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_alert_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAlertReceiver(ctx, ns, name)
 		return err
 	},
-	"f5xc_global_log_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_global_log_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetGlobalLogReceiver(ctx, ns, name)
 		return err
 	},
-	"f5xc_log_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_log_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetLogReceiver(ctx, ns, name)
 		return err
 	},
@@ -102,23 +102,23 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// API Security Resources
 	// ============================================================================
-	"f5xc_api_crawler": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_api_crawler": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAPICrawler(ctx, ns, name)
 		return err
 	},
-	"f5xc_api_definition": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_api_definition": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAPIDefinition(ctx, ns, name)
 		return err
 	},
-	"f5xc_api_discovery": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_api_discovery": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAPIDiscovery(ctx, ns, name)
 		return err
 	},
-	"f5xc_api_testing": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_api_testing": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAPITesting(ctx, ns, name)
 		return err
 	},
-	"f5xc_app_api_group": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_app_api_group": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAppAPIGroup(ctx, ns, name)
 		return err
 	},
@@ -126,23 +126,23 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Application Security Resources
 	// ============================================================================
-	"f5xc_app_firewall": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_app_firewall": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAppFirewall(ctx, ns, name)
 		return err
 	},
-	"f5xc_app_setting": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_app_setting": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAppSetting(ctx, ns, name)
 		return err
 	},
-	"f5xc_app_type": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_app_type": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAppType(ctx, ns, name)
 		return err
 	},
-	"f5xc_sensitive_data_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_sensitive_data_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetSensitiveDataPolicy(ctx, ns, name)
 		return err
 	},
-	"f5xc_waf_exclusion_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_waf_exclusion_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetWAFExclusionPolicy(ctx, ns, name)
 		return err
 	},
@@ -150,11 +150,11 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// BGP Resources
 	// ============================================================================
-	"f5xc_bgp_asn_set": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_bgp_asn_set": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetBGPAsnSet(ctx, ns, name)
 		return err
 	},
-	"f5xc_bgp_routing_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_bgp_routing_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetBGPRoutingPolicy(ctx, ns, name)
 		return err
 	},
@@ -162,7 +162,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// CDN Resources
 	// ============================================================================
-	"f5xc_cdn_cache_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_cdn_cache_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetCDNCacheRule(ctx, ns, name)
 		return err
 	},
@@ -170,19 +170,19 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Certificate Resources
 	// ============================================================================
-	"f5xc_certificate": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_certificate": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetCertificate(ctx, ns, name)
 		return err
 	},
-	"f5xc_certificate_chain": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_certificate_chain": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetCertificateChain(ctx, ns, name)
 		return err
 	},
-	"f5xc_crl": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_crl": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetCRL(ctx, ns, name)
 		return err
 	},
-	"f5xc_trusted_ca_list": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_trusted_ca_list": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetTrustedCAList(ctx, ns, name)
 		return err
 	},
@@ -190,7 +190,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Container & Registry Resources
 	// ============================================================================
-	"f5xc_container_registry": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_container_registry": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetContainerRegistry(ctx, ns, name)
 		return err
 	},
@@ -198,11 +198,11 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Data Resources
 	// ============================================================================
-	"f5xc_data_group": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_data_group": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetDataGroup(ctx, ns, name)
 		return err
 	},
-	"f5xc_data_type": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_data_type": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetDataType(ctx, ns, name)
 		return err
 	},
@@ -210,7 +210,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// DNS Resources
 	// ============================================================================
-	"f5xc_dns_compliance_checks": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_dns_compliance_checks": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetDNSComplianceChecks(ctx, ns, name)
 		return err
 	},
@@ -218,19 +218,19 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Firewall & ACL Resources
 	// ============================================================================
-	"f5xc_enhanced_firewall_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_enhanced_firewall_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetEnhancedFirewallPolicy(ctx, ns, name)
 		return err
 	},
-	"f5xc_fast_acl": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_fast_acl": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetFastACL(ctx, ns, name)
 		return err
 	},
-	"f5xc_fast_acl_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_fast_acl_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetFastACLRule(ctx, ns, name)
 		return err
 	},
-	"f5xc_filter_set": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_filter_set": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetFilterSet(ctx, ns, name)
 		return err
 	},
@@ -238,7 +238,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Fleet Resources
 	// ============================================================================
-	"f5xc_fleet": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_fleet": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetFleet(ctx, ns, name)
 		return err
 	},
@@ -246,15 +246,15 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Forwarding & Proxy Resources
 	// ============================================================================
-	"f5xc_forward_proxy_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_forward_proxy_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetForwardProxyPolicy(ctx, ns, name)
 		return err
 	},
-	"f5xc_forwarding_class": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_forwarding_class": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetForwardingClass(ctx, ns, name)
 		return err
 	},
-	"f5xc_proxy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_proxy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetProxy(ctx, ns, name)
 		return err
 	},
@@ -262,7 +262,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Health Check Resources
 	// ============================================================================
-	"f5xc_healthcheck": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_healthcheck": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetHealthcheck(ctx, ns, name)
 		return err
 	},
@@ -270,7 +270,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// IP Prefix Resources
 	// ============================================================================
-	"f5xc_ip_prefix_set": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_ip_prefix_set": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetIPPrefixSet(ctx, ns, name)
 		return err
 	},
@@ -278,7 +278,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// iRule Resources
 	// ============================================================================
-	"f5xc_irule": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_irule": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetIrule(ctx, ns, name)
 		return err
 	},
@@ -286,15 +286,15 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Load Balancer Resources
 	// ============================================================================
-	"f5xc_http_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_http_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetHTTPLoadBalancer(ctx, ns, name)
 		return err
 	},
-	"f5xc_tcp_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_tcp_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetTCPLoadBalancer(ctx, ns, name)
 		return err
 	},
-	"f5xc_udp_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_udp_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetUDPLoadBalancer(ctx, ns, name)
 		return err
 	},
@@ -302,7 +302,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Namespace Resources
 	// ============================================================================
-	"f5xc_namespace": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_namespace": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetNamespace(ctx, ns, name)
 		return err
 	},
@@ -310,7 +310,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Origin Pool Resources
 	// ============================================================================
-	"f5xc_origin_pool": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_origin_pool": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetOriginPool(ctx, ns, name)
 		return err
 	},
@@ -318,15 +318,15 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Policer & Rate Limiting Resources
 	// ============================================================================
-	"f5xc_policer": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_policer": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetPolicer(ctx, ns, name)
 		return err
 	},
-	"f5xc_rate_limiter": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_rate_limiter": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetRateLimiter(ctx, ns, name)
 		return err
 	},
-	"f5xc_rate_limiter_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_rate_limiter_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetRateLimiterPolicy(ctx, ns, name)
 		return err
 	},
@@ -334,7 +334,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Protocol Inspection Resources
 	// ============================================================================
-	"f5xc_protocol_inspection": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_protocol_inspection": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetProtocolInspection(ctx, ns, name)
 		return err
 	},
@@ -342,11 +342,11 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Service Policy Resources
 	// ============================================================================
-	"f5xc_service_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_service_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetServicePolicy(ctx, ns, name)
 		return err
 	},
-	"f5xc_service_policy_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_service_policy_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetServicePolicyRule(ctx, ns, name)
 		return err
 	},
@@ -354,23 +354,23 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Site Resources
 	// ============================================================================
-	"f5xc_aws_vpc_site": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_aws_vpc_site": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAWSVPCSite(ctx, ns, name)
 		return err
 	},
-	"f5xc_azure_vnet_site": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_azure_vnet_site": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAzureVNETSite(ctx, ns, name)
 		return err
 	},
-	"f5xc_gcp_vpc_site": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_gcp_vpc_site": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetGCPVPCSite(ctx, ns, name)
 		return err
 	},
-	"f5xc_securemesh_site": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_securemesh_site": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetSecuremeshSite(ctx, ns, name)
 		return err
 	},
-	"f5xc_virtual_site": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_virtual_site": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetVirtualSite(ctx, ns, name)
 		return err
 	},
@@ -378,7 +378,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// User Identification Resources
 	// ============================================================================
-	"f5xc_user_identification": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_user_identification": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetUserIdentification(ctx, ns, name)
 		return err
 	},
@@ -386,7 +386,7 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Virtual Host Resources
 	// ============================================================================
-	"f5xc_virtual_host": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_virtual_host": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetVirtualHost(ctx, ns, name)
 		return err
 	},
@@ -394,27 +394,27 @@ var resourceVerifierRegistry = map[string]ResourceVerifier{
 	// ============================================================================
 	// Infrastructure Resources (from original registry)
 	// ============================================================================
-	"f5xc_cloud_connect": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_cloud_connect": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetCloudConnect(ctx, ns, name)
 		return err
 	},
-	"f5xc_nfv_service": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_nfv_service": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetNfvService(ctx, ns, name)
 		return err
 	},
-	"f5xc_cminstance": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_cminstance": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetCminstance(ctx, ns, name)
 		return err
 	},
-	"f5xc_policy_based_routing": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_policy_based_routing": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetPolicyBasedRouting(ctx, ns, name)
 		return err
 	},
-	"f5xc_apm": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_apm": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetAPM(ctx, ns, name)
 		return err
 	},
-	"f5xc_code_base_integration": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_code_base_integration": func(ctx context.Context, c *client.Client, ns, name string) error {
 		_, err := c.GetCodeBaseIntegration(ctx, ns, name)
 		return err
 	},
@@ -426,268 +426,268 @@ var resourceDeleterRegistry = map[string]ResourceDeleter{
 	// ============================================================================
 	// Address & Network Resources
 	// ============================================================================
-	"f5xc_address_allocator": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_address_allocator": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAddressAllocator(ctx, ns, name)
 	},
-	"f5xc_advertise_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_advertise_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAdvertisePolicy(ctx, ns, name)
 	},
-	"f5xc_cluster": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_cluster": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteCluster(ctx, ns, name)
 	},
-	"f5xc_endpoint": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_endpoint": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteEndpoint(ctx, ns, name)
 	},
-	"f5xc_network_connector": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_connector": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteNetworkConnector(ctx, ns, name)
 	},
-	"f5xc_network_firewall": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_firewall": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteNetworkFirewall(ctx, ns, name)
 	},
-	"f5xc_network_interface": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_interface": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteNetworkInterface(ctx, ns, name)
 	},
-	"f5xc_network_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteNetworkPolicy(ctx, ns, name)
 	},
-	"f5xc_network_policy_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_policy_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteNetworkPolicyRule(ctx, ns, name)
 	},
-	"f5xc_network_policy_view": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_network_policy_view": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteNetworkPolicyView(ctx, ns, name)
 	},
-	"f5xc_segment": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_segment": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteSegment(ctx, ns, name)
 	},
-	"f5xc_tunnel": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_tunnel": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteTunnel(ctx, ns, name)
 	},
-	"f5xc_virtual_network": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_virtual_network": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteVirtualNetwork(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Alert & Monitoring Resources
 	// ============================================================================
-	"f5xc_alert_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_alert_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAlertPolicy(ctx, ns, name)
 	},
-	"f5xc_alert_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_alert_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAlertReceiver(ctx, ns, name)
 	},
-	"f5xc_global_log_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_global_log_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteGlobalLogReceiver(ctx, ns, name)
 	},
-	"f5xc_log_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_log_receiver": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteLogReceiver(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// API Security Resources
 	// ============================================================================
-	"f5xc_api_crawler": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_api_crawler": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAPICrawler(ctx, ns, name)
 	},
-	"f5xc_api_definition": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_api_definition": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAPIDefinition(ctx, ns, name)
 	},
-	"f5xc_api_discovery": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_api_discovery": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAPIDiscovery(ctx, ns, name)
 	},
-	"f5xc_api_testing": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_api_testing": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAPITesting(ctx, ns, name)
 	},
-	"f5xc_app_api_group": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_app_api_group": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAppAPIGroup(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Application Security Resources
 	// ============================================================================
-	"f5xc_app_firewall": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_app_firewall": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAppFirewall(ctx, ns, name)
 	},
-	"f5xc_app_setting": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_app_setting": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAppSetting(ctx, ns, name)
 	},
-	"f5xc_app_type": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_app_type": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAppType(ctx, ns, name)
 	},
-	"f5xc_sensitive_data_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_sensitive_data_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteSensitiveDataPolicy(ctx, ns, name)
 	},
-	"f5xc_waf_exclusion_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_waf_exclusion_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteWAFExclusionPolicy(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// BGP Resources
 	// ============================================================================
-	"f5xc_bgp_asn_set": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_bgp_asn_set": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteBGPAsnSet(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Bot Defense & Security Resources
 	// ============================================================================
-	"f5xc_malicious_user_mitigation": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_malicious_user_mitigation": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteMaliciousUserMitigation(ctx, ns, name)
 	},
-	"f5xc_user_identification": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_user_identification": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteUserIdentification(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Certificate Resources
 	// ============================================================================
-	"f5xc_certificate": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_certificate": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteCertificate(ctx, ns, name)
 	},
-	"f5xc_certificate_chain": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_certificate_chain": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteCertificateChain(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Cloud Credentials & Infrastructure
 	// ============================================================================
-	"f5xc_cloud_credentials": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_cloud_credentials": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteCloudCredentials(ctx, ns, name)
 	},
-	"f5xc_dns_domain": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_dns_domain": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteDNSDomain(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Data Resources
 	// ============================================================================
-	"f5xc_data_group": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_data_group": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteDataGroup(ctx, ns, name)
 	},
-	"f5xc_data_type": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_data_type": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteDataType(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Forwarding & Rate Limiting Resources
 	// ============================================================================
-	"f5xc_filter_set": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_filter_set": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteFilterSet(ctx, ns, name)
 	},
-	"f5xc_forwarding_class": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_forwarding_class": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteForwardingClass(ctx, ns, name)
 	},
-	"f5xc_policer": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_policer": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeletePolicer(ctx, ns, name)
 	},
-	"f5xc_rate_limiter_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_rate_limiter_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteRateLimiterPolicy(ctx, ns, name)
 	},
-	"f5xc_rate_limiter": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_rate_limiter": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteRateLimiter(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Healthcheck Resources
 	// ============================================================================
-	"f5xc_healthcheck": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_healthcheck": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteHealthcheck(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// IP & Protocol Resources
 	// ============================================================================
-	"f5xc_ip_prefix_set": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_ip_prefix_set": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteIPPrefixSet(ctx, ns, name)
 	},
-	"f5xc_protocol_policer": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_protocol_policer": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteProtocolPolicer(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Load Balancer Resources
 	// ============================================================================
-	"f5xc_http_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_http_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteHTTPLoadBalancer(ctx, ns, name)
 	},
-	"f5xc_tcp_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_tcp_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteTCPLoadBalancer(ctx, ns, name)
 	},
-	"f5xc_cdn_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_cdn_loadbalancer": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteCDNLoadBalancer(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Namespace & Origin Resources
 	// ============================================================================
-	"f5xc_namespace": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_namespace": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteNamespace(ctx, ns, name)
 	},
-	"f5xc_origin_pool": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_origin_pool": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteOriginPool(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Route Resources
 	// ============================================================================
-	"f5xc_route": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_route": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteRoute(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Service Policy Resources
 	// ============================================================================
-	"f5xc_service_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_service_policy": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteServicePolicy(ctx, ns, name)
 	},
-	"f5xc_service_policy_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_service_policy_rule": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteServicePolicyRule(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Site Resources
 	// ============================================================================
-	"f5xc_aws_vpc_site": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_aws_vpc_site": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAWSVPCSite(ctx, ns, name)
 	},
-	"f5xc_azure_vnet_site": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_azure_vnet_site": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAzureVNETSite(ctx, ns, name)
 	},
-	"f5xc_gcp_vpc_site": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_gcp_vpc_site": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteGCPVPCSite(ctx, ns, name)
 	},
-	"f5xc_virtual_site": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_virtual_site": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteVirtualSite(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Virtual Host Resources
 	// ============================================================================
-	"f5xc_virtual_host": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_virtual_host": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteVirtualHost(ctx, ns, name)
 	},
 
 	// ============================================================================
 	// Platform & Configuration Resources
 	// ============================================================================
-	"f5xc_tenant_configuration": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_tenant_configuration": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteTenantConfiguration(ctx, ns, name)
 	},
-	"f5xc_workload_flavor": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_workload_flavor": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteWorkloadFlavor(ctx, ns, name)
 	},
-	"f5xc_nfv_service": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_nfv_service": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteNfvService(ctx, ns, name)
 	},
-	"f5xc_cminstance": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_cminstance": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteCminstance(ctx, ns, name)
 	},
-	"f5xc_policy_based_routing": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_policy_based_routing": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeletePolicyBasedRouting(ctx, ns, name)
 	},
-	"f5xc_apm": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_apm": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteAPM(ctx, ns, name)
 	},
-	"f5xc_code_base_integration": func(ctx context.Context, c *client.Client, ns, name string) error {
+	"xcsh_code_base_integration": func(ctx context.Context, c *client.Client, ns, name string) error {
 		return c.DeleteCodeBaseIntegration(ctx, ns, name)
 	},
 }
@@ -795,7 +795,7 @@ func GetRegistrySize() int {
 //	    Config: testAccResourceConfig_basic(rName),
 //	    Check: resource.ComposeTestCheckFunc(
 //	        acctest.CheckResourceExists(resourceName),
-//	        acctest.CheckResourceDisappears("f5xc_namespace", resourceName),
+//	        acctest.CheckResourceDisappears("xcsh_namespace", resourceName),
 //	    ),
 //	    ExpectNonEmptyPlan: true,
 //	},

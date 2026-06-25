@@ -16,7 +16,7 @@ func GenerateExampleUsage(resourceName string, attributes []openapi.TerraformAtt
 	_, ns := namespace.ForResource(resourceName)
 
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("resource \"f5xc_%s\" \"example\" {\n", resourceName))
+	sb.WriteString(fmt.Sprintf("resource \"xcsh_%s\" \"example\" {\n", resourceName))
 	sb.WriteString("  name      = \"example\"\n")
 	sb.WriteString(fmt.Sprintf("  namespace = %q\n", ns))
 	sb.WriteString("\n")

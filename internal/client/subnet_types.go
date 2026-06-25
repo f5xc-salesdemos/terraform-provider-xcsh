@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Subnet represents a F5XC Subnet
+// Subnet represents a XCSH Subnet
 type Subnet struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

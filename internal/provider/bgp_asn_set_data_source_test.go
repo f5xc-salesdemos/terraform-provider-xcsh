@@ -16,8 +16,8 @@ func TestAccBgpAsnSetDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_bgp_asn_set.test"
-	dataSourceName := "data.f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
+	dataSourceName := "data.xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,16 +39,16 @@ func testAccBgpAsnSetDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_bgp_asn_set" "test" {
+resource "xcsh_bgp_asn_set" "test" {
   name      = %[1]q
   namespace = "system"
   as_numbers = ["65000"]
 }
 
-data "f5xc_bgp_asn_set" "test" {
-  depends_on = [f5xc_bgp_asn_set.test]
-  name       = f5xc_bgp_asn_set.test.name
-  namespace  = f5xc_bgp_asn_set.test.namespace
+data "xcsh_bgp_asn_set" "test" {
+  depends_on = [xcsh_bgp_asn_set.test]
+  name       = xcsh_bgp_asn_set.test.name
+  namespace  = xcsh_bgp_asn_set.test.namespace
 }
 `, name))
 }

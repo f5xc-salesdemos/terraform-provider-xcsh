@@ -18,12 +18,12 @@ func TestAccForwardProxyPolicyResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-fpp")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_forward_proxy_policy.test"
+	resourceName := "xcsh_forward_proxy_policy.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_forward_proxy_policy"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_forward_proxy_policy"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccForwardProxyPolicyConfig_basic(nsName, rName),
@@ -63,7 +63,7 @@ func testAccForwardProxyPolicyConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_forward_proxy_policy" "test" {
+resource "xcsh_forward_proxy_policy" "test" {
   name      = %[1]q
   namespace = "system"
 }

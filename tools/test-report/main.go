@@ -425,7 +425,7 @@ func classifySkipReason(reason string) SkipReasonType {
 		strings.Contains(lower, "api_token") ||
 		strings.Contains(lower, "api token") ||
 		strings.Contains(lower, "authentication") ||
-		strings.Contains(lower, "f5xc_api") ||
+		strings.Contains(lower, "xcsh_api") ||
 		strings.Contains(lower, "cloud credentials") {
 		return SkipReasonCredentials
 	}

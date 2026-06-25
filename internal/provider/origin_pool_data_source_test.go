@@ -16,8 +16,8 @@ func TestAccOriginPoolDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_origin_pool.test"
-	dataSourceName := "data.f5xc_origin_pool.test"
+	resourceName := "xcsh_origin_pool.test"
+	dataSourceName := "data.xcsh_origin_pool.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,7 +39,7 @@ func testAccOriginPoolDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = %[1]q
   namespace = "system"
   port = 443
@@ -53,10 +53,10 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-data "f5xc_origin_pool" "test" {
-  depends_on = [f5xc_origin_pool.test]
-  name       = f5xc_origin_pool.test.name
-  namespace  = f5xc_origin_pool.test.namespace
+data "xcsh_origin_pool" "test" {
+  depends_on = [xcsh_origin_pool.test]
+  name       = xcsh_origin_pool.test.name
+  namespace  = xcsh_origin_pool.test.namespace
 }
 `, name))
 }

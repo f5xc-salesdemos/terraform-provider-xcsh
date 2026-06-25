@@ -22,7 +22,7 @@ import (
 // 1. Basic Lifecycle Test - Create, Read, Import, Delete with API verification
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccTunnelResource -timeout 30m
 // =============================================================================
 
@@ -36,7 +36,7 @@ func TestAccTunnelResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_tunnel.test"
+	resourceName := "xcsh_tunnel.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tunnel")
 
@@ -101,7 +101,7 @@ func testAccTunnelResourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_tunnel" "test" {
+resource "xcsh_tunnel" "test" {
   name       = %[1]q
   namespace  = "system"
 

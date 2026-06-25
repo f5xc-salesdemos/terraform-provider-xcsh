@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	// PolicyDocumentEndpointFmt is the F5XC API endpoint template for fetching policy documents.
+	// PolicyDocumentEndpointFmt is the XCSH API endpoint template for fetching policy documents.
 	// Parameters: namespace, policy_name
 	PolicyDocumentEndpointFmt = "/api/secret_management/namespaces/%s/secret_policys/%s/get_policy_document"
 )
@@ -24,8 +24,8 @@ const (
 // Parameters:
 //   - ctx: Context for cancellation and timeouts
 //   - httpClient: Configured HTTP client with authentication
-//   - baseURL: F5XC API base URL (e.g., "https://tenant.console.ves.volterra.io")
-//   - namespace: F5XC namespace containing the policy
+//   - baseURL: XCSH API base URL (e.g., "https://tenant.console.ves.volterra.io")
+//   - namespace: XCSH namespace containing the policy
 //   - name: Name of the secret policy
 //
 // Returns:
@@ -81,7 +81,7 @@ func GetSecretPolicyDocument(ctx context.Context, httpClient *http.Client, baseU
 		return nil, fmt.Errorf("unexpected status %d: %s", resp.StatusCode, string(body))
 	}
 
-	// Parse response - F5XC wraps responses in an envelope
+	// Parse response - XCSH wraps responses in an envelope
 	var envelope APIEnvelope[SecretPolicyDocument]
 	if err := json.Unmarshal(body, &envelope); err != nil {
 		// Try parsing without envelope (direct response)

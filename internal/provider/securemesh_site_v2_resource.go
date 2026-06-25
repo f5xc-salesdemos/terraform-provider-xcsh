@@ -4804,7 +4804,7 @@ func (r *SecuremeshSiteV2Resource) Schema(ctx context.Context, req resource.Sche
 						},
 						Blocks: map[string]schema.Block{
 							"blindfold_secret_info": schema.SingleNestedBlock{
-								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -4824,7 +4824,7 @@ func (r *SecuremeshSiteV2Resource) Schema(ctx context.Context, req resource.Sche
 								},
 							},
 							"blindfold_secret_info_internal": schema.SingleNestedBlock{
-								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -6066,7 +6066,7 @@ func (r *SecuremeshSiteV2Resource) Schema(ctx context.Context, req resource.Sche
 						},
 						Blocks: map[string]schema.Block{
 							"blindfold_secret_info": schema.SingleNestedBlock{
-								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -6086,7 +6086,7 @@ func (r *SecuremeshSiteV2Resource) Schema(ctx context.Context, req resource.Sche
 								},
 							},
 							"blindfold_secret_info_internal": schema.SingleNestedBlock{
-								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -9839,7 +9839,7 @@ func (r *SecuremeshSiteV2Resource) Schema(ctx context.Context, req resource.Sche
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"os": schema.SingleNestedBlock{
-						MarkdownDescription: "Select the F5XC Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions.",
+						MarkdownDescription: "Select the XCSH Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions.",
 						Attributes: map[string]schema.Attribute{
 							"operating_system_version": schema.StringAttribute{
 								MarkdownDescription: "Exclusive with [default_os_version] Specify a OS version to be used e.g. 9.2024.6.",
@@ -9856,10 +9856,10 @@ func (r *SecuremeshSiteV2Resource) Schema(ctx context.Context, req resource.Sche
 						},
 					},
 					"sw": schema.SingleNestedBlock{
-						MarkdownDescription: "Select the F5XC Software Version for the site. By default, latest available F5XC Software Version will be used. Refer to release notes to find required released SW versions.",
+						MarkdownDescription: "Select the XCSH Software Version for the site. By default, latest available XCSH Software Version will be used. Refer to release notes to find required released SW versions.",
 						Attributes: map[string]schema.Attribute{
 							"volterra_software_version": schema.StringAttribute{
-								MarkdownDescription: "Exclusive with [default_sw_version] Specify a F5XC Software Version to be used e.g. Crt-20210329-1002.",
+								MarkdownDescription: "Exclusive with [default_sw_version] Specify a XCSH Software Version to be used e.g. Crt-20210329-1002.",
 								Optional:            true,
 								Validators: []validator.String{
 									stringvalidator.LengthAtMost(20),

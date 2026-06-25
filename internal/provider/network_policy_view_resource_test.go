@@ -18,12 +18,12 @@ func TestAccNetworkPolicyViewResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-npv")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_network_policy_view.test"
+	resourceName := "xcsh_network_policy_view.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_network_policy_view"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_network_policy_view"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccNetworkPolicyViewConfig_basic(nsName, rName),
@@ -63,7 +63,7 @@ func testAccNetworkPolicyViewConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_network_policy_view" "test" {
+resource "xcsh_network_policy_view" "test" {
   name      = %[1]q
   namespace = "system"
 

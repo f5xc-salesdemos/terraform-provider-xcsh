@@ -27,7 +27,7 @@ func TestAccFilterSetResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
 	fsName := acctest.RandomName("tf-fs")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -66,7 +66,7 @@ func TestAccFilterSetResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
 	fsName := acctest.RandomName("tf-fs")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -99,7 +99,7 @@ func TestAccFilterSetResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
 	fsName := acctest.RandomName("tf-fs")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -134,7 +134,7 @@ func TestAccFilterSetResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
 	fsName := acctest.RandomName("tf-fs")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -168,7 +168,7 @@ func TestAccFilterSetResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
 	fsName := acctest.RandomName("tf-fs")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -203,7 +203,7 @@ func TestAccFilterSetResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
 	fsName := acctest.RandomName("tf-fs")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -260,7 +260,7 @@ func TestAccFilterSetResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
 	fsName := acctest.RandomName("tf-fs")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -298,7 +298,7 @@ func TestAccFilterSetResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
 	fsName := acctest.RandomName("tf-fs")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -391,7 +391,7 @@ func TestAccFilterSetResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
 	fsName := acctest.RandomName("tf-fs")
 	newFsName := acctest.RandomName("tf-fs-new")
 
@@ -428,7 +428,7 @@ func TestAccFilterSetResource_filterFields(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_filter_set.test"
+	resourceName := "xcsh_filter_set.test"
 	fsName := acctest.RandomName("tf-fs")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -469,7 +469,7 @@ func testAccFilterSetImportStateIdFunc(resourceName string) resource.ImportState
 
 func testAccFilterSetResource_basicSystem(fsName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_filter_set" "test" {
+resource "xcsh_filter_set" "test" {
   name        = %[1]q
   namespace   = "system"
   context_key = "dashboard"
@@ -486,7 +486,7 @@ resource "f5xc_filter_set" "test" {
 
 func testAccFilterSetResource_allAttributesSystem(fsName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_filter_set" "test" {
+resource "xcsh_filter_set" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test filter_set with all attributes"
@@ -518,7 +518,7 @@ func testAccFilterSetResource_withLabelsSystem(fsName string, labels map[string]
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_filter_set" "test" {
+resource "xcsh_filter_set" "test" {
   name        = %[1]q
   namespace   = "system"
   context_key = "dashboard"
@@ -538,7 +538,7 @@ resource "f5xc_filter_set" "test" {
 
 func testAccFilterSetResource_withDescriptionSystem(fsName, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_filter_set" "test" {
+resource "xcsh_filter_set" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -561,7 +561,7 @@ func testAccFilterSetResource_withAnnotationsSystem(fsName string, annotations m
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_filter_set" "test" {
+resource "xcsh_filter_set" "test" {
   name        = %[1]q
   namespace   = "system"
   context_key = "dashboard"
@@ -581,7 +581,7 @@ resource "f5xc_filter_set" "test" {
 
 func testAccFilterSetResource_filterFieldsSystem(fsName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_filter_set" "test" {
+resource "xcsh_filter_set" "test" {
   name        = %[1]q
   namespace   = "system"
   context_key = "dashboard"

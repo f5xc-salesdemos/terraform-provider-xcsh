@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// AdvertisePolicy represents a F5XC AdvertisePolicy
+// AdvertisePolicy represents a XCSH AdvertisePolicy
 type AdvertisePolicy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

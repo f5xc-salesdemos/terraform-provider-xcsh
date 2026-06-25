@@ -16,8 +16,8 @@ func TestAccAdvertisePolicyDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_advertise_policy.test"
-	dataSourceName := "data.f5xc_advertise_policy.test"
+	resourceName := "xcsh_advertise_policy.test"
+	dataSourceName := "data.xcsh_advertise_policy.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -40,16 +40,16 @@ func testAccAdvertisePolicyDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_advertise_policy" "test" {
+resource "xcsh_advertise_policy" "test" {
   name      = %[1]q
   namespace = "system"
   port      = 80
   protocol  = "TCP"
 }
 
-data "f5xc_advertise_policy" "test" {
-  name      = f5xc_advertise_policy.test.name
-  namespace = f5xc_advertise_policy.test.namespace
+data "xcsh_advertise_policy" "test" {
+  name      = xcsh_advertise_policy.test.name
+  namespace = xcsh_advertise_policy.test.namespace
 }
 `, name))
 }

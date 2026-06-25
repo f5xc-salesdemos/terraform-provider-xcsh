@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// AppFirewall represents a F5XC AppFirewall
+// AppFirewall represents a XCSH AppFirewall
 type AppFirewall struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

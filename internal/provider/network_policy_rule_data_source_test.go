@@ -16,8 +16,8 @@ func TestAccNetworkPolicyRuleDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_network_policy_rule.test"
-	dataSourceName := "data.f5xc_network_policy_rule.test"
+	resourceName := "xcsh_network_policy_rule.test"
+	dataSourceName := "data.xcsh_network_policy_rule.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -40,7 +40,7 @@ func testAccNetworkPolicyRuleDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_network_policy_rule" "test" {
+resource "xcsh_network_policy_rule" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -53,9 +53,9 @@ resource "f5xc_network_policy_rule" "test" {
   }
 }
 
-data "f5xc_network_policy_rule" "test" {
-  name      = f5xc_network_policy_rule.test.name
-  namespace = f5xc_network_policy_rule.test.namespace
+data "xcsh_network_policy_rule" "test" {
+  name      = xcsh_network_policy_rule.test.name
+  namespace = xcsh_network_policy_rule.test.namespace
 }
 `, name))
 }

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Namespace represents a F5XC Namespace
+// Namespace represents a XCSH Namespace
 type Namespace struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

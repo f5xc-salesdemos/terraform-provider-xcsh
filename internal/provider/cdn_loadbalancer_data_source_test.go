@@ -17,8 +17,8 @@ func TestAccCdnLoadbalancerDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-cdn-lb")
-	resourceName := "f5xc_cdn_loadbalancer.test"
-	dataSourceName := "data.f5xc_cdn_loadbalancer.test"
+	resourceName := "xcsh_cdn_loadbalancer.test"
+	dataSourceName := "data.xcsh_cdn_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -40,7 +40,7 @@ func testAccCdnLoadbalancerDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_cdn_loadbalancer" "test" {
+resource "xcsh_cdn_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -52,10 +52,10 @@ resource "f5xc_cdn_loadbalancer" "test" {
   domains = ["%[1]s.example.com"]
 }
 
-data "f5xc_cdn_loadbalancer" "test" {
-  depends_on = [f5xc_cdn_loadbalancer.test]
-  name       = f5xc_cdn_loadbalancer.test.name
-  namespace  = f5xc_cdn_loadbalancer.test.namespace
+data "xcsh_cdn_loadbalancer" "test" {
+  depends_on = [xcsh_cdn_loadbalancer.test]
+  name       = xcsh_cdn_loadbalancer.test.name
+  namespace  = xcsh_cdn_loadbalancer.test.namespace
 }
 `, name))
 }

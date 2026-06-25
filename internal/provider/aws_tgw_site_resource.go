@@ -91,7 +91,7 @@ type AWSTGWSiteAWSParametersModel struct {
 	EnableEncryption    *AWSTGWSiteAWSParametersEnableEncryptionModel    `tfsdk:"enable_encryption"`
 	EnableInternetVIP   *AWSTGWSiteEmptyModel                            `tfsdk:"enable_internet_vip"`
 	ExistingTGW         *AWSTGWSiteAWSParametersExistingTGWModel         `tfsdk:"existing_tgw"`
-	F5xcSecurityGroup   *AWSTGWSiteEmptyModel                            `tfsdk:"f5xc_security_group"`
+	F5xcSecurityGroup   *AWSTGWSiteEmptyModel                            `tfsdk:"xcsh_security_group"`
 	NewTGW              *AWSTGWSiteAWSParametersNewTGWModel              `tfsdk:"new_tgw"`
 	NewVPC              *AWSTGWSiteAWSParametersNewVPCModel              `tfsdk:"new_vpc"`
 	NoWorkerNodes       *AWSTGWSiteEmptyModel                            `tfsdk:"no_worker_nodes"`
@@ -117,7 +117,7 @@ var AWSTGWSiteAWSParametersModelAttrTypes = map[string]attr.Type{
 	"enable_encryption":     types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersEnableEncryptionModelAttrTypes},
 	"enable_internet_vip":   types.ObjectType{AttrTypes: map[string]attr.Type{}},
 	"existing_tgw":          types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersExistingTGWModelAttrTypes},
-	"f5xc_security_group":   types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"xcsh_security_group":   types.ObjectType{AttrTypes: map[string]attr.Type{}},
 	"new_tgw":               types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersNewTGWModelAttrTypes},
 	"new_vpc":               types.ObjectType{AttrTypes: AWSTGWSiteAWSParametersNewVPCModelAttrTypes},
 	"no_worker_nodes":       types.ObjectType{AttrTypes: map[string]attr.Type{}},
@@ -1332,11 +1332,11 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				MarkdownDescription: "Setup AWS services VPC, transit gateway and site.",
 				Attributes: map[string]schema.Attribute{
 					"aws_region": schema.StringAttribute{
-						MarkdownDescription: "AWS Region of your services VPC, where F5XC site will be deployed.",
+						MarkdownDescription: "AWS Region of your services VPC, where XCSH site will be deployed.",
 						Optional:            true,
 					},
 					"disk_size": schema.Int64Attribute{
-						MarkdownDescription: "Node disk size for all node in the F5XC site. Unit is GiB.",
+						MarkdownDescription: "Node disk size for all node in the XCSH site. Unit is GiB.",
 						Optional:            true,
 					},
 					"instance_type": schema.StringAttribute{
@@ -1383,7 +1383,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 						Blocks: map[string]schema.Block{
 							"blindfold_secret_info": schema.SingleNestedBlock{
-								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -1403,7 +1403,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								},
 							},
 							"blindfold_secret_info_internal": schema.SingleNestedBlock{
-								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -1652,12 +1652,12 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 								},
 							},
 							"volterra_site_asn": schema.Int64Attribute{
-								MarkdownDescription: "X-displayName: 'Enter F5XC Site ASN' F5XC Site ASN.",
+								MarkdownDescription: "X-displayName: 'Enter XCSH Site ASN' XCSH Site ASN.",
 								Optional:            true,
 							},
 						},
 					},
-					"f5xc_security_group": schema.SingleNestedBlock{
+					"xcsh_security_group": schema.SingleNestedBlock{
 						MarkdownDescription: "Enable this option",
 					},
 					"new_tgw": schema.SingleNestedBlock{
@@ -1675,7 +1675,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 										Optional:            true,
 									},
 									"volterra_site_asn": schema.Int64Attribute{
-										MarkdownDescription: "X-displayName: 'Enter F5XC Site ASN' F5XC Site ASN.",
+										MarkdownDescription: "X-displayName: 'Enter XCSH Site ASN' XCSH Site ASN.",
 										Optional:            true,
 									},
 								},
@@ -1937,7 +1937,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 			},
 			"os": schema.SingleNestedBlock{
-				MarkdownDescription: "Select the F5XC Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions.",
+				MarkdownDescription: "Select the XCSH Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions.",
 				Attributes: map[string]schema.Attribute{
 					"operating_system_version": schema.StringAttribute{
 						MarkdownDescription: "Exclusive with [default_os_version] Specify a OS version to be used e.g. 9.2024.6.",
@@ -2000,10 +2000,10 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 			},
 			"sw": schema.SingleNestedBlock{
-				MarkdownDescription: "Select the F5XC Software Version for the site. By default, latest available F5XC Software Version will be used. Refer to release notes to find required released SW versions.",
+				MarkdownDescription: "Select the XCSH Software Version for the site. By default, latest available XCSH Software Version will be used. Refer to release notes to find required released SW versions.",
 				Attributes: map[string]schema.Attribute{
 					"volterra_software_version": schema.StringAttribute{
-						MarkdownDescription: "Exclusive with [default_sw_version] Specify a F5XC Software Version to be used e.g. Crt-20210329-1002.",
+						MarkdownDescription: "Exclusive with [default_sw_version] Specify a XCSH Software Version to be used e.g. Crt-20210329-1002.",
 						Optional:            true,
 						Validators: []validator.String{
 							stringvalidator.LengthAtMost(20),
@@ -2213,7 +2213,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Attributes:          map[string]schema.Attribute{},
 				Blocks: map[string]schema.Block{
 					"allowed_vip_port": schema.SingleNestedBlock{
-						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the F5XC Site.",
+						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the XCSH Site.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"custom_ports": schema.SingleNestedBlock{
@@ -2243,7 +2243,7 @@ func (r *AWSTGWSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"allowed_vip_port_sli": schema.SingleNestedBlock{
-						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the F5XC Site.",
+						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the XCSH Site.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"custom_ports": schema.SingleNestedBlock{
@@ -3043,7 +3043,7 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 			aws_parametersMap["existing_tgw"] = existing_tgwNestedMap
 		}
 		if data.AWSParameters.F5xcSecurityGroup != nil {
-			aws_parametersMap["f5xc_security_group"] = map[string]interface{}{}
+			aws_parametersMap["xcsh_security_group"] = map[string]interface{}{}
 		}
 		if !data.AWSParameters.InstanceType.IsNull() && !data.AWSParameters.InstanceType.IsUnknown() {
 			aws_parametersMap["instance_type"] = data.AWSParameters.InstanceType.ValueString()
@@ -3646,7 +3646,7 @@ func (r *AWSTGWSiteResource) Create(ctx context.Context, req resource.CreateRequ
 					return data.AWSParameters.F5xcSecurityGroup
 				}
 				// Import case: read from API
-				if _, ok := blockData["f5xc_security_group"].(map[string]interface{}); ok {
+				if _, ok := blockData["xcsh_security_group"].(map[string]interface{}); ok {
 					return &AWSTGWSiteEmptyModel{}
 				}
 				return nil
@@ -4415,7 +4415,7 @@ func (r *AWSTGWSiteResource) Read(ctx context.Context, req resource.ReadRequest,
 					return data.AWSParameters.F5xcSecurityGroup
 				}
 				// Import case: read from API
-				if _, ok := blockData["f5xc_security_group"].(map[string]interface{}); ok {
+				if _, ok := blockData["xcsh_security_group"].(map[string]interface{}); ok {
 					return &AWSTGWSiteEmptyModel{}
 				}
 				return nil
@@ -5013,7 +5013,7 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 			aws_parametersMap["existing_tgw"] = existing_tgwNestedMap
 		}
 		if data.AWSParameters.F5xcSecurityGroup != nil {
-			aws_parametersMap["f5xc_security_group"] = map[string]interface{}{}
+			aws_parametersMap["xcsh_security_group"] = map[string]interface{}{}
 		}
 		if !data.AWSParameters.InstanceType.IsNull() && !data.AWSParameters.InstanceType.IsUnknown() {
 			aws_parametersMap["instance_type"] = data.AWSParameters.InstanceType.ValueString()
@@ -5627,7 +5627,7 @@ func (r *AWSTGWSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 					return data.AWSParameters.F5xcSecurityGroup
 				}
 				// Import case: read from API
-				if _, ok := blockData["f5xc_security_group"].(map[string]interface{}); ok {
+				if _, ok := blockData["xcsh_security_group"].(map[string]interface{}); ok {
 					return &AWSTGWSiteEmptyModel{}
 				}
 				return nil

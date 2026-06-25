@@ -18,13 +18,13 @@ func TestAccAdvertisePolicyResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_advertise_policy.test"
+	resourceName := "xcsh_advertise_policy.test"
 	rName := acctest.RandomName("tf-test-adv")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_advertise_policy"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_advertise_policy"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAdvertisePolicyConfig_basic(rName),
@@ -62,13 +62,13 @@ func TestAccAdvertisePolicyResource_withLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_advertise_policy.test"
+	resourceName := "xcsh_advertise_policy.test"
 	rName := acctest.RandomName("tf-test-adv")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_advertise_policy"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_advertise_policy"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAdvertisePolicyConfig_withLabels(rName),
@@ -90,7 +90,7 @@ func TestAccAdvertisePolicyResource_emptyPlan(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_advertise_policy"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_advertise_policy"),
 		Steps: []resource.TestStep{
 			{Config: testAccAdvertisePolicyConfig_basic(rName)},
 			{Config: testAccAdvertisePolicyConfig_basic(rName), PlanOnly: true, ExpectNonEmptyPlan: false},
@@ -102,13 +102,13 @@ func TestAccAdvertisePolicyResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_advertise_policy.test"
+	resourceName := "xcsh_advertise_policy.test"
 	rName := acctest.RandomName("tf-test-adv")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_advertise_policy"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_advertise_policy"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAdvertisePolicyConfig_basic(rName),
@@ -149,14 +149,14 @@ func TestAccAdvertisePolicyResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_advertise_policy.test"
+	resourceName := "xcsh_advertise_policy.test"
 	rName1 := acctest.RandomName("tf-test-adv")
 	rName2 := acctest.RandomName("tf-test-adv")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_advertise_policy"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_advertise_policy"),
 		Steps: []resource.TestStep{
 			{Config: testAccAdvertisePolicyConfig_basic(rName1), Check: acctest.CheckResourceExists(resourceName)},
 			{
@@ -173,13 +173,13 @@ func TestAccAdvertisePolicyResource_updatePort(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_advertise_policy.test"
+	resourceName := "xcsh_advertise_policy.test"
 	rName := acctest.RandomName("tf-test-adv")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_advertise_policy"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_advertise_policy"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAdvertisePolicyConfig_port(rName, 80),
@@ -201,7 +201,7 @@ func TestAccAdvertisePolicyResource_updatePort(t *testing.T) {
 
 func testAccAdvertisePolicyConfig_withLabels(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_advertise_policy" "test" {
+resource "xcsh_advertise_policy" "test" {
   name            = %[1]q
   namespace       = "system"
   address         = "0.0.0.0"
@@ -217,7 +217,7 @@ resource "f5xc_advertise_policy" "test" {
 
 func testAccAdvertisePolicyConfig_port(name string, port int) string {
 	return fmt.Sprintf(`
-resource "f5xc_advertise_policy" "test" {
+resource "xcsh_advertise_policy" "test" {
   name            = %[1]q
   namespace       = "system"
   address         = "0.0.0.0"
@@ -230,7 +230,7 @@ resource "f5xc_advertise_policy" "test" {
 
 func testAccAdvertisePolicyConfig_basic(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_advertise_policy" "test" {
+resource "xcsh_advertise_policy" "test" {
   name            = %[1]q
   namespace       = "system"
   address         = "0.0.0.0"

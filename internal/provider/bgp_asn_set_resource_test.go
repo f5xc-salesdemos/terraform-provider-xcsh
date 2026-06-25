@@ -34,7 +34,7 @@ func TestAccBGPAsnSetResource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -87,7 +87,7 @@ func TestAccBGPAsnSetResource_allAttributes(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -127,7 +127,7 @@ func TestAccBGPAsnSetResource_updateLabels(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -171,7 +171,7 @@ func TestAccBGPAsnSetResource_updateDescription(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -218,7 +218,7 @@ func TestAccBGPAsnSetResource_updateAnnotations(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -260,7 +260,7 @@ func TestAccBGPAsnSetResource_disappears(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -288,7 +288,7 @@ func TestAccBGPAsnSetResource_emptyPlan(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -322,7 +322,7 @@ func TestAccBGPAsnSetResource_planChecks(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -369,7 +369,7 @@ func TestAccBGPAsnSetResource_knownValues(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -467,7 +467,7 @@ func TestAccBGPAsnSetResource_requiresReplace(t *testing.T) {
 
 	rName1 := acctest.RandomName("tf-acc-test-asn")
 	rName2 := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -506,7 +506,7 @@ func TestAccBGPAsnSetResource_asNumbers(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-asn")
-	resourceName := "f5xc_bgp_asn_set.test"
+	resourceName := "xcsh_bgp_asn_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -541,7 +541,7 @@ func TestAccBGPAsnSetResource_asNumbers(t *testing.T) {
 
 func testAccBGPAsnSetResourceConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_bgp_asn_set" "test" {
+resource "xcsh_bgp_asn_set" "test" {
   name       = %[1]q
   namespace  = "system"
   as_numbers = ["64512"]
@@ -551,7 +551,7 @@ resource "f5xc_bgp_asn_set" "test" {
 
 func testAccBGPAsnSetResourceConfig_allAttributesSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_bgp_asn_set" "test" {
+resource "xcsh_bgp_asn_set" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -572,7 +572,7 @@ resource "f5xc_bgp_asn_set" "test" {
 
 func testAccBGPAsnSetResourceConfig_withLabelsSystem(name, environment, managedBy string) string {
 	return fmt.Sprintf(`
-resource "f5xc_bgp_asn_set" "test" {
+resource "xcsh_bgp_asn_set" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -588,7 +588,7 @@ resource "f5xc_bgp_asn_set" "test" {
 
 func testAccBGPAsnSetResourceConfig_withDescriptionSystem(name, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_bgp_asn_set" "test" {
+resource "xcsh_bgp_asn_set" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -599,7 +599,7 @@ resource "f5xc_bgp_asn_set" "test" {
 
 func testAccBGPAsnSetResourceConfig_withAnnotationsSystem(name, value1, value2 string) string {
 	return fmt.Sprintf(`
-resource "f5xc_bgp_asn_set" "test" {
+resource "xcsh_bgp_asn_set" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -615,7 +615,7 @@ resource "f5xc_bgp_asn_set" "test" {
 
 func testAccBGPAsnSetResourceConfig_withASNumbersSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_bgp_asn_set" "test" {
+resource "xcsh_bgp_asn_set" "test" {
   name       = %[1]q
   namespace  = "system"
   as_numbers = ["64512", "64513", "64514"]

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// CloudElasticIP represents a F5XC CloudElasticIP
+// CloudElasticIP represents a XCSH CloudElasticIP
 type CloudElasticIP struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

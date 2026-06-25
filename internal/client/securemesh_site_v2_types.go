@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// SecuremeshSiteV2 represents a F5XC SecuremeshSiteV2
+// SecuremeshSiteV2 represents a XCSH SecuremeshSiteV2
 type SecuremeshSiteV2 struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

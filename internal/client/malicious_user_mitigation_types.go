@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// MaliciousUserMitigation represents a F5XC MaliciousUserMitigation
+// MaliciousUserMitigation represents a XCSH MaliciousUserMitigation
 type MaliciousUserMitigation struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

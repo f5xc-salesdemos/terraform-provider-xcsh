@@ -27,7 +27,7 @@ import (
 // 4. WAF Exclusion Rules Test - Test complex nested blocks
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccWAFExclusionPolicyResource -timeout 30m
 // =============================================================================
 
@@ -41,7 +41,7 @@ func TestAccWAFExclusionPolicyResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_waf_exclusion_policy.test"
+	resourceName := "xcsh_waf_exclusion_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-waf")
 
@@ -86,7 +86,7 @@ func TestAccWAFExclusionPolicyResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_waf_exclusion_policy.test"
+	resourceName := "xcsh_waf_exclusion_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-waf")
 	description := "Comprehensive acceptance test WAF exclusion policy"
@@ -135,7 +135,7 @@ func TestAccWAFExclusionPolicyResource_withExclusionRules(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_waf_exclusion_policy.test"
+	resourceName := "xcsh_waf_exclusion_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-waf")
 
@@ -181,7 +181,7 @@ func TestAccWAFExclusionPolicyResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_waf_exclusion_policy.test"
+	resourceName := "xcsh_waf_exclusion_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-waf")
 
@@ -237,7 +237,7 @@ func TestAccWAFExclusionPolicyResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_waf_exclusion_policy.test"
+	resourceName := "xcsh_waf_exclusion_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-waf")
 
@@ -289,7 +289,7 @@ func TestAccWAFExclusionPolicyResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_waf_exclusion_policy.test"
+	resourceName := "xcsh_waf_exclusion_policy.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name1 := acctest.RandomName("tf-acc-test-waf")
 	name2 := acctest.RandomName("tf-acc-test-waf")
@@ -348,7 +348,7 @@ func TestAccWAFExclusionPolicyResource_emptyPlan(t *testing.T) {
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		ExternalProviders:        acctest.ExternalProviders,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_waf_exclusion_policy"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_waf_exclusion_policy"),
 		Steps: []resource.TestStep{
 			{Config: testAccWAFExclusionPolicyResourceConfig_basic("", rName)},
 			{Config: testAccWAFExclusionPolicyResourceConfig_basic("", rName), PlanOnly: true, ExpectNonEmptyPlan: false},
@@ -363,14 +363,14 @@ func TestAccWAFExclusionPolicyResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_waf_exclusion_policy.test"
+	resourceName := "xcsh_waf_exclusion_policy.test"
 	rName := acctest.RandomName("tf-test-waf-exc")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		ExternalProviders:        acctest.ExternalProviders,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_waf_exclusion_policy"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_waf_exclusion_policy"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccWAFExclusionPolicyResourceConfig_basic("", rName),
@@ -418,14 +418,14 @@ func TestAccWAFExclusionPolicyResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_waf_exclusion_policy.test"
+	resourceName := "xcsh_waf_exclusion_policy.test"
 	rName := acctest.RandomName("tf-test-waf-exc")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		ExternalProviders:        acctest.ExternalProviders,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_waf_exclusion_policy"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_waf_exclusion_policy"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccWAFExclusionPolicyResourceConfig_allAttributes("", rName, "Full lifecycle test"),
@@ -469,7 +469,7 @@ func testAccWAFExclusionPolicyResourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_waf_exclusion_policy" "test" {
+resource "xcsh_waf_exclusion_policy" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -488,7 +488,7 @@ func testAccWAFExclusionPolicyResourceConfig_allAttributes(nsName, name, descrip
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_waf_exclusion_policy" "test" {
+resource "xcsh_waf_exclusion_policy" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -518,7 +518,7 @@ func testAccWAFExclusionPolicyResourceConfig_withDescription(nsName, name, descr
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_waf_exclusion_policy" "test" {
+resource "xcsh_waf_exclusion_policy" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -538,7 +538,7 @@ func testAccWAFExclusionPolicyResourceConfig_withLabels(nsName, name, environmen
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_waf_exclusion_policy" "test" {
+resource "xcsh_waf_exclusion_policy" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -562,7 +562,7 @@ func testAccWAFExclusionPolicyResourceConfig_withExclusionRules(nsName, name str
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_waf_exclusion_policy" "test" {
+resource "xcsh_waf_exclusion_policy" "test" {
   name      = %[1]q
   namespace = "system"
 

@@ -375,7 +375,7 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 						},
 					},
 					"session_name": schema.StringAttribute{
-						MarkdownDescription: "Use the role session name to uniquely identify a session, which will be used for deploy, monitor from F5XC console .",
+						MarkdownDescription: "Use the role session name to uniquely identify a session, which will be used for deploy, monitor from XCSH console .",
 						Optional:            true,
 						Validators: []validator.String{
 							stringvalidator.LengthBetween(2, 64),
@@ -411,7 +411,7 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"blindfold_secret_info": schema.SingleNestedBlock{
-								MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -481,7 +481,7 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"blindfold_secret_info": schema.SingleNestedBlock{
-								MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -558,7 +558,7 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"blindfold_secret_info": schema.SingleNestedBlock{
-								MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -606,7 +606,7 @@ func (r *CloudCredentialsResource) Schema(ctx context.Context, req resource.Sche
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"blindfold_secret_info": schema.SingleNestedBlock{
-								MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+								MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 								Attributes: map[string]schema.Attribute{
 									"decryption_provider": schema.StringAttribute{
 										MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",

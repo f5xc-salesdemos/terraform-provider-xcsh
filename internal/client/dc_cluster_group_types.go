@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// DcClusterGroup represents a F5XC DcClusterGroup
+// DcClusterGroup represents a XCSH DcClusterGroup
 type DcClusterGroup struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

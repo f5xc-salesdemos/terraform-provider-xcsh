@@ -56,7 +56,7 @@ func main() {
 		examples := extractExamples(res, string(content))
 
 		for _, ex := range examples {
-			exDir := filepath.Join(outputDir, "f5xc_"+ex.Resource)
+			exDir := filepath.Join(outputDir, "xcsh_"+ex.Resource)
 			if err := os.MkdirAll(exDir, 0755); err != nil {
 				fmt.Fprintf(os.Stderr, "Error creating %s: %v\n", exDir, err)
 				continue

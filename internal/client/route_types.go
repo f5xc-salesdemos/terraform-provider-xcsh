@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Route represents a F5XC Route
+// Route represents a XCSH Route
 type Route struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

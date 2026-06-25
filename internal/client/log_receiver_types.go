@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// LogReceiver represents a F5XC LogReceiver
+// LogReceiver represents a XCSH LogReceiver
 type LogReceiver struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -12,15 +12,15 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
-func TestF5XCErrorError(t *testing.T) {
+func TestXCSHErrorError(t *testing.T) {
 	tests := []struct {
 		name     string
-		err      *F5XCError
+		err      *XCSHError
 		contains []string
 	}{
 		{
 			name: "basic error",
-			err: &F5XCError{
+			err: &XCSHError{
 				Code:    ErrCodeNotFound,
 				Message: "resource not found",
 			},
@@ -28,7 +28,7 @@ func TestF5XCErrorError(t *testing.T) {
 		},
 		{
 			name: "error with resource",
-			err: &F5XCError{
+			err: &XCSHError{
 				Code:     ErrCodeNotFound,
 				Message:  "not found",
 				Resource: "namespace",
@@ -37,7 +37,7 @@ func TestF5XCErrorError(t *testing.T) {
 		},
 		{
 			name: "error with operation",
-			err: &F5XCError{
+			err: &XCSHError{
 				Code:      ErrCodeTimeout,
 				Message:   "timeout",
 				Operation: "create",
@@ -46,7 +46,7 @@ func TestF5XCErrorError(t *testing.T) {
 		},
 		{
 			name: "error with status code",
-			err: &F5XCError{
+			err: &XCSHError{
 				Code:       ErrCodeServerError,
 				Message:    "server error",
 				StatusCode: 500,
@@ -55,7 +55,7 @@ func TestF5XCErrorError(t *testing.T) {
 		},
 		{
 			name: "error with wrapped error",
-			err: &F5XCError{
+			err: &XCSHError{
 				Code:    ErrCodeNetworkError,
 				Message: "network error",
 				Wrapped: errors.New("connection refused"),
@@ -76,9 +76,9 @@ func TestF5XCErrorError(t *testing.T) {
 	}
 }
 
-func TestF5XCErrorUnwrap(t *testing.T) {
+func TestXCSHErrorUnwrap(t *testing.T) {
 	innerErr := errors.New("inner error")
-	err := &F5XCError{
+	err := &XCSHError{
 		Code:    ErrCodeServerError,
 		Message: "outer error",
 		Wrapped: innerErr,
@@ -90,7 +90,7 @@ func TestF5XCErrorUnwrap(t *testing.T) {
 	}
 
 	// Test with nil wrapped
-	errNoWrap := &F5XCError{
+	errNoWrap := &XCSHError{
 		Code:    ErrCodeNotFound,
 		Message: "no wrap",
 	}
@@ -99,7 +99,7 @@ func TestF5XCErrorUnwrap(t *testing.T) {
 	}
 }
 
-func TestF5XCErrorIsRetryable(t *testing.T) {
+func TestXCSHErrorIsRetryable(t *testing.T) {
 	tests := []struct {
 		code     ErrorCode
 		expected bool
@@ -118,7 +118,7 @@ func TestF5XCErrorIsRetryable(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(string(tt.code), func(t *testing.T) {
-			err := &F5XCError{Code: tt.code}
+			err := &XCSHError{Code: tt.code}
 			if err.IsRetryable() != tt.expected {
 				t.Errorf("IsRetryable() for %s = %v, expected %v", tt.code, err.IsRetryable(), tt.expected)
 			}
@@ -126,7 +126,7 @@ func TestF5XCErrorIsRetryable(t *testing.T) {
 	}
 }
 
-func TestF5XCErrorIsNotFound(t *testing.T) {
+func TestXCSHErrorIsNotFound(t *testing.T) {
 	tests := []struct {
 		code     ErrorCode
 		expected bool
@@ -138,7 +138,7 @@ func TestF5XCErrorIsNotFound(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(string(tt.code), func(t *testing.T) {
-			err := &F5XCError{Code: tt.code}
+			err := &XCSHError{Code: tt.code}
 			if err.IsNotFound() != tt.expected {
 				t.Errorf("IsNotFound() for %s = %v, expected %v", tt.code, err.IsNotFound(), tt.expected)
 			}
@@ -311,7 +311,7 @@ func TestNewConfigurationError(t *testing.T) {
 
 func TestAddError(t *testing.T) {
 	var diags diag.Diagnostics
-	err := &F5XCError{
+	err := &XCSHError{
 		Code:    ErrCodeNotFound,
 		Message: "resource not found",
 	}
@@ -350,13 +350,13 @@ func TestAddAttributeError(t *testing.T) {
 }
 
 func TestCreateDiagnostic(t *testing.T) {
-	t.Run("with F5XCError", func(t *testing.T) {
-		f5xcErr := &F5XCError{
+	t.Run("with XCSHError", func(t *testing.T) {
+		xcshErr := &XCSHError{
 			Code:    ErrCodeNotFound,
 			Message: "not found",
 		}
 
-		diags := CreateDiagnostic("reading", "namespace", f5xcErr)
+		diags := CreateDiagnostic("reading", "namespace", xcshErr)
 
 		if !diags.HasError() {
 			t.Error("CreateDiagnostic() should create error diagnostic")
@@ -391,13 +391,13 @@ func TestWrapError(t *testing.T) {
 		}
 	})
 
-	t.Run("wrap F5XCError", func(t *testing.T) {
-		f5xcErr := &F5XCError{
+	t.Run("wrap XCSHError", func(t *testing.T) {
+		xcshErr := &XCSHError{
 			Code:    ErrCodeNotFound,
 			Message: "not found",
 		}
 
-		wrapped := WrapError(f5xcErr, "namespace", "read")
+		wrapped := WrapError(xcshErr, "namespace", "read")
 
 		if wrapped.Resource != "namespace" {
 			t.Errorf("WrapError() should update resource, got %v", wrapped.Resource)
@@ -419,7 +419,7 @@ func TestAPIErrorResponseParsing(t *testing.T) {
 			{
 				"@type": "type.googleapis.com/google.rpc.BadRequest",
 				"reason": "name is required",
-				"domain": "f5xc.io"
+				"domain": "xcsh.io"
 			}
 		]
 	}`

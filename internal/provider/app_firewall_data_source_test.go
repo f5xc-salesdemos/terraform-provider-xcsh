@@ -16,8 +16,8 @@ func TestAccAppFirewallDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_app_firewall.test"
-	dataSourceName := "data.f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
+	dataSourceName := "data.xcsh_app_firewall.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,15 +39,15 @@ func testAccAppFirewallDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 }
 
-data "f5xc_app_firewall" "test" {
-  depends_on = [f5xc_app_firewall.test]
-  name       = f5xc_app_firewall.test.name
-  namespace  = f5xc_app_firewall.test.namespace
+data "xcsh_app_firewall" "test" {
+  depends_on = [xcsh_app_firewall.test]
+  name       = xcsh_app_firewall.test.name
+  namespace  = xcsh_app_firewall.test.namespace
 }
 `, name))
 }

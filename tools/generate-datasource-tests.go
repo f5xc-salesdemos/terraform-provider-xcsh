@@ -41,7 +41,7 @@ type ResourceConfig struct {
 }
 
 // Resource configurations based on OpenAPI specs
-// Key is the resource name (without f5xc_ prefix)
+// Key is the resource name (without xcsh_ prefix)
 var resourceConfigs = map[string]string{
 	// Simple resources - just name/namespace
 	"alert_policy":              "",
@@ -92,8 +92,8 @@ var resourceConfigs = map[string]string{
 
 	"app_setting": `
   app_type_refs {
-    name      = f5xc_app_type.test.name
-    namespace = f5xc_namespace.test.name
+    name      = xcsh_app_type.test.name
+    namespace = xcsh_namespace.test.name
   }`,
 
 	"app_type": `
@@ -299,8 +299,8 @@ var resourceConfigs = map[string]string{
   }
   default_route_pools {
     pool {
-      name      = f5xc_origin_pool.test.name
-      namespace = f5xc_namespace.test.name
+      name      = xcsh_origin_pool.test.name
+      namespace = xcsh_namespace.test.name
     }
   }`,
 
@@ -349,8 +349,8 @@ var resourceConfigs = map[string]string{
 	"network_firewall": `
   active_forward_proxy_policies {
     forward_proxy_policies {
-      name      = f5xc_forward_proxy_policy.test.name
-      namespace = f5xc_namespace.test.name
+      name      = xcsh_forward_proxy_policy.test.name
+      namespace = xcsh_namespace.test.name
     }
   }`,
 
@@ -491,8 +491,8 @@ var resourceConfigs = map[string]string{
   }
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
-      namespace = f5xc_namespace.test.name
+      name      = xcsh_origin_pool.test.name
+      namespace = xcsh_namespace.test.name
     }
   }`,
 
@@ -528,7 +528,7 @@ var resourceConfigs = map[string]string{
   listen_port = 53
   origin_pools_weights {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight = 1
@@ -600,20 +600,20 @@ var skipResources = map[string]string{
 // Resources that need special dependencies in the config
 var resourceDependencies = map[string]string{
 	"app_setting": `
-resource "f5xc_app_type" "test" {
+resource "xcsh_app_type" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = "${%[2]q}-apptype"
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
   business_logic_markup_setting {
     enable = true
   }
 }
 `,
 	"http_loadbalancer": `
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = "${%[2]q}-pool"
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
   origin_servers {
     public_ip {
       ip = "1.2.3.4"
@@ -625,10 +625,10 @@ resource "f5xc_origin_pool" "test" {
 }
 `,
 	"tcp_loadbalancer": `
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = "${%[2]q}-pool"
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
   origin_servers {
     public_ip {
       ip = "1.2.3.4"
@@ -640,10 +640,10 @@ resource "f5xc_origin_pool" "test" {
 }
 `,
 	"udp_loadbalancer": `
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = "${%[2]q}-pool"
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
   origin_servers {
     public_ip {
       ip = "1.2.3.4"
@@ -655,10 +655,10 @@ resource "f5xc_origin_pool" "test" {
 }
 `,
 	"network_firewall": `
-resource "f5xc_forward_proxy_policy" "test" {
+resource "xcsh_forward_proxy_policy" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = "${%[2]q}-fpp"
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
   proxy_label = "test-proxy"
   rule_list {
     rules {
@@ -816,19 +816,19 @@ func {{.ConfigFuncName}}(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(` + "`" + `
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 {{.Dependencies}}
 resource "{{.ResourceName}}" "test" {
   depends_on = [time_sleep.wait_for_namespace{{.DependsOnExtra}}]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name{{.ResourceConfig}}
+  namespace  = xcsh_namespace.test.name{{.ResourceConfig}}
 }
 
 data "{{.ResourceName}}" "test" {
@@ -886,7 +886,7 @@ data "{{.ResourceName}}" "test" {
 		config := ResourceConfig{
 			Name:           resourceName,
 			StructName:     structName,
-			ResourceName:   "f5xc_" + resourceName,
+			ResourceName:   "xcsh_" + resourceName,
 			TestFuncName:   "TestAcc" + structName + "DataSource_basic",
 			ConfigFuncName: "testAcc" + structName + "DataSourceConfig_basic",
 			NeedsNamespace: !systemLevelResources[resourceName],
@@ -910,12 +910,12 @@ data "{{.ResourceName}}" "test" {
 		if dep, exists := resourceDependencies[resourceName]; exists {
 			deps = dep
 			// Extract resource type from dependency
-			if strings.Contains(dep, "f5xc_origin_pool") {
-				dependsOnExtra = ", f5xc_origin_pool.test"
-			} else if strings.Contains(dep, "f5xc_app_type") {
-				dependsOnExtra = ", f5xc_app_type.test"
-			} else if strings.Contains(dep, "f5xc_forward_proxy_policy") {
-				dependsOnExtra = ", f5xc_forward_proxy_policy.test"
+			if strings.Contains(dep, "xcsh_origin_pool") {
+				dependsOnExtra = ", xcsh_origin_pool.test"
+			} else if strings.Contains(dep, "xcsh_app_type") {
+				dependsOnExtra = ", xcsh_app_type.test"
+			} else if strings.Contains(dep, "xcsh_forward_proxy_policy") {
+				dependsOnExtra = ", xcsh_forward_proxy_policy.test"
 			}
 		}
 

@@ -27,7 +27,7 @@ func TestAccForwardingClassResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_forwarding_class.test"
+	resourceName := "xcsh_forwarding_class.test"
 	fcName := acctest.RandomName("tf-fc")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -66,7 +66,7 @@ func TestAccForwardingClassResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_forwarding_class.test"
+	resourceName := "xcsh_forwarding_class.test"
 	fcName := acctest.RandomName("tf-fc")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -99,7 +99,7 @@ func TestAccForwardingClassResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_forwarding_class.test"
+	resourceName := "xcsh_forwarding_class.test"
 	fcName := acctest.RandomName("tf-fc")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -134,7 +134,7 @@ func TestAccForwardingClassResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_forwarding_class.test"
+	resourceName := "xcsh_forwarding_class.test"
 	fcName := acctest.RandomName("tf-fc")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -168,7 +168,7 @@ func TestAccForwardingClassResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_forwarding_class.test"
+	resourceName := "xcsh_forwarding_class.test"
 	fcName := acctest.RandomName("tf-fc")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -203,7 +203,7 @@ func TestAccForwardingClassResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_forwarding_class.test"
+	resourceName := "xcsh_forwarding_class.test"
 	fcName := acctest.RandomName("tf-fc")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -260,7 +260,7 @@ func TestAccForwardingClassResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_forwarding_class.test"
+	resourceName := "xcsh_forwarding_class.test"
 	fcName := acctest.RandomName("tf-fc")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -298,7 +298,7 @@ func TestAccForwardingClassResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_forwarding_class.test"
+	resourceName := "xcsh_forwarding_class.test"
 	fcName := acctest.RandomName("tf-fc")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -391,7 +391,7 @@ func TestAccForwardingClassResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_forwarding_class.test"
+	resourceName := "xcsh_forwarding_class.test"
 	fcName := acctest.RandomName("tf-fc")
 	newFcName := acctest.RandomName("tf-fc-new")
 
@@ -428,7 +428,7 @@ func TestAccForwardingClassResource_qosSettings(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_forwarding_class.test"
+	resourceName := "xcsh_forwarding_class.test"
 	fcName := acctest.RandomName("tf-fc")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -470,7 +470,7 @@ func testAccForwardingClassImportStateIdFunc(resourceName string) resource.Impor
 
 func testAccForwardingClassResource_basicSystem(fcName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_forwarding_class" "test" {
+resource "xcsh_forwarding_class" "test" {
   name      = %[1]q
   namespace = "system"
 }
@@ -479,7 +479,7 @@ resource "f5xc_forwarding_class" "test" {
 
 func testAccForwardingClassResource_allAttributesSystem(fcName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_forwarding_class" "test" {
+resource "xcsh_forwarding_class" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test forwarding_class with all attributes"
@@ -503,7 +503,7 @@ func testAccForwardingClassResource_withLabelsSystem(fcName string, labels map[s
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_forwarding_class" "test" {
+resource "xcsh_forwarding_class" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -515,7 +515,7 @@ resource "f5xc_forwarding_class" "test" {
 
 func testAccForwardingClassResource_withDescriptionSystem(fcName, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_forwarding_class" "test" {
+resource "xcsh_forwarding_class" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -530,7 +530,7 @@ func testAccForwardingClassResource_withAnnotationsSystem(fcName string, annotat
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_forwarding_class" "test" {
+resource "xcsh_forwarding_class" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -542,7 +542,7 @@ resource "f5xc_forwarding_class" "test" {
 
 func testAccForwardingClassResource_qosSettingsSystem(fcName string) string {
 	return fmt.Sprintf(`
-resource "f5xc_forwarding_class" "test" {
+resource "xcsh_forwarding_class" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Forwarding class with QoS settings"

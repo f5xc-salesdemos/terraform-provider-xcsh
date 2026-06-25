@@ -16,8 +16,8 @@ func TestAccPolicerDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_policer.test"
-	dataSourceName := "data.f5xc_policer.test"
+	resourceName := "xcsh_policer.test"
+	dataSourceName := "data.xcsh_policer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,17 +39,17 @@ func testAccPolicerDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_policer" "test" {
+resource "xcsh_policer" "test" {
   name      = %[1]q
   namespace = "system"
   committed_information_rate = 10000
   burst_size                 = 5000
 }
 
-data "f5xc_policer" "test" {
-  depends_on = [f5xc_policer.test]
-  name       = f5xc_policer.test.name
-  namespace  = f5xc_policer.test.namespace
+data "xcsh_policer" "test" {
+  depends_on = [xcsh_policer.test]
+  name       = xcsh_policer.test.name
+  namespace  = xcsh_policer.test.namespace
 }
 `, name))
 }

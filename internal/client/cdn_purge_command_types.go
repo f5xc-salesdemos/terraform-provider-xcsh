@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// CDNPurgeCommand represents a F5XC CDNPurgeCommand
+// CDNPurgeCommand represents a XCSH CDNPurgeCommand
 type CDNPurgeCommand struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

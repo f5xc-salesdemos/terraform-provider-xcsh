@@ -24,7 +24,7 @@ func TestAccServicePolicyResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -61,7 +61,7 @@ func TestAccServicePolicyResource_withLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -91,7 +91,7 @@ func TestAccServicePolicyResource_denyAll(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -118,7 +118,7 @@ func TestAccServicePolicyResource_allowList(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -145,7 +145,7 @@ func TestAccServicePolicyResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -173,7 +173,7 @@ func TestAccServicePolicyResource_emptyPlan(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -218,7 +218,7 @@ func TestAccServicePolicyResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -253,7 +253,7 @@ func TestAccServicePolicyResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -296,7 +296,7 @@ func TestAccServicePolicyResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -343,7 +343,7 @@ func TestAccServicePolicyResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName1 := acctest.RandomName("tf-test-sp")
 	rName2 := acctest.RandomName("tf-test-sp")
 
@@ -375,7 +375,7 @@ func TestAccServicePolicyResource_switchType(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -411,7 +411,7 @@ func TestAccServicePolicyResource_denyList(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -441,7 +441,7 @@ func TestAccServicePolicyResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
 	rName := acctest.RandomName("tf-test-sp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -494,7 +494,7 @@ func TestAccServicePolicyResource_fullLifecycle(t *testing.T) {
 
 func testAccServicePolicyConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_service_policy" "test" {
+resource "xcsh_service_policy" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -509,7 +509,7 @@ resource "f5xc_service_policy" "test" {
 
 func testAccServicePolicyConfig_withLabelsSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_service_policy" "test" {
+resource "xcsh_service_policy" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test service policy"
@@ -530,7 +530,7 @@ resource "f5xc_service_policy" "test" {
 
 func testAccServicePolicyConfig_denyAllSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_service_policy" "test" {
+resource "xcsh_service_policy" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -545,7 +545,7 @@ resource "f5xc_service_policy" "test" {
 
 func testAccServicePolicyConfig_denyListSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_service_policy" "test" {
+resource "xcsh_service_policy" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -563,7 +563,7 @@ resource "f5xc_service_policy" "test" {
 
 func testAccServicePolicyConfig_allowListSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_service_policy" "test" {
+resource "xcsh_service_policy" "test" {
   name       = %[1]q
   namespace  = "system"
 

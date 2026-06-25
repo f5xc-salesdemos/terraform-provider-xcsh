@@ -34,7 +34,7 @@ import (
 // 9. IPv4 Prefixes Test - Test nested block configuration
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccIPPrefixSetResource -timeout 30m
 // =============================================================================
 
@@ -50,7 +50,7 @@ func TestAccIPPrefixSetResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -121,7 +121,7 @@ func TestAccIPPrefixSetResource_allAttributes(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -170,7 +170,7 @@ func TestAccIPPrefixSetResource_updateLabels(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -225,7 +225,7 @@ func TestAccIPPrefixSetResource_updateDescription(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -284,7 +284,7 @@ func TestAccIPPrefixSetResource_updateAnnotations(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -337,7 +337,7 @@ func TestAccIPPrefixSetResource_disappears(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -375,7 +375,7 @@ func TestAccIPPrefixSetResource_emptyPlan(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -419,7 +419,7 @@ func TestAccIPPrefixSetResource_planChecks(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -477,7 +477,7 @@ func TestAccIPPrefixSetResource_knownValues(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -611,7 +611,7 @@ func TestAccIPPrefixSetResource_requiresReplace(t *testing.T) {
 	rName1 := acctest.RandomName("tf-acc-test-ips")
 	rName2 := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -660,7 +660,7 @@ func TestAccIPPrefixSetResource_ipv4Prefixes(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-ips")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_ip_prefix_set.test"
+	resourceName := "xcsh_ip_prefix_set.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -703,20 +703,20 @@ func testAccIPPrefixSetResourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_ip_prefix_set" "test" {
+resource "xcsh_ip_prefix_set" "test" {
   depends_on = [time_sleep.wait_for_namespace]
 
   name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  namespace = xcsh_namespace.test.name
 
   ipv4_prefixes {
     ipv4_prefix = "10.0.0.0/8"
@@ -730,20 +730,20 @@ func testAccIPPrefixSetResourceConfig_allAttributes(nsName, name string) string 
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_ip_prefix_set" "test" {
+resource "xcsh_ip_prefix_set" "test" {
   depends_on = [time_sleep.wait_for_namespace]
 
   name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  namespace = xcsh_namespace.test.name
 
   labels = {
     environment = "test"
@@ -767,20 +767,20 @@ func testAccIPPrefixSetResourceConfig_withLabels(nsName, name, environment, mana
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_ip_prefix_set" "test" {
+resource "xcsh_ip_prefix_set" "test" {
   depends_on = [time_sleep.wait_for_namespace]
 
   name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  namespace = xcsh_namespace.test.name
 
   labels = {
     environment = %[3]q
@@ -799,20 +799,20 @@ func testAccIPPrefixSetResourceConfig_withDescription(nsName, name, description 
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_ip_prefix_set" "test" {
+resource "xcsh_ip_prefix_set" "test" {
   depends_on = [time_sleep.wait_for_namespace]
 
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 
   ipv4_prefixes {
@@ -827,20 +827,20 @@ func testAccIPPrefixSetResourceConfig_withAnnotations(nsName, name, value1, valu
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_ip_prefix_set" "test" {
+resource "xcsh_ip_prefix_set" "test" {
   depends_on = [time_sleep.wait_for_namespace]
 
   name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  namespace = xcsh_namespace.test.name
 
   annotations = {
     key1 = %[3]q
@@ -859,20 +859,20 @@ func testAccIPPrefixSetResourceConfig_withIPv4Prefixes(nsName, name string) stri
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_ip_prefix_set" "test" {
+resource "xcsh_ip_prefix_set" "test" {
   depends_on = [time_sleep.wait_for_namespace]
 
   name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  namespace = xcsh_namespace.test.name
 
   ipv4_prefixes {
     ipv4_prefix = "10.0.0.0/8"

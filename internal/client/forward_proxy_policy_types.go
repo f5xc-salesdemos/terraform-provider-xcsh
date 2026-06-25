@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// ForwardProxyPolicy represents a F5XC ForwardProxyPolicy
+// ForwardProxyPolicy represents a XCSH ForwardProxyPolicy
 type ForwardProxyPolicy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

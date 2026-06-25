@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// AlertPolicy represents a F5XC AlertPolicy
+// AlertPolicy represents a XCSH AlertPolicy
 type AlertPolicy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

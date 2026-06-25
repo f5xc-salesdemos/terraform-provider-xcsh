@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// AWSVPCSite represents a F5XC AWSVPCSite
+// AWSVPCSite represents a XCSH AWSVPCSite
 type AWSVPCSite struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// VoltstackSite represents a F5XC VoltstackSite
+// VoltstackSite represents a XCSH VoltstackSite
 type VoltstackSite struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

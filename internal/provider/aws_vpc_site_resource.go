@@ -1672,7 +1672,7 @@ type AWSVPCSiteResourceModel struct {
 	EnableEncryption            *AWSVPCSiteEnableEncryptionModel            `tfsdk:"enable_encryption"`
 	EnableInternetVIP           *AWSVPCSiteEmptyModel                       `tfsdk:"enable_internet_vip"`
 	F5OrchestratedRouting       *AWSVPCSiteEmptyModel                       `tfsdk:"f5_orchestrated_routing"`
-	F5xcSecurityGroup           *AWSVPCSiteEmptyModel                       `tfsdk:"f5xc_security_group"`
+	F5xcSecurityGroup           *AWSVPCSiteEmptyModel                       `tfsdk:"xcsh_security_group"`
 	IngressEgressGw             *AWSVPCSiteIngressEgressGwModel             `tfsdk:"ingress_egress_gw"`
 	IngressGw                   *AWSVPCSiteIngressGwModel                   `tfsdk:"ingress_gw"`
 	KubernetesUpgradeDrain      *AWSVPCSiteKubernetesUpgradeDrainModel      `tfsdk:"kubernetes_upgrade_drain"`
@@ -1808,7 +1808,7 @@ func (r *AWSVPCSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 				Blocks: map[string]schema.Block{
 					"blindfold_secret_info": schema.SingleNestedBlock{
-						MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+						MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 						Attributes: map[string]schema.Attribute{
 							"decryption_provider": schema.StringAttribute{
 								MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -1828,7 +1828,7 @@ func (r *AWSVPCSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"blindfold_secret_info_internal": schema.SingleNestedBlock{
-						MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+						MarkdownDescription: "X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 						Attributes: map[string]schema.Attribute{
 							"decryption_provider": schema.StringAttribute{
 								MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -2007,7 +2007,7 @@ func (r *AWSVPCSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 			},
 			"custom_security_group": schema.SingleNestedBlock{
-				MarkdownDescription: "[OneOf: custom_security_group, f5xc_security_group] Enter pre created security groups for slo(Site Local Outside) and sli(Site Local Inside) interface. Supported only for sites deployed on existing VPC.",
+				MarkdownDescription: "[OneOf: custom_security_group, xcsh_security_group] Enter pre created security groups for slo(Site Local Outside) and sli(Site Local Inside) interface. Supported only for sites deployed on existing VPC.",
 				Attributes: map[string]schema.Attribute{
 					"inside_security_group_id": schema.StringAttribute{
 						MarkdownDescription: "X-displayName: 'Inside Security Group ID' Security Group ID to be attached to SLI(Site Local Inside) Interface.",
@@ -2140,7 +2140,7 @@ func (r *AWSVPCSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 			"f5_orchestrated_routing": schema.SingleNestedBlock{
 				MarkdownDescription: "[OneOf: f5_orchestrated_routing, manual_routing] Enable this option",
 			},
-			"f5xc_security_group": schema.SingleNestedBlock{
+			"xcsh_security_group": schema.SingleNestedBlock{
 				MarkdownDescription: "Enable this option",
 			},
 			"ingress_egress_gw": schema.SingleNestedBlock{
@@ -2282,7 +2282,7 @@ func (r *AWSVPCSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"allowed_vip_port": schema.SingleNestedBlock{
-						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the F5XC Site.",
+						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the XCSH Site.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"custom_ports": schema.SingleNestedBlock{
@@ -2312,7 +2312,7 @@ func (r *AWSVPCSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"allowed_vip_port_sli": schema.SingleNestedBlock{
-						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the F5XC Site.",
+						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the XCSH Site.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"custom_ports": schema.SingleNestedBlock{
@@ -2995,7 +2995,7 @@ func (r *AWSVPCSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 				Blocks: map[string]schema.Block{
 					"allowed_vip_port": schema.SingleNestedBlock{
-						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the F5XC Site.",
+						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the XCSH Site.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"custom_ports": schema.SingleNestedBlock{
@@ -3169,7 +3169,7 @@ func (r *AWSVPCSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 			},
 			"os": schema.SingleNestedBlock{
-				MarkdownDescription: "Select the F5XC Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions.",
+				MarkdownDescription: "Select the XCSH Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions.",
 				Attributes: map[string]schema.Attribute{
 					"operating_system_version": schema.StringAttribute{
 						MarkdownDescription: "Exclusive with [default_os_version] Specify a OS version to be used e.g. 9.2024.6.",
@@ -3232,10 +3232,10 @@ func (r *AWSVPCSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 				},
 			},
 			"sw": schema.SingleNestedBlock{
-				MarkdownDescription: "Select the F5XC Software Version for the site. By default, latest available F5XC Software Version will be used. Refer to release notes to find required released SW versions.",
+				MarkdownDescription: "Select the XCSH Software Version for the site. By default, latest available XCSH Software Version will be used. Refer to release notes to find required released SW versions.",
 				Attributes: map[string]schema.Attribute{
 					"volterra_software_version": schema.StringAttribute{
-						MarkdownDescription: "Exclusive with [default_sw_version] Specify a F5XC Software Version to be used e.g. Crt-20210329-1002.",
+						MarkdownDescription: "Exclusive with [default_sw_version] Specify a XCSH Software Version to be used e.g. Crt-20210329-1002.",
 						Optional:            true,
 						Validators: []validator.String{
 							stringvalidator.LengthAtMost(20),
@@ -3390,7 +3390,7 @@ func (r *AWSVPCSiteResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 					"allowed_vip_port": schema.SingleNestedBlock{
-						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the F5XC Site.",
+						MarkdownDescription: "Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the XCSH Site.",
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"custom_ports": schema.SingleNestedBlock{
@@ -4211,8 +4211,8 @@ func (r *AWSVPCSiteResource) Create(ctx context.Context, req resource.CreateRequ
 		createReq.Spec["f5_orchestrated_routing"] = f5_orchestrated_routingMap
 	}
 	if data.F5xcSecurityGroup != nil {
-		f5xc_security_groupMap := make(map[string]interface{})
-		createReq.Spec["f5xc_security_group"] = f5xc_security_groupMap
+		xcsh_security_groupMap := make(map[string]interface{})
+		createReq.Spec["xcsh_security_group"] = xcsh_security_groupMap
 	}
 	if data.IngressEgressGw != nil {
 		ingress_egress_gwMap := make(map[string]interface{})
@@ -5056,7 +5056,7 @@ func (r *AWSVPCSiteResource) Create(ctx context.Context, req resource.CreateRequ
 		data.F5OrchestratedRouting = &AWSVPCSiteEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["f5xc_security_group"].(map[string]interface{}); ok && isImport && data.F5xcSecurityGroup == nil {
+	if _, ok := apiResource.Spec["xcsh_security_group"].(map[string]interface{}); ok && isImport && data.F5xcSecurityGroup == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.F5xcSecurityGroup = &AWSVPCSiteEmptyModel{}
 	}
@@ -6431,7 +6431,7 @@ func (r *AWSVPCSiteResource) Read(ctx context.Context, req resource.ReadRequest,
 		data.F5OrchestratedRouting = &AWSVPCSiteEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["f5xc_security_group"].(map[string]interface{}); ok && isImport && data.F5xcSecurityGroup == nil {
+	if _, ok := apiResource.Spec["xcsh_security_group"].(map[string]interface{}); ok && isImport && data.F5xcSecurityGroup == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.F5xcSecurityGroup = &AWSVPCSiteEmptyModel{}
 	}
@@ -7568,8 +7568,8 @@ func (r *AWSVPCSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 		apiResource.Spec["f5_orchestrated_routing"] = f5_orchestrated_routingMap
 	}
 	if data.F5xcSecurityGroup != nil {
-		f5xc_security_groupMap := make(map[string]interface{})
-		apiResource.Spec["f5xc_security_group"] = f5xc_security_groupMap
+		xcsh_security_groupMap := make(map[string]interface{})
+		apiResource.Spec["xcsh_security_group"] = xcsh_security_groupMap
 	}
 	if data.IngressEgressGw != nil {
 		ingress_egress_gwMap := make(map[string]interface{})
@@ -8438,7 +8438,7 @@ func (r *AWSVPCSiteResource) Update(ctx context.Context, req resource.UpdateRequ
 		data.F5OrchestratedRouting = &AWSVPCSiteEmptyModel{}
 	}
 	// Normal Read: preserve existing state value
-	if _, ok := apiResource.Spec["f5xc_security_group"].(map[string]interface{}); ok && isImport && data.F5xcSecurityGroup == nil {
+	if _, ok := apiResource.Spec["xcsh_security_group"].(map[string]interface{}); ok && isImport && data.F5xcSecurityGroup == nil {
 		// Import case: populate from API since state is nil and psd is empty
 		data.F5xcSecurityGroup = &AWSVPCSiteEmptyModel{}
 	}

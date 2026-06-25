@@ -34,7 +34,7 @@ import (
 // 9. Requires Replace Test - Name/namespace change forces replacement
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccSiteMeshGroupResource -timeout 30m
 // =============================================================================
 
@@ -54,12 +54,12 @@ func TestAccSiteMeshGroupResource_basic(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	rName := acctest.RandomName("tf-acc-test-smg")
-	resourceName := "f5xc_site_mesh_group.test"
+	resourceName := "xcsh_site_mesh_group.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_site_mesh_group"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_site_mesh_group"),
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
@@ -101,13 +101,13 @@ func TestAccSiteMeshGroupResource_fullMesh(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	rName := acctest.RandomName("tf-acc-test-smg")
-	resourceName := "f5xc_site_mesh_group.test"
+	resourceName := "xcsh_site_mesh_group.test"
 	description := "Full mesh site mesh group acceptance test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_site_mesh_group"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_site_mesh_group"),
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
@@ -153,12 +153,12 @@ func TestAccSiteMeshGroupResource_updateLabels(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	rName := acctest.RandomName("tf-acc-test-smg")
-	resourceName := "f5xc_site_mesh_group.test"
+	resourceName := "xcsh_site_mesh_group.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_site_mesh_group"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_site_mesh_group"),
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
@@ -207,12 +207,12 @@ func TestAccSiteMeshGroupResource_updateDescription(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	rName := acctest.RandomName("tf-acc-test-smg")
-	resourceName := "f5xc_site_mesh_group.test"
+	resourceName := "xcsh_site_mesh_group.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_site_mesh_group"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_site_mesh_group"),
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
@@ -265,12 +265,12 @@ func TestAccSiteMeshGroupResource_updateAnnotations(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	rName := acctest.RandomName("tf-acc-test-smg")
-	resourceName := "f5xc_site_mesh_group.test"
+	resourceName := "xcsh_site_mesh_group.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_site_mesh_group"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_site_mesh_group"),
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
@@ -317,12 +317,12 @@ func TestAccSiteMeshGroupResource_emptyPlan(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	rName := acctest.RandomName("tf-acc-test-smg")
-	resourceName := "f5xc_site_mesh_group.test"
+	resourceName := "xcsh_site_mesh_group.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_site_mesh_group"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_site_mesh_group"),
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
@@ -360,12 +360,12 @@ func TestAccSiteMeshGroupResource_planChecks(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	rName := acctest.RandomName("tf-acc-test-smg")
-	resourceName := "f5xc_site_mesh_group.test"
+	resourceName := "xcsh_site_mesh_group.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_site_mesh_group"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_site_mesh_group"),
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
@@ -417,12 +417,12 @@ func TestAccSiteMeshGroupResource_knownValues(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	rName := acctest.RandomName("tf-acc-test-smg")
-	resourceName := "f5xc_site_mesh_group.test"
+	resourceName := "xcsh_site_mesh_group.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_site_mesh_group"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_site_mesh_group"),
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
@@ -548,12 +548,12 @@ func TestAccSiteMeshGroupResource_requiresReplaceName(t *testing.T) {
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	rName1 := acctest.RandomName("tf-acc-test-smg")
 	rName2 := acctest.RandomName("tf-acc-test-smg")
-	resourceName := "f5xc_site_mesh_group.test"
+	resourceName := "xcsh_site_mesh_group.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_site_mesh_group"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_site_mesh_group"),
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
@@ -597,12 +597,12 @@ func TestAccSiteMeshGroupResource_requiresReplaceNamespace(t *testing.T) {
 	nsName1 := acctest.RandomName("tf-acc-test-ns")
 	nsName2 := acctest.RandomName("tf-acc-test-ns")
 	rName := acctest.RandomName("tf-acc-test-smg")
-	resourceName := "f5xc_site_mesh_group.test"
+	resourceName := "xcsh_site_mesh_group.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_site_mesh_group"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_site_mesh_group"),
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
@@ -640,19 +640,19 @@ func testAccSiteMeshGroupResourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_site_mesh_group" "test" {
+resource "xcsh_site_mesh_group" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   full_mesh {
     control_and_data_plane_mesh {}
@@ -665,19 +665,19 @@ func testAccSiteMeshGroupResourceConfig_fullMesh(nsName, name, description strin
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_site_mesh_group" "test" {
+resource "xcsh_site_mesh_group" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 
   labels = {
@@ -701,19 +701,19 @@ func testAccSiteMeshGroupResourceConfig_withLabels(nsName, name, environment, ma
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_site_mesh_group" "test" {
+resource "xcsh_site_mesh_group" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   labels = {
     environment = %[3]q
@@ -731,19 +731,19 @@ func testAccSiteMeshGroupResourceConfig_withDescription(nsName, name, descriptio
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_site_mesh_group" "test" {
+resource "xcsh_site_mesh_group" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 
   full_mesh {
@@ -757,19 +757,19 @@ func testAccSiteMeshGroupResourceConfig_withAnnotations(nsName, name, value1, va
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_site_mesh_group" "test" {
+resource "xcsh_site_mesh_group" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   annotations = {
     key1 = %[3]q

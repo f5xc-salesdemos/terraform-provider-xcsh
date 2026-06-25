@@ -18,7 +18,7 @@ func TestAccCRLResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-crl")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_crl.test"
+	resourceName := "xcsh_crl.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -26,7 +26,7 @@ func TestAccCRLResource_basic(t *testing.T) {
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_crl"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_crl"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCRLConfig_basic(nsName, rName),
@@ -63,7 +63,7 @@ func TestAccCRLResource_emptyPlan(t *testing.T) {
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		ExternalProviders:        acctest.ExternalProviders,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_crl"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_crl"),
 		Steps: []resource.TestStep{
 			{Config: testAccCRLConfig_basic(nsName, rName)},
 			{Config: testAccCRLConfig_basic(nsName, rName), PlanOnly: true, ExpectNonEmptyPlan: false},
@@ -87,19 +87,19 @@ func testAccCRLConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_crl" "test" {
+resource "xcsh_crl" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   server_address   = "crl.example.com"
   server_port      = 80

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	// PublicKeyEndpoint is the F5XC API endpoint for fetching the encryption public key
+	// PublicKeyEndpoint is the XCSH API endpoint for fetching the encryption public key
 	PublicKeyEndpoint = "/api/secret_management/get_public_key"
 
 	// Retry configuration for rate-limited requests
@@ -23,13 +23,13 @@ const (
 	defaultRateLimitDelay = 60 * time.Second
 )
 
-// GetPublicKey fetches the encryption public key from F5XC Secret Management API.
+// GetPublicKey fetches the encryption public key from XCSH Secret Management API.
 // The public key is used for RSA-OAEP encryption of secrets.
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeouts
 //   - httpClient: Configured HTTP client with authentication
-//   - baseURL: F5XC API base URL (e.g., "https://tenant.console.ves.volterra.io")
+//   - baseURL: XCSH API base URL (e.g., "https://tenant.console.ves.volterra.io")
 //
 // Returns:
 //   - PublicKey containing RSA modulus and exponent
@@ -70,7 +70,7 @@ func calculateBackoff(attempt int) time.Duration {
 // Parameters:
 //   - ctx: Context for cancellation and timeouts
 //   - httpClient: Configured HTTP client with authentication
-//   - baseURL: F5XC API base URL
+//   - baseURL: XCSH API base URL
 //   - version: Specific key version to fetch, or 0 for latest
 //
 // Returns:
@@ -130,7 +130,7 @@ func GetPublicKeyWithVersion(ctx context.Context, httpClient *http.Client, baseU
 
 		// Check for successful response
 		if resp.StatusCode == http.StatusOK {
-			// Parse response - F5XC wraps responses in an envelope
+			// Parse response - XCSH wraps responses in an envelope
 			var envelope APIEnvelope[PublicKey]
 			if err := json.Unmarshal(body, &envelope); err != nil {
 				// Try parsing without envelope (direct response)

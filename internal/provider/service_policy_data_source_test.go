@@ -16,8 +16,8 @@ func TestAccServicePolicyDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_service_policy.test"
-	dataSourceName := "data.f5xc_service_policy.test"
+	resourceName := "xcsh_service_policy.test"
+	dataSourceName := "data.xcsh_service_policy.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,17 +39,17 @@ func testAccServicePolicyDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_service_policy" "test" {
+resource "xcsh_service_policy" "test" {
   name      = %[1]q
   namespace = "system"
   allow_all_requests {}
   any_server {}
 }
 
-data "f5xc_service_policy" "test" {
-  depends_on = [f5xc_service_policy.test]
-  name       = f5xc_service_policy.test.name
-  namespace  = f5xc_service_policy.test.namespace
+data "xcsh_service_policy" "test" {
+  depends_on = [xcsh_service_policy.test]
+  name       = xcsh_service_policy.test.name
+  namespace  = xcsh_service_policy.test.namespace
 }
 `, name))
 }

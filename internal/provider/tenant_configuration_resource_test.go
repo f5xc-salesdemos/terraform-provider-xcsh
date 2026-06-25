@@ -32,7 +32,7 @@ import (
 // 7. Plan Checks - Verify planned actions
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccTenantConfigurationResource -timeout 30m
 // =============================================================================
 
@@ -52,7 +52,7 @@ func TestAccTenantConfigurationResource_basic(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -98,7 +98,7 @@ func TestAccTenantConfigurationResource_allAttributes(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 	description := "Comprehensive tenant configuration test"
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -160,7 +160,7 @@ func TestAccTenantConfigurationResource_updateBasicConfiguration(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -211,7 +211,7 @@ func TestAccTenantConfigurationResource_updateBruteForceDetection(t *testing.T) 
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -255,7 +255,7 @@ func TestAccTenantConfigurationResource_updatePasswordPolicy(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -307,7 +307,7 @@ func TestAccTenantConfigurationResource_updateLabels(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -362,7 +362,7 @@ func TestAccTenantConfigurationResource_updateDescription(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -421,7 +421,7 @@ func TestAccTenantConfigurationResource_disappears(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -435,7 +435,7 @@ func TestAccTenantConfigurationResource_disappears(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					acctest.CheckResourceExists(resourceName),
 					// Delete the resource outside of Terraform
-					acctest.CheckResourceDisappears("f5xc_tenant_configuration", resourceName),
+					acctest.CheckResourceDisappears("xcsh_tenant_configuration", resourceName),
 				),
 				// Expect the plan to show the resource needs to be recreated
 				ExpectNonEmptyPlan: true,
@@ -459,7 +459,7 @@ func TestAccTenantConfigurationResource_emptyPlan(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 	description := "Empty plan test"
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -504,7 +504,7 @@ func TestAccTenantConfigurationResource_planChecks(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -562,7 +562,7 @@ func TestAccTenantConfigurationResource_knownValues(t *testing.T) {
 
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -674,7 +674,7 @@ func TestAccTenantConfigurationResource_requiresReplace(t *testing.T) {
 	nsName2 := acctest.RandomName("tf-acc-test-ns")
 	name1 := acctest.RandomName("tf-acc-test-tenant-config")
 	name2 := acctest.RandomName("tf-acc-test-tenant-config")
-	resourceName := "f5xc_tenant_configuration.test"
+	resourceName := "xcsh_tenant_configuration.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -730,19 +730,19 @@ func testAccTenantConfigurationResourceConfig_basic(nsName, name string) string 
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_tenant_configuration" "test" {
+resource "xcsh_tenant_configuration" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 }
 `, nsName, name))
 }
@@ -751,19 +751,19 @@ func testAccTenantConfigurationResourceConfig_allAttributes(nsName, name, descri
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_tenant_configuration" "test" {
+resource "xcsh_tenant_configuration" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 
   labels = {
@@ -801,19 +801,19 @@ func testAccTenantConfigurationResourceConfig_withBasicConfig(nsName, name, disp
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_tenant_configuration" "test" {
+resource "xcsh_tenant_configuration" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   basic_configuration {
     display_name = %[3]q
@@ -826,19 +826,19 @@ func testAccTenantConfigurationResourceConfig_withBruteForce(nsName, name string
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_tenant_configuration" "test" {
+resource "xcsh_tenant_configuration" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   brute_force_detection_settings {
     max_login_failures = %[3]d
@@ -851,19 +851,19 @@ func testAccTenantConfigurationResourceConfig_withPasswordPolicy(nsName, name st
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_tenant_configuration" "test" {
+resource "xcsh_tenant_configuration" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   password_policy {
     minimum_length       = %[3]d
@@ -880,19 +880,19 @@ func testAccTenantConfigurationResourceConfig_withLabels(nsName, name, environme
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_tenant_configuration" "test" {
+resource "xcsh_tenant_configuration" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   labels = {
     environment = %[3]q
@@ -906,19 +906,19 @@ func testAccTenantConfigurationResourceConfig_withDescription(nsName, name, desc
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_tenant_configuration" "test" {
+resource "xcsh_tenant_configuration" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 }
 `, nsName, name, description))

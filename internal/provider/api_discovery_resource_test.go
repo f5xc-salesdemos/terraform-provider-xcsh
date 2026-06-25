@@ -18,13 +18,13 @@ func TestAccAPIDiscoveryResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_api_discovery.test"
+	resourceName := "xcsh_api_discovery.test"
 	rName := acctest.RandomName("tf-test-disc")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_discovery"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_discovery"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPIDiscoveryConfig_basic(rName),
@@ -62,13 +62,13 @@ func TestAccAPIDiscoveryResource_withLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_api_discovery.test"
+	resourceName := "xcsh_api_discovery.test"
 	rName := acctest.RandomName("tf-test-disc")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_discovery"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_discovery"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPIDiscoveryConfig_withLabels(rName),
@@ -90,7 +90,7 @@ func TestAccAPIDiscoveryResource_emptyPlan(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_discovery"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_discovery"),
 		Steps: []resource.TestStep{
 			{Config: testAccAPIDiscoveryConfig_basic(rName)},
 			{Config: testAccAPIDiscoveryConfig_basic(rName), PlanOnly: true, ExpectNonEmptyPlan: false},
@@ -102,13 +102,13 @@ func TestAccAPIDiscoveryResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_api_discovery.test"
+	resourceName := "xcsh_api_discovery.test"
 	rName := acctest.RandomName("tf-test-disc")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_discovery"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_discovery"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPIDiscoveryConfig_basic(rName),
@@ -149,14 +149,14 @@ func TestAccAPIDiscoveryResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_api_discovery.test"
+	resourceName := "xcsh_api_discovery.test"
 	rName1 := acctest.RandomName("tf-test-disc")
 	rName2 := acctest.RandomName("tf-test-disc")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_discovery"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_discovery"),
 		Steps: []resource.TestStep{
 			{Config: testAccAPIDiscoveryConfig_basic(rName1), Check: acctest.CheckResourceExists(resourceName)},
 			{
@@ -171,7 +171,7 @@ func TestAccAPIDiscoveryResource_requiresReplace(t *testing.T) {
 
 func testAccAPIDiscoveryConfig_withLabels(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_api_discovery" "test" {
+resource "xcsh_api_discovery" "test" {
   name      = %[1]q
   namespace = "system"
   labels = {
@@ -183,7 +183,7 @@ resource "f5xc_api_discovery" "test" {
 
 func testAccAPIDiscoveryConfig_basic(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_api_discovery" "test" {
+resource "xcsh_api_discovery" "test" {
   name      = %[1]q
   namespace = "system"
 }

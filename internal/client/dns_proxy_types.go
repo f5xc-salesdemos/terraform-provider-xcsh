@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// DNSProxy represents a F5XC DNSProxy
+// DNSProxy represents a XCSH DNSProxy
 type DNSProxy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

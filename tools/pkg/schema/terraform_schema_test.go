@@ -23,7 +23,7 @@ func TestParseTerraformSchema_DistinguishesBlocksFromAttributes(t *testing.T) {
 		"provider_schemas": {
 			"registry.terraform.io/f5xc-salesdemos/f5xc": {
 				"resource_schemas": {
-					"f5xc_http_loadbalancer": {
+					"xcsh_http_loadbalancer": {
 						"version": 0,
 						"block": {
 							"attributes": {
@@ -62,9 +62,9 @@ func TestParseTerraformSchema_DistinguishesBlocksFromAttributes(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	res, ok := ts.Resources["f5xc_http_loadbalancer"]
+	res, ok := ts.Resources["xcsh_http_loadbalancer"]
 	if !ok {
-		t.Fatal("expected f5xc_http_loadbalancer in resources")
+		t.Fatal("expected xcsh_http_loadbalancer in resources")
 	}
 
 	tests := []struct {
@@ -90,10 +90,10 @@ func TestParseTerraformSchema_DistinguishesBlocksFromAttributes(t *testing.T) {
 func TestFieldKind_UnknownPath(t *testing.T) {
 	ts := &TerraformSchema{
 		Resources: map[string]*ResourceSchema{
-			"f5xc_test": {Fields: map[string]FieldKind{}},
+			"xcsh_test": {Fields: map[string]FieldKind{}},
 		},
 	}
-	got := ts.Resources["f5xc_test"].FieldKind("nonexistent")
+	got := ts.Resources["xcsh_test"].FieldKind("nonexistent")
 	if got != FieldKindUnknown {
 		t.Errorf("expected FieldKindUnknown, got %v", got)
 	}

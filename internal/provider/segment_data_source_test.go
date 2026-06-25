@@ -16,8 +16,8 @@ func TestAccSegmentDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_segment.test"
-	dataSourceName := "data.f5xc_segment.test"
+	resourceName := "xcsh_segment.test"
+	dataSourceName := "data.xcsh_segment.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -40,15 +40,15 @@ func testAccSegmentDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_segment" "test" {
+resource "xcsh_segment" "test" {
   name      = %[1]q
   namespace = "system"
 }
 
-data "f5xc_segment" "test" {
-  depends_on = [f5xc_segment.test]
-  name       = f5xc_segment.test.name
-  namespace  = f5xc_segment.test.namespace
+data "xcsh_segment" "test" {
+  depends_on = [xcsh_segment.test]
+  name       = xcsh_segment.test.name
+  namespace  = xcsh_segment.test.namespace
 }
 `, name))
 }

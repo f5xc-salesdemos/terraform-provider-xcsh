@@ -25,12 +25,12 @@ func TestAccHTTPLoadBalancerResource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-test-lb")
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
@@ -67,12 +67,12 @@ func TestAccHTTPLoadBalancerResource_withLabels(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-test-lb")
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLoadBalancerConfig_withLabelsSystem(rName),
@@ -96,12 +96,12 @@ func TestAccHTTPLoadBalancerResource_withDomains(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-test-lb-domain")
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLoadBalancerConfig_withDomainsSystem(rName),
@@ -124,12 +124,12 @@ func TestAccHTTPLoadBalancerResource_updateLabels(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-test-lb")
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLoadBalancerConfig_labelsUpdateSystem(rName, "dev"),
@@ -158,12 +158,12 @@ func TestAccHTTPLoadBalancerResource_emptyPlan(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-test-lb")
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName),
@@ -202,13 +202,13 @@ func TestAccHTTPLoadBalancerResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName),
@@ -245,13 +245,13 @@ func TestAccHTTPLoadBalancerResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName),
@@ -292,14 +292,14 @@ func TestAccHTTPLoadBalancerResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName1 := acctest.RandomName("tf-test-lb")
 	rName2 := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName1),
@@ -324,13 +324,13 @@ func TestAccHTTPLoadBalancerResource_httpsAutoCert(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLBConfig_httpsAutoCertSystem(rName),
@@ -363,14 +363,14 @@ func TestAccHTTPLoadBalancerResource_withOriginPool(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		CheckDestroy: func(s *terraform.State) error {
-			if err := acctest.CheckResourceDestroyed("f5xc_http_loadbalancer")(s); err != nil {
+			if err := acctest.CheckResourceDestroyed("xcsh_http_loadbalancer")(s); err != nil {
 				return err
 			}
 			return acctest.CheckOriginPoolDestroyed(s)
@@ -394,14 +394,14 @@ func TestAccHTTPLoadBalancerResource_withWAF(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		CheckDestroy: func(s *terraform.State) error {
-			if err := acctest.CheckResourceDestroyed("f5xc_http_loadbalancer")(s); err != nil {
+			if err := acctest.CheckResourceDestroyed("xcsh_http_loadbalancer")(s); err != nil {
 				return err
 			}
 			return acctest.CheckAppFirewallDestroyed(s)
@@ -424,14 +424,14 @@ func TestAccHTTPLoadBalancerResource_securityStack(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		CheckDestroy: func(s *terraform.State) error {
-			if err := acctest.CheckResourceDestroyed("f5xc_http_loadbalancer")(s); err != nil {
+			if err := acctest.CheckResourceDestroyed("xcsh_http_loadbalancer")(s); err != nil {
 				return err
 			}
 			if err := acctest.CheckAppFirewallDestroyed(s); err != nil {
@@ -461,13 +461,13 @@ func TestAccHTTPLoadBalancerResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLoadBalancerConfig_withLabelsSystem(rName),
@@ -521,7 +521,7 @@ func TestAccHTTPLoadBalancerResource_fullLifecycle(t *testing.T) {
 
 func testAccHTTPLoadBalancerConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -543,7 +543,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLoadBalancerConfig_withLabelsSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -566,7 +566,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLoadBalancerConfig_withDomainsSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -595,13 +595,13 @@ func TestAccHTTPLoadBalancerResource_jsChallenge(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLBConfig_jsChallengeSystem(rName),
@@ -625,13 +625,13 @@ func TestAccHTTPLoadBalancerResource_leastActive(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLBConfig_leastActiveSystem(rName),
@@ -645,13 +645,13 @@ func TestAccHTTPLoadBalancerResource_sourceIpStickiness(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLBConfig_sourceIpStickinessSystem(rName),
@@ -668,14 +668,14 @@ func TestAccHTTPLoadBalancerResource_withRateLimit(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		CheckDestroy: func(s *terraform.State) error {
-			if err := acctest.CheckResourceDestroyed("f5xc_http_loadbalancer")(s); err != nil {
+			if err := acctest.CheckResourceDestroyed("xcsh_http_loadbalancer")(s); err != nil {
 				return err
 			}
 			return acctest.CheckRateLimiterDestroyed(s)
@@ -696,14 +696,14 @@ func TestAccHTTPLoadBalancerResource_userIdentification(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		CheckDestroy: func(s *terraform.State) error {
-			if err := acctest.CheckResourceDestroyed("f5xc_http_loadbalancer")(s); err != nil {
+			if err := acctest.CheckResourceDestroyed("xcsh_http_loadbalancer")(s); err != nil {
 				return err
 			}
 			return acctest.CheckUserIdentificationDestroyed(s)
@@ -724,13 +724,13 @@ func TestAccHTTPLoadBalancerResource_doNotAdvertise(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLBConfig_doNotAdvertiseSystem(rName),
@@ -747,13 +747,13 @@ func TestAccHTTPLoadBalancerResource_ipReputation(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLBConfig_ipReputationSystem(rName),
@@ -770,14 +770,14 @@ func TestAccHTTPLoadBalancerResource_switchProtocol(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName1 := acctest.RandomName("tf-test-lb")
 	rName2 := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName1),
@@ -803,13 +803,13 @@ func TestAccHTTPLoadBalancerResource_switchAlgorithm(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_http_loadbalancer.test"
+	resourceName := "xcsh_http_loadbalancer.test"
 	rName := acctest.RandomName("tf-test-lb")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_http_loadbalancer"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_http_loadbalancer"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccHTTPLoadBalancerConfig_basicSystem(rName),
@@ -854,7 +854,7 @@ func TestAccHTTPLoadBalancerResource_conflictHttpAndHttps(t *testing.T) {
 
 func testAccHTTPLBConfig_jsChallengeSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]
@@ -875,7 +875,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLBConfig_leastActiveSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]
@@ -893,7 +893,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLBConfig_sourceIpStickinessSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]
@@ -911,7 +911,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLBConfig_withRateLimitSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]
@@ -936,7 +936,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLBConfig_userIdentificationSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_user_identification" "test" {
+resource "xcsh_user_identification" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -945,7 +945,7 @@ resource "f5xc_user_identification" "test" {
   }
 }
 
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]
@@ -955,7 +955,7 @@ resource "f5xc_http_loadbalancer" "test" {
   }
 
   user_identification {
-    name      = f5xc_user_identification.test.name
+    name      = xcsh_user_identification.test.name
     namespace = "system"
   }
 
@@ -966,7 +966,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLBConfig_doNotAdvertiseSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]
@@ -982,7 +982,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLBConfig_ipReputationSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]
@@ -1000,7 +1000,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLBConfig_conflictProtocolSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]
@@ -1024,7 +1024,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLBConfig_httpsAutoCertSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1045,7 +1045,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLoadBalancerConfig_withOriginPoolSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = %[1]q
   namespace = "system"
   port      = 443
@@ -1061,7 +1061,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1073,7 +1073,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
   default_route_pools {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight   = 1
@@ -1087,7 +1087,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLoadBalancerConfig_withWAFSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1099,7 +1099,7 @@ resource "f5xc_app_firewall" "test" {
   default_anonymization {}
 }
 
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1110,7 +1110,7 @@ resource "f5xc_http_loadbalancer" "test" {
   }
 
   app_firewall {
-    name      = f5xc_app_firewall.test.name
+    name      = xcsh_app_firewall.test.name
     namespace = "system"
   }
 
@@ -1121,7 +1121,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLoadBalancerConfig_securityStackSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_healthcheck" "test" {
+resource "xcsh_healthcheck" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1136,7 +1136,7 @@ resource "f5xc_healthcheck" "test" {
   }
 }
 
-resource "f5xc_origin_pool" "test" {
+resource "xcsh_origin_pool" "test" {
   name      = %[1]q
   namespace = "system"
   port      = 443
@@ -1149,7 +1149,7 @@ resource "f5xc_origin_pool" "test" {
   }
 
   healthcheck {
-    name      = f5xc_healthcheck.test.name
+    name      = xcsh_healthcheck.test.name
     namespace = "system"
   }
 
@@ -1157,7 +1157,7 @@ resource "f5xc_origin_pool" "test" {
   same_as_endpoint_port {}
 }
 
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1169,7 +1169,7 @@ resource "f5xc_app_firewall" "test" {
   default_anonymization {}
 }
 
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1181,7 +1181,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
   default_route_pools {
     pool {
-      name      = f5xc_origin_pool.test.name
+      name      = xcsh_origin_pool.test.name
       namespace = "system"
     }
     weight   = 1
@@ -1189,7 +1189,7 @@ resource "f5xc_http_loadbalancer" "test" {
   }
 
   app_firewall {
-    name      = f5xc_app_firewall.test.name
+    name      = xcsh_app_firewall.test.name
     namespace = "system"
   }
 
@@ -1203,7 +1203,7 @@ resource "f5xc_http_loadbalancer" "test" {
 
 func testAccHTTPLoadBalancerConfig_labelsUpdateSystem(name, env string) string {
 	return fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -1238,7 +1238,7 @@ func TestAccHTTPLoadBalancerResource_conflictAdvertiseOptions(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]
@@ -1272,7 +1272,7 @@ func TestAccHTTPLoadBalancerResource_conflictChallengeOptions(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]
@@ -1311,7 +1311,7 @@ func TestAccHTTPLoadBalancerResource_conflictAlgorithmOptions(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-resource "f5xc_http_loadbalancer" "test" {
+resource "xcsh_http_loadbalancer" "test" {
   name      = %[1]q
   namespace = "system"
   domains   = ["test.example.com"]

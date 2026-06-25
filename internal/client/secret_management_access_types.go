@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// SecretManagementAccess represents a F5XC SecretManagementAccess
+// SecretManagementAccess represents a XCSH SecretManagementAccess
 type SecretManagementAccess struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -39,7 +39,7 @@ func TestMockAWSVPCSiteResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-mock-test-vpc")
 	nsName := acctest.RandomName("tf-mock-test-ns")
-	resourceName := "f5xc_aws_vpc_site.test"
+	resourceName := "xcsh_aws_vpc_site.test"
 
 	mockCfg := acctest.SetupMockTest(t)
 	defer mockCfg.Cleanup()
@@ -79,7 +79,7 @@ func TestMockAWSVPCSiteResource_withAWSConfig(t *testing.T) {
 	rName := acctest.RandomName("tf-mock-test-vpc")
 	nsName := acctest.RandomName("tf-mock-test-ns")
 	credsName := acctest.RandomName("tf-mock-aws-creds")
-	resourceName := "f5xc_aws_vpc_site.test"
+	resourceName := "xcsh_aws_vpc_site.test"
 
 	mockCfg := acctest.SetupMockTest(t)
 	defer mockCfg.Cleanup()
@@ -109,7 +109,7 @@ func TestMockAWSVPCSiteResource_update(t *testing.T) {
 
 	rName := acctest.RandomName("tf-mock-test-vpc")
 	nsName := acctest.RandomName("tf-mock-test-ns")
-	resourceName := "f5xc_aws_vpc_site.test"
+	resourceName := "xcsh_aws_vpc_site.test"
 
 	mockCfg := acctest.SetupMockTest(t)
 	defer mockCfg.Cleanup()
@@ -145,7 +145,7 @@ func TestMockAWSVPCSiteResource_labels(t *testing.T) {
 
 	rName := acctest.RandomName("tf-mock-test-vpc")
 	nsName := acctest.RandomName("tf-mock-test-ns")
-	resourceName := "f5xc_aws_vpc_site.test"
+	resourceName := "xcsh_aws_vpc_site.test"
 
 	mockCfg := acctest.SetupMockTest(t)
 	defer mockCfg.Cleanup()
@@ -173,7 +173,7 @@ func TestMockAWSVPCSiteDataSource_basic(t *testing.T) {
 
 	rName := "existing-vpc-site"
 	nsName := "system"
-	dataSourceName := "data.f5xc_aws_vpc_site.test"
+	dataSourceName := "data.xcsh_aws_vpc_site.test"
 
 	mockCfg := acctest.SetupMockTest(t)
 	defer mockCfg.Cleanup()
@@ -206,15 +206,15 @@ func testAccMockAWSVPCSiteConfig_basic(mockCfg *acctest.MockTestConfig, nsName, 
 	return acctest.ConfigCompose(
 		mockCfg.MockProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
-resource "f5xc_aws_vpc_site" "test" {
-  depends_on = [f5xc_namespace.test]
+resource "xcsh_aws_vpc_site" "test" {
+  depends_on = [xcsh_namespace.test]
 
   name          = %[2]q
-  namespace     = f5xc_namespace.test.name
+  namespace     = xcsh_namespace.test.name
   aws_region    = "us-east-1"
   instance_type = "t3.xlarge"
   ssh_key       = "mock-ssh-key"
@@ -226,15 +226,15 @@ func testAccMockAWSVPCSiteConfig_withAWSConfig(mockCfg *acctest.MockTestConfig, 
 	return acctest.ConfigCompose(
 		mockCfg.MockProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
-resource "f5xc_aws_vpc_site" "test" {
-  depends_on = [f5xc_namespace.test]
+resource "xcsh_aws_vpc_site" "test" {
+  depends_on = [xcsh_namespace.test]
 
   name          = %[2]q
-  namespace     = f5xc_namespace.test.name
+  namespace     = xcsh_namespace.test.name
   aws_region    = "us-east-1"
   instance_type = "t3.xlarge"
   ssh_key       = "mock-ssh-key"
@@ -252,15 +252,15 @@ func testAccMockAWSVPCSiteConfig_withDescription(mockCfg *acctest.MockTestConfig
 	return acctest.ConfigCompose(
 		mockCfg.MockProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
-resource "f5xc_aws_vpc_site" "test" {
-  depends_on = [f5xc_namespace.test]
+resource "xcsh_aws_vpc_site" "test" {
+  depends_on = [xcsh_namespace.test]
 
   name          = %[2]q
-  namespace     = f5xc_namespace.test.name
+  namespace     = xcsh_namespace.test.name
   aws_region    = "us-east-1"
   instance_type = "t3.xlarge"
   ssh_key       = "mock-ssh-key"
@@ -273,15 +273,15 @@ func testAccMockAWSVPCSiteConfig_withLabels(mockCfg *acctest.MockTestConfig, nsN
 	return acctest.ConfigCompose(
 		mockCfg.MockProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
-resource "f5xc_aws_vpc_site" "test" {
-  depends_on = [f5xc_namespace.test]
+resource "xcsh_aws_vpc_site" "test" {
+  depends_on = [xcsh_namespace.test]
 
   name          = %[2]q
-  namespace     = f5xc_namespace.test.name
+  namespace     = xcsh_namespace.test.name
   aws_region    = "us-east-1"
   instance_type = "t3.xlarge"
   ssh_key       = "mock-ssh-key"
@@ -298,7 +298,7 @@ func testAccMockAWSVPCSiteDataSourceConfig(mockCfg *acctest.MockTestConfig, nsNa
 	return acctest.ConfigCompose(
 		mockCfg.MockProviderConfig(),
 		fmt.Sprintf(`
-data "f5xc_aws_vpc_site" "test" {
+data "xcsh_aws_vpc_site" "test" {
   name      = %[1]q
   namespace = %[2]q
 }

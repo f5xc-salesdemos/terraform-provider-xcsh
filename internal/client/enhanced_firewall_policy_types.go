@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// EnhancedFirewallPolicy represents a F5XC EnhancedFirewallPolicy
+// EnhancedFirewallPolicy represents a XCSH EnhancedFirewallPolicy
 type EnhancedFirewallPolicy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -18,13 +18,13 @@ func TestAccAPIDefinitionResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_api_definition.test"
+	resourceName := "xcsh_api_definition.test"
 	rName := acctest.RandomName("tf-test-def")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_definition"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_definition"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPIDefinitionConfig_basic(rName),
@@ -62,13 +62,13 @@ func TestAccAPIDefinitionResource_withLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_api_definition.test"
+	resourceName := "xcsh_api_definition.test"
 	rName := acctest.RandomName("tf-test-def")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_definition"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_definition"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPIDefinitionConfig_withLabels(rName),
@@ -85,13 +85,13 @@ func TestAccAPIDefinitionResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_api_definition.test"
+	resourceName := "xcsh_api_definition.test"
 	rName := acctest.RandomName("tf-test-def")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_definition"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_definition"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPIDefinitionConfig_withLabels(rName),
@@ -129,7 +129,7 @@ func TestAccAPIDefinitionResource_emptyPlan(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_definition"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_definition"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPIDefinitionConfig_basic(rName),
@@ -147,13 +147,13 @@ func TestAccAPIDefinitionResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_api_definition.test"
+	resourceName := "xcsh_api_definition.test"
 	rName := acctest.RandomName("tf-test-def")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_definition"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_definition"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPIDefinitionConfig_basic(rName),
@@ -203,14 +203,14 @@ func TestAccAPIDefinitionResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_api_definition.test"
+	resourceName := "xcsh_api_definition.test"
 	rName1 := acctest.RandomName("tf-test-def")
 	rName2 := acctest.RandomName("tf-test-def")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_definition"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_definition"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPIDefinitionConfig_basic(rName1),
@@ -232,13 +232,13 @@ func TestAccAPIDefinitionResource_strictSchemaOrigin(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_api_definition.test"
+	resourceName := "xcsh_api_definition.test"
 	rName := acctest.RandomName("tf-test-def")
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_api_definition"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_api_definition"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAPIDefinitionConfig_strictSchema(rName),
@@ -257,7 +257,7 @@ func TestAccAPIDefinitionResource_strictSchemaOrigin(t *testing.T) {
 
 func testAccAPIDefinitionConfig_withLabels(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_api_definition" "test" {
+resource "xcsh_api_definition" "test" {
   name      = %[1]q
   namespace = "shared"
 
@@ -270,7 +270,7 @@ resource "f5xc_api_definition" "test" {
 
 func testAccAPIDefinitionConfig_strictSchema(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_api_definition" "test" {
+resource "xcsh_api_definition" "test" {
   name      = %[1]q
   namespace = "shared"
 
@@ -281,7 +281,7 @@ resource "f5xc_api_definition" "test" {
 
 func testAccAPIDefinitionConfig_basic(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_api_definition" "test" {
+resource "xcsh_api_definition" "test" {
   name      = %[1]q
   namespace = "shared"
 }

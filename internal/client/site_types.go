@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Site represents a F5XC Site
+// Site represents a XCSH Site
 type Site struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

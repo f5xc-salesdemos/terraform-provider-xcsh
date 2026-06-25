@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// ServicePolicy represents a F5XC ServicePolicy
+// ServicePolicy represents a XCSH ServicePolicy
 type ServicePolicy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -37,8 +37,8 @@ const (
 	ErrCodeConfiguration ErrorCode = "CONFIGURATION"
 )
 
-// F5XCError is a structured error type for the provider
-type F5XCError struct {
+// XCSHError is a structured error type for the provider
+type XCSHError struct {
 	Code       ErrorCode
 	Message    string
 	Resource   string
@@ -49,7 +49,7 @@ type F5XCError struct {
 }
 
 // Error implements the error interface
-func (e *F5XCError) Error() string {
+func (e *XCSHError) Error() string {
 	var sb strings.Builder
 	fmt.Fprintf(&sb, "[%s] %s", e.Code, e.Message)
 
@@ -70,12 +70,12 @@ func (e *F5XCError) Error() string {
 }
 
 // Unwrap returns the wrapped error
-func (e *F5XCError) Unwrap() error {
+func (e *XCSHError) Unwrap() error {
 	return e.Wrapped
 }
 
 // IsRetryable returns true if the error is potentially transient
-func (e *F5XCError) IsRetryable() bool {
+func (e *XCSHError) IsRetryable() bool {
 	switch e.Code {
 	case ErrCodeRateLimit, ErrCodeTimeout, ErrCodeNetworkError, ErrCodeServerError:
 		return true
@@ -85,7 +85,7 @@ func (e *F5XCError) IsRetryable() bool {
 }
 
 // IsNotFound returns true if the resource was not found
-func (e *F5XCError) IsNotFound() bool {
+func (e *XCSHError) IsNotFound() bool {
 	return e.Code == ErrCodeNotFound
 }
 
@@ -101,8 +101,8 @@ type APIErrorResponse struct {
 }
 
 // NewAPIError creates an error from an API response
-func NewAPIError(statusCode int, body []byte, resource, operation string) *F5XCError {
-	err := &F5XCError{
+func NewAPIError(statusCode int, body []byte, resource, operation string) *XCSHError {
+	err := &XCSHError{
 		Resource:   resource,
 		Operation:  operation,
 		StatusCode: statusCode,
@@ -162,8 +162,8 @@ func NewAPIError(statusCode int, body []byte, resource, operation string) *F5XCE
 }
 
 // NewNotFoundError creates a not found error
-func NewNotFoundError(resource, name, namespace string) *F5XCError {
-	return &F5XCError{
+func NewNotFoundError(resource, name, namespace string) *XCSHError {
+	return &XCSHError{
 		Code:     ErrCodeNotFound,
 		Message:  fmt.Sprintf("%s '%s' not found in namespace '%s'", resource, name, namespace),
 		Resource: resource,
@@ -175,8 +175,8 @@ func NewNotFoundError(resource, name, namespace string) *F5XCError {
 }
 
 // NewValidationError creates a validation error
-func NewValidationError(resource, field, message string) *F5XCError {
-	return &F5XCError{
+func NewValidationError(resource, field, message string) *XCSHError {
+	return &XCSHError{
 		Code:     ErrCodeValidation,
 		Message:  fmt.Sprintf("validation failed for %s.%s: %s", resource, field, message),
 		Resource: resource,
@@ -187,8 +187,8 @@ func NewValidationError(resource, field, message string) *F5XCError {
 }
 
 // NewTimeoutError creates a timeout error
-func NewTimeoutError(resource, operation string, wrapped error) *F5XCError {
-	return &F5XCError{
+func NewTimeoutError(resource, operation string, wrapped error) *XCSHError {
+	return &XCSHError{
 		Code:      ErrCodeTimeout,
 		Message:   fmt.Sprintf("operation timed out: %s %s", operation, resource),
 		Resource:  resource,
@@ -198,8 +198,8 @@ func NewTimeoutError(resource, operation string, wrapped error) *F5XCError {
 }
 
 // NewNetworkError creates a network error
-func NewNetworkError(wrapped error) *F5XCError {
-	return &F5XCError{
+func NewNetworkError(wrapped error) *XCSHError {
+	return &XCSHError{
 		Code:    ErrCodeNetworkError,
 		Message: "network error communicating with F5 XC API",
 		Wrapped: wrapped,
@@ -207,8 +207,8 @@ func NewNetworkError(wrapped error) *F5XCError {
 }
 
 // NewConfigurationError creates a configuration error
-func NewConfigurationError(message string) *F5XCError {
-	return &F5XCError{
+func NewConfigurationError(message string) *XCSHError {
+	return &XCSHError{
 		Code:    ErrCodeConfiguration,
 		Message: message,
 	}
@@ -217,7 +217,7 @@ func NewConfigurationError(message string) *F5XCError {
 // DiagnosticHelpers provides methods to add errors to diagnostics
 
 // AddError adds a structured error to diagnostics
-func AddError(diags *diag.Diagnostics, err *F5XCError) {
+func AddError(diags *diag.Diagnostics, err *XCSHError) {
 	caser := cases.Title(language.English)
 	summary := fmt.Sprintf("%s Error", caser.String(string(err.Code)))
 	diags.AddError(summary, err.Error())
@@ -237,8 +237,8 @@ func AddAttributeError(diags *diag.Diagnostics, path, summary, detail string) {
 func CreateDiagnostic(operation, resourceType string, err error) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	if f5xcErr, ok := err.(*F5XCError); ok {
-		AddError(&diags, f5xcErr)
+	if xcshErr, ok := err.(*XCSHError); ok {
+		AddError(&diags, xcshErr)
 	} else {
 		diags.AddError(
 			fmt.Sprintf("Error %s %s", operation, resourceType),
@@ -250,14 +250,14 @@ func CreateDiagnostic(operation, resourceType string, err error) diag.Diagnostic
 }
 
 // WrapError wraps an error with additional context
-func WrapError(err error, resource, operation string) *F5XCError {
-	if f5xcErr, ok := err.(*F5XCError); ok {
-		f5xcErr.Resource = resource
-		f5xcErr.Operation = operation
-		return f5xcErr
+func WrapError(err error, resource, operation string) *XCSHError {
+	if xcshErr, ok := err.(*XCSHError); ok {
+		xcshErr.Resource = resource
+		xcshErr.Operation = operation
+		return xcshErr
 	}
 
-	return &F5XCError{
+	return &XCSHError{
 		Code:      ErrCodeServerError,
 		Message:   err.Error(),
 		Resource:  resource,

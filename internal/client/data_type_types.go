@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// DataType represents a F5XC DataType
+// DataType represents a XCSH DataType
 type DataType struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

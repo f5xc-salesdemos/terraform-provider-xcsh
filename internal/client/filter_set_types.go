@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// FilterSet represents a F5XC FilterSet
+// FilterSet represents a XCSH FilterSet
 type FilterSet struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

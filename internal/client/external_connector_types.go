@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// ExternalConnector represents a F5XC ExternalConnector
+// ExternalConnector represents a XCSH ExternalConnector
 type ExternalConnector struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

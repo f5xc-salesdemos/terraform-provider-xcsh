@@ -9,7 +9,7 @@ import (
 func TestCrossCheck_NoMismatches(t *testing.T) {
 	tfSchema := &TerraformSchema{
 		Resources: map[string]*ResourceSchema{
-			"f5xc_http_loadbalancer": {
+			"xcsh_http_loadbalancer": {
 				Fields: map[string]FieldKind{
 					"round_robin": FieldKindBlock,
 					"name":        FieldKindAttribute,
@@ -18,7 +18,7 @@ func TestCrossCheck_NoMismatches(t *testing.T) {
 		},
 	}
 	openAPIFields := map[string]map[string]FieldKind{
-		"f5xc_http_loadbalancer": {
+		"xcsh_http_loadbalancer": {
 			"round_robin": FieldKindBlock,
 			"name":        FieldKindAttribute,
 		},
@@ -33,7 +33,7 @@ func TestCrossCheck_NoMismatches(t *testing.T) {
 func TestCrossCheck_DetectsMismatch(t *testing.T) {
 	tfSchema := &TerraformSchema{
 		Resources: map[string]*ResourceSchema{
-			"f5xc_http_loadbalancer": {
+			"xcsh_http_loadbalancer": {
 				Fields: map[string]FieldKind{
 					"round_robin": FieldKindBlock,
 				},
@@ -41,7 +41,7 @@ func TestCrossCheck_DetectsMismatch(t *testing.T) {
 		},
 	}
 	openAPIFields := map[string]map[string]FieldKind{
-		"f5xc_http_loadbalancer": {
+		"xcsh_http_loadbalancer": {
 			"round_robin": FieldKindAttribute,
 		},
 	}
@@ -50,8 +50,8 @@ func TestCrossCheck_DetectsMismatch(t *testing.T) {
 	if len(mismatches) != 1 {
 		t.Fatalf("expected 1 mismatch, got %d", len(mismatches))
 	}
-	if mismatches[0].Resource != "f5xc_http_loadbalancer" {
-		t.Errorf("expected resource f5xc_http_loadbalancer, got %s", mismatches[0].Resource)
+	if mismatches[0].Resource != "xcsh_http_loadbalancer" {
+		t.Errorf("expected resource xcsh_http_loadbalancer, got %s", mismatches[0].Resource)
 	}
 	if mismatches[0].Field != "round_robin" {
 		t.Errorf("expected field round_robin, got %s", mismatches[0].Field)
@@ -61,13 +61,13 @@ func TestCrossCheck_DetectsMismatch(t *testing.T) {
 func TestCrossCheck_SkipsMissingResources(t *testing.T) {
 	tfSchema := &TerraformSchema{
 		Resources: map[string]*ResourceSchema{
-			"f5xc_http_loadbalancer": {
+			"xcsh_http_loadbalancer": {
 				Fields: map[string]FieldKind{"name": FieldKindAttribute},
 			},
 		},
 	}
 	openAPIFields := map[string]map[string]FieldKind{
-		"f5xc_nonexistent": {
+		"xcsh_nonexistent": {
 			"name": FieldKindAttribute,
 		},
 	}

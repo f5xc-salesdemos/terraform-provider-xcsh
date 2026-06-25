@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// AuthorizationServer represents a F5XC AuthorizationServer
+// AuthorizationServer represents a XCSH AuthorizationServer
 type AuthorizationServer struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

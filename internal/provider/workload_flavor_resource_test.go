@@ -34,7 +34,7 @@ import (
 // 9. Requires Replace Test - Verify attributes that force replacement
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccWorkloadFlavorResource -timeout 30m
 // =============================================================================
 
@@ -49,7 +49,7 @@ func TestAccWorkloadFlavorResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_workload_flavor.test"
+	resourceName := "xcsh_workload_flavor.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-wf")
 
@@ -97,7 +97,7 @@ func TestAccWorkloadFlavorResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_workload_flavor.test"
+	resourceName := "xcsh_workload_flavor.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-wf")
 	description := "Comprehensive acceptance test workload flavor"
@@ -151,7 +151,7 @@ func TestAccWorkloadFlavorResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_workload_flavor.test"
+	resourceName := "xcsh_workload_flavor.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-wf")
 
@@ -206,7 +206,7 @@ func TestAccWorkloadFlavorResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_workload_flavor.test"
+	resourceName := "xcsh_workload_flavor.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-wf")
 
@@ -265,7 +265,7 @@ func TestAccWorkloadFlavorResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_workload_flavor.test"
+	resourceName := "xcsh_workload_flavor.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-wf")
 
@@ -318,7 +318,7 @@ func TestAccWorkloadFlavorResource_updateSpecFields(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_workload_flavor.test"
+	resourceName := "xcsh_workload_flavor.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-wf")
 
@@ -366,7 +366,7 @@ func TestAccWorkloadFlavorResource_emptyPlan(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_workload_flavor.test"
+	resourceName := "xcsh_workload_flavor.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-wf")
 
@@ -410,7 +410,7 @@ func TestAccWorkloadFlavorResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_workload_flavor.test"
+	resourceName := "xcsh_workload_flavor.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-wf")
 
@@ -468,7 +468,7 @@ func TestAccWorkloadFlavorResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_workload_flavor.test"
+	resourceName := "xcsh_workload_flavor.test"
 	nsName := acctest.RandomName("tf-acc-test-ns")
 	name := acctest.RandomName("tf-acc-test-wf")
 
@@ -608,7 +608,7 @@ func TestAccWorkloadFlavorResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_workload_flavor.test"
+	resourceName := "xcsh_workload_flavor.test"
 	nsName1 := acctest.RandomName("tf-acc-test-ns")
 	nsName2 := acctest.RandomName("tf-acc-test-ns")
 	name1 := acctest.RandomName("tf-acc-test-wf")
@@ -680,19 +680,19 @@ func testAccWorkloadFlavorResourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload_flavor" "test" {
+resource "xcsh_workload_flavor" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 }
 `, nsName, name))
 }
@@ -701,19 +701,19 @@ func testAccWorkloadFlavorResourceConfig_allAttributes(nsName, name, description
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload_flavor" "test" {
+resource "xcsh_workload_flavor" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 
   labels = {
@@ -737,19 +737,19 @@ func testAccWorkloadFlavorResourceConfig_withLabels(nsName, name, environment, m
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload_flavor" "test" {
+resource "xcsh_workload_flavor" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   labels = {
     environment = %[3]q
@@ -763,19 +763,19 @@ func testAccWorkloadFlavorResourceConfig_withDescription(nsName, name, descripti
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload_flavor" "test" {
+resource "xcsh_workload_flavor" "test" {
   depends_on  = [time_sleep.wait_for_namespace]
   name        = %[2]q
-  namespace   = f5xc_namespace.test.name
+  namespace   = xcsh_namespace.test.name
   description = %[3]q
 }
 `, nsName, name, description))
@@ -785,19 +785,19 @@ func testAccWorkloadFlavorResourceConfig_withAnnotations(nsName, name, value1, v
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload_flavor" "test" {
+resource "xcsh_workload_flavor" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   annotations = {
     key1 = %[3]q
@@ -811,19 +811,19 @@ func testAccWorkloadFlavorResourceConfig_withSpec(nsName, name string, vcpus int
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_workload_flavor" "test" {
+resource "xcsh_workload_flavor" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   vcpus             = %[3]d
   memory            = %[4]q

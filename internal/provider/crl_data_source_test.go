@@ -17,8 +17,8 @@ func TestAccCrlDataSource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-crl")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_crl.test"
-	dataSourceName := "data.f5xc_crl.test"
+	resourceName := "xcsh_crl.test"
+	dataSourceName := "data.xcsh_crl.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -45,19 +45,19 @@ func testAccCrlDataSourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_crl" "test" {
+resource "xcsh_crl" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   server_address   = "crl.example.com"
   server_port      = 80
@@ -69,10 +69,10 @@ resource "f5xc_crl" "test" {
   }
 }
 
-data "f5xc_crl" "test" {
-  depends_on = [f5xc_crl.test]
-  name       = f5xc_crl.test.name
-  namespace  = f5xc_crl.test.namespace
+data "xcsh_crl" "test" {
+  depends_on = [xcsh_crl.test]
+  name       = xcsh_crl.test.name
+  namespace  = xcsh_crl.test.namespace
 }
 `, nsName, name))
 }

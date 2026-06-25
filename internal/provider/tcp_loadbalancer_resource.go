@@ -865,7 +865,7 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 				},
 			},
 			"dns_volterra_managed": schema.BoolAttribute{
-				MarkdownDescription: "DNS records for domains will be managed automatically by F5 Distributed Cloud. This requires the domain to be delegated to F5XC using the Delegated Domain feature. Defaults to `false`. Server applies default when omitted.",
+				MarkdownDescription: "DNS records for domains will be managed automatically by F5 Distributed Cloud. This requires the domain to be delegated to XCSH using the Delegated Domain feature. Defaults to `false`. Server applies default when omitted.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
@@ -1701,7 +1701,7 @@ func (r *TCPLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 											Attributes:          map[string]schema.Attribute{},
 											Blocks: map[string]schema.Block{
 												"blindfold_secret_info": schema.SingleNestedBlock{
-													MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+													MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 													Attributes: map[string]schema.Attribute{
 														"decryption_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",

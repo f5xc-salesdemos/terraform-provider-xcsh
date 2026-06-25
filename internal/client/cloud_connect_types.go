@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// CloudConnect represents a F5XC CloudConnect
+// CloudConnect represents a XCSH CloudConnect
 type CloudConnect struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -29,7 +29,7 @@ func TestAccCertificateBlindfold_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-cert-bf")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_certificate.test"
+	resourceName := "xcsh_certificate.test"
 
 	certs := acctest.MustGenerateTestCertificates()
 
@@ -39,7 +39,7 @@ func TestAccCertificateBlindfold_basic(t *testing.T) {
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_certificate"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_certificate"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCertificateBlindfoldConfig(nsName, rName, certs),
@@ -78,7 +78,7 @@ func TestAccCertificateBlindfold_emptyPlan(t *testing.T) {
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_certificate"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_certificate"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCertificateBlindfoldConfig(nsName, rName, certs),
@@ -108,8 +108,8 @@ func TestAccTLSChain_blindfoldCertWithOriginPool(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-tls")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	certResourceName := "f5xc_certificate.test"
-	poolResourceName := "f5xc_origin_pool.test"
+	certResourceName := "xcsh_certificate.test"
+	poolResourceName := "xcsh_origin_pool.test"
 
 	certs := acctest.MustGenerateTestCertificates()
 
@@ -120,13 +120,13 @@ func TestAccTLSChain_blindfoldCertWithOriginPool(t *testing.T) {
 			"time": {Source: "hashicorp/time"},
 		},
 		CheckDestroy: func(s *terraform.State) error {
-			if err := acctest.CheckResourceDestroyed("f5xc_origin_pool")(s); err != nil {
+			if err := acctest.CheckResourceDestroyed("xcsh_origin_pool")(s); err != nil {
 				return err
 			}
-			if err := acctest.CheckResourceDestroyed("f5xc_certificate")(s); err != nil {
+			if err := acctest.CheckResourceDestroyed("xcsh_certificate")(s); err != nil {
 				return err
 			}
-			return acctest.CheckResourceDestroyed("f5xc_trusted_ca_list")(s)
+			return acctest.CheckResourceDestroyed("xcsh_trusted_ca_list")(s)
 		},
 		Steps: []resource.TestStep{
 			{
@@ -176,19 +176,19 @@ func testAccCertificateBlindfoldConfig(nsName, name string, certs *acctest.TestC
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_certificate" "test" {
+resource "xcsh_certificate" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   certificate_url = "string:///%[3]s"
 
@@ -214,26 +214,26 @@ func testAccTLSChainConfig(nsName, name string, certs *acctest.TestCertificates)
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_trusted_ca_list" "test" {
+resource "xcsh_trusted_ca_list" "test" {
   depends_on     = [time_sleep.wait_for_namespace]
   name           = %[2]q
-  namespace      = f5xc_namespace.test.name
+  namespace      = xcsh_namespace.test.name
   trusted_ca_url = "string:///%[5]s"
 }
 
-resource "f5xc_certificate" "test" {
+resource "xcsh_certificate" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   certificate_url = "string:///%[3]s"
 
@@ -246,10 +246,10 @@ resource "f5xc_certificate" "test" {
   disable_ocsp_stapling {}
 }
 
-resource "f5xc_origin_pool" "test" {
-  depends_on = [f5xc_certificate.test, f5xc_trusted_ca_list.test]
+resource "xcsh_origin_pool" "test" {
+  depends_on = [xcsh_certificate.test, xcsh_trusted_ca_list.test]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   port = 443
 

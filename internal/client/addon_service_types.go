@@ -10,7 +10,7 @@ import (
 	"fmt"
 )
 
-// AddonService represents a F5XC Addon Service
+// AddonService represents a XCSH Addon Service
 type AddonService struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

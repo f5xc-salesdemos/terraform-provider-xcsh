@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Srv6NetworkSlice represents a F5XC Srv6NetworkSlice
+// Srv6NetworkSlice represents a XCSH Srv6NetworkSlice
 type Srv6NetworkSlice struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -16,8 +16,8 @@ func TestAccFastAclDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-facl")
-	resourceName := "f5xc_fast_acl.test"
-	dataSourceName := "data.f5xc_fast_acl.test"
+	resourceName := "xcsh_fast_acl.test"
+	dataSourceName := "data.xcsh_fast_acl.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,16 +39,16 @@ func testAccFastAclDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_fast_acl" "test" {
+resource "xcsh_fast_acl" "test" {
   name      = %[1]q
   namespace = "system"
   action    = "policer_action"
   prefix    = "10.0.0.0/8"
 }
 
-data "f5xc_fast_acl" "test" {
-  name      = f5xc_fast_acl.test.name
-  namespace = f5xc_fast_acl.test.namespace
+data "xcsh_fast_acl" "test" {
+  name      = xcsh_fast_acl.test.name
+  namespace = xcsh_fast_acl.test.namespace
 }
 `, name))
 }

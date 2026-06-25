@@ -18,7 +18,7 @@ import (
 var _ function.Function = &BlindfoldFunction{}
 
 // BlindfoldFunction implements the blindfold() provider function.
-// It encrypts base64-encoded plaintext using F5XC Secret Management.
+// It encrypts base64-encoded plaintext using XCSH Secret Management.
 type BlindfoldFunction struct{}
 
 // NewBlindfoldFunction creates a new blindfold function instance.
@@ -34,27 +34,27 @@ func (f *BlindfoldFunction) Metadata(ctx context.Context, req function.MetadataR
 // Definition describes the function signature and documentation.
 func (f *BlindfoldFunction) Definition(ctx context.Context, req function.DefinitionRequest, resp *function.DefinitionResponse) {
 	resp.Definition = function.Definition{
-		Summary: "Encrypt a secret using F5XC blindfold",
+		Summary: "Encrypt a secret using XCSH blindfold",
 		Description: "Encrypts base64-encoded plaintext using F5 Distributed Cloud Secret Management (blindfold). " +
 			"Returns a sealed secret string suitable for use in blindfold_secret_info.location fields. " +
-			"The encryption happens locally using the public key fetched from F5XC - the plaintext is never sent to F5XC.",
+			"The encryption happens locally using the public key fetched from XCSH - the plaintext is never sent to F5XC.",
 		MarkdownDescription: `Encrypts base64-encoded plaintext using F5 Distributed Cloud Secret Management (blindfold).
 
 Returns a sealed secret string suitable for use in ` + "`blindfold_secret_info.location`" + ` fields.
 
 **Security**: The encryption happens locally using the public key fetched from F5XC.
-The plaintext secret is **never** transmitted to F5XC during encryption.
+The plaintext secret is **never** transmitted to XCSH during encryption.
 
 ## Example
 
 ` + "```hcl" + `
-resource "f5xc_http_loadbalancer" "example" {
+resource "xcsh_http_loadbalancer" "example" {
   name = "secure-lb"
 
   tls_parameters {
     private_key {
       blindfold_secret_info {
-        location = provider::f5xc::blindfold(
+        location = provider::xcsh::blindfold(
           base64encode(file("${path.module}/private.key")),
           "example-secret-policy",
           "shared"
@@ -79,8 +79,8 @@ resource "f5xc_http_loadbalancer" "example" {
 			},
 			function.StringParameter{
 				Name:        "namespace",
-				Description: "F5XC namespace containing the SecretPolicy.",
-				MarkdownDescription: "F5XC namespace containing the SecretPolicy.\n\n" +
+				Description: "XCSH namespace containing the SecretPolicy.",
+				MarkdownDescription: "XCSH namespace containing the SecretPolicy.\n\n" +
 					"Common values: `shared`, `system`, or your application namespace.",
 			},
 		},
@@ -120,8 +120,8 @@ func (f *BlindfoldFunction) Run(ctx context.Context, req function.RunRequest, re
 		resp.Error = function.NewFuncError(
 			fmt.Sprintf("Authentication configuration error: %s\n\n"+
 				"Configure one of:\n"+
-				"  - F5XC_API_TOKEN for API token authentication\n"+
-				"  - F5XC_P12_FILE and F5XC_P12_PASSWORD for P12 certificate authentication",
+				"  - XCSH_API_TOKEN for API token authentication\n"+
+				"  - XCSH_P12_FILE and XCSH_P12_PASSWORD for P12 certificate authentication",
 				err),
 		)
 		return

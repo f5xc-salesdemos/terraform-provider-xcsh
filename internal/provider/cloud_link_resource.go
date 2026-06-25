@@ -332,7 +332,7 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "[OneOf: aws, gcp] Amazon Web Services(AWS) CloudLink Provider. CloudLink for AWS Cloud Provider.",
 				Attributes: map[string]schema.Attribute{
 					"custom_asn": schema.Int64Attribute{
-						MarkdownDescription: "Exclusive with [] F5XC will use custom ASN to create a Direct Connect Gateway.",
+						MarkdownDescription: "Exclusive with [] XCSH will use custom ASN to create a Direct Connect Gateway.",
 						Optional:            true,
 					},
 				},
@@ -376,7 +376,7 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 						Attributes:          map[string]schema.Attribute{},
 						Blocks: map[string]schema.Block{
 							"connections": schema.ListNestedBlock{
-								MarkdownDescription: "List of Bring You Own Connections. These AWS Direct Connect connections are not managed by F5XC but will be used for connecting sites and REs.",
+								MarkdownDescription: "List of Bring You Own Connections. These AWS Direct Connect connections are not managed by XCSH but will be used for connecting sites and REs.",
 								NestedObject: schema.NestedBlockObject{
 									Attributes: map[string]schema.Attribute{
 										"bgp_asn": schema.Int64Attribute{
@@ -419,7 +419,7 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 											Attributes:          map[string]schema.Attribute{},
 											Blocks: map[string]schema.Block{
 												"blindfold_secret_info": schema.SingleNestedBlock{
-													MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management.",
+													MarkdownDescription: "BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management.",
 													Attributes: map[string]schema.Attribute{
 														"decryption_provider": schema.StringAttribute{
 															MarkdownDescription: "Name of the Secret Management Access object that contains information about the backend Secret Management service.",
@@ -492,7 +492,7 @@ func (r *CloudLinkResource) Schema(ctx context.Context, req resource.SchemaReque
 											MarkdownDescription: "Enable this option",
 										},
 										"tags": schema.SingleNestedBlock{
-											MarkdownDescription: "AWS Tags is a label consisting of a user-defined key and value. It helps to manage, identify, organize, search for, and filter resources in AWS console. Specified tags will be added to Virtual interface along with any F5XC specific tags.",
+											MarkdownDescription: "AWS Tags is a label consisting of a user-defined key and value. It helps to manage, identify, organize, search for, and filter resources in AWS console. Specified tags will be added to Virtual interface along with any XCSH specific tags.",
 										},
 									},
 								},

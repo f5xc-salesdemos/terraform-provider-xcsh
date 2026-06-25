@@ -17,8 +17,8 @@ func TestAccCertificateDataSource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_certificate.test"
-	dataSourceName := "data.f5xc_certificate.test"
+	resourceName := "xcsh_certificate.test"
+	dataSourceName := "data.xcsh_certificate.test"
 
 	// Generate test certificates dynamically for CI/CD compatibility
 	certs := acctest.MustGenerateTestCertificates()
@@ -46,29 +46,29 @@ func testAccCertificateDataSourceConfig_basic(nsName, name string, certs *acctes
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_certificate" "test" {
+resource "xcsh_certificate" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   certificate_url       = "string:///%[3]s"
   private_key           = "string:///%[4]s"
   disable_ocsp_stapling = "true"
 }
 
-data "f5xc_certificate" "test" {
-  depends_on = [f5xc_certificate.test]
-  name       = f5xc_certificate.test.name
-  namespace  = f5xc_certificate.test.namespace
+data "xcsh_certificate" "test" {
+  depends_on = [xcsh_certificate.test]
+  name       = xcsh_certificate.test.name
+  namespace  = xcsh_certificate.test.namespace
 }
 `, nsName, name, certs.ServerCertBase64, certs.ServerKeyBase64))
 }

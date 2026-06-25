@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Workload represents a F5XC Workload
+// Workload represents a XCSH Workload
 type Workload struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

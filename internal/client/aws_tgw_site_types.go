@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// AWSTGWSite represents a F5XC AWSTGWSite
+// AWSTGWSite represents a XCSH AWSTGWSite
 type AWSTGWSite struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

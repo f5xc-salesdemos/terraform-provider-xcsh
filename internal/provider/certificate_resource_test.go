@@ -18,7 +18,7 @@ func TestAccCertificateResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-cert")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_certificate.test"
+	resourceName := "xcsh_certificate.test"
 
 	// Generate test certificates dynamically for CI/CD compatibility
 	certs := acctest.MustGenerateTestCertificates()
@@ -29,7 +29,7 @@ func TestAccCertificateResource_basic(t *testing.T) {
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"time": {Source: "hashicorp/time"},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_certificate"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_certificate"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCertificateConfig_basic(nsName, rName, certs),
@@ -63,7 +63,7 @@ func TestAccCertificateResource_emptyPlan(t *testing.T) {
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		ExternalProviders:        map[string]resource.ExternalProvider{"time": {Source: "hashicorp/time"}},
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_certificate"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_certificate"),
 		Steps: []resource.TestStep{
 			{Config: testAccCertificateConfig_basic(nsName, rName, certs)},
 			{Config: testAccCertificateConfig_basic(nsName, rName, certs), PlanOnly: true, ExpectNonEmptyPlan: false},
@@ -77,14 +77,14 @@ func TestAccCertificateResource_withLabels(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-cert")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_certificate.test"
+	resourceName := "xcsh_certificate.test"
 	certs := acctest.MustGenerateTestCertificates()
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		ExternalProviders:        map[string]resource.ExternalProvider{"time": {Source: "hashicorp/time"}},
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_certificate"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_certificate"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCertificateConfig_withLabels(nsName, rName, certs),
@@ -101,19 +101,19 @@ func testAccCertificateConfig_withLabels(nsName, name string, certs *acctest.Tes
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_certificate" "test" {
+resource "xcsh_certificate" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   labels = {
     environment = "test"
@@ -148,19 +148,19 @@ func testAccCertificateConfig_basic(nsName, name string, certs *acctest.TestCert
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_certificate" "test" {
+resource "xcsh_certificate" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   certificate_url = "string:///%[3]s"
 

@@ -19,8 +19,8 @@ func TestAccAppSettingDataSource_basic(t *testing.T) {
 	// app_setting can only be created in namespaces with namespace_type: "app"
 	// Using "hipster-shop" which is an existing app-type namespace in the staging environment
 	rName := acctest.RandomName("tf-acc-test-appset")
-	resourceName := "f5xc_app_setting.test"
-	dataSourceName := "data.f5xc_app_setting.test"
+	resourceName := "xcsh_app_setting.test"
+	dataSourceName := "data.xcsh_app_setting.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -44,7 +44,7 @@ func testAccAppSettingDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_app_setting" "test" {
+resource "xcsh_app_setting" "test" {
   name      = %[1]q
   namespace = "hipster-shop"
 
@@ -56,10 +56,10 @@ resource "f5xc_app_setting" "test" {
   }
 }
 
-data "f5xc_app_setting" "test" {
-  depends_on = [f5xc_app_setting.test]
-  name       = f5xc_app_setting.test.name
-  namespace  = f5xc_app_setting.test.namespace
+data "xcsh_app_setting" "test" {
+  depends_on = [xcsh_app_setting.test]
+  name       = xcsh_app_setting.test.name
+  namespace  = xcsh_app_setting.test.namespace
 }
 `, name))
 }

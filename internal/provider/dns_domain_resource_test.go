@@ -34,7 +34,7 @@ import (
 // 10. DNSSEC Mode Test - Test dnssec_mode attribute functionality
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccDNSDomainResource -timeout 30m
 // =============================================================================
 
@@ -51,12 +51,12 @@ func TestAccDNSDomainResource_basic(t *testing.T) {
 
 	// Generate a unique domain name using random string
 	domainName := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
-	resourceName := "f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_dns_domain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_dns_domain"),
 		Steps: []resource.TestStep{
 			// Step 1: Create dns_domain with minimal configuration
 			{
@@ -93,13 +93,13 @@ func TestAccDNSDomainResource_allAttributes(t *testing.T) {
 	t.Skip("Skipping: dns_domain creation is disabled in staging environment - requires delegated domain configuration")
 
 	domainName := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
-	resourceName := "f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
 	description := "Comprehensive acceptance test dns domain"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_dns_domain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_dns_domain"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDNSDomainResourceConfig_allAttributes(domainName, description),
@@ -139,12 +139,12 @@ func TestAccDNSDomainResource_updateLabels(t *testing.T) {
 	t.Skip("Skipping: dns_domain creation is disabled in staging environment - requires delegated domain configuration")
 
 	domainName := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
-	resourceName := "f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_dns_domain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_dns_domain"),
 		Steps: []resource.TestStep{
 			// Step 1: Create with initial labels
 			{
@@ -189,12 +189,12 @@ func TestAccDNSDomainResource_updateDescription(t *testing.T) {
 	t.Skip("Skipping: dns_domain creation is disabled in staging environment - requires delegated domain configuration")
 
 	domainName := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
-	resourceName := "f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_dns_domain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_dns_domain"),
 		Steps: []resource.TestStep{
 			// Step 1: Create without description
 			{
@@ -243,12 +243,12 @@ func TestAccDNSDomainResource_updateAnnotations(t *testing.T) {
 	t.Skip("Skipping: dns_domain creation is disabled in staging environment - requires delegated domain configuration")
 
 	domainName := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
-	resourceName := "f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_dns_domain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_dns_domain"),
 		Steps: []resource.TestStep{
 			// Step 1: Create with annotations
 			{
@@ -291,12 +291,12 @@ func TestAccDNSDomainResource_emptyPlan(t *testing.T) {
 	t.Skip("Skipping: dns_domain creation is disabled in staging environment - requires delegated domain configuration")
 
 	domainName := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
-	resourceName := "f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_dns_domain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_dns_domain"),
 		Steps: []resource.TestStep{
 			// Step 1: Create resource
 			{
@@ -330,12 +330,12 @@ func TestAccDNSDomainResource_planChecks(t *testing.T) {
 	t.Skip("Skipping: dns_domain creation is disabled in staging environment - requires delegated domain configuration")
 
 	domainName := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
-	resourceName := "f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_dns_domain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_dns_domain"),
 		Steps: []resource.TestStep{
 			// Step 1: Create - verify create action planned
 			{
@@ -383,12 +383,12 @@ func TestAccDNSDomainResource_knownValues(t *testing.T) {
 	t.Skip("Skipping: dns_domain creation is disabled in staging environment - requires delegated domain configuration")
 
 	domainName := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
-	resourceName := "f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_dns_domain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_dns_domain"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDNSDomainResourceConfig_withDescription(domainName, "Known value test"),
@@ -496,12 +496,12 @@ func TestAccDNSDomainResource_requiresReplace(t *testing.T) {
 
 	domainName1 := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
 	domainName2 := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
-	resourceName := "f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_dns_domain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_dns_domain"),
 		Steps: []resource.TestStep{
 			// Step 1: Create with first name
 			{
@@ -540,12 +540,12 @@ func TestAccDNSDomainResource_dnssecMode(t *testing.T) {
 	t.Skip("Skipping: dns_domain creation is disabled in staging environment - requires delegated domain configuration")
 
 	domainName := fmt.Sprintf("%s.example.com", acctest.RandomName("tf-acc-test-dns"))
-	resourceName := "f5xc_dns_domain.test"
+	resourceName := "xcsh_dns_domain.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_dns_domain"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_dns_domain"),
 		Steps: []resource.TestStep{
 			// Step 1: Create with DNSSEC disabled (default)
 			{
@@ -583,7 +583,7 @@ func testAccDNSDomainResourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_dns_domain" "test" {
+resource "xcsh_dns_domain" "test" {
   name      = %[1]q
   namespace = "system"
 }
@@ -594,7 +594,7 @@ func testAccDNSDomainResourceConfig_allAttributes(name, description string) stri
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_dns_domain" "test" {
+resource "xcsh_dns_domain" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -620,7 +620,7 @@ func testAccDNSDomainResourceConfig_withLabels(name, environment, managedBy stri
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_dns_domain" "test" {
+resource "xcsh_dns_domain" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -636,7 +636,7 @@ func testAccDNSDomainResourceConfig_withDescription(name, description string) st
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_dns_domain" "test" {
+resource "xcsh_dns_domain" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -648,7 +648,7 @@ func testAccDNSDomainResourceConfig_withAnnotations(name, value1, value2 string)
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_dns_domain" "test" {
+resource "xcsh_dns_domain" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -664,7 +664,7 @@ func testAccDNSDomainResourceConfig_withDNSSEC(name, dnssecMode string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_dns_domain" "test" {
+resource "xcsh_dns_domain" "test" {
   name        = %[1]q
   namespace   = "system"
   dnssec_mode = %[2]q

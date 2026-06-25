@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Authentication represents a F5XC Authentication
+// Authentication represents a XCSH Authentication
 type Authentication struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

@@ -16,8 +16,8 @@ func TestAccDataGroupDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test")
-	resourceName := "f5xc_data_group.test"
-	dataSourceName := "data.f5xc_data_group.test"
+	resourceName := "xcsh_data_group.test"
+	dataSourceName := "data.xcsh_data_group.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -39,16 +39,16 @@ func testAccDataGroupDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_data_group" "test" {
+resource "xcsh_data_group" "test" {
   name      = %[1]q
   namespace = "system"
   string_records {}
 }
 
-data "f5xc_data_group" "test" {
-  depends_on = [f5xc_data_group.test]
-  name       = f5xc_data_group.test.name
-  namespace  = f5xc_data_group.test.namespace
+data "xcsh_data_group" "test" {
+  depends_on = [xcsh_data_group.test]
+  name       = xcsh_data_group.test.name
+  namespace  = xcsh_data_group.test.namespace
 }
 `, name))
 }

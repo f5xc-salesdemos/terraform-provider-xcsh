@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// K8SPodSecurityPolicy represents a F5XC K8SPodSecurityPolicy
+// K8SPodSecurityPolicy represents a XCSH K8SPodSecurityPolicy
 type K8SPodSecurityPolicy struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

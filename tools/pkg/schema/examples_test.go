@@ -16,7 +16,7 @@ func TestGenerateExampleUsage_Basic(t *testing.T) {
 		{Name: "port", Type: "int64", Optional: true},
 	}
 	result := GenerateExampleUsage("http_loadbalancer", attrs)
-	if !strings.Contains(result, `resource "f5xc_http_loadbalancer" "example"`) {
+	if !strings.Contains(result, `resource "xcsh_http_loadbalancer" "example"`) {
 		t.Error("Should contain resource declaration")
 	}
 	if !strings.Contains(result, `name      = "example"`) {

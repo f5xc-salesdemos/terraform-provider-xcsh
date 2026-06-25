@@ -480,7 +480,7 @@ func TestSchema_AllExtensions(t *testing.T) {
 	assertNotNil(t, "XF5XCRequiredForOps", schema.XF5XCRequiredForOps)
 	assertIntEqual(t, "XF5XCDisplayOrder", schema.XF5XCDisplayOrder, 10)
 	assertEqual(t, "XF5XCUniqueness", schema.XF5XCUniqueness, "global")
-	assertEqual(t, "XF5XCTerraformResource", schema.XF5XCTerraformResource, "f5xc_full_extensions")
+	assertEqual(t, "XF5XCTerraformResource", schema.XF5XCTerraformResource, "xcsh_full_extensions")
 
 	// --- SP-1: operation-level extensions ---
 	assertEqual(t, "XF5XCDangerLevel", schema.XF5XCDangerLevel, "high")

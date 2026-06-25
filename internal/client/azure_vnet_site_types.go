@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// AzureVNETSite represents a F5XC AzureVNETSite
+// AzureVNETSite represents a XCSH AzureVNETSite
 type AzureVNETSite struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

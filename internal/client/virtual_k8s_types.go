@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// VirtualK8S represents a F5XC VirtualK8S
+// VirtualK8S represents a XCSH VirtualK8S
 type VirtualK8S struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

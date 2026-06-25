@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Healthcheck represents a F5XC Healthcheck
+// Healthcheck represents a XCSH Healthcheck
 type Healthcheck struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

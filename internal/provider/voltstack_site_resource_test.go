@@ -32,7 +32,7 @@ import (
 // Production deployments require comprehensive site configuration.
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccVoltstackSiteResource -timeout 30m
 // =============================================================================
 
@@ -49,7 +49,7 @@ func TestAccVoltstackSiteResource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-vs")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_voltstack_site.test"
+	resourceName := "xcsh_voltstack_site.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -59,7 +59,7 @@ func TestAccVoltstackSiteResource_basic(t *testing.T) {
 				Source: "hashicorp/time",
 			},
 		},
-		CheckDestroy: acctest.CheckResourceDestroyed("f5xc_voltstack_site"),
+		CheckDestroy: acctest.CheckResourceDestroyed("xcsh_voltstack_site"),
 		Steps: []resource.TestStep{
 			// Step 1: Create voltstack site with minimal configuration
 			{
@@ -106,12 +106,12 @@ func testAccVoltstackSiteConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
@@ -124,11 +124,11 @@ resource "time_sleep" "wait_for_namespace" {
 # - logs_streaming_disabled or custom_logs block
 # - Multiple required nested blocks for network configuration
 # - Site token registration details
-resource "f5xc_voltstack_site" "test" {
+resource "xcsh_voltstack_site" "test" {
   depends_on = [time_sleep.wait_for_namespace]
 
   name      = %[2]q
-  namespace = f5xc_namespace.test.name
+  namespace = xcsh_namespace.test.name
 
   # Minimal configuration - would need extensive configuration blocks for real deployment
 }

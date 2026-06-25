@@ -25,7 +25,7 @@ func TestAccAppFirewallResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -63,7 +63,7 @@ func TestAccAppFirewallResource_withLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -94,7 +94,7 @@ func TestAccAppFirewallResource_blocking(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -122,7 +122,7 @@ func TestAccAppFirewallResource_monitoring(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -150,7 +150,7 @@ func TestAccAppFirewallResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -179,7 +179,7 @@ func TestAccAppFirewallResource_emptyPlan(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -225,7 +225,7 @@ func TestAccAppFirewallResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -263,7 +263,7 @@ func TestAccAppFirewallResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -308,7 +308,7 @@ func TestAccAppFirewallResource_planChecks(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -352,7 +352,7 @@ func TestAccAppFirewallResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -441,7 +441,7 @@ func TestAccAppFirewallResource_requiresReplace(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName1 := acctest.RandomName("tf-test-waf")
 	rName2 := acctest.RandomName("tf-test-waf")
 
@@ -474,7 +474,7 @@ func TestAccAppFirewallResource_switchMode_blockingToMonitoring(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -516,7 +516,7 @@ func TestAccAppFirewallResource_fullLifecycle(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -573,7 +573,7 @@ func TestAccAppFirewallResource_fullLifecycle(t *testing.T) {
 // to avoid creating test namespaces (namespace DELETE returns 501)
 func testAccAppFirewallConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -600,7 +600,7 @@ resource "f5xc_app_firewall" "test" {
 
 func testAccAppFirewallConfig_withLabelsSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test application firewall"
@@ -633,7 +633,7 @@ resource "f5xc_app_firewall" "test" {
 
 func testAccAppFirewallConfig_blockingSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -660,7 +660,7 @@ resource "f5xc_app_firewall" "test" {
 
 func testAccAppFirewallConfig_allAttributesSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Full attributes test"
@@ -686,7 +686,7 @@ resource "f5xc_app_firewall" "test" {
 
 func testAccAppFirewallConfig_withUpdatedLabelsSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test application firewall"
@@ -708,7 +708,7 @@ resource "f5xc_app_firewall" "test" {
 
 func testAccAppFirewallConfig_monitoringSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name       = %[1]q
   namespace  = "system"
 
@@ -729,7 +729,7 @@ resource "f5xc_app_firewall" "test" {
 // OneOf: blocking_page / use_default_blocking_page
 func testAccAppFirewallConfig_customBlockingPage(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -750,7 +750,7 @@ resource "f5xc_app_firewall" "test" {
 // OneOf: bot_protection_setting / default_bot_setting
 func testAccAppFirewallConfig_botProtection(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -772,7 +772,7 @@ resource "f5xc_app_firewall" "test" {
 // OneOf: disable_anonymization / default_anonymization / custom_anonymization
 func testAccAppFirewallConfig_disableAnonymization(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -790,7 +790,7 @@ resource "f5xc_app_firewall" "test" {
 // OneOf: detection_settings / default_detection_settings
 func testAccAppFirewallConfig_detectionSettings(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -817,7 +817,7 @@ resource "f5xc_app_firewall" "test" {
 // OneOf: enable_ai_enhancements / disable_ai_enhancements
 func testAccAppFirewallConfig_aiEnhancements(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -838,7 +838,7 @@ resource "f5xc_app_firewall" "test" {
 // OneOf: allowed_response_codes / allow_all_response_codes
 func testAccAppFirewallConfig_allowedResponseCodes(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -863,7 +863,7 @@ func TestAccAppFirewallResource_customBlockingPage(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -900,7 +900,7 @@ func TestAccAppFirewallResource_botProtection(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -947,7 +947,7 @@ func TestAccAppFirewallResource_disableAnonymization(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -983,7 +983,7 @@ func TestAccAppFirewallResource_detectionSettings(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -1017,7 +1017,7 @@ func TestAccAppFirewallResource_aiEnhancements(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -1051,7 +1051,7 @@ func TestAccAppFirewallResource_allowedResponseCodes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_app_firewall.test"
+	resourceName := "xcsh_app_firewall.test"
 	rName := acctest.RandomName("tf-test-waf")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -1102,7 +1102,7 @@ func TestAccAppFirewallResource_conflictBlockingAndMonitoring(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -1138,7 +1138,7 @@ func TestAccAppFirewallResource_conflictBlockingPageOptions(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-resource "f5xc_app_firewall" "test" {
+resource "xcsh_app_firewall" "test" {
   name      = %[1]q
   namespace = "system"
 

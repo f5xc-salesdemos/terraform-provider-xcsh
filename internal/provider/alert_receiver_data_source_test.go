@@ -17,8 +17,8 @@ func TestAccAlertReceiverDataSource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_alert_receiver.test"
-	dataSourceName := "data.f5xc_alert_receiver.test"
+	resourceName := "xcsh_alert_receiver.test"
+	dataSourceName := "data.xcsh_alert_receiver.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -43,28 +43,28 @@ func testAccAlertReceiverDataSourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_alert_receiver" "test" {
+resource "xcsh_alert_receiver" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
   email {
     email = "test@example.com"
   }
 }
 
-data "f5xc_alert_receiver" "test" {
-  depends_on = [f5xc_alert_receiver.test]
-  name       = f5xc_alert_receiver.test.name
-  namespace  = f5xc_alert_receiver.test.namespace
+data "xcsh_alert_receiver" "test" {
+  depends_on = [xcsh_alert_receiver.test]
+  name       = xcsh_alert_receiver.test.name
+  namespace  = xcsh_alert_receiver.test.namespace
 }
 `, nsName, name))
 }

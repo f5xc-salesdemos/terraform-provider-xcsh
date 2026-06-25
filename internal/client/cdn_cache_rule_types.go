@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// CDNCacheRule represents a F5XC CDNCacheRule
+// CDNCacheRule represents a XCSH CDNCacheRule
 type CDNCacheRule struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

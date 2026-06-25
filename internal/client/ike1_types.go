@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Ike1 represents a F5XC Ike1
+// Ike1 represents a XCSH Ike1
 type Ike1 struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

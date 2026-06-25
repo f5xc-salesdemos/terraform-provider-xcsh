@@ -32,7 +32,7 @@ import (
 // 8. Plan Checks - Verify planned actions
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccNamespaceResource -timeout 30m
 // =============================================================================
 
@@ -47,7 +47,7 @@ func TestAccNamespaceResource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -91,7 +91,7 @@ func TestAccNamespaceResource_allAttributes(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
 	description := "Comprehensive acceptance test namespace"
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -146,7 +146,7 @@ func TestAccNamespaceResource_updateLabels(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -203,7 +203,7 @@ func TestAccNamespaceResource_updateDescription(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -256,7 +256,7 @@ func TestAccNamespaceResource_updateAnnotations(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -309,7 +309,7 @@ func TestAccNamespaceResource_disappears(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -341,7 +341,7 @@ func TestAccNamespaceResource_emptyPlan(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -379,7 +379,7 @@ func TestAccNamespaceResource_planChecks(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -431,7 +431,7 @@ func TestAccNamespaceResource_knownValues(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -540,7 +540,7 @@ func TestAccNamespaceResource_requiresReplace(t *testing.T) {
 
 	rName1 := acctest.RandomName("tf-acc-test-ns")
 	rName2 := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_namespace.test"
+	resourceName := "xcsh_namespace.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -580,7 +580,7 @@ func testAccNamespaceResourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 `, name))
@@ -590,7 +590,7 @@ func testAccNamespaceResourceConfig_allAttributes(name, description string) stri
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name        = %[1]q
   description = %[2]q
 
@@ -611,7 +611,7 @@ func testAccNamespaceResourceConfig_withLabels(name, environment, managedBy stri
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 
   labels = {
@@ -626,7 +626,7 @@ func testAccNamespaceResourceConfig_withDescription(name, description string) st
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name        = %[1]q
   description = %[2]q
 }
@@ -637,7 +637,7 @@ func testAccNamespaceResourceConfig_withAnnotations(name, value1, value2 string)
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 
   annotations = {

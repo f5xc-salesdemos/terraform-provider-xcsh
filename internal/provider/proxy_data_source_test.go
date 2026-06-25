@@ -17,8 +17,8 @@ func TestAccProxyDataSource_basic(t *testing.T) {
 
 	rName := acctest.RandomName("tf-acc-test-proxy")
 	nsName := acctest.RandomName("tf-acc-test-ns")
-	resourceName := "f5xc_proxy.test"
-	dataSourceName := "data.f5xc_proxy.test"
+	resourceName := "xcsh_proxy.test"
+	dataSourceName := "data.xcsh_proxy.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -43,29 +43,29 @@ func testAccProxyDataSourceConfig_basic(nsName, name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_namespace" "test" {
+resource "xcsh_namespace" "test" {
   name = %[1]q
 }
 
 resource "time_sleep" "wait_for_namespace" {
-  depends_on      = [f5xc_namespace.test]
+  depends_on      = [xcsh_namespace.test]
   create_duration = "5s"
 }
 
-resource "f5xc_proxy" "test" {
+resource "xcsh_proxy" "test" {
   depends_on = [time_sleep.wait_for_namespace]
   name       = %[2]q
-  namespace  = f5xc_namespace.test.name
+  namespace  = xcsh_namespace.test.name
 
   http_proxy {}
   do_not_advertise {}
   no_interception {}
 }
 
-data "f5xc_proxy" "test" {
-  depends_on = [f5xc_proxy.test]
-  name       = f5xc_proxy.test.name
-  namespace  = f5xc_proxy.test.namespace
+data "xcsh_proxy" "test" {
+  depends_on = [xcsh_proxy.test]
+  name       = xcsh_proxy.test.name
+  namespace  = xcsh_proxy.test.namespace
 }
 `, nsName, name))
 }

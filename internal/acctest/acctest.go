@@ -370,7 +370,7 @@ func CheckNamespaceDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_namespace" {
+		if rs.Type != "xcsh_namespace" {
 			continue
 		}
 
@@ -541,7 +541,7 @@ func CheckHealthcheckDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_healthcheck" {
+		if rs.Type != "xcsh_healthcheck" {
 			continue
 		}
 
@@ -717,7 +717,7 @@ func CheckIPPrefixSetDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_ip_prefix_set" {
+		if rs.Type != "xcsh_ip_prefix_set" {
 			continue
 		}
 
@@ -833,7 +833,7 @@ func CheckBGPAsnSetDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_bgp_asn_set" {
+		if rs.Type != "xcsh_bgp_asn_set" {
 			continue
 		}
 
@@ -952,7 +952,7 @@ func CheckPolicerDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_policer" {
+		if rs.Type != "xcsh_policer" {
 			continue
 		}
 
@@ -1071,7 +1071,7 @@ func CheckDataGroupDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_data_group" {
+		if rs.Type != "xcsh_data_group" {
 			continue
 		}
 
@@ -1190,7 +1190,7 @@ func CheckDataTypeDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_data_type" {
+		if rs.Type != "xcsh_data_type" {
 			continue
 		}
 
@@ -1309,7 +1309,7 @@ func CheckFilterSetDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_filter_set" {
+		if rs.Type != "xcsh_filter_set" {
 			continue
 		}
 
@@ -1428,7 +1428,7 @@ func CheckForwardingClassDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_forwarding_class" {
+		if rs.Type != "xcsh_forwarding_class" {
 			continue
 		}
 
@@ -1548,7 +1548,7 @@ func CheckRateLimiterDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_rate_limiter" {
+		if rs.Type != "xcsh_rate_limiter" {
 			continue
 		}
 
@@ -1674,7 +1674,7 @@ func CheckUserIdentificationDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_user_identification" {
+		if rs.Type != "xcsh_user_identification" {
 			continue
 		}
 
@@ -1800,7 +1800,7 @@ func CheckMaliciousUserMitigationDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_malicious_user_mitigation" {
+		if rs.Type != "xcsh_malicious_user_mitigation" {
 			continue
 		}
 
@@ -1921,7 +1921,7 @@ func CheckAlertPolicyDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_alert_policy" {
+		if rs.Type != "xcsh_alert_policy" {
 			continue
 		}
 
@@ -2022,7 +2022,7 @@ func CheckAlertReceiverDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_alert_receiver" {
+		if rs.Type != "xcsh_alert_receiver" {
 			continue
 		}
 
@@ -2123,7 +2123,7 @@ func CheckCloudCredentialsDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_cloud_credentials" {
+		if rs.Type != "xcsh_cloud_credentials" {
 			continue
 		}
 
@@ -2224,7 +2224,7 @@ func CheckNetworkConnectorDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_network_connector" {
+		if rs.Type != "xcsh_network_connector" {
 			continue
 		}
 
@@ -2329,7 +2329,7 @@ func CheckAppFirewallDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_app_firewall" {
+		if rs.Type != "xcsh_app_firewall" {
 			continue
 		}
 
@@ -2444,7 +2444,7 @@ func CheckOriginPoolDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_origin_pool" {
+		if rs.Type != "xcsh_origin_pool" {
 			continue
 		}
 
@@ -2559,7 +2559,7 @@ func CheckServicePolicyDestroyed(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "f5xc_service_policy" {
+		if rs.Type != "xcsh_service_policy" {
 			continue
 		}
 

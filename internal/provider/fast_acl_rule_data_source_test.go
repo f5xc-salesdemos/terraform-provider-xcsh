@@ -16,8 +16,8 @@ func TestAccFastAclRuleDataSource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-faclr")
-	resourceName := "f5xc_fast_acl_rule.test"
-	dataSourceName := "data.f5xc_fast_acl_rule.test"
+	resourceName := "xcsh_fast_acl_rule.test"
+	dataSourceName := "data.xcsh_fast_acl_rule.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -40,7 +40,7 @@ func testAccFastAclRuleDataSourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_fast_acl_rule" "test" {
+resource "xcsh_fast_acl_rule" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -51,9 +51,9 @@ resource "f5xc_fast_acl_rule" "test" {
   ip_prefix_set {}
 }
 
-data "f5xc_fast_acl_rule" "test" {
-  name      = f5xc_fast_acl_rule.test.name
-  namespace = f5xc_fast_acl_rule.test.namespace
+data "xcsh_fast_acl_rule" "test" {
+  name      = xcsh_fast_acl_rule.test.name
+  namespace = xcsh_fast_acl_rule.test.namespace
 }
 `, name))
 }

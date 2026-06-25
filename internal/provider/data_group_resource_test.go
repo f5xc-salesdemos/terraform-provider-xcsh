@@ -26,7 +26,7 @@ func TestAccDataGroupResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_group.test"
+	resourceName := "xcsh_data_group.test"
 	rName := acctest.RandomName("tf-test-datagrp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -63,7 +63,7 @@ func TestAccDataGroupResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_group.test"
+	resourceName := "xcsh_data_group.test"
 	rName := acctest.RandomName("tf-test-datagrp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -94,7 +94,7 @@ func TestAccDataGroupResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_group.test"
+	resourceName := "xcsh_data_group.test"
 	rName := acctest.RandomName("tf-test-datagrp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -134,7 +134,7 @@ func TestAccDataGroupResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_group.test"
+	resourceName := "xcsh_data_group.test"
 	rName := acctest.RandomName("tf-test-datagrp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -168,7 +168,7 @@ func TestAccDataGroupResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_group.test"
+	resourceName := "xcsh_data_group.test"
 	rName := acctest.RandomName("tf-test-datagrp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -208,7 +208,7 @@ func TestAccDataGroupResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_group.test"
+	resourceName := "xcsh_data_group.test"
 	rName := acctest.RandomName("tf-test-datagrp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -236,7 +236,7 @@ func TestAccDataGroupResource_emptyPlan(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_group.test"
+	resourceName := "xcsh_data_group.test"
 	rName := acctest.RandomName("tf-test-datagrp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -278,7 +278,7 @@ func TestAccDataGroupResource_planChecks(t *testing.T) {
 				Config: testAccDataGroupConfig_basicSystem(rName),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_data_group.test", plancheck.ResourceActionCreate),
+						plancheck.ExpectResourceAction("xcsh_data_group.test", plancheck.ResourceActionCreate),
 					},
 				},
 			},
@@ -294,7 +294,7 @@ func TestAccDataGroupResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_group.test"
+	resourceName := "xcsh_data_group.test"
 	rName := acctest.RandomName("tf-test-datagrp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -405,15 +405,15 @@ func TestAccDataGroupResource_requiresReplace(t *testing.T) {
 			{
 				Config: testAccDataGroupConfig_basicSystem(rName1),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					acctest.CheckDataGroupExists("f5xc_data_group.test"),
-					resource.TestCheckResourceAttr("f5xc_data_group.test", "name", rName1),
+					acctest.CheckDataGroupExists("xcsh_data_group.test"),
+					resource.TestCheckResourceAttr("xcsh_data_group.test", "name", rName1),
 				),
 			},
 			{
 				Config: testAccDataGroupConfig_basicSystem(rName2),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_data_group.test", plancheck.ResourceActionDestroyBeforeCreate),
+						plancheck.ExpectResourceAction("xcsh_data_group.test", plancheck.ResourceActionDestroyBeforeCreate),
 					},
 				},
 			},
@@ -429,7 +429,7 @@ func TestAccDataGroupResource_stringRecords(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_data_group.test"
+	resourceName := "xcsh_data_group.test"
 	rName := acctest.RandomName("tf-test-datagrp")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -469,7 +469,7 @@ func testAccDataGroupImportStateIdFunc(resourceName string) resource.ImportState
 
 func testAccDataGroupConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_data_group" "test" {
+resource "xcsh_data_group" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -480,7 +480,7 @@ resource "f5xc_data_group" "test" {
 
 func testAccDataGroupConfig_allAttributesSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_data_group" "test" {
+resource "xcsh_data_group" "test" {
   name        = %[1]q
   namespace   = "system"
   description = "Test data group description"
@@ -506,7 +506,7 @@ func testAccDataGroupConfig_withLabelsSystem(name string, labels map[string]stri
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_data_group" "test" {
+resource "xcsh_data_group" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -520,7 +520,7 @@ resource "f5xc_data_group" "test" {
 
 func testAccDataGroupConfig_withDescriptionSystem(name, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_data_group" "test" {
+resource "xcsh_data_group" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -537,7 +537,7 @@ func testAccDataGroupConfig_withAnnotationsSystem(name string, annotations map[s
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_data_group" "test" {
+resource "xcsh_data_group" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -551,7 +551,7 @@ resource "f5xc_data_group" "test" {
 
 func testAccDataGroupConfig_withStringRecordsSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_data_group" "test" {
+resource "xcsh_data_group" "test" {
   name      = %[1]q
   namespace = "system"
 

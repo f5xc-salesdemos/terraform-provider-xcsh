@@ -26,7 +26,7 @@ func TestAccPolicerResource_basic(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_policer.test"
+	resourceName := "xcsh_policer.test"
 	rName := acctest.RandomName("tf-test-policer")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -63,7 +63,7 @@ func TestAccPolicerResource_allAttributes(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_policer.test"
+	resourceName := "xcsh_policer.test"
 	rName := acctest.RandomName("tf-test-policer")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -94,7 +94,7 @@ func TestAccPolicerResource_updateLabels(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_policer.test"
+	resourceName := "xcsh_policer.test"
 	rName := acctest.RandomName("tf-test-policer")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -134,7 +134,7 @@ func TestAccPolicerResource_updateDescription(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_policer.test"
+	resourceName := "xcsh_policer.test"
 	rName := acctest.RandomName("tf-test-policer")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -168,7 +168,7 @@ func TestAccPolicerResource_updateAnnotations(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_policer.test"
+	resourceName := "xcsh_policer.test"
 	rName := acctest.RandomName("tf-test-policer")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -208,7 +208,7 @@ func TestAccPolicerResource_disappears(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_policer.test"
+	resourceName := "xcsh_policer.test"
 	rName := acctest.RandomName("tf-test-policer")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -236,7 +236,7 @@ func TestAccPolicerResource_emptyPlan(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_policer.test"
+	resourceName := "xcsh_policer.test"
 	rName := acctest.RandomName("tf-test-policer")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -278,7 +278,7 @@ func TestAccPolicerResource_planChecks(t *testing.T) {
 				Config: testAccPolicerConfig_basicSystem(rName),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_policer.test", plancheck.ResourceActionCreate),
+						plancheck.ExpectResourceAction("xcsh_policer.test", plancheck.ResourceActionCreate),
 					},
 				},
 			},
@@ -294,7 +294,7 @@ func TestAccPolicerResource_knownValues(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_policer.test"
+	resourceName := "xcsh_policer.test"
 	rName := acctest.RandomName("tf-test-policer")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -405,15 +405,15 @@ func TestAccPolicerResource_requiresReplace(t *testing.T) {
 			{
 				Config: testAccPolicerConfig_basicSystem(rName1),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					acctest.CheckPolicerExists("f5xc_policer.test"),
-					resource.TestCheckResourceAttr("f5xc_policer.test", "name", rName1),
+					acctest.CheckPolicerExists("xcsh_policer.test"),
+					resource.TestCheckResourceAttr("xcsh_policer.test", "name", rName1),
 				),
 			},
 			{
 				Config: testAccPolicerConfig_basicSystem(rName2),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("f5xc_policer.test", plancheck.ResourceActionDestroyBeforeCreate),
+						plancheck.ExpectResourceAction("xcsh_policer.test", plancheck.ResourceActionDestroyBeforeCreate),
 					},
 				},
 			},
@@ -429,7 +429,7 @@ func TestAccPolicerResource_rateLimits(t *testing.T) {
 	acctest.SkipIfNotAccTest(t)
 	acctest.PreCheck(t)
 
-	resourceName := "f5xc_policer.test"
+	resourceName := "xcsh_policer.test"
 	rName := acctest.RandomName("tf-test-policer")
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -479,7 +479,7 @@ func testAccPolicerImportStateIdFunc(resourceName string) resource.ImportStateId
 
 func testAccPolicerConfig_basicSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_policer" "test" {
+resource "xcsh_policer" "test" {
   name                       = %[1]q
   namespace                  = "system"
   committed_information_rate = 10000
@@ -490,7 +490,7 @@ resource "f5xc_policer" "test" {
 
 func testAccPolicerConfig_allAttributesSystem(name string) string {
 	return fmt.Sprintf(`
-resource "f5xc_policer" "test" {
+resource "xcsh_policer" "test" {
   name                       = %[1]q
   namespace                  = "system"
   description                = "Test policer description"
@@ -516,7 +516,7 @@ func testAccPolicerConfig_withLabelsSystem(name string, labels map[string]string
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_policer" "test" {
+resource "xcsh_policer" "test" {
   name                       = %[1]q
   namespace                  = "system"
   committed_information_rate = 10000
@@ -530,7 +530,7 @@ resource "f5xc_policer" "test" {
 
 func testAccPolicerConfig_withDescriptionSystem(name, description string) string {
 	return fmt.Sprintf(`
-resource "f5xc_policer" "test" {
+resource "xcsh_policer" "test" {
   name                       = %[1]q
   namespace                  = "system"
   description                = %[2]q
@@ -547,7 +547,7 @@ func testAccPolicerConfig_withAnnotationsSystem(name string, annotations map[str
 	}
 
 	return fmt.Sprintf(`
-resource "f5xc_policer" "test" {
+resource "xcsh_policer" "test" {
   name                       = %[1]q
   namespace                  = "system"
   committed_information_rate = 10000
@@ -561,7 +561,7 @@ resource "f5xc_policer" "test" {
 
 func testAccPolicerConfig_withRateLimitsSystem(name string, cir, burstSize int) string {
 	return fmt.Sprintf(`
-resource "f5xc_policer" "test" {
+resource "xcsh_policer" "test" {
   name                       = %[1]q
   namespace                  = "system"
   committed_information_rate = %[2]d

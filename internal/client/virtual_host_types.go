@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// VirtualHost represents a F5XC VirtualHost
+// VirtualHost represents a XCSH VirtualHost
 type VirtualHost struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`

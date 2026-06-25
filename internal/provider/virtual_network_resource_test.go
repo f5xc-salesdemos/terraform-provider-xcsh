@@ -46,7 +46,7 @@ func testAccVirtualNetworkImportStateIdFunc(resourceName string) resource.Import
 // 8. Plan Checks - Verify planned actions
 //
 // Run with:
-//   TF_ACC=1 F5XC_API_URL="..." F5XC_P12_FILE="..." F5XC_P12_PASSWORD="..." \
+//   TF_ACC=1 XCSH_API_URL="..." XCSH_P12_FILE="..." XCSH_P12_PASSWORD="..." \
 //   go test -v ./internal/provider/ -run TestAccVirtualNetworkResource -timeout 30m
 // =============================================================================
 
@@ -61,12 +61,12 @@ func TestAccVirtualNetworkResource_basic(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-vnet")
-	resourceName := "f5xc_virtual_network.test"
+	resourceName := "xcsh_virtual_network.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_virtual_network"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_virtual_network"),
 		Steps: []resource.TestStep{
 			// Step 1: Create virtual_network with minimal configuration
 			{
@@ -105,13 +105,13 @@ func TestAccVirtualNetworkResource_allAttributes(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-vnet")
-	resourceName := "f5xc_virtual_network.test"
+	resourceName := "xcsh_virtual_network.test"
 	description := "Comprehensive acceptance test virtual network"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_virtual_network"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_virtual_network"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccVirtualNetworkResourceConfig_allAttributes(rName, description),
@@ -150,12 +150,12 @@ func TestAccVirtualNetworkResource_updateLabels(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-vnet")
-	resourceName := "f5xc_virtual_network.test"
+	resourceName := "xcsh_virtual_network.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_virtual_network"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_virtual_network"),
 		Steps: []resource.TestStep{
 			// Step 1: Create with initial labels
 			{
@@ -199,12 +199,12 @@ func TestAccVirtualNetworkResource_updateDescription(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-vnet")
-	resourceName := "f5xc_virtual_network.test"
+	resourceName := "xcsh_virtual_network.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_virtual_network"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_virtual_network"),
 		Steps: []resource.TestStep{
 			// Step 1: Create without description
 			{
@@ -252,12 +252,12 @@ func TestAccVirtualNetworkResource_updateAnnotations(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-vnet")
-	resourceName := "f5xc_virtual_network.test"
+	resourceName := "xcsh_virtual_network.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_virtual_network"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_virtual_network"),
 		Steps: []resource.TestStep{
 			// Step 1: Create with annotations
 			{
@@ -299,12 +299,12 @@ func TestAccVirtualNetworkResource_emptyPlan(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-vnet")
-	resourceName := "f5xc_virtual_network.test"
+	resourceName := "xcsh_virtual_network.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_virtual_network"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_virtual_network"),
 		Steps: []resource.TestStep{
 			// Step 1: Create resource
 			{
@@ -337,12 +337,12 @@ func TestAccVirtualNetworkResource_planChecks(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-vnet")
-	resourceName := "f5xc_virtual_network.test"
+	resourceName := "xcsh_virtual_network.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_virtual_network"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_virtual_network"),
 		Steps: []resource.TestStep{
 			// Step 1: Create - verify create action planned
 			{
@@ -389,12 +389,12 @@ func TestAccVirtualNetworkResource_knownValues(t *testing.T) {
 	acctest.PreCheck(t)
 
 	rName := acctest.RandomName("tf-acc-test-vnet")
-	resourceName := "f5xc_virtual_network.test"
+	resourceName := "xcsh_virtual_network.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_virtual_network"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_virtual_network"),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccVirtualNetworkResourceConfig_withDescription(rName, "Known value test"),
@@ -501,12 +501,12 @@ func TestAccVirtualNetworkResource_requiresReplace(t *testing.T) {
 
 	rName1 := acctest.RandomName("tf-acc-test-vnet")
 	rName2 := acctest.RandomName("tf-acc-test-vnet")
-	resourceName := "f5xc_virtual_network.test"
+	resourceName := "xcsh_virtual_network.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             acctest.CheckResourceDestroyed("f5xc_virtual_network"),
+		CheckDestroy:             acctest.CheckResourceDestroyed("xcsh_virtual_network"),
 		Steps: []resource.TestStep{
 			// Step 1: Create with first name
 			{
@@ -541,7 +541,7 @@ func testAccVirtualNetworkResourceConfig_basic(name string) string {
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_virtual_network" "test" {
+resource "xcsh_virtual_network" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -559,7 +559,7 @@ func testAccVirtualNetworkResourceConfig_allAttributes(name, description string)
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_virtual_network" "test" {
+resource "xcsh_virtual_network" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -583,7 +583,7 @@ func testAccVirtualNetworkResourceConfig_withLabels(name, environment, managedBy
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_virtual_network" "test" {
+resource "xcsh_virtual_network" "test" {
   name      = %[1]q
   namespace = "system"
 
@@ -601,7 +601,7 @@ func testAccVirtualNetworkResourceConfig_withDescription(name, description strin
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_virtual_network" "test" {
+resource "xcsh_virtual_network" "test" {
   name        = %[1]q
   namespace   = "system"
   description = %[2]q
@@ -620,7 +620,7 @@ func testAccVirtualNetworkResourceConfig_withAnnotations(name, value1, value2 st
 	return acctest.ConfigCompose(
 		acctest.ProviderConfig(),
 		fmt.Sprintf(`
-resource "f5xc_virtual_network" "test" {
+resource "xcsh_virtual_network" "test" {
   name      = %[1]q
   namespace = "system"
 

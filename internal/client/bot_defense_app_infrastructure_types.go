@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// BotDefenseAppInfrastructure represents a F5XC BotDefenseAppInfrastructure
+// BotDefenseAppInfrastructure represents a XCSH BotDefenseAppInfrastructure
 type BotDefenseAppInfrastructure struct {
 	Metadata Metadata               `json:"metadata"`
 	Spec     map[string]interface{} `json:"spec"`
