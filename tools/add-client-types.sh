@@ -25,16 +25,16 @@ TEMP_FILE=$(mktemp)
 LINE_NUM=$(grep -n "^}$" $CLIENT_FILE | tail -1 | cut -d: -f1)
 
 # Insert before the last line
-head -n $((LINE_NUM - 1)) $CLIENT_FILE > $TEMP_FILE
+head -n $((LINE_NUM - 1)) $CLIENT_FILE >$TEMP_FILE
 
 # Add each resource's client types
 for resource in $RESOURCES; do
-    # Convert to TitleCase
-    title_case=$(echo $resource | sed -r 's/(^|_)([a-z])/\U\2/g' | sed 's/_//g')
+  # Convert to TitleCase
+  title_case=$(echo $resource | sed -r 's/(^|_)([a-z])/\U\2/g' | sed 's/_//g')
 
-    echo "Adding types for: $resource ($title_case)"
+  echo "Adding types for: $resource ($title_case)"
 
-    cat >> $TEMP_FILE << EOF
+  cat >>$TEMP_FILE <<EOF
 
 // $title_case represents an XCSH $title_case
 type $title_case struct {
@@ -80,7 +80,7 @@ EOF
 done
 
 # Close the file
-echo "}" >> $TEMP_FILE
+echo "}" >>$TEMP_FILE
 
 # Replace original file
 mv $TEMP_FILE $CLIENT_FILE
