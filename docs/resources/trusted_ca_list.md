@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_trusted_ca_list Resource - terraform-provider-xcsh"
+page_title: "xcsh_trusted_ca_list Resource - xcsh"
 subcategory: "Certificates"
 description: |-
   Manages a Trusted CA List resource in F5 Distributed Cloud for trusted certificate authority list management.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -51,8 +51,6 @@ resource "xcsh_trusted_ca_list" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 

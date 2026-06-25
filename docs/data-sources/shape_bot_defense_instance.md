@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_shape_bot_defense_instance Data Source - terraform-provider-xcsh"
+page_title: "xcsh_shape_bot_defense_instance Data Source - xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about an existing Shape Bot Defense Instance resource in F5 Distributed Cloud for get virtual host from a given namespace. configuration. (read-only data source)
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }

@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_waf_exclusion_policy Resource - terraform-provider-xcsh"
+page_title: "xcsh_waf_exclusion_policy Resource - xcsh"
 subcategory: "Security"
 description: |-
   Manages WAF exclusion policy. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -58,32 +58,6 @@ resource "xcsh_waf_exclusion_policy" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `waf_exclusion_rules`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: waf_exclusion_policy
-metadata:
-  name: example-waf-exclusion
-  namespace: default
-spec:
-  waf_exclusion_rules:
-    - metadata:
-        name: exclude-health
-      exact_path: "/health"
-
-```
 
 ### Metadata Argument Reference
 

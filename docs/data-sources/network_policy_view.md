@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_network_policy_view Data Source - terraform-provider-xcsh"
+page_title: "xcsh_network_policy_view Data Source - xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about an existing Network Policy View resource in F5 Distributed Cloud for network policy view specification. configuration.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -43,8 +43,6 @@ output "network_policy_view_id" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 

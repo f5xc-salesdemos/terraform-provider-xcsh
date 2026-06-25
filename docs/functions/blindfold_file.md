@@ -1,5 +1,5 @@
 ---
-page_title: "blindfold_file function - terraform-provider-xcsh"
+page_title: "blindfold_file function - xcsh"
 description: |-
   Reads a file and encrypts its contents using F5 Distributed Cloud Secret Management (blindfold).
   Returns a sealed secret string suitable for use in blindfold_secret_info.location fields.
@@ -8,7 +8,7 @@ description: |-
   provider::xcsh::blindfold(base64encode(file(path)), policy_name, namespace)
   
   Security: The encryption happens locally using the public key fetched from F5XC.
-  The file contents are never transmitted to F5XC during encryption.
+  The file contents are never transmitted to XCSH during encryption.
   Example
   
   resource "xcsh_http_loadbalancer" "example" {
@@ -40,7 +40,7 @@ provider::xcsh::blindfold(base64encode(file(path)), policy_name, namespace)
 ```
 
 **Security**: The encryption happens locally using the public key fetched from F5XC.
-The file contents are **never** transmitted to F5XC during encryption.
+The file contents are **never** transmitted to XCSH during encryption.
 
 ## Example
 
@@ -80,13 +80,23 @@ Use `${path.module}` for paths relative to the current module.
 1. `policy_name` (String) Name of the SecretPolicy that controls which clients can decrypt this secret.
 
 The policy must exist in the specified namespace before encryption.
-1. `namespace` (String) F5XC namespace containing the SecretPolicy.
+1. `namespace` (String) XCSH namespace containing the SecretPolicy.
 
 Common values: `shared`, `system`, or your application namespace.
 
 ## Example Usage
 
 ```terraform
+terraform {
+  required_version = ">= 1.8"
+  required_providers {
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Encrypt a file using F5XC blindfold
 #
 # The blindfold_file function reads a file and encrypts its contents using F5

@@ -7,8 +7,6 @@ Defining backend server pools for load balancer targets
 
 - name
 - namespace
-- origin_servers
-- port
 
 ## OneOf Groups
 

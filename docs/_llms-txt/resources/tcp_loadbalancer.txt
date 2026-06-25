@@ -7,7 +7,6 @@ Load balancing TCP traffic across origin pools
 
 - name
 - namespace
-- origin_pools
 
 ## OneOf Groups
 

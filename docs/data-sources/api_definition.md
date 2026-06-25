@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_api_definition Data Source - terraform-provider-xcsh"
+page_title: "xcsh_api_definition Data Source - xcsh"
 subcategory: "API Security"
 description: |-
   Retrieves information about API Definition. in F5 Distributed Cloud.
@@ -9,7 +9,7 @@ description: |-
 
 Manages API Definition. in F5 Distributed Cloud. This is a read-only data source.
 
-~> **Note** Please refer to [API Definition API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/api/) to learn more.
+~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -43,27 +43,6 @@ output "api_definition_id" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: api_definition
-metadata:
-  name: example-api
-  namespace: default
-spec: {}
-
-```
 
 ### Metadata Argument Reference
 

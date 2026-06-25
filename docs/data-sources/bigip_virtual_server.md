@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_bigip_virtual_server Data Source - terraform-provider-xcsh"
+page_title: "xcsh_bigip_virtual_server Data Source - xcsh"
 subcategory: "BIG-IP Integration"
 description: |-
   Retrieves information about an existing BIG-IP Virtual Server resource in F5 Distributed Cloud for big-ip virtual server specification. configuration. (read-only data source)
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }

@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_nginx_csg Data Source - terraform-provider-xcsh"
+page_title: "xcsh_nginx_csg Data Source - xcsh"
 subcategory: "Uncategorized"
 description: |-
   Retrieves information about an existing Nginx Csg resource in F5 Distributed Cloud for get nginx csg configuration. configuration. (read-only data source)
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }

@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_tunnel Resource - terraform-provider-xcsh"
+page_title: "xcsh_tunnel Resource - xcsh"
 subcategory: "Networking"
 description: |-
   Manages tunnel in a given namespace. If one already exist it will give a error. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -50,8 +50,6 @@ resource "xcsh_tunnel" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -171,7 +169,7 @@ An [`ipsec`](#params-ipsec) block (within [`params`](#params)) supports the foll
 
 An [`ipsec_psk`](#params-ipsec-ipsec-psk) block (within [`params.ipsec`](#params-ipsec)) supports the following:
 
-<a id="info-5ffa9e"></a>&#x2022; [`blindfold_secret_info`](#info-5ffa9e) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-5ffa9e) below.
+<a id="info-5ffa9e"></a>&#x2022; [`blindfold_secret_info`](#info-5ffa9e) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-5ffa9e) below.
 
 <a id="info-8a167c"></a>&#x2022; [`clear_secret_info`](#info-8a167c) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-8a167c) below.
 

@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_network_connector Resource - terraform-provider-xcsh"
+page_title: "xcsh_network_connector Resource - xcsh"
 subcategory: "Networking"
 description: |-
   Manages a Network Connector resource in F5 Distributed Cloud for network connector is created by users in system namespace. configuration.
@@ -9,7 +9,7 @@ description: |-
 
 Manages a Network Connector resource in F5 Distributed Cloud for network connector is created by users in system namespace. configuration.
 
-~> **Note** Please refer to [Network Connector API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/network/) to learn more.
+~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -60,10 +60,6 @@ resource "xcsh_network_connector" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-~> **Dependencies** — This resource requires: `virtual_network`.
 
 ### Metadata Argument Reference
 

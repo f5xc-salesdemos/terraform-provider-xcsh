@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_rate_limiter_policy Resource - terraform-provider-xcsh"
+page_title: "xcsh_rate_limiter_policy Resource - xcsh"
 subcategory: "Security"
 description: |-
   Manages a Rate Limiter Policy resource in F5 Distributed Cloud for rate limiter policy create specification. configuration.
@@ -9,7 +9,7 @@ description: |-
 
 Manages a Rate Limiter Policy resource in F5 Distributed Cloud for rate limiter policy create specification. configuration.
 
-~> **Note** Please refer to [Rate Limiter Policy API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/rate_limiting/) to learn more.
+~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -65,31 +65,6 @@ resource "xcsh_rate_limiter_policy" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `burst_size`
-- `committed_information_rate`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: rate_limiter_policy
-metadata:
-  name: example-rl
-  namespace: default
-spec:
-  burst_size: 1
-  committed_information_rate: 1
-
-```
 
 ### Metadata Argument Reference
 

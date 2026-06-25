@@ -6,7 +6,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -38,7 +38,7 @@ resource "xcsh_aws_tgw_site" "example" {
   # VPC configuration
   vpc {
     new_vpc {
-      name_tag     = "f5xc-tgw-vpc"
+      name_tag     = "xcsh-tgw-vpc"
       primary_ipv4 = "10.0.0.0/16"
     }
   }
@@ -46,7 +46,7 @@ resource "xcsh_aws_tgw_site" "example" {
   # TGW configuration
   tgw {
     new_tgw {
-      name = "f5xc-tgw"
+      name = "xcsh-tgw"
     }
   }
 

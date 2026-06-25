@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_code_base_integration Resource - terraform-provider-xcsh"
+page_title: "xcsh_code_base_integration Resource - xcsh"
 subcategory: "Integrations"
 description: |-
   Manages integration details. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -62,8 +62,6 @@ resource "xcsh_code_base_integration" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -121,7 +119,7 @@ An [`azure_repos`](#code-base-integration-Azure-repos) block (within [`code_base
 
 An [`access_token`](#token-d4247d) block (within [`code_base_integration.azure_repos`](#code-base-integration-Azure-repos)) supports the following:
 
-<a id="info-088938"></a>&#x2022; [`blindfold_secret_info`](#info-088938) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-088938) below.
+<a id="info-088938"></a>&#x2022; [`blindfold_secret_info`](#info-088938) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-088938) below.
 
 <a id="info-8fbdd3"></a>&#x2022; [`clear_secret_info`](#info-8fbdd3) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-8fbdd3) below.
 
@@ -145,7 +143,7 @@ A [`Bitbucket`](#code-base-integration-Bitbucket) block (within [`code_base_inte
 
 A [`passwd`](#code-base-integration-Bitbucket-passwd) block (within [`code_base_integration.Bitbucket`](#code-base-integration-Bitbucket)) supports the following:
 
-<a id="info-6400a1"></a>&#x2022; [`blindfold_secret_info`](#info-6400a1) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-6400a1) below.
+<a id="info-6400a1"></a>&#x2022; [`blindfold_secret_info`](#info-6400a1) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-6400a1) below.
 
 <a id="info-3c272b"></a>&#x2022; [`clear_secret_info`](#info-3c272b) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-3c272b) below.
 
@@ -173,7 +171,7 @@ A [`bitbucket_server`](#code-base-integration-Bitbucket-server) block (within [`
 
 A [`passwd`](#passwd-13127c) block (within [`code_base_integration.bitbucket_server`](#code-base-integration-Bitbucket-server)) supports the following:
 
-<a id="info-e29dd9"></a>&#x2022; [`blindfold_secret_info`](#info-e29dd9) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-e29dd9) below.
+<a id="info-e29dd9"></a>&#x2022; [`blindfold_secret_info`](#info-e29dd9) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-e29dd9) below.
 
 <a id="info-38f71d"></a>&#x2022; [`clear_secret_info`](#info-38f71d) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-38f71d) below.
 
@@ -199,7 +197,7 @@ A [`GitHub`](#code-base-integration-GitHub) block (within [`code_base_integratio
 
 An [`access_token`](#token-b77f94) block (within [`code_base_integration.GitHub`](#code-base-integration-GitHub)) supports the following:
 
-<a id="info-a74f41"></a>&#x2022; [`blindfold_secret_info`](#info-a74f41) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-a74f41) below.
+<a id="info-a74f41"></a>&#x2022; [`blindfold_secret_info`](#info-a74f41) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-a74f41) below.
 
 <a id="info-4afb31"></a>&#x2022; [`clear_secret_info`](#info-4afb31) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-4afb31) below.
 
@@ -225,7 +223,7 @@ A [`github_enterprise`](#code-base-integration-GitHub-enterprise) block (within 
 
 An [`access_token`](#token-c0b5c1) block (within [`code_base_integration.github_enterprise`](#code-base-integration-GitHub-enterprise)) supports the following:
 
-<a id="info-113b2a"></a>&#x2022; [`blindfold_secret_info`](#info-113b2a) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-113b2a) below.
+<a id="info-113b2a"></a>&#x2022; [`blindfold_secret_info`](#info-113b2a) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-113b2a) below.
 
 <a id="info-f7aaa0"></a>&#x2022; [`clear_secret_info`](#info-f7aaa0) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-f7aaa0) below.
 
@@ -247,7 +245,7 @@ A [`GitLab`](#code-base-integration-GitLab) block (within [`code_base_integratio
 
 An [`access_token`](#token-5d157b) block (within [`code_base_integration.GitLab`](#code-base-integration-GitLab)) supports the following:
 
-<a id="info-ceae94"></a>&#x2022; [`blindfold_secret_info`](#info-ceae94) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-ceae94) below.
+<a id="info-ceae94"></a>&#x2022; [`blindfold_secret_info`](#info-ceae94) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-ceae94) below.
 
 <a id="info-6cbf02"></a>&#x2022; [`clear_secret_info`](#info-6cbf02) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-6cbf02) below.
 
@@ -271,7 +269,7 @@ A [`gitlab_enterprise`](#code-base-integration-GitLab-enterprise) block (within 
 
 An [`access_token`](#token-b5c2b4) block (within [`code_base_integration.gitlab_enterprise`](#code-base-integration-GitLab-enterprise)) supports the following:
 
-<a id="info-f6945e"></a>&#x2022; [`blindfold_secret_info`](#info-f6945e) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-f6945e) below.
+<a id="info-f6945e"></a>&#x2022; [`blindfold_secret_info`](#info-f6945e) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-f6945e) below.
 
 <a id="info-040ff9"></a>&#x2022; [`clear_secret_info`](#info-040ff9) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-040ff9) below.
 

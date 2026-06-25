@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_fleet Resource - terraform-provider-xcsh"
+page_title: "xcsh_fleet Resource - xcsh"
 subcategory: "Sites"
 description: |-
   Manages fleet will create a fleet object in 'system' namespace of the user. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -65,8 +65,6 @@ resource "xcsh_fleet" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -169,7 +167,7 @@ network<br>See [Network Firewall](#network-firewall) below for details.
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block
 
-<a id="volterra-software-version"></a>&#x2022; [`volterra_software_version`](#volterra-software-version) - Required String<br>F5XC software version is human readable string matching released set of version components. The given software version is applied to all sites that are member of the fleet. Current software installed can be overridden via site config
+<a id="volterra-software-version"></a>&#x2022; [`volterra_software_version`](#volterra-software-version) - Required String<br>XCSH software version is human readable string matching released set of version components. The given software version is applied to all sites that are member of the fleet. Current software installed can be overridden via site config
 
 ### Attributes Reference
 

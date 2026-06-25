@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_cminstance Resource - terraform-provider-xcsh"
+page_title: "xcsh_cminstance Resource - xcsh"
 subcategory: "Subscriptions"
 description: |-
   Manages App type will create the configuration in namespace metadata.namespace. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -62,8 +62,6 @@ resource "xcsh_cminstance" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -105,7 +103,7 @@ In addition to all arguments above, the following attributes are exported:
 
 An [`api_token`](#api-token) block supports the following:
 
-<a id="api-token-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#api-token-blindfold-secret-info) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#api-token-blindfold-secret-info) below.
+<a id="api-token-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#api-token-blindfold-secret-info) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#api-token-blindfold-secret-info) below.
 
 <a id="api-token-clear-secret-info"></a>&#x2022; [`clear_secret_info`](#api-token-clear-secret-info) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#api-token-clear-secret-info) below.
 
@@ -137,7 +135,7 @@ An [`ip`](#ip) block supports the following:
 
 A [`password`](#password) block supports the following:
 
-<a id="password-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#password-blindfold-secret-info) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#password-blindfold-secret-info) below.
+<a id="password-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#password-blindfold-secret-info) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#password-blindfold-secret-info) below.
 
 <a id="password-clear-secret-info"></a>&#x2022; [`clear_secret_info`](#password-clear-secret-info) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#password-clear-secret-info) below.
 

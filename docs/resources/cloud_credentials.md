@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_cloud_credentials Resource - terraform-provider-xcsh"
+page_title: "xcsh_cloud_credentials Resource - xcsh"
 subcategory: "Authentication"
 description: |-
   Manages a Cloud Credentials resource in F5 Distributed Cloud for api to create cloud_credentials object. configuration.
@@ -9,7 +9,7 @@ description: |-
 
 Manages a Cloud Credentials resource in F5 Distributed Cloud for api to create cloud_credentials object. configuration.
 
-~> **Note** Please refer to [Cloud Credentials API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/cloud_infrastructure/) to learn more.
+~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -59,8 +59,6 @@ resource "xcsh_cloud_credentials" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -109,7 +107,7 @@ An [`aws_assume_role`](#aws-assume-role) block supports the following:
 
 <a id="aws-assume-role-role-arn"></a>&#x2022; [`role_arn`](#aws-assume-role-role-arn) - Optional String<br>IAM Role ARN to assume the role
 
-<a id="aws-assume-role-session-name"></a>&#x2022; [`session_name`](#aws-assume-role-session-name) - Optional String<br>Use the role session name to uniquely identify a session, which will be used for deploy, monitor from F5XC console
+<a id="aws-assume-role-session-name"></a>&#x2022; [`session_name`](#aws-assume-role-session-name) - Optional String<br>Use the role session name to uniquely identify a session, which will be used for deploy, monitor from XCSH console
 
 <a id="aws-assume-role-session-tags"></a>&#x2022; [`session_tags`](#aws-assume-role-session-tags) - Optional Block<br>Session tags are key-value pair attributes that you pass when you assume an IAM role
 
@@ -125,7 +123,7 @@ An [`aws_secret_key`](#aws-secret-key) block supports the following:
 
 A [`secret_key`](#aws-secret-key-secret-key) block (within [`aws_secret_key`](#aws-secret-key)) supports the following:
 
-<a id="info-9190c7"></a>&#x2022; [`blindfold_secret_info`](#info-9190c7) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-9190c7) below.
+<a id="info-9190c7"></a>&#x2022; [`blindfold_secret_info`](#info-9190c7) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-9190c7) below.
 
 <a id="info-498ec7"></a>&#x2022; [`clear_secret_info`](#info-498ec7) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-498ec7) below.
 
@@ -153,7 +151,7 @@ An [`azure_client_secret`](#Azure-client-secret) block supports the following:
 
 A [`client_secret`](#Azure-client-secret-client-secret) block (within [`azure_client_secret`](#Azure-client-secret)) supports the following:
 
-<a id="info-2956b6"></a>&#x2022; [`blindfold_secret_info`](#info-2956b6) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-2956b6) below.
+<a id="info-2956b6"></a>&#x2022; [`blindfold_secret_info`](#info-2956b6) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-2956b6) below.
 
 <a id="info-3d8384"></a>&#x2022; [`clear_secret_info`](#info-3d8384) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-3d8384) below.
 
@@ -184,7 +182,7 @@ binary file
 
 A [`password`](#Azure-pfx-certificate-password) block (within [`azure_pfx_certificate`](#Azure-pfx-certificate)) supports the following:
 
-<a id="info-86ae9f"></a>&#x2022; [`blindfold_secret_info`](#info-86ae9f) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-86ae9f) below.
+<a id="info-86ae9f"></a>&#x2022; [`blindfold_secret_info`](#info-86ae9f) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-86ae9f) below.
 
 <a id="info-b6797c"></a>&#x2022; [`clear_secret_info`](#info-b6797c) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-b6797c) below.
 
@@ -216,7 +214,7 @@ A [`gcp_cred_file`](#gcp-cred-file) block supports the following:
 
 A [`credential_file`](#gcp-cred-file-credential-file) block (within [`gcp_cred_file`](#gcp-cred-file)) supports the following:
 
-<a id="info-3869e4"></a>&#x2022; [`blindfold_secret_info`](#info-3869e4) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-3869e4) below.
+<a id="info-3869e4"></a>&#x2022; [`blindfold_secret_info`](#info-3869e4) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-3869e4) below.
 
 <a id="info-226bef"></a>&#x2022; [`clear_secret_info`](#info-226bef) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-226bef) below.
 

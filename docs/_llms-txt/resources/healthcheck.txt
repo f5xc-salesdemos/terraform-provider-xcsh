@@ -7,9 +7,9 @@ Healthcheck object defines method to determine if the given endpoint is healthy.
 
 - name
 - namespace
+- healthy_threshold
 - interval
 - timeout
-- healthy_threshold
 - unhealthy_threshold
 
 ## OneOf Groups

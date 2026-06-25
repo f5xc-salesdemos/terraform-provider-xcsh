@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_protocol_inspection Resource - terraform-provider-xcsh"
+page_title: "xcsh_protocol_inspection Resource - xcsh"
 subcategory: "Security"
 description: |-
   Manages Protocol Inspection Specification in a given namespace. If one already exists it will give an error. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -65,33 +65,6 @@ resource "xcsh_protocol_inspection" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `enable_disable_compliance_checks`
-- `enable_disable_signatures`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: protocol_inspection
-metadata:
-  name: example-inspection
-  namespace: default
-spec:
-  enable_disable_compliance_checks:
-    disable_compliance_checks: {}
-  enable_disable_signatures:
-    enable_signature: {}
-
-```
 
 ### Metadata Argument Reference
 

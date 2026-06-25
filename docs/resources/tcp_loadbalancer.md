@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_tcp_loadbalancer Resource - terraform-provider-xcsh"
+page_title: "xcsh_tcp_loadbalancer Resource - xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages a TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools.
@@ -9,7 +9,7 @@ description: |-
 
 Manages a TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools.
 
-~> **Note** Please refer to [TCP Loadbalancer API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/virtual/) to learn more.
+~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -380,37 +380,6 @@ resource "xcsh_tcp_loadbalancer" "test" {
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
 
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-~> **Dependencies** — This resource requires: `origin_pool`.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `origin_pools`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: tcp_loadbalancer
-metadata:
-  name: database-lb
-  namespace: default
-spec:
-  listener:
-    port: 5432
-    protocol: "TCP"
-  origin_pools:
-    - pool_name: postgres-cluster
-  advertise:
-    - public_ip: true
-
-```
-
 ### Metadata Argument Reference
 
 <a id="name"></a>&#x2022; [`name`](#name) - Required String<br>Name of the TCP Load Balancer. Must be unique within the namespace
@@ -440,7 +409,7 @@ spec:
 &#x2022; <a id="default-lb-with-sni"></a>[`default_lb_with_sni`](#default-lb-with-sni) - Optional Block<br>Configuration parameter for default LB with sni
 <br><br>&#x2022; <a id="no-sni"></a>[`no_sni`](#no-sni) - Optional Block  Defaults to `map[]`<br>Enable this option.  Server applies default when omitted
 
-<a id="dns-volterra-managed"></a>&#x2022; [`dns_volterra_managed`](#dns-volterra-managed) - Optional Bool  Defaults to `false`<br>DNS records for domains will be managed automatically by F5 Distributed Cloud. This requires the domain to be delegated to F5XC using the Delegated Domain feature.  Server applies default when omitted
+<a id="dns-volterra-managed"></a>&#x2022; [`dns_volterra_managed`](#dns-volterra-managed) - Optional Bool  Defaults to `false`<br>DNS records for domains will be managed automatically by F5 Distributed Cloud. This requires the domain to be delegated to XCSH using the Delegated Domain feature.  Server applies default when omitted
 
 <a id="do-not-advertise"></a>&#x2022; [`do_not_advertise`](#do-not-advertise) - Optional Block<br>Configuration parameter for do not advertise
 

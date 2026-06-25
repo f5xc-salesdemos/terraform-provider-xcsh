@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_healthcheck Resource - terraform-provider-xcsh"
+page_title: "xcsh_healthcheck Resource - xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages a Healthcheck resource in F5 Distributed Cloud for healthcheck object defines method to determine if the given endpoint is healthy. single healthcheck object can be referred to by one or many cluster objects. configuration.
@@ -9,7 +9,7 @@ description: |-
 
 Manages a Healthcheck resource in F5 Distributed Cloud for healthcheck object defines method to determine if the given endpoint is healthy. single healthcheck object can be referred to by one or many cluster objects. configuration.
 
-~> **Note** Please refer to [Healthcheck API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/virtual/) to learn more.
+~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -330,39 +330,6 @@ resource "xcsh_healthcheck" "test" {
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
 
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `interval`
-- `timeout`
-- `healthy_threshold`
-- `unhealthy_threshold`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: healthcheck
-metadata:
-  name: http-health
-  namespace: default
-spec:
-  http_health_check:
-    path: /health
-    use_origin_server_name: {}
-  interval: 15
-  timeout: 3
-  unhealthy_threshold: 1
-  healthy_threshold: 3
-  jitter_percent: 30
-
-```
-
 ### Metadata Argument Reference
 
 <a id="name"></a>&#x2022; [`name`](#name) - Required String<br>Name of the Healthcheck. Must be unique within the namespace
@@ -394,7 +361,7 @@ spec:
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block<br>See [Timeouts](#timeouts) below for details.
 
-<a id="unhealthy-threshold"></a>&#x2022; [`unhealthy_threshold`](#unhealthy-threshold) - Required Number<br>Number of failed responses before declaring unhealthy. In other words, this is the number of unhealthy health checks required before a host is marked unhealthy. Note that for HTTP health checkinggggg if a host responds with 503 this threshold is ignored and the host is considered unhealthy
+<a id="unhealthy-threshold"></a>&#x2022; [`unhealthy_threshold`](#unhealthy-threshold) - Required Number<br>Number of failed responses before declaring unhealthy. In other words, this is the number of unhealthy health checks required before a host is marked unhealthy. Note that for HTTP health checkingggggg if a host responds with 503 this threshold is ignored and the host is considered unhealthy
 immediately. Recommended: `1`
 
 ### Attributes Reference
@@ -418,7 +385,7 @@ and end values separated by '-'
 
 <a id="http-health-check-host-header"></a>&#x2022; [`host_header`](#http-health-check-host-header) - Optional String<br>The value of the host header
 
-<a id="http-health-check-path"></a>&#x2022; [`path`](#http-health-check-path) - Optional String<br>Specifies the HTTP path that will be requested during health checkinggggg
+<a id="http-health-check-path"></a>&#x2022; [`path`](#http-health-check-path) - Optional String<br>Specifies the HTTP path that will be requested during health checkingggggg
 
 <a id="remove-35d538"></a>&#x2022; [`request_headers_to_remove`](#remove-35d538) - Optional List<br>Specifies a list of HTTP headers that should be removed from each request that is sent to the health checked cluster. This is a list of keys of headers
 

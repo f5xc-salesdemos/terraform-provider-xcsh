@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_healthcheck Data Source - terraform-provider-xcsh"
+page_title: "xcsh_healthcheck Data Source - xcsh"
 subcategory: "Load Balancing"
 description: |-
   Retrieves information about an existing Healthcheck resource in F5 Distributed Cloud for healthcheck object defines method to determine if the given endpoint is healthy. single healthcheck object can be referred to by one or many cluster objects. configuration.
@@ -9,7 +9,7 @@ description: |-
 
 Retrieves information about a Healthcheck resource in F5 Distributed Cloud for healthcheck object defines method to determine if the given endpoint is healthy. single healthcheck object can be referred to by one or many cluster objects. configuration. This is a read-only data source.
 
-~> **Note** Please refer to [Healthcheck API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/virtual/) to learn more.
+~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -54,39 +54,6 @@ output "healthcheck_id" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `interval`
-- `timeout`
-- `healthy_threshold`
-- `unhealthy_threshold`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: healthcheck
-metadata:
-  name: http-health
-  namespace: default
-spec:
-  http_health_check:
-    path: /health
-    use_origin_server_name: {}
-  interval: 15
-  timeout: 3
-  unhealthy_threshold: 1
-  healthy_threshold: 3
-  jitter_percent: 30
-
-```
 
 ### Metadata Argument Reference
 

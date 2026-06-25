@@ -7,7 +7,6 @@ WAF exclusion policy
 
 - name
 - namespace
-- waf_exclusion_rules
 
 ## OneOf Groups
 

@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_cloud_connect Resource - terraform-provider-xcsh"
+page_title: "xcsh_cloud_connect Resource - xcsh"
 subcategory: "Networking"
 description: |-
   Manages a Cloud Connect resource in F5 Distributed Cloud for establishing connectivity to cloud provider networks.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -62,8 +62,6 @@ resource "xcsh_cloud_connect" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 

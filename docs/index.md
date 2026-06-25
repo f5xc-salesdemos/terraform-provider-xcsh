@@ -42,7 +42,7 @@ terraform {
   }
 }
 
-# Configure the XCSH Provider with API Token Authentication
+# Configure the F5XC Provider with API Token Authentication
 provider "xcsh" {
   api_url   = "https://your-tenant.console.ves.volterra.io"
   api_token = var.xcsh_api_token

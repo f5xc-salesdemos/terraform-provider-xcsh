@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_third_party_application Data Source - terraform-provider-xcsh"
+page_title: "xcsh_third_party_application Data Source - xcsh"
 subcategory: "Uncategorized"
 description: |-
   Retrieves information about an existing Third Party Application resource in F5 Distributed Cloud for third party application specification. configuration. (read-only data source)
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }

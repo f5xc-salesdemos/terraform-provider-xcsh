@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_origin_pool Resource - terraform-provider-xcsh"
+page_title: "xcsh_origin_pool Resource - xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages an Origin Pool resource in F5 Distributed Cloud for defining backend server pools for load balancer targets.
@@ -9,7 +9,7 @@ description: |-
 
 Manages an Origin Pool resource in F5 Distributed Cloud for defining backend server pools for load balancer targets.
 
-~> **Note** Please refer to [Origin Pool API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/virtual/) to learn more.
+~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -287,35 +287,6 @@ resource "xcsh_origin_pool" "test" {
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
 
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `origin_servers`
-- `port`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: origin_pool
-metadata:
-  name: backend-pool
-  namespace: default
-spec:
-  origin_servers:
-    - public_name:
-        dns_name: backend1.example.com
-    - public_name:
-        dns_name: backend2.example.com
-  port: 8080
-
-```
-
 ### Metadata Argument Reference
 
 <a id="name"></a>&#x2022; [`name`](#name) - Required String<br>Name of the Origin Pool. Must be unique within the namespace
@@ -410,7 +381,7 @@ Breaker](#advanced-options-circuit-breaker) below.
 <a id="connection-9ed841"></a>&#x2022; [`no_request_limit_per_connection`](#connection-9ed841) - Optional Block<br>Configuration parameter for no request limit per connection
 
 <a id="advanced-options-outlier-detection"></a>&#x2022; [`outlier_detection`](#advanced-options-outlier-detection) - Optional Block<br>Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health
-checkinggggg. Algorithm 1<br>See [Outlier Detection](#advanced-options-outlier-detection) below.
+checkingggggg. Algorithm 1<br>See [Outlier Detection](#advanced-options-outlier-detection) below.
 
 <a id="advanced-options-panic-threshold"></a>&#x2022; [`panic_threshold`](#advanced-options-panic-threshold) - Optional Number<br>Configure a threshold (percentage of unhealthy endpoints) below which all endpoints will be considered for load balancing ignoring its health status
 

@@ -7,7 +7,6 @@ Load balancing HTTP/HTTPS traffic with advanced routing and security
 
 - name
 - namespace
-- domains
 
 ## OneOf Groups
 

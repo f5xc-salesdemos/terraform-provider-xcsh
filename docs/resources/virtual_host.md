@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_virtual_host Resource - terraform-provider-xcsh"
+page_title: "xcsh_virtual_host Resource - xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages virtual host in a given namespace. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -61,8 +61,6 @@ resource "xcsh_virtual_host" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -119,7 +117,7 @@ Policy](#csrf-policy) below for details.
 -> **One of the following:**
 &#x2022; <a id="default-loadbalancer"></a>[`default_loadbalancer`](#default-loadbalancer) - Optional Block<br>Configuration parameter for default loadbalancer
 
-<a id="disable-default-error-pages"></a>&#x2022; [`disable_default_error_pages`](#disable-default-error-pages) - Required Bool<br>Option to specify whether to disable using default F5XC error pages
+<a id="disable-default-error-pages"></a>&#x2022; [`disable_default_error_pages`](#disable-default-error-pages) - Required Bool<br>Option to specify whether to disable using default XCSH error pages
 
 <a id="disable-dns-resolve"></a>&#x2022; [`disable_dns_resolve`](#disable-dns-resolve) - Required Bool<br>Disable DNS resolution for domains specified in the virtual host When the virtual host is configured as Dynamive Resolve Proxy (DRP), disable DNS resolution for domains configured. This configuration is suitable for HTTP CONNECT proxy
 
@@ -272,7 +270,7 @@ An [`auth_hmac`](#authentication-cookie-params-auth-hmac) block (within [`authen
 
 A [`prim_key`](#key-cec38f) block (within [`authentication.cookie_params.auth_hmac`](#authentication-cookie-params-auth-hmac)) supports the following:
 
-<a id="info-51af12"></a>&#x2022; [`blindfold_secret_info`](#info-51af12) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-51af12) below.
+<a id="info-51af12"></a>&#x2022; [`blindfold_secret_info`](#info-51af12) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-51af12) below.
 
 <a id="info-fb9b06"></a>&#x2022; [`clear_secret_info`](#info-fb9b06) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-fb9b06) below.
 
@@ -288,7 +286,7 @@ A [`prim_key`](#key-cec38f) block (within [`authentication.cookie_params.auth_hm
 
 A [`sec_key`](#key-f289cf) block (within [`authentication.cookie_params.auth_hmac`](#authentication-cookie-params-auth-hmac)) supports the following:
 
-<a id="info-07eb40"></a>&#x2022; [`blindfold_secret_info`](#info-07eb40) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-07eb40) below.
+<a id="info-07eb40"></a>&#x2022; [`blindfold_secret_info`](#info-07eb40) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-07eb40) below.
 
 <a id="info-f63518"></a>&#x2022; [`clear_secret_info`](#info-f63518) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-f63518) below.
 
@@ -460,7 +458,7 @@ A [`request_cookies_to_add`](#request-cookies-to-add) block supports the followi
 
 A [`secret_value`](#request-cookies-to-add-secret-value) block (within [`request_cookies_to_add`](#request-cookies-to-add)) supports the following:
 
-<a id="info-f95f6c"></a>&#x2022; [`blindfold_secret_info`](#info-f95f6c) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-f95f6c) below.
+<a id="info-f95f6c"></a>&#x2022; [`blindfold_secret_info`](#info-f95f6c) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-f95f6c) below.
 
 <a id="info-fcb5d1"></a>&#x2022; [`clear_secret_info`](#info-fcb5d1) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-fcb5d1) below.
 
@@ -488,7 +486,7 @@ A [`request_headers_to_add`](#request-headers-to-add) block supports the followi
 
 A [`secret_value`](#request-headers-to-add-secret-value) block (within [`request_headers_to_add`](#request-headers-to-add)) supports the following:
 
-<a id="info-be8500"></a>&#x2022; [`blindfold_secret_info`](#info-be8500) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-be8500) below.
+<a id="info-be8500"></a>&#x2022; [`blindfold_secret_info`](#info-be8500) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-be8500) below.
 
 <a id="info-d2833c"></a>&#x2022; [`clear_secret_info`](#info-d2833c) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-d2833c) below.
 
@@ -554,7 +552,7 @@ A [`response_cookies_to_add`](#response-cookies-to-add) block supports the follo
 
 A [`secret_value`](#response-cookies-to-add-secret-value) block (within [`response_cookies_to_add`](#response-cookies-to-add)) supports the following:
 
-<a id="info-85cc48"></a>&#x2022; [`blindfold_secret_info`](#info-85cc48) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-85cc48) below.
+<a id="info-85cc48"></a>&#x2022; [`blindfold_secret_info`](#info-85cc48) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-85cc48) below.
 
 <a id="info-3654fd"></a>&#x2022; [`clear_secret_info`](#info-3654fd) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-3654fd) below.
 
@@ -582,7 +580,7 @@ A [`response_headers_to_add`](#response-headers-to-add) block supports the follo
 
 A [`secret_value`](#response-headers-to-add-secret-value) block (within [`response_headers_to_add`](#response-headers-to-add)) supports the following:
 
-<a id="info-92dea8"></a>&#x2022; [`blindfold_secret_info`](#info-92dea8) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-92dea8) below.
+<a id="info-92dea8"></a>&#x2022; [`blindfold_secret_info`](#info-92dea8) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-92dea8) below.
 
 <a id="info-52d56a"></a>&#x2022; [`clear_secret_info`](#info-52d56a) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-52d56a) below.
 

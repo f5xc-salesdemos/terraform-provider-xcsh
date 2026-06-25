@@ -6,7 +6,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -36,12 +36,12 @@ resource "xcsh_azure_vnet_site" "example" {
   }
 
   # Resource group
-  resource_group = "f5xc-rg"
+  resource_group = "xcsh-rg"
 
   # VNET configuration
   vnet {
     new_vnet {
-      name         = "f5xc-vnet"
+      name         = "xcsh-vnet"
       primary_ipv4 = "10.0.0.0/16"
     }
   }

@@ -8,7 +8,6 @@ Certificate. configuration
 - name
 - namespace
 - certificate_url
-- private_key
 
 ## Minimal Valid Config
 

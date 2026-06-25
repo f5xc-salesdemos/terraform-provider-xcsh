@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_k8s_cluster Data Source - terraform-provider-xcsh"
+page_title: "xcsh_k8s_cluster Data Source - xcsh"
 subcategory: "Kubernetes"
 description: |-
   Retrieves information about k8s_cluster will create the object in the storage backend for namespace metadata.namespace. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -43,24 +43,6 @@ output "k8s_cluster_id" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-
-**Example (API format):**
-
-```yaml
-metadata:
-  name: my-k8s-cluster
-  namespace: system
-spec: {}
-```
 
 ### Metadata Argument Reference
 

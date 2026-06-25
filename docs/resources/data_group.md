@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_data_group Resource - terraform-provider-xcsh"
+page_title: "xcsh_data_group Resource - xcsh"
 subcategory: "BIG-IP Integration"
 description: |-
   Manages data group in a given namespace. If one already exists it will give an error. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -62,8 +62,6 @@ resource "xcsh_data_group" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 

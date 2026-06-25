@@ -1,10 +1,10 @@
 ---
-page_title: "blindfold function - terraform-provider-xcsh"
+page_title: "blindfold function - xcsh"
 description: |-
   Encrypts base64-encoded plaintext using F5 Distributed Cloud Secret Management (blindfold).
   Returns a sealed secret string suitable for use in blindfold_secret_info.location fields.
   Security: The encryption happens locally using the public key fetched from F5XC.
-  The plaintext secret is never transmitted to F5XC during encryption.
+  The plaintext secret is never transmitted to XCSH during encryption.
   Example
   
   resource "xcsh_http_loadbalancer" "example" {
@@ -31,7 +31,7 @@ Encrypts base64-encoded plaintext using F5 Distributed Cloud Secret Management (
 Returns a sealed secret string suitable for use in `blindfold_secret_info.location` fields.
 
 **Security**: The encryption happens locally using the public key fetched from F5XC.
-The plaintext secret is **never** transmitted to F5XC during encryption.
+The plaintext secret is **never** transmitted to XCSH during encryption.
 
 ## Example
 
@@ -71,13 +71,23 @@ Example: `base64encode(file("private.key"))`
 1. `policy_name` (String) Name of the SecretPolicy that controls which clients can decrypt this secret.
 
 The policy must exist in the specified namespace before encryption.
-1. `namespace` (String) F5XC namespace containing the SecretPolicy.
+1. `namespace` (String) XCSH namespace containing the SecretPolicy.
 
 Common values: `shared`, `system`, or your application namespace.
 
 ## Example Usage
 
 ```terraform
+terraform {
+  required_version = ">= 1.8"
+  required_providers {
+    xcsh = {
+      source  = "f5xc-salesdemos/xcsh"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
 # Encrypt a secret string using F5XC blindfold
 #
 # The blindfold function encrypts base64-encoded plaintext using F5 Distributed
@@ -102,7 +112,25 @@ locals {
   )
 }
 
-# Example: Using the encrypted secret in a resource
+# Example: Using the encrypted secrets in a resource
+resource "xcsh_origin_pool" "example" {
+  name      = "secure-pool"
+  namespace = "production"
+
+  origin_servers {
+    private_ip {
+      ip = "10.0.0.1"
+    }
+  }
+
+  port = 443
+
+  # Use the encrypted password from locals
+  custom_hash_algorithms {
+    hash_algorithms = [local.encrypted_password]
+  }
+}
+
 resource "xcsh_http_loadbalancer" "example" {
   name      = "secure-lb"
   namespace = "production"
@@ -114,11 +142,7 @@ resource "xcsh_http_loadbalancer" "example" {
       custom_security {
         private_key {
           blindfold_secret_info {
-            location = provider::xcsh::blindfold(
-              base64encode(file("${path.module}/certs/server.key")),
-              "tls-secrets-policy",
-              "shared"
-            )
+            location = local.encrypted_key
           }
         }
       }

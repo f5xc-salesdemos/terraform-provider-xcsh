@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_virtual_network Resource - terraform-provider-xcsh"
+page_title: "xcsh_virtual_network Resource - xcsh"
 subcategory: "Networking"
 description: |-
   Manages virtual network in given namespace. in F5 Distributed Cloud.
@@ -9,7 +9,7 @@ description: |-
 
 Manages virtual network in given namespace. in F5 Distributed Cloud.
 
-~> **Note** Please refer to [Virtual Network API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/network/) to learn more.
+~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -50,8 +50,6 @@ resource "xcsh_virtual_network" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 

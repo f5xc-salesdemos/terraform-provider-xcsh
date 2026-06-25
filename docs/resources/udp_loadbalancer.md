@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_udp_loadbalancer Resource - terraform-provider-xcsh"
+page_title: "xcsh_udp_loadbalancer Resource - xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages a UDP Load Balancer resource in F5 Distributed Cloud for load balancing UDP traffic across origin pools.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -58,8 +58,6 @@ resource "xcsh_udp_loadbalancer" "example" {
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
 
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
 ### Metadata Argument Reference
 
 <a id="name"></a>&#x2022; [`name`](#name) - Required String<br>Name of the UDP Load Balancer. Must be unique within the namespace
@@ -92,7 +90,7 @@ resource "xcsh_udp_loadbalancer" "example" {
 <a id="domains"></a>&#x2022; [`domains`](#domains) - Required List<br>List of domains (host/authority header) that will be matched to this load balancer
 
 <a id="enable-per-packet-load-balancing"></a>&#x2022; [`enable_per_packet_load_balancing`](#enable-per-packet-load-balancing) - Required Bool<br>Per packet load balancing: If disabled (default): First packet identified by source IP/port and local IP/port is sent to an upstream server as the load balancing algorithm dictates, and subsequent packets with the same identity are forwarded to the same
-upstream server without recheckinggggg the
+upstream server without recheckingggggg the
 
 -> **One of the following:**
 &#x2022; <a id="hash-policy-choice-random"></a>[`hash_policy_choice_random`](#hash-policy-choice-random) - Optional Block<br>Configuration parameter for hash policy choice random

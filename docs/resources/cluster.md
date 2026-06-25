@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_cluster Resource - terraform-provider-xcsh"
+page_title: "xcsh_cluster Resource - xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages cluster will create the object in the storage backend for namespace metadata.namespace. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -62,8 +62,6 @@ resource "xcsh_cluster" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -121,8 +119,8 @@ is required, the load balancer uses loadbalancer_algorithm to determine which ho
 
 <a id="no-request-limit-per-connection"></a>&#x2022; [`no_request_limit_per_connection`](#no-request-limit-per-connection) - Optional Block<br>Configuration parameter for no request limit per connection
 
-<a id="outlier-detection"></a>&#x2022; [`outlier_detection`](#outlier-detection) - Optional Block<br>Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkinggggg. Algorithm 1<br>See [Outlier
-Detection](#outlier-detection) below for details.
+<a id="outlier-detection"></a>&#x2022; [`outlier_detection`](#outlier-detection) - Optional Block<br>Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkingggggg. Algorithm 1<br>See
+[Outlier Detection](#outlier-detection) below for details.
 
 <a id="panic-threshold"></a>&#x2022; [`panic_threshold`](#panic-threshold) - Optional Number<br>Configure a threshold (percentage of unhealthy endpoints) below which all endpoints will be considered for loadbalancing ignoring its health status
 

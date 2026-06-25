@@ -7,8 +7,6 @@ Protocol Inspection Specification in a given namespace. If one already exists it
 
 - name
 - namespace
-- enable_disable_compliance_checks
-- enable_disable_signatures
 
 ## Server Defaults (safe to omit)
 

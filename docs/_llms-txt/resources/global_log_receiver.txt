@@ -7,8 +7,6 @@ New Global Log Receiver object
 
 - name
 - namespace
-- log_type
-- receiver_choice
 
 ## Server Defaults (safe to omit)
 

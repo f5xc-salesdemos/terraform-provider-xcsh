@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_alert_receiver Resource - terraform-provider-xcsh"
+page_title: "xcsh_alert_receiver Resource - xcsh"
 subcategory: "Monitoring"
 description: |-
   Manages new Alert Receiver object. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -54,27 +54,6 @@ resource "xcsh_alert_receiver" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `receiver_choice`
-
-**Example (API format):**
-
-```yaml
-metadata:
-  name: my-alert-receiver
-  namespace: system
-spec:
-  email:
-    email_address: `alerts@example.com`
-```
 
 ### Metadata Argument Reference
 
@@ -128,7 +107,7 @@ An [`opsgenie`](#opsgenie) block supports the following:
 
 An [`api_key`](#opsgenie-api-key) block (within [`opsgenie`](#opsgenie)) supports the following:
 
-<a id="opsgenie-api-key-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#opsgenie-api-key-blindfold-secret-info) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#opsgenie-api-key-blindfold-secret-info) below.
+<a id="opsgenie-api-key-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#opsgenie-api-key-blindfold-secret-info) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#opsgenie-api-key-blindfold-secret-info) below.
 
 <a id="opsgenie-api-key-clear-secret-info"></a>&#x2022; [`clear_secret_info`](#opsgenie-api-key-clear-secret-info) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#opsgenie-api-key-clear-secret-info) below.
 
@@ -162,7 +141,7 @@ A [`pagerduty`](#pagerduty) block supports the following:
 
 A [`routing_key`](#pagerduty-routing-key) block (within [`pagerduty`](#pagerduty)) supports the following:
 
-<a id="info-338522"></a>&#x2022; [`blindfold_secret_info`](#info-338522) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-338522) below.
+<a id="info-338522"></a>&#x2022; [`blindfold_secret_info`](#info-338522) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-338522) below.
 
 <a id="pagerduty-routing-key-clear-secret-info"></a>&#x2022; [`clear_secret_info`](#pagerduty-routing-key-clear-secret-info) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#pagerduty-routing-key-clear-secret-info) below.
 
@@ -196,7 +175,7 @@ A [`slack`](#slack) block supports the following:
 
 An [`url`](#slack-url) block (within [`slack`](#slack)) supports the following:
 
-<a id="slack-url-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#slack-url-blindfold-secret-info) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#slack-url-blindfold-secret-info) below.
+<a id="slack-url-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#slack-url-blindfold-secret-info) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#slack-url-blindfold-secret-info) below.
 
 <a id="slack-url-clear-secret-info"></a>&#x2022; [`clear_secret_info`](#slack-url-clear-secret-info) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#slack-url-clear-secret-info) below.
 
@@ -274,7 +253,7 @@ An [`auth_token`](#webhook-http-config-auth-token) block (within [`webhook.http_
 
 A [`token`](#webhook-http-config-auth-token-token) block (within [`webhook.http_config.auth_token`](#webhook-http-config-auth-token)) supports the following:
 
-<a id="info-cf9560"></a>&#x2022; [`blindfold_secret_info`](#info-cf9560) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-cf9560) below.
+<a id="info-cf9560"></a>&#x2022; [`blindfold_secret_info`](#info-cf9560) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-cf9560) below.
 
 <a id="info-a3e44e"></a>&#x2022; [`clear_secret_info`](#info-a3e44e) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-a3e44e) below.
 
@@ -298,7 +277,7 @@ A [`basic_auth`](#webhook-http-config-basic-auth) block (within [`webhook.http_c
 
 A [`password`](#webhook-http-config-basic-auth-password) block (within [`webhook.http_config.basic_auth`](#webhook-http-config-basic-auth)) supports the following:
 
-<a id="info-f1b0b0"></a>&#x2022; [`blindfold_secret_info`](#info-f1b0b0) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-f1b0b0) below.
+<a id="info-f1b0b0"></a>&#x2022; [`blindfold_secret_info`](#info-f1b0b0) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-f1b0b0) below.
 
 <a id="info-71ce91"></a>&#x2022; [`clear_secret_info`](#info-71ce91) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-71ce91) below.
 
@@ -352,7 +331,7 @@ An [`use_tls`](#webhook-http-config-use-tls) block (within [`webhook.http_config
 
 An [`url`](#webhook-url) block (within [`webhook`](#webhook)) supports the following:
 
-<a id="webhook-url-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#webhook-url-blindfold-secret-info) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#webhook-url-blindfold-secret-info) below.
+<a id="webhook-url-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#webhook-url-blindfold-secret-info) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#webhook-url-blindfold-secret-info) below.
 
 <a id="webhook-url-clear-secret-info"></a>&#x2022; [`clear_secret_info`](#webhook-url-clear-secret-info) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#webhook-url-clear-secret-info) below.
 

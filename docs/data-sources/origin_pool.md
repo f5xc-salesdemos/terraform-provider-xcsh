@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_origin_pool Data Source - terraform-provider-xcsh"
+page_title: "xcsh_origin_pool Data Source - xcsh"
 subcategory: "Load Balancing"
 description: |-
   Retrieves information about an existing Origin Pool resource in F5 Distributed Cloud for defining backend server pools for load balancer targets.
@@ -9,7 +9,7 @@ description: |-
 
 Retrieves information about an Origin Pool resource in F5 Distributed Cloud for defining backend server pools for load balancer targets. This is a read-only data source.
 
-~> **Note** Please refer to [Origin Pool API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/virtual/) to learn more.
+~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -57,35 +57,6 @@ output "origin_pool_id" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `origin_servers`
-- `port`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: origin_pool
-metadata:
-  name: backend-pool
-  namespace: default
-spec:
-  origin_servers:
-    - public_name:
-        dns_name: backend1.example.com
-    - public_name:
-        dns_name: backend2.example.com
-  port: 8080
-
-```
 
 ### Metadata Argument Reference
 

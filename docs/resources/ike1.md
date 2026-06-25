@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_ike1 Resource - terraform-provider-xcsh"
+page_title: "xcsh_ike1 Resource - xcsh"
 subcategory: "VPN"
 description: |-
   Manages a Ike1 resource in F5 Distributed Cloud for ike phase1 profile specification. configuration.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -62,8 +62,6 @@ resource "xcsh_ike1" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 

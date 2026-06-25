@@ -7,7 +7,6 @@ User_identification creates a new object in the storage backend for metadata.nam
 
 - name
 - namespace
-- rules
 
 ## Minimal Valid Config
 

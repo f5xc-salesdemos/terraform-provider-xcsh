@@ -7,7 +7,6 @@ API discovery creates a new object in the storage backend for metadata.namespace
 
 - name
 - namespace
-- user_defined_api_discovery_policy
 
 ## Server Defaults (safe to omit)
 

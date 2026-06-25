@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_api_discovery Resource - terraform-provider-xcsh"
+page_title: "xcsh_api_discovery Resource - xcsh"
 subcategory: "API Security"
 description: |-
   Manages API discovery creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -57,29 +57,6 @@ resource "xcsh_api_discovery" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `user_defined_api_discovery_policy`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: api_discovery
-metadata:
-  name: example-discovery
-  namespace: default
-spec:
-  user_defined_api_discovery_policy: {}
-
-```
 
 ### Metadata Argument Reference
 

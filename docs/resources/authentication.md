@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_authentication Resource - terraform-provider-xcsh"
+page_title: "xcsh_authentication Resource - xcsh"
 subcategory: "Authentication"
 description: |-
   Manages an Authentication resource in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -62,8 +62,6 @@ resource "xcsh_authentication" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -126,7 +124,7 @@ An [`auth_hmac`](#cookie-params-auth-hmac) block (within [`cookie_params`](#cook
 
 A [`prim_key`](#cookie-params-auth-hmac-prim-key) block (within [`cookie_params.auth_hmac`](#cookie-params-auth-hmac)) supports the following:
 
-<a id="info-6001c9"></a>&#x2022; [`blindfold_secret_info`](#info-6001c9) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-6001c9) below.
+<a id="info-6001c9"></a>&#x2022; [`blindfold_secret_info`](#info-6001c9) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-6001c9) below.
 
 <a id="info-73f0e1"></a>&#x2022; [`clear_secret_info`](#info-73f0e1) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-73f0e1) below.
 
@@ -142,7 +140,7 @@ A [`prim_key`](#cookie-params-auth-hmac-prim-key) block (within [`cookie_params.
 
 A [`sec_key`](#cookie-params-auth-hmac-sec-key) block (within [`cookie_params.auth_hmac`](#cookie-params-auth-hmac)) supports the following:
 
-<a id="info-e2433d"></a>&#x2022; [`blindfold_secret_info`](#info-e2433d) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-e2433d) below.
+<a id="info-e2433d"></a>&#x2022; [`blindfold_secret_info`](#info-e2433d) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-e2433d) below.
 
 <a id="info-15d634"></a>&#x2022; [`clear_secret_info`](#info-15d634) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-15d634) below.
 
@@ -170,7 +168,7 @@ An [`oidc_auth`](#oidc-auth) block supports the following:
 
 A [`client_secret`](#oidc-auth-client-secret) block (within [`oidc_auth`](#oidc-auth)) supports the following:
 
-<a id="info-672642"></a>&#x2022; [`blindfold_secret_info`](#info-672642) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-672642) below.
+<a id="info-672642"></a>&#x2022; [`blindfold_secret_info`](#info-672642) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-672642) below.
 
 <a id="info-b8137a"></a>&#x2022; [`clear_secret_info`](#info-b8137a) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-b8137a) below.
 

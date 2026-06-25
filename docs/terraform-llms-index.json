@@ -1,8 +1,8 @@
 {
   "version": "0.1.0",
   "provider": {
-    "source": "f5xc-salesdemos/xcsh",
-    "registry": "https://registry.terraform.io/providers/f5xc-salesdemos/xcsh",
+    "source": "f5xc-salesdemos/f5xc",
+    "registry": "https://registry.terraform.io/providers/f5xc-salesdemos/f5xc",
     "required_block": "terraform {\n  required_providers {\n    xcsh = {\n      source = \"f5xc-salesdemos/xcsh\"\n    }\n  }\n}",
     "config_block": "provider \"xcsh\" {}",
     "auth_methods": [
@@ -273,7 +273,7 @@
     "alert_receiver": {
       "category": "monitoring",
       "description": "New Alert Receiver object",
-      "required": ["name", "namespace", "receiver_choice"],
+      "required": ["name", "namespace"],
       "minimal_config": "resource \"xcsh_alert_receiver\" \"example\" {\n  name      = \"example-alert-receiver\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  slack {\n    url = \"`https://your-slack-webhook-url\"`\n  }\n}",
       "dependencies": {
         "requires": []
@@ -310,7 +310,7 @@
     "api_discovery": {
       "category": "api-security",
       "description": "API discovery creates a new object in the storage backend for metadata.namespace",
-      "required": ["name", "namespace", "user_defined_api_discovery_policy"],
+      "required": ["name", "namespace"],
       "server_defaults": ["custom_auth_types"],
       "minimal_config": "resource \"xcsh_api_discovery\" \"example\" {\n  name      = \"example-api-discovery\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  custom_auth_types {\n  }\n}",
       "dependencies": {
@@ -547,7 +547,7 @@
     "certificate": {
       "category": "certificates",
       "description": "Certificate. configuration",
-      "required": ["name", "namespace", "certificate_url", "private_key"],
+      "required": ["name", "namespace", "certificate_url"],
       "minimal_config": "resource \"xcsh_certificate\" \"example\" {\n  name      = \"example-certificate\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  certificate_url = \"string:///LS0tLS1CRUdJTi...\"\n  private_key {\n    clear_secret_info {\n      url = \"string:///LS0tLS1CRUdJTi...\"\n    }\n  }\n}",
       "dependencies": {
         "requires": ["namespace"]
@@ -843,7 +843,7 @@
     "global_log_receiver": {
       "category": "monitoring",
       "description": "New Global Log Receiver object",
-      "required": ["name", "namespace", "log_type", "receiver_choice"],
+      "required": ["name", "namespace"],
       "server_defaults": ["ns_current"],
       "minimal_config": "resource \"xcsh_global_log_receiver\" \"example\" {\n  name      = \"example-global-log-receiver\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  audit_logs {\n  }\n  aws_cloud_watch_receiver {\n  }\n  aws_cred {\n  }\n}",
       "dependencies": {
@@ -854,7 +854,7 @@
     "healthcheck": {
       "category": "load-balancing",
       "description": "Healthcheck object defines method to determine if the given endpoint is healthy. single healthcheck object can be referred to by one or many cluster objects. configuration",
-      "required": ["name", "namespace", "interval", "timeout", "healthy_threshold", "unhealthy_threshold"],
+      "required": ["name", "namespace", "healthy_threshold", "interval", "timeout", "unhealthy_threshold"],
       "oneof_groups": [
         {
           "fields": ["http_health_check", "tcp_health_check", "udp_icmp_health_check"]
@@ -879,7 +879,7 @@
     "http_loadbalancer": {
       "category": "load-balancing",
       "description": "Load balancing HTTP/HTTPS traffic with advanced routing and security",
-      "required": ["name", "namespace", "domains"],
+      "required": ["name", "namespace"],
       "oneof_groups": [
         {
           "fields": ["advertise_custom", "advertise_on_public", "advertise_on_public_default_vip", "do_not_advertise"]
@@ -1231,7 +1231,7 @@
     "origin_pool": {
       "category": "load-balancing",
       "description": "Defining backend server pools for load balancer targets",
-      "required": ["name", "namespace", "origin_servers", "port"],
+      "required": ["name", "namespace"],
       "oneof_groups": [
         {
           "parent": "origin_servers",
@@ -1313,7 +1313,7 @@
     "protocol_inspection": {
       "category": "security",
       "description": "Protocol Inspection Specification in a given namespace. If one already exists it will give an error",
-      "required": ["name", "namespace", "enable_disable_compliance_checks", "enable_disable_signatures"],
+      "required": ["name", "namespace"],
       "server_defaults": ["action"],
       "minimal_config": "resource \"xcsh_protocol_inspection\" \"example\" {\n  name      = \"example-protocol-inspection\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  enable_disable_compliance_checks {\n  }\n  disable_compliance_checks {\n  }\n  enable_compliance_checks {\n  }\n}",
       "dependencies": {
@@ -1355,7 +1355,7 @@
     "rate_limiter_policy": {
       "category": "security",
       "description": "Rate limiter policy create specification. configuration",
-      "required": ["name", "namespace", "burst_size", "committed_information_rate"],
+      "required": ["name", "namespace"],
       "server_defaults": ["rules"],
       "minimal_config": "resource \"xcsh_rate_limiter_policy\" \"example\" {\n  name      = \"example-rate-limiter-policy\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  any_server {\n  }\n  server_name_matcher {\n  }\n  server_selector {\n  }\n}",
       "dependencies": {
@@ -1503,7 +1503,7 @@
     "tcp_loadbalancer": {
       "category": "load-balancing",
       "description": "Load balancing TCP traffic across origin pools",
-      "required": ["name", "namespace", "origin_pools"],
+      "required": ["name", "namespace"],
       "oneof_groups": [
         {
           "fields": ["advertise_custom", "advertise_on_public", "advertise_on_public_default_vip", "do_not_advertise"]
@@ -1577,7 +1577,7 @@
     "user_identification": {
       "category": "security",
       "description": "User_identification creates a new object in the storage backend for metadata.namespace",
-      "required": ["name", "namespace", "rules"],
+      "required": ["name", "namespace"],
       "minimal_config": "resource \"xcsh_user_identification\" \"example\" {\n  name      = \"example-user-identification\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  rules {\n    client_ip {}\n  }\n}",
       "dependencies": {
         "requires": []
@@ -1627,7 +1627,7 @@
     "virtual_site": {
       "category": "sites",
       "description": "Virtual site object in given namespace",
-      "required": ["name", "namespace", "site_type", "site_selector"],
+      "required": ["name", "namespace", "site_type"],
       "minimal_config": "resource \"xcsh_virtual_site\" \"example\" {\n  name      = \"example-virtual-site\"\n  namespace = \"staging\"\n\n  labels = {\n    environment = \"production\"\n    managed_by  = \"terraform\"\n  }\n\n  annotations = {\n    \"owner\" = \"platform-team\"\n  }\n\n  site_type = \"CUSTOMER_EDGE\"\n\n  site_selector {\n    expressions = [\"region in (us-west-2, us-east-1)\"]\n  }\n}",
       "dependencies": {
         "requires": []
@@ -1647,7 +1647,7 @@
     "waf_exclusion_policy": {
       "category": "security",
       "description": "WAF exclusion policy",
-      "required": ["name", "namespace", "waf_exclusion_rules"],
+      "required": ["name", "namespace"],
       "oneof_groups": [
         {
           "parent": "waf_exclusion_rules",

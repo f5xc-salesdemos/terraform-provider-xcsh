@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_network_policy_set Data Source - terraform-provider-xcsh"
+page_title: "xcsh_network_policy_set Data Source - xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about an existing Network Policy Set resource in F5 Distributed Cloud for get network policy set in a given namespace. configuration. (read-only data source)
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }

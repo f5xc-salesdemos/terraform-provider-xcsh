@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_securemesh_site Resource - terraform-provider-xcsh"
+page_title: "xcsh_securemesh_site Resource - xcsh"
 subcategory: "Sites"
 description: |-
   Manages a Securemesh Site resource in F5 Distributed Cloud for deploying secure mesh edge sites with distributed security capabilities.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -70,8 +70,6 @@ resource "xcsh_securemesh_site" "example" {
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
 
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
 ### Metadata Argument Reference
 
 <a id="name"></a>&#x2022; [`name`](#name) - Required String<br>Name of the Securemesh Site. Must be unique within the namespace
@@ -118,11 +116,11 @@ resource "xcsh_securemesh_site" "example" {
 <a id="offline-survivability-mode"></a>&#x2022; [`offline_survivability_mode`](#offline-survivability-mode) - Optional Block<br>Offline Survivability allows the Site to continue functioning normally without traffic loss during periods of connectivity loss to the Regional Edge (RE) or the Global Controller (GC). When this feature is enabled, a site can continue to function as is with existing
 configuration for upto 7
 
-<a id="os"></a>&#x2022; [`os`](#os) - Optional Block<br>Select the F5XC Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions
+<a id="os"></a>&#x2022; [`os`](#os) - Optional Block<br>Select the XCSH Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions
 
 <a id="performance-enhancement-mode"></a>&#x2022; [`performance_enhancement_mode`](#performance-enhancement-mode) - Optional Block<br>Optimize the site for L3 or L7 traffic processing. L7 optimized is the default
 
-<a id="sw"></a>&#x2022; [`sw`](#sw) - Optional Block<br>Select the F5XC Software Version for the site. By default, latest available F5XC Software Version will be used. Refer to release notes to find required released SW versions
+<a id="sw"></a>&#x2022; [`sw`](#sw) - Optional Block<br>Select the XCSH Software Version for the site. By default, latest available XCSH Software Version will be used. Refer to release notes to find required released SW versions
 
 <a id="timeouts"></a>&#x2022; [`timeouts`](#timeouts) - Optional Block
 
@@ -619,7 +617,7 @@ A [`sw`](#sw) block supports the following:
 
 <a id="sw-default-sw-version"></a>&#x2022; [`default_sw_version`](#sw-default-sw-version) - Optional Block<br>Enable this option
 
-<a id="sw-volterra-software-version"></a>&#x2022; [`volterra_software_version`](#sw-volterra-software-version) - Optional String<br>Specify a F5XC Software Version to be used e.g. Crt-20210329-1002
+<a id="sw-volterra-software-version"></a>&#x2022; [`volterra_software_version`](#sw-volterra-software-version) - Optional String<br>Specify a XCSH Software Version to be used e.g. Crt-20210329-1002
 
 #### Timeouts
 

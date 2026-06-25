@@ -7,8 +7,6 @@ Rate limiter policy create specification. configuration
 
 - name
 - namespace
-- burst_size
-- committed_information_rate
 
 ## Server Defaults (safe to omit)
 

@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_user_identification Data Source - terraform-provider-xcsh"
+page_title: "xcsh_user_identification Data Source - xcsh"
 subcategory: "Security"
 description: |-
   Retrieves information about user_identification creates a new object in the storage backend for metadata.namespace. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -43,30 +43,6 @@ output "user_identification_id" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `rules`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: user_identification
-metadata:
-  name: example-user-id
-  namespace: default
-spec:
-  rules:
-    - client_ip: {}
-
-```
 
 ### Metadata Argument Reference
 

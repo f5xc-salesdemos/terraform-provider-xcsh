@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_namespace Resource - terraform-provider-xcsh"
+page_title: "xcsh_namespace Resource - xcsh"
 subcategory: "Organization"
 description: |-
   Manages new namespace. Name of the object is name of the namespace. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }

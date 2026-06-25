@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_aws_vpc_site Resource - terraform-provider-xcsh"
+page_title: "xcsh_aws_vpc_site Resource - xcsh"
 subcategory: "Sites"
 description: |-
   Manages a AWS VPC Site resource in F5 Distributed Cloud for deploying F5 sites within AWS VPC environments.
@@ -9,7 +9,7 @@ description: |-
 
 Manages a AWS VPC Site resource in F5 Distributed Cloud for deploying F5 sites within AWS VPC environments.
 
-~> **Note** Please refer to [AWS VPC Site API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/cloud_infrastructure/) to learn more.
+~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -89,10 +89,6 @@ resource "xcsh_aws_vpc_site" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-~> **Dependencies** — This resource requires: `cloud_credentials`.
 
 ### Metadata Argument Reference
 
@@ -179,11 +175,11 @@ resource "xcsh_aws_vpc_site" "example" {
 <a id="offline-survivability-mode"></a>&#x2022; [`offline_survivability_mode`](#offline-survivability-mode) - Optional Block<br>Offline Survivability allows the Site to continue functioning normally without traffic loss during periods of connectivity loss to the Regional Edge (RE) or the Global Controller (GC). When this feature is enabled, a site can continue to function as is with existing
 configuration for upto 7
 
-<a id="os"></a>&#x2022; [`os`](#os) - Optional Block<br>Select the F5XC Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions
+<a id="os"></a>&#x2022; [`os`](#os) - Optional Block<br>Select the XCSH Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions
 
 <a id="ssh-key"></a>&#x2022; [`ssh_key`](#ssh-key) - Required String<br>Public SSH key for accessing the site
 
-<a id="sw"></a>&#x2022; [`sw`](#sw) - Optional Block<br>Select the F5XC Software Version for the site. By default, latest available F5XC Software Version will be used. Refer to release notes to find required released SW versions
+<a id="sw"></a>&#x2022; [`sw`](#sw) - Optional Block<br>Select the XCSH Software Version for the site. By default, latest available XCSH Software Version will be used. Refer to release notes to find required released SW versions
 
 <a id="tags"></a>&#x2022; [`tags`](#tags) - Optional Block<br>AWS Tags is a label consisting of a user-defined key and value. It helps to manage, identify, organize, search for, and filter resources in AWS console
 
@@ -205,9 +201,9 @@ In addition to all arguments above, the following attributes are exported:
 
 An [`admin_password`](#admin-password) block supports the following:
 
-<a id="admin-password-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#admin-password-blindfold-secret-info) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#admin-password-blindfold-secret-info) below.
+<a id="admin-password-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#admin-password-blindfold-secret-info) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#admin-password-blindfold-secret-info) below.
 
-<a id="internal-7b413c"></a>&#x2022; [`blindfold_secret_info_internal`](#internal-7b413c) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info Internal](#internal-7b413c) below.
+<a id="internal-7b413c"></a>&#x2022; [`blindfold_secret_info_internal`](#internal-7b413c) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info Internal](#internal-7b413c) below.
 
 <a id="admin-password-clear-secret-info"></a>&#x2022; [`clear_secret_info`](#admin-password-clear-secret-info) - Optional Block<br>X-displayName: 'In-Clear Secret' ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#admin-password-clear-secret-info) below.
 
@@ -386,9 +382,9 @@ An [`ingress_egress_gw`](#ingress-egress-gw) block supports the following:
 
 <a id="policies-a2ee20"></a>&#x2022; [`active_network_policies`](#policies-a2ee20) - Optional Block<br>Configuration parameter for active network policies<br>See [Active Network Policies](#policies-a2ee20) below.
 
-<a id="ingress-egress-gw-allowed-vip-port"></a>&#x2022; [`allowed_vip_port`](#ingress-egress-gw-allowed-vip-port) - Optional Block<br>Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the F5XC Site<br>See [Allowed VIP Port](#ingress-egress-gw-allowed-vip-port) below.
+<a id="ingress-egress-gw-allowed-vip-port"></a>&#x2022; [`allowed_vip_port`](#ingress-egress-gw-allowed-vip-port) - Optional Block<br>Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the XCSH Site<br>See [Allowed VIP Port](#ingress-egress-gw-allowed-vip-port) below.
 
-<a id="ingress-egress-gw-allowed-vip-port-sli"></a>&#x2022; [`allowed_vip_port_sli`](#ingress-egress-gw-allowed-vip-port-sli) - Optional Block<br>Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the F5XC Site<br>See [Allowed VIP Port
+<a id="ingress-egress-gw-allowed-vip-port-sli"></a>&#x2022; [`allowed_vip_port_sli`](#ingress-egress-gw-allowed-vip-port-sli) - Optional Block<br>Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the XCSH Site<br>See [Allowed VIP Port
 SLI](#ingress-egress-gw-allowed-vip-port-sli) below.
 
 <a id="ingress-egress-gw-aws-certified-hw"></a>&#x2022; [`aws_certified_hw`](#ingress-egress-gw-aws-certified-hw) - Optional String<br>Name for AWS certified hardware
@@ -683,7 +679,7 @@ A [`performance_enhancement_mode`](#mode-4d23c2) block (within [`ingress_egress_
 
 An [`ingress_gw`](#ingress-gw) block supports the following:
 
-<a id="ingress-gw-allowed-vip-port"></a>&#x2022; [`allowed_vip_port`](#ingress-gw-allowed-vip-port) - Optional Block<br>Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the F5XC Site<br>See [Allowed VIP Port](#ingress-gw-allowed-vip-port) below.
+<a id="ingress-gw-allowed-vip-port"></a>&#x2022; [`allowed_vip_port`](#ingress-gw-allowed-vip-port) - Optional Block<br>Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the XCSH Site<br>See [Allowed VIP Port](#ingress-gw-allowed-vip-port) below.
 
 <a id="ingress-gw-aws-certified-hw"></a>&#x2022; [`aws_certified_hw`](#ingress-gw-aws-certified-hw) - Optional String<br>Name for AWS certified hardware
 
@@ -815,7 +811,7 @@ A [`sw`](#sw) block supports the following:
 
 <a id="sw-default-sw-version"></a>&#x2022; [`default_sw_version`](#sw-default-sw-version) - Optional Block<br>Enable this option
 
-<a id="sw-volterra-software-version"></a>&#x2022; [`volterra_software_version`](#sw-volterra-software-version) - Optional String<br>Specify a F5XC Software Version to be used e.g. Crt-20210329-1002
+<a id="sw-volterra-software-version"></a>&#x2022; [`volterra_software_version`](#sw-volterra-software-version) - Optional String<br>Specify a XCSH Software Version to be used e.g. Crt-20210329-1002
 
 #### Timeouts
 
@@ -839,7 +835,7 @@ A [`voltstack_cluster`](#voltstack-cluster) block supports the following:
 
 <a id="policies-704e06"></a>&#x2022; [`active_network_policies`](#policies-704e06) - Optional Block<br>Configuration parameter for active network policies<br>See [Active Network Policies](#policies-704e06) below.
 
-<a id="voltstack-cluster-allowed-vip-port"></a>&#x2022; [`allowed_vip_port`](#voltstack-cluster-allowed-vip-port) - Optional Block<br>Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the F5XC Site<br>See [Allowed VIP Port](#voltstack-cluster-allowed-vip-port) below.
+<a id="voltstack-cluster-allowed-vip-port"></a>&#x2022; [`allowed_vip_port`](#voltstack-cluster-allowed-vip-port) - Optional Block<br>Defines the TCP port(s) which will be opened on the cloud loadbalancer. Such that the client can use the cloud VIP IP and port combination to reach TCP/HTTP LB configured on the XCSH Site<br>See [Allowed VIP Port](#voltstack-cluster-allowed-vip-port) below.
 
 <a id="voltstack-cluster-aws-certified-hw"></a>&#x2022; [`aws_certified_hw`](#voltstack-cluster-aws-certified-hw) - Optional String<br>Name for AWS certified hardware
 

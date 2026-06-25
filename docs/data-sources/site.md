@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_site Data Source - terraform-provider-xcsh"
+page_title: "xcsh_site Data Source - xcsh"
 subcategory: "Sites"
 description: |-
   Retrieves information about virtual site object in given namespace. in F5 Distributed Cloud.
@@ -9,7 +9,7 @@ description: |-
 
 Manages virtual site object in given namespace. in F5 Distributed Cloud. This is a read-only data source.
 
-~> **Note** Please refer to [Site API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/sites/) to learn more.
+~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }

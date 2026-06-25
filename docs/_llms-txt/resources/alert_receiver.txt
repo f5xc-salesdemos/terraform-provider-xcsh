@@ -7,7 +7,6 @@ New Alert Receiver object
 
 - name
 - namespace
-- receiver_choice
 
 ## Minimal Valid Config
 

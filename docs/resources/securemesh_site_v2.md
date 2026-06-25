@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_securemesh_site_v2 Resource - terraform-provider-xcsh"
+page_title: "xcsh_securemesh_site_v2 Resource - xcsh"
 subcategory: "Sites"
 description: |-
   Manages a Securemesh Site V2 resource in F5 Distributed Cloud for deploying secure mesh edge sites with enhanced security and networking features.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -62,8 +62,6 @@ resource "xcsh_securemesh_site_v2" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -232,9 +230,9 @@ An [`admin_user_credentials`](#admin-user-credentials) block supports the follow
 
 An [`admin_password`](#admin-user-credentials-admin-password) block (within [`admin_user_credentials`](#admin-user-credentials)) supports the following:
 
-<a id="info-710bcb"></a>&#x2022; [`blindfold_secret_info`](#info-710bcb) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-710bcb) below.
+<a id="info-710bcb"></a>&#x2022; [`blindfold_secret_info`](#info-710bcb) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-710bcb) below.
 
-<a id="internal-3185a2"></a>&#x2022; [`blindfold_secret_info_internal`](#internal-3185a2) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info Internal](#internal-3185a2) below.
+<a id="internal-3185a2"></a>&#x2022; [`blindfold_secret_info_internal`](#internal-3185a2) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info Internal](#internal-3185a2) below.
 
 <a id="info-32b90f"></a>&#x2022; [`clear_secret_info`](#info-32b90f) - Optional Block<br>X-displayName: 'In-Clear Secret' ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-32b90f) below.
 
@@ -723,9 +721,9 @@ A [`custom_proxy`](#custom-proxy) block supports the following:
 
 A [`password`](#custom-proxy-password) block (within [`custom_proxy`](#custom-proxy)) supports the following:
 
-<a id="info-a3e566"></a>&#x2022; [`blindfold_secret_info`](#info-a3e566) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-a3e566) below.
+<a id="info-a3e566"></a>&#x2022; [`blindfold_secret_info`](#info-a3e566) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-a3e566) below.
 
-<a id="internal-89f596"></a>&#x2022; [`blindfold_secret_info_internal`](#internal-89f596) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info Internal](#internal-89f596) below.
+<a id="internal-89f596"></a>&#x2022; [`blindfold_secret_info_internal`](#internal-89f596) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info Internal](#internal-89f596) below.
 
 <a id="custom-proxy-password-clear-secret-info"></a>&#x2022; [`clear_secret_info`](#custom-proxy-password-clear-secret-info) - Optional Block<br>X-displayName: 'In-Clear Secret' ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#custom-proxy-password-clear-secret-info) below.
 
@@ -2073,9 +2071,9 @@ A [`site_mesh_group_on_slo`](#site-mesh-group-on-slo) block supports the followi
 
 A [`software_settings`](#software-settings) block supports the following:
 
-<a id="software-settings-os"></a>&#x2022; [`os`](#software-settings-os) - Optional Block<br>Select the F5XC Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions<br>See [OS](#software-settings-os) below.
+<a id="software-settings-os"></a>&#x2022; [`os`](#software-settings-os) - Optional Block<br>Select the XCSH Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions<br>See [OS](#software-settings-os) below.
 
-<a id="software-settings-sw"></a>&#x2022; [`sw`](#software-settings-sw) - Optional Block<br>Select the F5XC Software Version for the site. By default, latest available F5XC Software Version will be used. Refer to release notes to find required released SW versions<br>See [Sw](#software-settings-sw) below.
+<a id="software-settings-sw"></a>&#x2022; [`sw`](#software-settings-sw) - Optional Block<br>Select the XCSH Software Version for the site. By default, latest available XCSH Software Version will be used. Refer to release notes to find required released SW versions<br>See [Sw](#software-settings-sw) below.
 
 #### Software Settings OS
 
@@ -2091,7 +2089,7 @@ A [`sw`](#software-settings-sw) block (within [`software_settings`](#software-se
 
 <a id="software-settings-sw-default-sw-version"></a>&#x2022; [`default_sw_version`](#software-settings-sw-default-sw-version) - Optional Block<br>Enable this option
 
-<a id="version-0a788c"></a>&#x2022; [`volterra_software_version`](#version-0a788c) - Optional String<br>Specify a F5XC Software Version to be used e.g. Crt-20210329-1002
+<a id="version-0a788c"></a>&#x2022; [`volterra_software_version`](#version-0a788c) - Optional String<br>Specify a XCSH Software Version to be used e.g. Crt-20210329-1002
 
 #### Timeouts
 

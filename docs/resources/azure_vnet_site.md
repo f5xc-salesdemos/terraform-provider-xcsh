@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_azure_vnet_site Resource - terraform-provider-xcsh"
+page_title: "xcsh_azure_vnet_site Resource - xcsh"
 subcategory: "Sites"
 description: |-
   Manages a Azure VNET Site resource in F5 Distributed Cloud for deploying F5 sites within Azure Virtual Network environments.
@@ -9,7 +9,7 @@ description: |-
 
 Manages a Azure VNET Site resource in F5 Distributed Cloud for deploying F5 sites within Azure Virtual Network environments.
 
-~> **Note** Please refer to [Azure VNET Site API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/cloud_infrastructure/) to learn more.
+~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -100,10 +100,6 @@ resource "xcsh_azure_vnet_site" "example" {
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
 
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-~> **Dependencies** — This resource requires: `cloud_credentials`.
-
 ### Metadata Argument Reference
 
 <a id="name"></a>&#x2022; [`name`](#name) - Required String<br>Name of the Azure VNET Site. Must be unique within the namespace
@@ -170,13 +166,13 @@ resource "xcsh_azure_vnet_site" "example" {
 <a id="offline-survivability-mode"></a>&#x2022; [`offline_survivability_mode`](#offline-survivability-mode) - Optional Block<br>Offline Survivability allows the Site to continue functioning normally without traffic loss during periods of connectivity loss to the Regional Edge (RE) or the Global Controller (GC). When this feature is enabled, a site can continue to function as is with existing
 configuration for upto 7
 
-<a id="os"></a>&#x2022; [`os`](#os) - Optional Block<br>Select the F5XC Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions
+<a id="os"></a>&#x2022; [`os`](#os) - Optional Block<br>Select the XCSH Operating System Version for the site. By default, latest available OS Version will be used. Refer to release notes to find required released OS versions
 
 <a id="resource-group"></a>&#x2022; [`resource_group`](#resource-group) - Required String<br>Azure resource group for resources that will be created
 
 <a id="ssh-key"></a>&#x2022; [`ssh_key`](#ssh-key) - Required String<br>Public SSH key for accessing the site
 
-<a id="sw"></a>&#x2022; [`sw`](#sw) - Optional Block<br>Select the F5XC Software Version for the site. By default, latest available F5XC Software Version will be used. Refer to release notes to find required released SW versions
+<a id="sw"></a>&#x2022; [`sw`](#sw) - Optional Block<br>Select the XCSH Software Version for the site. By default, latest available XCSH Software Version will be used. Refer to release notes to find required released SW versions
 
 <a id="tags"></a>&#x2022; [`tags`](#tags) - Optional Block  Defaults to `map[]`<br>Azure Tags is a label consisting of a user-defined key and value. It helps to manage, identify, organize, search for, and filter resources in Azure console.  Server applies default when omitted
 
@@ -198,9 +194,9 @@ In addition to all arguments above, the following attributes are exported:
 
 An [`admin_password`](#admin-password) block supports the following:
 
-<a id="admin-password-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#admin-password-blindfold-secret-info) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#admin-password-blindfold-secret-info) below.
+<a id="admin-password-blindfold-secret-info"></a>&#x2022; [`blindfold_secret_info`](#admin-password-blindfold-secret-info) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#admin-password-blindfold-secret-info) below.
 
-<a id="internal-7b413c"></a>&#x2022; [`blindfold_secret_info_internal`](#internal-7b413c) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info Internal](#internal-7b413c) below.
+<a id="internal-7b413c"></a>&#x2022; [`blindfold_secret_info_internal`](#internal-7b413c) - Optional Block<br>X-displayName: 'Blindfold Secret' BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info Internal](#internal-7b413c) below.
 
 <a id="admin-password-clear-secret-info"></a>&#x2022; [`clear_secret_info`](#admin-password-clear-secret-info) - Optional Block<br>X-displayName: 'In-Clear Secret' ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#admin-password-clear-secret-info) below.
 
@@ -499,7 +495,7 @@ An [`express_route_enabled`](#enabled-af8996) block (within [`ingress_egress_gw.
 
 <a id="connections-cb7206"></a>&#x2022; [`connections`](#connections-cb7206) - Optional Block<br>Add the ExpressRoute Circuit Connections to this site<br>See [Connections](#connections-cb7206) below.
 
-<a id="asn-75fbeb"></a>&#x2022; [`custom_asn`](#asn-75fbeb) - Optional Number<br>Set custom ASN for F5XC Site
+<a id="asn-75fbeb"></a>&#x2022; [`custom_asn`](#asn-75fbeb) - Optional Number<br>Set custom ASN for XCSH Site
 
 <a id="server-cbee20"></a>&#x2022; [`do_not_advertise_to_route_server`](#server-cbee20) - Optional Block<br>Configuration parameter for do not advertise to route server
 
@@ -1253,7 +1249,7 @@ A [`sw`](#sw) block supports the following:
 
 <a id="sw-default-sw-version"></a>&#x2022; [`default_sw_version`](#sw-default-sw-version) - Optional Block<br>Enable this option
 
-<a id="sw-volterra-software-version"></a>&#x2022; [`volterra_software_version`](#sw-volterra-software-version) - Optional String<br>Specify a F5XC Software Version to be used e.g. Crt-20210329-1002
+<a id="sw-volterra-software-version"></a>&#x2022; [`volterra_software_version`](#sw-volterra-software-version) - Optional String<br>Specify a XCSH Software Version to be used e.g. Crt-20210329-1002
 
 #### Timeouts
 

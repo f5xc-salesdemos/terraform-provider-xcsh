@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_discovery Resource - terraform-provider-xcsh"
+page_title: "xcsh_discovery Resource - xcsh"
 subcategory: "Applications"
 description: |-
   Manages a Discovery resource in F5 Distributed Cloud for api to create discovery object for a site or virtual site in system namespace. configuration.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -74,8 +74,6 @@ resource "xcsh_discovery" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -231,7 +229,7 @@ A [`connection_info`](#info-731c25) block (within [`discovery_k8s.access_info`](
 
 A [`kubeconfig_url`](#url-d50898) block (within [`discovery_k8s.access_info`](#discovery-k8s-access-info)) supports the following:
 
-<a id="info-fef53c"></a>&#x2022; [`blindfold_secret_info`](#info-fef53c) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-fef53c) below.
+<a id="info-fef53c"></a>&#x2022; [`blindfold_secret_info`](#info-fef53c) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-fef53c) below.
 
 <a id="info-ba8969"></a>&#x2022; [`clear_secret_info`](#info-ba8969) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-ba8969) below.
 
@@ -253,7 +251,7 @@ A [`namespace_mapping`](#discovery-k8s-namespace-mapping) block (within [`discov
 
 An [`items`](#discovery-k8s-namespace-mapping-items) block (within [`discovery_k8s.namespace_mapping`](#discovery-k8s-namespace-mapping)) supports the following:
 
-<a id="namespace-b6599c"></a>&#x2022; [`namespace`](#namespace-b6599c) - Optional String<br>F5XC Application Namespaces. Select a namespace
+<a id="namespace-b6599c"></a>&#x2022; [`namespace`](#namespace-b6599c) - Optional String<br>XCSH Application Namespaces. Select a namespace
 
 <a id="regex-0aa709"></a>&#x2022; [`namespace_regex`](#regex-0aa709) - Optional String<br>The regex here will be used to match K8S namespace(s)
 
@@ -275,7 +273,7 @@ A [`dns_delegation`](#delegation-53a235) block (within [`discovery_k8s.publish_i
 
 <a id="mode-f08507"></a>&#x2022; [`dns_mode`](#mode-f08507) - Optional String  Defaults to `CORE_DNS`<br>Possible values are `CORE_DNS`, `KUBE_DNS`<br>[Enum: CORE_DNS|KUBE_DNS] Two modes are possible CoreDNS: Whether external K8S cluster is running core-DNS KubeDNS: External K8S cluster is running kube-DNS
 
-<a id="subdomain-f4f8f0"></a>&#x2022; [`subdomain`](#subdomain-f4f8f0) - Optional String<br>The DNS subdomain for which F5XC will respond to DNS queries
+<a id="subdomain-f4f8f0"></a>&#x2022; [`subdomain`](#subdomain-f4f8f0) - Optional String<br>The DNS subdomain for which XCSH will respond to DNS queries
 
 #### Discovery K8S Publish Info Publish
 

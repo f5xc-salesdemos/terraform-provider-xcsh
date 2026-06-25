@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_http_loadbalancer Resource - terraform-provider-xcsh"
+page_title: "xcsh_http_loadbalancer Resource - xcsh"
 subcategory: "Load Balancing"
 description: |-
   Manages an HTTP Load Balancer resource in F5 Distributed Cloud for load balancing HTTP/HTTPS traffic with advanced routing and security.
@@ -9,7 +9,7 @@ description: |-
 
 Manages an HTTP Load Balancer resource in F5 Distributed Cloud for load balancing HTTP/HTTPS traffic with advanced routing and security.
 
-~> **Note** Please refer to [HTTP Loadbalancer API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/virtual/) to learn more.
+~> **Note** For more information about this resource, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -592,41 +592,6 @@ resource "xcsh_http_loadbalancer" "test" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-~> **Dependencies** — This resource requires: `origin_pool`.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `domains`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: http_loadbalancer
-metadata:
-  name: example-app
-  namespace: default
-spec:
-  domains:
-    - example.com
-  https_auto_cert:
-    port: 443
-    tls_config:
-      default_security: {}
-  advertise_on_public_default_vip: {}
-  routes:
-    - prefix: "/"
-      origin_pool:
-        pool_name: backend-pool
-
-```
 
 ### Metadata Argument Reference
 
@@ -1775,7 +1740,7 @@ An [`api_key`](#api-testing-domains-credentials-api-key) block (within [`api_tes
 
 A [`value`](#value-f4a033) block (within [`api_testing.domains.credentials.api_key`](#api-testing-domains-credentials-api-key)) supports the following:
 
-<a id="info-b2f866"></a>&#x2022; [`blindfold_secret_info`](#info-b2f866) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-b2f866) below.
+<a id="info-b2f866"></a>&#x2022; [`blindfold_secret_info`](#info-b2f866) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-b2f866) below.
 
 <a id="info-d18192"></a>&#x2022; [`clear_secret_info`](#info-d18192) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-d18192) below.
 
@@ -1799,7 +1764,7 @@ A [`basic_auth`](#auth-4868f3) block (within [`api_testing.domains.credentials`]
 
 A [`password`](#password-e6a065) block (within [`api_testing.domains.credentials.basic_auth`](#auth-4868f3)) supports the following:
 
-<a id="info-0decf2"></a>&#x2022; [`blindfold_secret_info`](#info-0decf2) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-0decf2) below.
+<a id="info-0decf2"></a>&#x2022; [`blindfold_secret_info`](#info-0decf2) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-0decf2) below.
 
 <a id="info-71b4da"></a>&#x2022; [`clear_secret_info`](#info-71b4da) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-71b4da) below.
 
@@ -1821,7 +1786,7 @@ A [`bearer_token`](#token-2a2002) block (within [`api_testing.domains.credential
 
 A [`token`](#token-7fcc22) block (within [`api_testing.domains.credentials.bearer_token`](#token-2a2002)) supports the following:
 
-<a id="info-ce1236"></a>&#x2022; [`blindfold_secret_info`](#info-ce1236) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-ce1236) below.
+<a id="info-ce1236"></a>&#x2022; [`blindfold_secret_info`](#info-ce1236) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-ce1236) below.
 
 <a id="info-5e8cda"></a>&#x2022; [`clear_secret_info`](#info-5e8cda) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-5e8cda) below.
 
@@ -2715,7 +2680,7 @@ An [`advanced_options`](#default-pool-advanced-options) block (within [`default_
 
 <a id="connection-081822"></a>&#x2022; [`no_request_limit_per_connection`](#connection-081822) - Optional Block<br>Configuration parameter for no request limit per connection
 
-<a id="detection-c89e70"></a>&#x2022; [`outlier_detection`](#detection-c89e70) - Optional Block<br>Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkinggggg. Algorithm 1<br>See [Outlier
+<a id="detection-c89e70"></a>&#x2022; [`outlier_detection`](#detection-c89e70) - Optional Block<br>Outlier detection and ejection is the process of dynamically determining whether some number of hosts in an upstream cluster are performing unlike the others and removing them from the healthy load balancing set. Outlier detection is a form of passive health checkingggggg. Algorithm 1<br>See [Outlier
 Detection](#detection-c89e70) below.
 
 <a id="threshold-61a03f"></a>&#x2022; [`panic_threshold`](#threshold-61a03f) - Optional Number<br>Configure a threshold (percentage of unhealthy endpoints) below which all endpoints will be considered for load balancing ignoring its health status
@@ -3605,7 +3570,7 @@ A [`tls_certificates`](#https-tls-parameters-tls-certificates) block (within [`h
 
 A [`private_key`](#key-372460) block (within [`https.tls_parameters.tls_certificates`](#https-tls-parameters-tls-certificates)) supports the following:
 
-<a id="info-0c9fbe"></a>&#x2022; [`blindfold_secret_info`](#info-0c9fbe) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-0c9fbe) below.
+<a id="info-0c9fbe"></a>&#x2022; [`blindfold_secret_info`](#info-0c9fbe) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-0c9fbe) below.
 
 <a id="info-556650"></a>&#x2022; [`clear_secret_info`](#info-556650) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-556650) below.
 
@@ -4085,7 +4050,7 @@ Params](#more-option-compression-params) below.
 <a id="more-option-custom-errors"></a>&#x2022; [`custom_errors`](#more-option-custom-errors) - Optional Block<br>Map of integer error codes as keys and string values that can be used to provide custom HTTP pages for each error code. Key of the map can be either response code class or HTTP Error code. Response code classes for key is configured as follows 3 -- for 3xx response code class 4 -- for
 4xx
 
-<a id="more-option-disable-default-error-pages"></a>&#x2022; [`disable_default_error_pages`](#more-option-disable-default-error-pages) - Optional Bool<br>Disable the use of default F5XC error pages
+<a id="more-option-disable-default-error-pages"></a>&#x2022; [`disable_default_error_pages`](#more-option-disable-default-error-pages) - Optional Bool<br>Disable the use of default XCSH error pages
 
 <a id="more-option-disable-path-normalize"></a>&#x2022; [`disable_path_normalize`](#more-option-disable-path-normalize) - Optional Block<br>Enable this option
 

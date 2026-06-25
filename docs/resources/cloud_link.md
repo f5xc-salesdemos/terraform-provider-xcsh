@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_cloud_link Resource - terraform-provider-xcsh"
+page_title: "xcsh_cloud_link Resource - xcsh"
 subcategory: "Networking"
 description: |-
   Manages new CloudLink with configured parameters. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -62,8 +62,6 @@ resource "xcsh_cloud_link" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -107,7 +105,7 @@ An [`aws`](#aws) block supports the following:
 
 <a id="aws-byoc"></a>&#x2022; [`byoc`](#aws-byoc) - Optional Block<br>Bring Your Own Connections. List of Bring You Own Connection<br>See [Byoc](#aws-byoc) below.
 
-<a id="aws-custom-asn"></a>&#x2022; [`custom_asn`](#aws-custom-asn) - Optional Number<br>F5XC will use custom ASN to create a Direct Connect Gateway
+<a id="aws-custom-asn"></a>&#x2022; [`custom_asn`](#aws-custom-asn) - Optional Number<br>XCSH will use custom ASN to create a Direct Connect Gateway
 
 #### AWS AWS Cred
 
@@ -123,7 +121,7 @@ An [`aws_cred`](#aws-aws-cred) block (within [`aws`](#aws)) supports the followi
 
 A [`byoc`](#aws-byoc) block (within [`aws`](#aws)) supports the following:
 
-<a id="aws-byoc-connections"></a>&#x2022; [`connections`](#aws-byoc-connections) - Optional Block<br>List of Bring You Own Connections. These AWS Direct Connect connections are not managed by F5XC but will be used for connecting sites and REs<br>See [Connections](#aws-byoc-connections) below.
+<a id="aws-byoc-connections"></a>&#x2022; [`connections`](#aws-byoc-connections) - Optional Block<br>List of Bring You Own Connections. These AWS Direct Connect connections are not managed by XCSH but will be used for connecting sites and REs<br>See [Connections](#aws-byoc-connections) below.
 
 #### AWS Byoc Connections
 
@@ -144,7 +142,7 @@ during create<br>See [Metadata](#aws-byoc-connections-metadata) below.
 
 <a id="name-ebc6a3"></a>&#x2022; [`system_generated_name`](#name-ebc6a3) - Optional Block<br>Enable this option
 
-<a id="aws-byoc-connections-tags"></a>&#x2022; [`tags`](#aws-byoc-connections-tags) - Optional Block<br>AWS Tags is a label consisting of a user-defined key and value. It helps to manage, identify, organize, search for, and filter resources in AWS console. Specified tags will be added to Virtual interface along with any F5XC specific tags
+<a id="aws-byoc-connections-tags"></a>&#x2022; [`tags`](#aws-byoc-connections-tags) - Optional Block<br>AWS Tags is a label consisting of a user-defined key and value. It helps to manage, identify, organize, search for, and filter resources in AWS console. Specified tags will be added to Virtual interface along with any XCSH specific tags
 
 <a id="aws-byoc-connections-user-assigned-name"></a>&#x2022; [`user_assigned_name`](#aws-byoc-connections-user-assigned-name) - Optional String<br>User is managing the AWS resource name
 
@@ -157,7 +155,7 @@ traffic from a Direct Connect.. The only possible value is `PRIVATE`
 
 An [`auth_key`](#aws-byoc-connections-auth-key) block (within [`aws.byoc.connections`](#aws-byoc-connections)) supports the following:
 
-<a id="info-79ff82"></a>&#x2022; [`blindfold_secret_info`](#info-79ff82) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-79ff82) below.
+<a id="info-79ff82"></a>&#x2022; [`blindfold_secret_info`](#info-79ff82) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-79ff82) below.
 
 <a id="info-dc68b3"></a>&#x2022; [`clear_secret_info`](#info-dc68b3) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-dc68b3) below.
 

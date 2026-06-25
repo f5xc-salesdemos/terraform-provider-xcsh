@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_certificate_chain Data Source - terraform-provider-xcsh"
+page_title: "xcsh_certificate_chain Data Source - xcsh"
 subcategory: "Certificates"
 description: |-
   Retrieves information about an existing Certificate Chain resource in F5 Distributed Cloud for certificate chain configuration for TLS.
@@ -9,7 +9,7 @@ description: |-
 
 Retrieves information about a Certificate Chain resource in F5 Distributed Cloud for certificate chain configuration for TLS. This is a read-only data source.
 
-~> **Note** Please refer to [Certificate Chain API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/certificates/) to learn more.
+~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -43,8 +43,6 @@ output "certificate_chain_id" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 

@@ -2141,12 +2141,12 @@ var CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFinancialServic
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel represents flight block
 type CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel struct {
-	Checkingggg *CDNLoadBalancerEmptyModel `tfsdk:"checkingggg"`
+	Checkinggggg *CDNLoadBalancerEmptyModel `tfsdk:"checkinggggg"`
 }
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModelAttrTypes defines the attribute types for CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModel
 var CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelFlightModelAttrTypes = map[string]attr.Type{
-	"checkingggg": types.ObjectType{AttrTypes: map[string]attr.Type{}},
+	"checkinggggg": types.ObjectType{AttrTypes: map[string]attr.Type{}},
 }
 
 // CDNLoadBalancerBotDefensePolicyProtectedAppEndpointsFlowLabelProfileManagementModel represents profile_management block
@@ -8086,7 +8086,7 @@ func (r *CDNLoadBalancerResource) Schema(ctx context.Context, req resource.Schem
 													MarkdownDescription: "Bot Defense Flow Label Flight Category. Bot Defense Flow Label Flight Category.",
 													Attributes:          map[string]schema.Attribute{},
 													Blocks: map[string]schema.Block{
-														"checkingggg": schema.SingleNestedBlock{
+														"checkinggggg": schema.SingleNestedBlock{
 															MarkdownDescription: "Enable this option",
 														},
 													},

@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_namespace Data Source - terraform-provider-xcsh"
+page_title: "xcsh_namespace Data Source - xcsh"
 subcategory: "Organization"
 description: |-
   Retrieves information about an existing namespace. Name of the object is name of the namespace. in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }

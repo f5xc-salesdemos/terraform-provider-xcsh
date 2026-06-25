@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_tcp_loadbalancer Data Source - terraform-provider-xcsh"
+page_title: "xcsh_tcp_loadbalancer Data Source - xcsh"
 subcategory: "Load Balancing"
 description: |-
   Retrieves information about an existing TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools.
@@ -9,7 +9,7 @@ description: |-
 
 Retrieves information about a TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools. This is a read-only data source.
 
-~> **Note** Please refer to [TCP Loadbalancer API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/virtual/) to learn more.
+~> **Note** For more information about this data source, please refer to the [F5 XC API Documentation](https://docs.cloud.f5.com/docs/api/).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -43,37 +43,6 @@ output "tcp_loadbalancer_id" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
-
-~> **Dependencies** — This resource requires: `origin_pool`.
-
-### Minimum Configuration
-
-Required fields:
-
-- `name`
-- `namespace`
-- `origin_pools`
-
-**Example (API format):**
-
-```yaml
-apiVersion: v1
-kind: tcp_loadbalancer
-metadata:
-  name: database-lb
-  namespace: default
-spec:
-  listener:
-    port: 5432
-    protocol: "TCP"
-  origin_pools:
-    - pool_name: postgres-cluster
-  advertise:
-    - public_ip: true
-
-```
 
 ### Metadata Argument Reference
 

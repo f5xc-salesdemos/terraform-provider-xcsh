@@ -1,5 +1,5 @@
 ---
-page_title: "xcsh_api_testing Resource - terraform-provider-xcsh"
+page_title: "xcsh_api_testing Resource - xcsh"
 subcategory: "API Security"
 description: |-
   Manages an API Testing resource in F5 Distributed Cloud.
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5xc-salesdemos/f5xc"
       version = ">= 0.1.0"
     }
   }
@@ -62,8 +62,6 @@ resource "xcsh_api_testing" "example" {
 ## Argument Reference
 -> **Syntax Rule:** This provider uses OneOf groups for mutually exclusive options. Fields documented as "Optional Block" use empty block syntax `field_name {}`, **never** `field_name = true`. Boolean attributes (like `add_hsts`, `http_redirect`) use `= true/false` as normal.
 
-
-🔶 **High Risk Operations** — Some operations on this resource have high danger level. Destructive operations may require confirmation.
 
 ### Metadata Argument Reference
 
@@ -140,7 +138,7 @@ An [`api_key`](#domains-credentials-api-key) block (within [`domains.credentials
 
 A [`value`](#domains-credentials-api-key-value) block (within [`domains.credentials.api_key`](#domains-credentials-api-key)) supports the following:
 
-<a id="info-bf6763"></a>&#x2022; [`blindfold_secret_info`](#info-bf6763) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-bf6763) below.
+<a id="info-bf6763"></a>&#x2022; [`blindfold_secret_info`](#info-bf6763) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-bf6763) below.
 
 <a id="info-b50323"></a>&#x2022; [`clear_secret_info`](#info-b50323) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-b50323) below.
 
@@ -164,7 +162,7 @@ A [`basic_auth`](#domains-credentials-basic-auth) block (within [`domains.creden
 
 A [`password`](#domains-credentials-basic-auth-password) block (within [`domains.credentials.basic_auth`](#domains-credentials-basic-auth)) supports the following:
 
-<a id="info-8ba200"></a>&#x2022; [`blindfold_secret_info`](#info-8ba200) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-8ba200) below.
+<a id="info-8ba200"></a>&#x2022; [`blindfold_secret_info`](#info-8ba200) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-8ba200) below.
 
 <a id="info-1c1b32"></a>&#x2022; [`clear_secret_info`](#info-1c1b32) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-1c1b32) below.
 
@@ -186,7 +184,7 @@ A [`bearer_token`](#domains-credentials-bearer-token) block (within [`domains.cr
 
 A [`token`](#domains-credentials-bearer-token-token) block (within [`domains.credentials.bearer_token`](#domains-credentials-bearer-token)) supports the following:
 
-<a id="info-961400"></a>&#x2022; [`blindfold_secret_info`](#info-961400) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-961400) below.
+<a id="info-961400"></a>&#x2022; [`blindfold_secret_info`](#info-961400) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-961400) below.
 
 <a id="info-35b8eb"></a>&#x2022; [`clear_secret_info`](#info-35b8eb) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-35b8eb) below.
 
@@ -214,7 +212,7 @@ A [`login_endpoint`](#domains-credentials-login-endpoint) block (within [`domain
 
 A [`json_payload`](#payload-c266f9) block (within [`domains.credentials.login_endpoint`](#domains-credentials-login-endpoint)) supports the following:
 
-<a id="info-a09a15"></a>&#x2022; [`blindfold_secret_info`](#info-a09a15) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by F5XC Secret Management<br>See [Blindfold Secret Info](#info-a09a15) below.
+<a id="info-a09a15"></a>&#x2022; [`blindfold_secret_info`](#info-a09a15) - Optional Block<br>BlindfoldSecretInfoType specifies information about the Secret managed by XCSH Secret Management<br>See [Blindfold Secret Info](#info-a09a15) below.
 
 <a id="info-cd9709"></a>&#x2022; [`clear_secret_info`](#info-cd9709) - Optional Block<br>ClearSecretInfoType specifies information about the Secret that is not encrypted<br>See [Clear Secret Info](#info-cd9709) below.
 
