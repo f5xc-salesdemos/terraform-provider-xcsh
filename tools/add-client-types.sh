@@ -7,8 +7,8 @@
 
 set -e
 
-CLIENT_FILE="/tmp/terraform-provider-f5xc/internal/client/client.go"
-PROVIDER_DIR="/tmp/terraform-provider-f5xc/internal/provider"
+CLIENT_FILE="/tmp/terraform-provider-xcsh/internal/client/client.go"
+PROVIDER_DIR="/tmp/terraform-provider-xcsh/internal/provider"
 
 # Extract resource names from generated files
 # Using find instead of ls | grep to avoid SC2010
@@ -36,7 +36,7 @@ for resource in $RESOURCES; do
 
     cat >> $TEMP_FILE << EOF
 
-// $title_case represents a F5XC $title_case
+// $title_case represents an XCSH $title_case
 type $title_case struct {
 	Metadata Metadata        \`json:"metadata"\`
 	Spec     ${title_case}Spec \`json:"spec"\`

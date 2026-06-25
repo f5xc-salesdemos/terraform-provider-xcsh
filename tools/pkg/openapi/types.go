@@ -47,7 +47,7 @@ type Schema struct {
 	XVesValidationRules map[string]string `json:"x-ves-validation-rules"`
 	XVesProtoMessage    string            `json:"x-ves-proto-message"`
 
-	// Enrichment extensions (x-f5xc-*) - added by f5xc-api-enriched repository
+	// Enrichment extensions (x-f5xc-*) - added by api-specs-enriched repository
 	XF5XCCategory         string   `json:"x-f5xc-category"`
 	XF5XCRequiresTier     string   `json:"x-f5xc-requires-tier"`
 	XF5XCComplexity       string   `json:"x-f5xc-complexity"`
@@ -232,7 +232,7 @@ func (s *Schema) HasProperties() bool {
 }
 
 // =============================================================================
-// V2 Spec Types - For parsing enriched API specifications from f5xc-api-enriched
+// V2 Spec Types - For parsing enriched API specifications from api-specs-enriched
 // =============================================================================
 
 // Index represents the index.json manifest file in v2 spec structure.

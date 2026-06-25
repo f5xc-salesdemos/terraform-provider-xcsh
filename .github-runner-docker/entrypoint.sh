@@ -2,7 +2,7 @@
 # Entrypoint for GitHub Actions Runner Container
 #
 # Required environment variables:
-#   GITHUB_REPOSITORY  - owner/repo (e.g., robinmordasiewicz/terraform-provider-f5xc)
+#   GITHUB_REPOSITORY  - owner/repo (e.g., robinmordasiewicz/terraform-provider-xcsh)
 #   GITHUB_TOKEN       - Personal Access Token with repo scope
 #
 # Optional environment variables:
