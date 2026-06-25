@@ -109,4 +109,4 @@ docker-compose -f docker-compose.yml --env-file runner1.env up -d
 
 ### Persistent Caching
 
-The work directory is persisted in a Docker volume (`f5xc-runner-work`) for caching Go modules and build artifacts between runs.
+The work directory is persisted in a Docker volume (`xcsh-runner-work`) for caching Go modules and build artifacts between runs.

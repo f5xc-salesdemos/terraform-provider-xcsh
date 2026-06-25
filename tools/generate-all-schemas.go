@@ -163,7 +163,7 @@ func main() {
 	fmt.Println("\n🎉 Batch generation complete!")
 }
 
-// processV2Specs processes v2 format specs (domain-organized files from f5xc-api-enriched)
+// processV2Specs processes v2 format specs (domain-organized files from api-specs-enriched)
 func processV2Specs(specDir string) ([]GenerationResult, int, int) {
 	// Parse the index.json to get domain information
 	index, err := openapi.ParseIndexFromDir(specDir)

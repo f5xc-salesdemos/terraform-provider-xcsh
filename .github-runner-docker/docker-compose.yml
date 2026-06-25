@@ -18,8 +18,8 @@ services:
         - RUNNER_VERSION=2.321.0
         - GO_VERSION=1.24.2
         - TERRAFORM_VERSION=1.9.8
-    image: f5xc-runner:latest
-    container_name: f5xc-github-runner
+    image: xcsh-runner:latest
+    container_name: xcsh-github-runner
     restart: unless-stopped
     environment:
       # Required: Repository in owner/repo format
@@ -27,7 +27,7 @@ services:
       # Required: Personal Access Token with repo scope
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       # Optional: Custom runner name (default: container hostname)
-      - RUNNER_NAME=${RUNNER_NAME:-f5xc-container-runner}
+      - RUNNER_NAME=${RUNNER_NAME:-xcsh-container-runner}
       # Optional: Additional labels
       - RUNNER_LABELS=${RUNNER_LABELS:-self-hosted,Linux,X64,container}
       # F5 XC API credentials (passed to workflow jobs)
@@ -50,4 +50,4 @@ services:
 
 volumes:
   runner-work:
-    name: f5xc-runner-work
+    name: xcsh-runner-work
