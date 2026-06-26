@@ -14,7 +14,7 @@ DOCS_DIR=docs
 SPEC_DIR?=docs/specifications/api
 
 # API spec source
-ENRICHED_REPO?=f5xc-salesdemos/api-specs-enriched
+ENRICHED_REPO?=f5-sales-demo/api-specs-enriched
 
 # Go commands
 GO=go
@@ -223,8 +223,8 @@ regenerate: clean-generated generate
 # Install provider locally for testing
 install: build
 	@echo "Installing provider locally..."
-	mkdir -p ~/.terraform.d/plugins/registry.terraform.io/f5xc-salesdemos/xcsh/$(VERSION)/$(GOOS)_$(GOARCH)
-	cp $(BINARY_NAME) ~/.terraform.d/plugins/registry.terraform.io/f5xc-salesdemos/xcsh/$(VERSION)/$(GOOS)_$(GOARCH)/
+	mkdir -p ~/.terraform.d/plugins/registry.terraform.io/f5-sales-demo/xcsh/$(VERSION)/$(GOOS)_$(GOARCH)
+	cp $(BINARY_NAME) ~/.terraform.d/plugins/registry.terraform.io/f5-sales-demo/xcsh/$(VERSION)/$(GOOS)_$(GOARCH)/
 
 # Acceptance testing and cleanup
 testacc:
