@@ -34,7 +34,7 @@ jobs:
       - name: Download specs if not present
         env:
           GH_TOKEN: ${{ github.token }}
-          ENRICHED_REPO: f5xc-salesdemos/api-specs-enriched
+          ENRICHED_REPO: f5-sales-demo/api-specs-enriched
         run: |
           SPEC_COUNT=$(find "${{ inputs.spec-dir }}" -name "*.json" -type f 2>/dev/null | wc -l)
           if [ "$SPEC_COUNT" -eq "0" ]; then

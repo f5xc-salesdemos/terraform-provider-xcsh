@@ -1,4 +1,4 @@
-module github.com/f5xc-salesdemos/terraform-provider-xcsh
+module github.com/f5-sales-demo/terraform-provider-xcsh
 
 go 1.25.0
 

@@ -47,7 +47,7 @@ terraform {
   required_version = ">= 1.0"
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5-sales-demo/xcsh"
       version = ">= 2.5"
     }
   }
@@ -565,5 +565,5 @@ rate_limit {
 
 ## Support
 
-- **Provider Issues:** [GitHub Issues](https://github.com/f5xc-salesdemos/terraform-provider-xcsh/issues)
+- **Provider Issues:** [GitHub Issues](https://github.com/f5-sales-demo/terraform-provider-xcsh/issues)
 - **F5 Support:** [F5 Distributed Cloud Support](https://docs.cloud.f5.com/docs/support)

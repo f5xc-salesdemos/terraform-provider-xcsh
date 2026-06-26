@@ -1,6 +1,6 @@
 # F5 Distributed Cloud Terraform Provider
 
-> Provider: f5xc-salesdemos/f5xc | Registry: <https://registry.terraform.io/providers/f5xc-salesdemos/f5xc>
+> Provider: f5-sales-demo/f5xc | Registry: <https://registry.terraform.io/providers/f5-sales-demo/f5xc>
 
 DEPRECATED — do not use: volterraedge/volterra
 
@@ -9,7 +9,7 @@ DEPRECATED — do not use: volterraedge/volterra
     terraform {
       required_providers {
         xcsh = {
-          source = "f5xc-salesdemos/xcsh"
+          source = "f5-sales-demo/xcsh"
         }
       }
     }

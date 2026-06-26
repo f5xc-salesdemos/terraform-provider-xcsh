@@ -137,7 +137,7 @@ Contact F5 support with your tenant ID and the specific error message.
 
 ## Related Documentation
 
-- [Addon Activation Guide](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/guides/addon-activation)
-- [xcsh_addon_service Data Source](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/data-sources/addon_service)
-- [xcsh_addon_service_activation_status Data Source](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/data-sources/addon_service_activation_status)
-- [xcsh_addon_subscription Resource](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/resources/addon_subscription)
+- [Addon Activation Guide](https://registry.terraform.io/providers/f5-sales-demo/f5xc/latest/docs/guides/addon-activation)
+- [xcsh_addon_service Data Source](https://registry.terraform.io/providers/f5-sales-demo/f5xc/latest/docs/data-sources/addon_service)
+- [xcsh_addon_service_activation_status Data Source](https://registry.terraform.io/providers/f5-sales-demo/f5xc/latest/docs/data-sources/addon_service_activation_status)
+- [xcsh_addon_subscription Resource](https://registry.terraform.io/providers/f5-sales-demo/f5xc/latest/docs/resources/addon_subscription)

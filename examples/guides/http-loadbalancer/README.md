@@ -110,10 +110,10 @@ terraform destroy
 ## Full Documentation
 
 For detailed documentation including architecture diagrams and troubleshooting, see:
-[HTTP Load Balancer Guide](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs/guides/http-loadbalancer)
+[HTTP Load Balancer Guide](https://registry.terraform.io/providers/f5-sales-demo/f5xc/latest/docs/guides/http-loadbalancer)
 
 ## Support
 
-- [F5XC Provider Documentation](https://registry.terraform.io/providers/f5xc-salesdemos/f5xc/latest/docs)
+- [F5XC Provider Documentation](https://registry.terraform.io/providers/f5-sales-demo/f5xc/latest/docs)
 - [F5 Distributed Cloud Documentation](https://docs.cloud.f5.com/)
-- [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh/issues)
+- [GitHub Issues](https://GitHub.com/f5-sales-demo/terraform-provider-xcsh/issues)

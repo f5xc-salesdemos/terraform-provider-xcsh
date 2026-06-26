@@ -35,7 +35,7 @@ Before you begin, ensure you have:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/f5xc-salesdemos/terraform-provider-xcsh.git
+git clone https://github.com/f5-sales-demo/terraform-provider-xcsh.git
 cd terraform-provider-xcsh/examples/guides/http-loadbalancer
 ```
 
@@ -273,4 +273,4 @@ Now that you have a basic HTTP Load Balancer deployed, consider exploring:
 
 - **Provider Documentation:** [F5XC Provider](../index.md)
 - **F5 Documentation:** [F5 Distributed Cloud Docs](https://docs.cloud.f5.com/)
-- **Issues:** [GitHub Issues](https://github.com/f5xc-salesdemos/terraform-provider-xcsh/issues)
+- **Issues:** [GitHub Issues](https://github.com/f5-sales-demo/terraform-provider-xcsh/issues)

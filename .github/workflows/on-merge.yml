@@ -275,7 +275,7 @@ jobs:
       - name: Download specs if not present
         env:
           GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
-          ENRICHED_REPO: f5xc-salesdemos/api-specs-enriched
+          ENRICHED_REPO: f5-sales-demo/api-specs-enriched
         run: |
           SPEC_DIR="docs/specifications/api"
           SPEC_COUNT=$(find "$SPEC_DIR" -name "*.json" -type f 2>/dev/null | wc -l)
@@ -433,7 +433,7 @@ jobs:
 
             required_providers {
               xcsh = {
-                source  = \"f5xc-salesdemos/xcsh\"
+                source  = \"f5-sales-demo/xcsh\"
                 version = \">= 0.1.0\"
               }
             }

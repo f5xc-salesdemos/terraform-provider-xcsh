@@ -44,7 +44,7 @@ env:
   SPEC_DIR: docs/specifications/api
   PR_TITLE: "feat: update F5 Distributed Cloud OpenAPI specifications"
   # V2 spec source configuration
-  ENRICHED_REPO: f5xc-salesdemos/api-specs-enriched
+  ENRICHED_REPO: f5-sales-demo/api-specs-enriched
   # Default to v2 specs unless overridden
   SPEC_SOURCE: ${{ inputs.spec_source || 'v2' }}
   SPEC_VERSION: ${{ inputs.spec_version || 'latest' }}

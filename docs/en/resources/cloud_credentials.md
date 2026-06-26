@@ -9,7 +9,7 @@ description: |-
 
 Manages a Cloud Credentials resource in F5 Distributed Cloud for api to create cloud_credentials object. configuration.
 
-~> **Note** Please refer to [Cloud Credentials API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/cloud_infrastructure/) to learn more.
+~> **Note** Please refer to [Cloud Credentials API docs](https://f5-sales-demo.GitHub.io/api-specs-enriched/api-reference/cloud_infrastructure/) to learn more.
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5-sales-demo/xcsh"
       version = ">= 0.1.0"
     }
   }

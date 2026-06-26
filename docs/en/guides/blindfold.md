@@ -86,7 +86,7 @@ export XCSH_P12_PASSWORD="your-p12-password"  # pragma: allowlist secret
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh.git
+git clone https://GitHub.com/f5-sales-demo/terraform-provider-xcsh.git
 cd terraform-provider-xcsh/examples/guides/blindfold
 ```
 
@@ -516,4 +516,4 @@ Now that you understand blindfold encryption, explore related resources:
 - **Provider Documentation:** [F5XC Provider](../index.md)
 - **F5 Documentation:** [F5 Distributed Cloud Docs](https://docs.cloud.f5.com/)
 - **Secret Management:** [F5XC Secret Management](https://docs.cloud.f5.com/docs/how-to/secrets-management)
-- **Issues:** [GitHub Issues](https://GitHub.com/f5xc-salesdemos/terraform-provider-xcsh/issues)
+- **Issues:** [GitHub Issues](https://GitHub.com/f5-sales-demo/terraform-provider-xcsh/issues)

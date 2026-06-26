@@ -9,7 +9,7 @@ description: |-
 
 Manages a CDN Load Balancer resource in F5 Distributed Cloud for content delivery and edge caching with load balancing.
 
-~> **Note** Please refer to [CDN Loadbalancer API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/cdn/) to learn more.
+~> **Note** Please refer to [CDN Loadbalancer API docs](https://f5-sales-demo.GitHub.io/api-specs-enriched/api-reference/cdn/) to learn more.
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5-sales-demo/xcsh"
       version = ">= 0.1.0"
     }
   }

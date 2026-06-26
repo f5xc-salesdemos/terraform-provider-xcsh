@@ -1,9 +1,9 @@
 {
   "version": "0.1.0",
   "provider": {
-    "source": "f5xc-salesdemos/f5xc",
-    "registry": "https://registry.terraform.io/providers/f5xc-salesdemos/f5xc",
-    "required_block": "terraform {\n  required_providers {\n    xcsh = {\n      source = \"f5xc-salesdemos/xcsh\"\n    }\n  }\n}",
+    "source": "f5-sales-demo/f5xc",
+    "registry": "https://registry.terraform.io/providers/f5-sales-demo/f5xc",
+    "required_block": "terraform {\n  required_providers {\n    xcsh = {\n      source = \"f5-sales-demo/xcsh\"\n    }\n  }\n}",
     "config_block": "provider \"xcsh\" {}",
     "auth_methods": [
       "REQUIRED: every .tf must contain a `provider \"xcsh\" {}` block. Without it Terraform errors: \"Provider requires explicit configuration. Add a provider block\".",

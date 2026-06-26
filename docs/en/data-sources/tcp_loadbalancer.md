@@ -9,7 +9,7 @@ description: |-
 
 Retrieves information about a TCP Load Balancer resource in F5 Distributed Cloud for load balancing TCP traffic across origin pools. This is a read-only data source.
 
-~> **Note** Please refer to [TCP Loadbalancer API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/virtual/) to learn more.
+~> **Note** Please refer to [TCP Loadbalancer API docs](https://f5-sales-demo.GitHub.io/api-specs-enriched/api-reference/virtual/) to learn more.
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5-sales-demo/xcsh"
       version = ">= 0.1.0"
     }
   }

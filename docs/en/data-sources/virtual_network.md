@@ -9,7 +9,7 @@ description: |-
 
 Manages virtual network in given namespace. in F5 Distributed Cloud. This is a read-only data source.
 
-~> **Note** Please refer to [Virtual Network API docs](https://f5xc-salesdemos.GitHub.io/api-specs-enriched/api-reference/network/) to learn more.
+~> **Note** Please refer to [Virtual Network API docs](https://f5-sales-demo.GitHub.io/api-specs-enriched/api-reference/network/) to learn more.
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ terraform {
 
   required_providers {
     xcsh = {
-      source  = "f5xc-salesdemos/xcsh"
+      source  = "f5-sales-demo/xcsh"
       version = ">= 0.1.0"
     }
   }
